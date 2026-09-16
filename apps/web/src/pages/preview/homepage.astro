@@ -21,4 +21,4 @@ Astro.response.headers.set('Cache-Control', 'no-store')
 Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow')
 ---
 
-{content ? <SiteLayout title={content.seo.title ?? undefined} description={content.seo.description ?? undefined} robots="noindex,nofollow"><App client:load content={content} /></SiteLayout> : <html lang="ru"><head><meta charset="utf-8" /><meta name="robots" content="noindex,nofollow" /><title>Preview access denied</title></head><body><main><h1>Доступ к предпросмотру запрещён</h1></main></body></html>}
+{content ? <SiteLayout site={content.site} title={content.seo.title ?? undefined} description={content.seo.description ?? undefined} robots="noindex,nofollow"><App client:load content={content} /></SiteLayout> : <html lang="ru"><head><meta charset="utf-8" /><meta name="robots" content="noindex,nofollow" /><title>Preview access denied</title></head><body><main><h1>Доступ к предпросмотру запрещён</h1></main></body></html>}

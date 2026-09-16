@@ -4,4 +4,4 @@ import { loadCatalog } from '../../content/loadCatalog'
 import SiteLayout from '../../layouts/SiteLayout.astro'
 const dto = await loadCatalog(import.meta.env.CMS_URL, 'tournaments')
 ---
-<SiteLayout title={dto.page.seo.title ?? dto.page.title} description={dto.page.seo.description ?? dto.page.intro} canonical={dto.page.seo.canonical} robots={dto.page.seo.robots} socialImage={dto.page.seo.socialImage?.url} webmasterVerification={dto.site.analytics.vendors.webmasterVerification}><CatalogPage client:load dto={dto} /></SiteLayout>
+<SiteLayout site={dto.site} title={dto.page.seo.title ?? dto.page.title} description={dto.page.seo.description ?? dto.page.intro} canonical={dto.page.seo.canonical} robots={dto.page.seo.robots} socialImage={dto.page.seo.socialImage?.url} webmasterVerification={dto.site.analytics.vendors.webmasterVerification}><CatalogPage client:load dto={dto} /></SiteLayout>

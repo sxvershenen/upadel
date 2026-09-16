@@ -37,7 +37,7 @@ type HeaderScrollTarget = HeaderEventTarget & {
   cancelAnimationFrame: (handle: number) => void
 }
 
-/** Rebinds the global scroll listener after Astro/Swup swaps the page surface. */
+/** Keeps one global scroll listener and resynchronizes state after the Swup surface swaps. */
 export function bindHeaderScroll({ scrollTarget, lifecycleTarget, onScroll }: { scrollTarget: HeaderScrollTarget; lifecycleTarget: HeaderEventTarget; onScroll: (scrollY: number) => void }): () => void {
   let frame: number | null = null
   const update = () => {
@@ -48,18 +48,16 @@ export function bindHeaderScroll({ scrollTarget, lifecycleTarget, onScroll }: { 
     if (frame !== null) return
     frame = scrollTarget.requestAnimationFrame(update)
   }
-  const bind = () => {
-    scrollTarget.removeEventListener('scroll', handleScroll)
-    scrollTarget.addEventListener('scroll', handleScroll, { passive: true })
-    update()
-  }
-  const handleSwap: EventListener = () => bind()
+  const handleSwap: EventListener = () => update()
 
-  bind()
+  scrollTarget.addEventListener('scroll', handleScroll, { passive: true })
+  update()
   lifecycleTarget.addEventListener('astro:after-swap', handleSwap)
+  lifecycleTarget.addEventListener('swup:page:view', handleSwap)
   return () => {
     scrollTarget.removeEventListener('scroll', handleScroll)
     lifecycleTarget.removeEventListener('astro:after-swap', handleSwap)
+    lifecycleTarget.removeEventListener('swup:page:view', handleSwap)
     if (frame !== null) scrollTarget.cancelAnimationFrame(frame)
   }
 }
@@ -72,7 +70,8 @@ export type HeaderScrollState = {
 }
 
 export function initialHeaderScrollState(scrollY = 0): HeaderScrollState {
-  return { anchorY: Math.max(0, scrollY), compact: false, direction: null, lastY: Math.max(0, scrollY) }
+  const initialY = Math.max(0, scrollY)
+  return { anchorY: initialY, compact: initialY > HEADER_TOP_THRESHOLD, direction: null, lastY: initialY }
 }
 
 export function nextHeaderScrollState(state: HeaderScrollState, scrollY: number): HeaderScrollState {

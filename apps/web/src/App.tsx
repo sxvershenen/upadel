@@ -1,6 +1,4 @@
 import { MotionConfig } from "framer-motion";
-import { DesktopHeader } from "./components/navigation/DesktopHeader";
-import { MobileBottomNav } from "./components/navigation/MobileBottomNav";
 import { CookieBanner } from "./components/CookieBanner";
 import { Hero } from "./sections/Hero";
 import { Benefits } from "./sections/Benefits";
@@ -70,8 +68,6 @@ export default function App({ content, view = "home" }: AppProps) {
     <ExternalAnalytics vendors={content.site.analytics.vendors} />
     <CoolModeEffects />
     <div className="min-h-screen bg-page text-ink" onClickCapture={handleAppClick}>
-      <DesktopHeader />
-
       <main>
         {visibleHomepageSections(content.sections).map((key) => {
           const Section = sectionComponents[key];
@@ -81,7 +77,6 @@ export default function App({ content, view = "home" }: AppProps) {
 
       <Footer />
 
-      <MobileBottomNav />
       <CookieBanner />
     </div>
     </MotionConfig>

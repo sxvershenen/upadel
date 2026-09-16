@@ -65,7 +65,7 @@ function LeadForm({ site, lead, onClose, onContact }: { site: SiteDTO; lead: Lea
   </form>
 }
 
-export function ActionLayerProvider({ site, children }: { site: SiteDTO; children: ReactNode }) {
+export function ActionLayerProvider({ site, children, captureContacts = true }: { site: SiteDTO; children: ReactNode; captureContacts?: boolean }) {
   const [channel, setChannel] = useState<Channel | null>(null)
   const [lead, setLead] = useState<LeadRequest | null>(null)
   const [external, setExternal] = useState<ExternalRequest | null>(null)
@@ -75,6 +75,7 @@ export function ActionLayerProvider({ site, children }: { site: SiteDTO; childre
     if (/^https:\/\//.test(next.href)) setExternal(next)
   }
   useEffect(() => {
+    if (!captureContacts) return
     const capture = (event: globalThis.MouseEvent) => {
       if (!(event.target instanceof Element)) return
       const anchor = event.target.closest('a[href]')
@@ -85,7 +86,7 @@ export function ActionLayerProvider({ site, children }: { site: SiteDTO; childre
     }
     document.addEventListener('click', capture, true)
     return () => document.removeEventListener('click', capture, true)
-  }, [site.contactConfirmation.channels])
+  }, [captureContacts, site.contactConfirmation.channels])
   return <ActionLayerContext.Provider value={{ requestContact, requestLead, requestExternal }}>{children}
     <Dialog open={channel !== null} onClose={() => setChannel(null)} title={site.contactConfirmation.dialogTitle}>{channel && <div className="text-center">{site.contactConfirmation.avatar ? <img src={site.contactConfirmation.avatar.url} alt={site.contactConfirmation.avatar.alt} className="mx-auto h-20 w-20 rounded-full object-cover" /> : <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-lime-soft text-ink">{channel.channel === 'phone' ? <Phone /> : channel.channel === 'email' ? <Mail /> : <Send />}</span>}<p className="type-caption mt-5 text-ink-soft">{channel.label}</p><p className="type-title-card mt-1 break-all text-ink">{channel.displayValue}</p><div className="mt-7 flex justify-center gap-3"><Button variant="neutral" onClick={() => setChannel(null)}>{site.contactConfirmation.cancelLabel}</Button><ButtonLink data-contact-confirmed data-analytics-ignore href={channel.destination} target={channel.destination.startsWith('http') ? '_blank' : undefined} rel={channel.destination.startsWith('http') ? 'noreferrer' : undefined}>{channel.channel === 'phone' ? 'Позвонить' : site.contactConfirmation.continueLabel}</ButtonLink></div></div>}</Dialog>
     <Dialog open={lead !== null} onClose={() => setLead(null)} title={site.contactConfirmation.formTitle}>{lead && <LeadForm site={site} lead={lead} onClose={() => setLead(null)} onContact={(kind) => { requestContact(kind) }} />}</Dialog>

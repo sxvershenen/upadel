@@ -84,6 +84,8 @@ export function GlobalPageTransition() {
         },
         'page:view': (visit) => {
           if (visit.to.document) updateMetadata(visit.to.document)
+          // Astro islands removed by Swup otherwise never receive their unmount event.
+          document.dispatchEvent(new Event('astro:after-swap'))
         },
         'visit:abort': () => {
           ballRef.current?.cancel()

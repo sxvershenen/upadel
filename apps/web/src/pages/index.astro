@@ -6,6 +6,6 @@ import SiteLayout from '../layouts/SiteLayout.astro'
 const content = await loadHomepage({ cmsURL: import.meta.env.CMS_URL })
 ---
 
-<SiteLayout title={content.seo.title ?? undefined} description={content.seo.description ?? undefined} webmasterVerification={content.site.analytics.vendors.webmasterVerification}>
+<SiteLayout site={content.site} title={content.seo.title ?? undefined} description={content.seo.description ?? undefined} webmasterVerification={content.site.analytics.vendors.webmasterVerification}>
   <App client:load content={content} />
 </SiteLayout>

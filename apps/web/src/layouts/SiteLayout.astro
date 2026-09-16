@@ -1,5 +1,7 @@
 ---
 import '../index.css'
+import type { SiteDTO } from '@unlim/content-contract'
+import { SiteChromeIsland } from '../components/navigation/SiteChromeIsland'
 import { GlobalPageTransition } from '../transition-demo/GlobalPageTransition'
 
 interface Props {
@@ -9,6 +11,7 @@ interface Props {
   canonical?: string | null
   socialImage?: string | null
   webmasterVerification?: string | null
+  site?: SiteDTO
 }
 
 const {
@@ -18,6 +21,7 @@ const {
   canonical,
   socialImage,
   webmasterVerification,
+  site,
 } = Astro.props
 const robotsContent = robots?.replace('-', ', ')
 const publicOrigin = import.meta.env.PUBLIC_SITE_URL ?? Astro.url.origin
@@ -48,6 +52,7 @@ const enableGlobalTransitions = !Astro.url.pathname.startsWith('/transitions/') 
   </head>
   <body>
     {enableGlobalTransitions && <GlobalPageTransition client:load />}
+    {site && <SiteChromeIsland client:load site={site} />}
     <div id="swup" data-swup-container>
       <slot />
     </div>

@@ -10,6 +10,6 @@ export async function getStaticPaths() {
 }
 const { dto } = Astro.props as { dto: ThematicPageDTO }
 ---
-<SiteLayout title={dto.page.seo.title ?? dto.page.title} description={dto.page.seo.description ?? dto.page.intro} canonical={dto.page.seo.canonical} robots={dto.page.seo.robots} socialImage={dto.page.seo.socialImage?.url} webmasterVerification={dto.site.analytics.vendors.webmasterVerification}>
+<SiteLayout site={dto.site} title={dto.page.seo.title ?? dto.page.title} description={dto.page.seo.description ?? dto.page.intro} canonical={dto.page.seo.canonical} robots={dto.page.seo.robots} socialImage={dto.page.seo.socialImage?.url} webmasterVerification={dto.site.analytics.vendors.webmasterVerification}>
   <ThematicPage client:load dto={dto} />
 </SiteLayout>

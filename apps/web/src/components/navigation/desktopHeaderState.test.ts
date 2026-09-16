@@ -19,6 +19,11 @@ test('header returns to expanded state near the top', () => {
   assert.equal(state.direction, null)
 })
 
+test('header starts compact when hydration happens below the top threshold', () => {
+  assert.equal(initialHeaderScrollState(33).compact, true)
+  assert.equal(initialHeaderScrollState(32).compact, false)
+})
+
 test('navigation icons use stable route fallbacks', () => {
   assert.equal(navigationIconPreset('/'), 'home')
   assert.equal(navigationIconPreset('/blog'), 'article')
@@ -33,17 +38,18 @@ test('submenu keyboard actions open, close, and preserve the link fallback', () 
   assert.equal(desktopSubmenuKeyAction('ArrowDown', true), null)
 })
 
-test('header scroll binding rebinds after an Astro page swap without duplicate listeners', () => {
+test('header scroll binding syncs after an Astro page swap without duplicate listeners', () => {
   let scrollY = 80
   let nextFrame = 1
+  const frames = new Map<number, FrameRequestCallback>()
   const scrollListeners = new Set<EventListener>()
   const lifecycleListeners = new Set<EventListener>()
   const scrollTarget = {
     get scrollY() { return scrollY },
     addEventListener: (_type: string, listener: EventListener) => { scrollListeners.add(listener) },
     removeEventListener: (_type: string, listener: EventListener) => { scrollListeners.delete(listener) },
-    requestAnimationFrame: (callback: FrameRequestCallback) => { callback(0); return nextFrame++ },
-    cancelAnimationFrame: () => undefined,
+    requestAnimationFrame: (callback: FrameRequestCallback) => { const id = nextFrame++; frames.set(id, callback); return id },
+    cancelAnimationFrame: (id: number) => { frames.delete(id) },
   }
   const lifecycleTarget = {
     addEventListener: (_type: string, listener: EventListener) => { lifecycleListeners.add(listener) },
@@ -54,9 +60,12 @@ test('header scroll binding rebinds after an Astro page swap without duplicate l
 
   scrollY = 140
   scrollListeners.forEach((listener) => listener(new Event('scroll')))
+  assert.equal(scrollListeners.size, 1)
+  frames.forEach((callback, id) => { frames.delete(id); callback(0) })
   lifecycleListeners.forEach((listener) => listener(new Event('astro:after-swap')))
   scrollY = 170
   scrollListeners.forEach((listener) => listener(new Event('scroll')))
+  frames.forEach((callback, id) => { frames.delete(id); callback(0) })
   dispose()
 
   assert.deepEqual(values, [80, 140, 140, 170])

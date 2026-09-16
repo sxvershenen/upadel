@@ -6,8 +6,8 @@ const ContentContext = createContext<HomepageDTO | null>(null)
 const SiteContext = createContext<SiteDTO | null>(null)
 const HomeHrefContext = createContext('#top')
 
-export function SiteProvider({ site, children, homeHref = '#top' }: { site: SiteDTO; children: ReactNode; homeHref?: string }) {
-  return <HomeHrefContext.Provider value={homeHref}><SiteContext.Provider value={site}><ActionLayerProvider site={site}>{children}</ActionLayerProvider></SiteContext.Provider></HomeHrefContext.Provider>
+export function SiteProvider({ site, children, homeHref = '#top', captureContacts = true }: { site: SiteDTO; children: ReactNode; homeHref?: string; captureContacts?: boolean }) {
+  return <HomeHrefContext.Provider value={homeHref}><SiteContext.Provider value={site}><ActionLayerProvider site={site} captureContacts={captureContacts}>{children}</ActionLayerProvider></SiteContext.Provider></HomeHrefContext.Provider>
 }
 
 export function ContentProvider({ content, children }: { content: HomepageDTO; children: ReactNode }) {

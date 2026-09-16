@@ -6,4 +6,4 @@ import SiteLayout from '../../layouts/SiteLayout.astro'
 export async function getStaticPaths() { const catalog = await loadCatalog(import.meta.env.CMS_URL, 'blog'); return Promise.all(catalog.items.map(async ({ slug }) => ({ params: { slug }, props: { dto: await loadDetail(import.meta.env.CMS_URL, 'blog', slug) as BlogDetailDTO } }))) }
 const { dto } = Astro.props as { dto: BlogDetailDTO }
 ---
-<SiteLayout title={dto.item.seo.title ?? dto.item.title} description={dto.item.seo.description ?? dto.item.excerpt} canonical={dto.item.seo.canonical} robots={dto.item.seo.robots} socialImage={dto.item.seo.socialImage?.url ?? dto.item.image.url} webmasterVerification={dto.site.analytics.vendors.webmasterVerification}><DetailPage client:load dto={dto} /></SiteLayout>
+<SiteLayout site={dto.site} title={dto.item.seo.title ?? dto.item.title} description={dto.item.seo.description ?? dto.item.excerpt} canonical={dto.item.seo.canonical} robots={dto.item.seo.robots} socialImage={dto.item.seo.socialImage?.url ?? dto.item.image.url} webmasterVerification={dto.site.analytics.vendors.webmasterVerification}><DetailPage client:load dto={dto} /></SiteLayout>

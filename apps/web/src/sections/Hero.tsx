@@ -1,22 +1,14 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { motion } from "framer-motion";
 import { CalendarCheck, MapPin, Play, Star, Users } from "lucide-react";
 import { ContentAction } from "../components/ContentAction";
 import { useContent } from "../content/ContentContext";
 import { SplitTextReveal } from "../components/ui/SplitTextReveal";
-import { revealContainer, revealUp } from "../lib/motion";
-import { springSoft } from "../lib/motion";
 import { cn } from "../utils/cn";
 import type { MediaDTO } from "@unlim/content-contract";
 
 gsap.registerPlugin(ScrollTrigger);
-
-const heroCtaReveal = (delay: number) => ({
-  hidden: { opacity: 0, y: 18 },
-  show: { opacity: 1, y: 0, transition: { ...springSoft, delay } },
-});
 
 function HeroBackgroundMedia({ media, poster, className, setRef }: { media: MediaDTO; poster?: MediaDTO | null; className?: string; setRef?: (node: HTMLImageElement | HTMLVideoElement | null) => void }) {
   const classes = cn("absolute inset-0 h-full w-full object-cover", className);
@@ -28,10 +20,8 @@ function HeroBackgroundMedia({ media, poster, className, setRef }: { media: Medi
 function SocialProof({ className }: { className?: string }) {
   const { home } = useContent();
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ ...revealUp.show.transition, delay: 0.4 }}
+    <div
+      data-hero-social-proof=""
       className={cn("glass-overlay se-3 flex min-h-[52px] items-center gap-3 px-3.5 py-2 text-white", className)}
     >
       <div className="flex -space-x-2.5">
@@ -49,7 +39,7 @@ function SocialProof({ className }: { className?: string }) {
           <Users size={11} /> {home.hero.socialProof.caption}
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -65,6 +55,24 @@ export function Hero() {
   const replaceBrand = Boolean(site.brandLogo) && site.brandLogoMode === "replace";
   const sectionRef = useRef<HTMLDivElement>(null);
   const mediaRef = useRef<HTMLImageElement | HTMLVideoElement>(null);
+
+  useLayoutEffect(() => {
+    const section = sectionRef.current;
+    if (!section || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const ctx = gsap.context(() => {
+      const timeline = gsap.timeline({ defaults: { ease: "power3.out" } });
+      timeline
+        .fromTo("[data-hero-word]", { autoAlpha: 0, y: "0.7em", filter: "blur(5px)" }, { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 0.7, stagger: 0.045 }, 0)
+        .fromTo("[data-hero-accent]", { autoAlpha: 0, y: "0.5em", filter: "blur(5px)" }, { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 0.65 }, 0.28)
+        .fromTo("[data-hero-description]", { autoAlpha: 0, y: 28 }, { autoAlpha: 1, y: 0, duration: 0.65 }, 0.18)
+        .fromTo("[data-hero-cta]", { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.58, stagger: 0.12 }, 0.3)
+        .fromTo("[data-hero-social-proof]", { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.6 }, 0.4)
+        .fromTo("[data-hero-stat]", { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.55, stagger: 0.08 }, 0.42);
+    }, section);
+
+    return () => ctx.revert();
+  }, []);
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -125,48 +133,32 @@ export function Hero() {
       </div>
 
       <div className="container-page relative z-10 flex h-full flex-col justify-end pb-[calc(104px+env(safe-area-inset-bottom))] pt-32 sm:pb-9 lg:pb-12">
-        <motion.div
-          variants={revealContainer}
-          initial="hidden"
-          animate="show"
-          className="flex max-w-[980px] flex-col"
-        >
-          <motion.h1
-            variants={revealUp}
-            className="type-hero font-semibold text-white"
-          >
+        <div className="flex max-w-[980px] flex-col">
+          <h1 className="type-hero font-semibold text-white">
             <SplitTextReveal text={hero.titleLine} animateOnMount />
             <br />
             <SplitTextReveal text={hero.titleConnector} animateOnMount />{" "}
-            <motion.span
-              initial={{ opacity: 0, y: "0.5em", filter: "blur(5px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              transition={{ ...revealUp.show.transition, delay: 0.28 }}
-              className="text-[#c2f542]"
-            >
+            <span data-hero-accent="" className="inline-block text-[#c2f542]">
               {hero.titleAccent}
-            </motion.span>
-          </motion.h1>
-          <motion.p variants={revealUp} className="type-hero-lead mt-7 max-w-[900px] text-white/75">
+            </span>
+          </h1>
+          <p data-hero-description="" className="type-hero-lead mt-7 max-w-[900px] text-white/75">
             {hero.description}
-          </motion.p>
-          <motion.div variants={revealUp} className="mt-8 flex flex-nowrap items-center gap-2 sm:gap-3">
-            <motion.div initial="hidden" animate="show" variants={heroCtaReveal(0.02)} className="flex-1 sm:flex-none">
+          </p>
+          <div className="mt-8 flex flex-nowrap items-center gap-2 sm:gap-3">
+            <div data-hero-cta="" className="flex-1 sm:flex-none">
               <ContentAction action={hero.primaryAction} variant="primary" size="lg" icon={<CalendarCheck size={17} />} className="w-full px-5 sm:w-auto" />
-            </motion.div>
-            <motion.div initial="hidden" animate="show" variants={heroCtaReveal(0.14)} className="flex-1 sm:flex-none">
+            </div>
+            <div data-hero-cta="" className="flex-1 sm:flex-none">
               <ContentAction action={hero.secondaryAction} variant="glass" size="lg" icon={<Play size={17} />} className="w-full px-5 sm:w-auto" />
-            </motion.div>
+            </div>
             <SocialProof className="hidden md:flex" />
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
 
-        <motion.div
-          variants={revealUp}
-          className="mt-8 hidden grid-cols-2 gap-y-6 border-t border-white/15 pt-6 text-white sm:grid sm:grid-cols-4 sm:gap-y-0 sm:pt-7"
-        >
-          {hero.stats.map((stat, index) => <motion.div key={stat.label} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ ...springSoft, delay: (index + 1) * 0.08 }} className={cn("flex flex-col gap-1", index < hero.stats.length - 1 ? "sm:border-r sm:border-white/15 sm:px-8 first:pl-0 first:pr-8" : "sm:pl-8")}><strong className="type-title-large font-semibold text-white">{stat.value}</strong><span className="type-caption text-white/55">{stat.label}</span></motion.div>)}
-        </motion.div>
+        <div className="mt-8 hidden grid-cols-2 gap-y-6 border-t border-white/15 pt-6 text-white sm:grid sm:grid-cols-4 sm:gap-y-0 sm:pt-7">
+          {hero.stats.map((stat, index) => <div data-hero-stat="" key={stat.label} className={cn("flex flex-col gap-1", index < hero.stats.length - 1 ? "sm:border-r sm:border-white/15 sm:px-8 first:pl-0 first:pr-8" : "sm:pl-8")}><strong className="type-title-large font-semibold text-white">{stat.value}</strong><span className="type-caption text-white/55">{stat.label}</span></div>)}
+        </div>
       </div>
     </section>
   );
