@@ -4,12 +4,13 @@ import test from 'node:test'
 import { isAllowedLeadSourcePage, parseLeadSubmission } from './validation'
 
 test('lead sources include fixed, code-defined, tournament catalog and safe detail routes', () => {
-  for (const path of ['/training', '/gift', '/padel-courts', '/tournaments', '/tournaments/summer-open', '/coaches/anna-smith']) {
+  for (const path of ['/training', '/gift', '/padel-court-zakaz', '/padel-courts', '/tournaments', '/tournaments/summer-open', '/coaches/anna-smith']) {
     assert.equal(isAllowedLeadSourcePage(path), true, path)
   }
   assert.equal(isAllowedLeadSourcePage('/tournaments/summer-open/'), true)
   assert.equal(isAllowedLeadSourcePage('/tournaments/summer-open/results'), false)
   assert.equal(isAllowedLeadSourcePage('/api/public/leads'), false)
+  assert.equal(isAllowedLeadSourcePage('/padel-court-zakaz?preview=1'), false)
   assert.equal(isAllowedLeadSourcePage('/padel-courts?preview=1'), false)
 })
 

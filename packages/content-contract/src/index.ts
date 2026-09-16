@@ -17,17 +17,28 @@ export const publicRouteRegistry = [
 
 export const codeDefinedRouteRegistry = [
   {
+    path: '/padel-court-zakaz',
+    parent: '/',
+    template: 'padel-court-zakaz',
+    title: 'Падел корт купить под ключ — цена, строительство, монтаж',
+    description: 'Официальный дистрибьютор падел-кортов JUBO в России: продажа, поставка с завода и монтаж под ключ. Модели Infinity, Super Panoramic, Xtrem. Расчёт стоимости под объект.',
+    robots: 'index-follow',
+    canonical: null,
+    socialImage: 'https://jubopadel.com/wp-content/uploads/2025/01/JGC06036-2048x1365.jpg',
+  },
+  {
     path: '/padel-courts',
     parent: '/',
     template: 'padel-courts',
     title: 'Падел корт купить под ключ — цена, строительство, монтаж',
     description: 'Продажа и монтаж падел-кортов JUBO в России: подбор модели, комплектации и расчёт проекта под площадку. Дистрибьютор JUBO — UNLIM.',
-    robots: 'index-follow',
-    canonical: null,
+    robots: 'noindex-follow',
+    canonical: '/padel-court-zakaz',
     socialImage: 'https://jubopadel.com/wp-content/uploads/2025/01/JGC06036-2048x1365.jpg',
   },
 ] as const
 
+export const padelCourtZakazRoute = codeDefinedRouteRegistry[0]
 export const padelCourtsRoute = codeDefinedRouteRegistry[0]
 
 export const dynamicRouteRegistry = [

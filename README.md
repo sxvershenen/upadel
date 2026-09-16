@@ -34,7 +34,7 @@ Run analytics aggregation every 15 minutes with `npm run analytics:maintain`; `n
 
 ## Product surface
 
-Public routes: `/`, `/blog`, `/prices`, `/training`, `/coaches`, `/courts`, `/tournaments`, `/about`, `/contacts`, `/policy`, `/oferta`, `/padel-courts`, plus article and entity detail pages.
+Public routes: `/`, `/blog`, `/prices`, `/training`, `/coaches`, `/courts`, `/tournaments`, `/about`, `/contacts`, `/policy`, `/oferta`, `/padel-court-zakaz` (with `/padel-courts` redirect), plus article and entity detail pages.
 
 CMS areas: pages and navigation, home sections, business entities, blog, media, leads, SEO, integrations, booking and analytics.
 

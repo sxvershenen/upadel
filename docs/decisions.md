@@ -79,7 +79,7 @@ Gallery management uses thumbnail cards, not a table. Media management shows liv
 
 ## D14 — Commercial landing — accepted
 
-`/padel-courts` is a code-defined SEO landing for JUBO court sales and installation in Russia. It uses the shared site shell and CTA layer, keeps court-model content in accessible tabs, and includes source attribution for official JUBO photography. External benefit-card destinations require explicit confirmation before opening a new tab.
+`/padel-court-zakaz` is a code-defined SEO landing for JUBO court sales and turnkey installation in Russia (with 301 redirect from legacy `/padel-courts`). It features Swiss grid vertical construction lines, page-view hero header with WebM/poster loop, turnkey services breakdown, price factors, JUBO engineering infographic, interactive court model tabs (Infinity, Super Panoramic, Panoramic, Vision Pro, Infinity Tournament, Infinity Xtrem) with video/specs, and a dual CTA conversion block with 1-click messengers (Telegram, VK, Phone) and inline lead form submitting to the validated lead endpoint. External benefit-card destinations require explicit confirmation before opening a new tab.
 
 ## D13 — CMS palette — accepted
 
