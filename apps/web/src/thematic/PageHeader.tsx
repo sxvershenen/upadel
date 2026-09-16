@@ -7,14 +7,10 @@ type PageHeaderData = Pick<CatalogPageHeader, 'eyebrow' | 'title' | 'intro' | 'h
 export function StickyBackLink({ href = '/', label = 'Назад' }: { href?: string; label?: string }) {
   return <>
     <div aria-hidden="true" className="hidden h-[60px] md:block" />
-    <div className="sticky top-0 z-40 border-b border-ink/5 bg-page/95 backdrop-blur md:top-[60px]">
-      <div className="container-page flex min-h-14 items-center py-2">
-        <a href={href} className="se-full inline-flex items-center gap-1.5 bg-control px-3 py-2 type-caption text-ink-soft transition-colors hover:bg-control-hover hover:text-ink focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2">
-          <ArrowLeft aria-hidden="true" size={14} />
-          {label}
-        </a>
-      </div>
-    </div>
+    <a href={href} className="se-full fixed right-4 top-4 z-[60] inline-flex items-center gap-1.5 bg-control px-3 py-2 type-caption text-ink-soft shadow-[0_8px_18px_-12px_rgba(20,20,26,.8)] transition-colors hover:bg-control-hover hover:text-ink focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2 md:right-8 md:top-[30px] md:-translate-y-1/2">
+      <ArrowLeft aria-hidden="true" size={14} />
+      {label}
+    </a>
   </>
 }
 
