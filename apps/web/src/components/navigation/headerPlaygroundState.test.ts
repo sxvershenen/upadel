@@ -8,7 +8,7 @@ test('playground header starts expanded at the top and compact below the top thr
   assert.equal(initialHeaderPlaygroundScrollState(33).compact, true)
 })
 
-test('playground header compacts only after accumulated downward movement', () => {
+test('playground header compacts only after the fixed downward threshold', () => {
   let state = { ...initialHeaderPlaygroundScrollState(40), compact: false }
   state = nextHeaderPlaygroundScrollState(state, 52)
   assert.equal(state.compact, false)

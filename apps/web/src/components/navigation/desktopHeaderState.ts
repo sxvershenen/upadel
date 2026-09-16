@@ -1,5 +1,7 @@
 export const HEADER_TOP_THRESHOLD = 32
-export const HEADER_DIRECTION_THRESHOLD = 14
+export const HEADER_DOWN_THRESHOLD = 24
+export const HEADER_UP_THRESHOLD = 16
+export const HEADER_MORPH_LOCK_MS = 320
 
 export type NavigationIconPreset = 'about' | 'article' | 'coaches' | 'courts' | 'default' | 'gift' | 'home' | 'prices' | 'training' | 'tournaments'
 
@@ -82,9 +84,10 @@ export function nextHeaderScrollState(state: HeaderScrollState, scrollY: number)
   const direction = nextY > state.lastY ? 'down' : 'up'
   const anchorY = direction === state.direction ? state.anchorY : state.lastY
   const distance = Math.abs(nextY - anchorY)
+  const threshold = direction === 'down' ? HEADER_DOWN_THRESHOLD : HEADER_UP_THRESHOLD
   return {
     anchorY,
-    compact: distance >= HEADER_DIRECTION_THRESHOLD ? direction === 'down' : state.compact,
+    compact: distance >= threshold ? direction === 'down' : state.compact,
     direction,
     lastY: nextY,
   }

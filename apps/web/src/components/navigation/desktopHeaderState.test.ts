@@ -24,6 +24,16 @@ test('header starts compact when hydration happens below the top threshold', () 
   assert.equal(initialHeaderScrollState(32).compact, false)
 })
 
+test('header uses fixed directional thresholds for hysteresis', () => {
+  let state = { ...initialHeaderScrollState(40), compact: false }
+  state = nextHeaderScrollState(state, 63)
+  assert.equal(state.compact, false)
+  state = nextHeaderScrollState(state, 64)
+  assert.equal(state.compact, true)
+  state = nextHeaderScrollState(state, 48)
+  assert.equal(state.compact, false)
+})
+
 test('navigation icons use stable route fallbacks', () => {
   assert.equal(navigationIconPreset('/'), 'home')
   assert.equal(navigationIconPreset('/blog'), 'article')

@@ -84,6 +84,8 @@ button:not(:disabled), a[href], [role="button"] { cursor: pointer; }
 .desktop-header[data-header-compact="true"] .desktop-header-utilities { gap: 0; }
 .desktop-header[data-header-compact="true"] .desktop-header-utilities > .desktop-header-compact-control:last-child { margin-left: .25rem; }
 .desktop-header[data-header-compact="true"] .desktop-header-utility-link { border-left: 0; background: transparent; }
+.desktop-header-booking-control { width: 136px; }
+.desktop-header-booking-measure { position: absolute; width: max-content; padding-inline: 16px; visibility: hidden; white-space: nowrap; pointer-events: none; }
 .desktop-header-tooltip {
   position: absolute;
   top: calc(100% + .5rem);

@@ -1,8 +1,9 @@
 import { AnimatePresence, MotionConfig, motion, useReducedMotion } from 'framer-motion'
 import { CalendarCheck, Dumbbell, Gift, Home, Info, Newspaper, Phone, Send, Tag, Trophy, type LucideIcon } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { VkIcon } from '../ui/VkIcon'
+import { HEADER_MORPH_LOCK_MS, HEADER_TOP_THRESHOLD } from './desktopHeaderState'
 import { initialHeaderPlaygroundScrollState, nextHeaderPlaygroundScrollState } from './headerPlaygroundState'
 
 type PlaygroundNavItem = {
@@ -20,17 +21,40 @@ const navItems: PlaygroundNavItem[] = [
   { label: 'О нас', href: '/about', icon: Info },
 ]
 
-const shellSpring = { type: 'spring' as const, visualDuration: 0.22, bounce: 0.08 }
+const shellSpring = { type: 'spring' as const, visualDuration: 0.2, bounce: 0.06, velocity: 0 }
 const contentTransition = { duration: 0.16, ease: [0.2, 0.8, 0.2, 1] as const }
 
 function useCompactHeader() {
   const [scrollState, setScrollState] = useState(() => initialHeaderPlaygroundScrollState(typeof window === 'undefined' ? 0 : window.scrollY))
+  const morphLockUntilRef = useRef(0)
+  const frameRef = useRef<number | null>(null)
 
   useEffect(() => {
-    const onScroll = () => setScrollState((current) => nextHeaderPlaygroundScrollState(current, window.scrollY))
+    const update = () => {
+      frameRef.current = null
+      setScrollState((current) => {
+        const next = nextHeaderPlaygroundScrollState(current, window.scrollY)
+        if (next.compact === current.compact) return next
+        if (next.lastY <= HEADER_TOP_THRESHOLD) {
+          morphLockUntilRef.current = 0
+          return next
+        }
+        const now = performance.now()
+        if (now < morphLockUntilRef.current) return { ...next, compact: current.compact }
+        morphLockUntilRef.current = now + HEADER_MORPH_LOCK_MS
+        return next
+      })
+    }
+    const onScroll = () => {
+      if (frameRef.current !== null) return
+      frameRef.current = window.requestAnimationFrame(update)
+    }
     window.addEventListener('scroll', onScroll, { passive: true })
     onScroll()
-    return () => window.removeEventListener('scroll', onScroll)
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      if (frameRef.current !== null) window.cancelAnimationFrame(frameRef.current)
+    }
   }, [])
 
   return scrollState.compact
@@ -82,7 +106,7 @@ function CompactNav() {
 export function HeaderPlayground() {
   const compact = useCompactHeader()
   const reduceMotion = useReducedMotion() ?? false
-  const transition = reduceMotion ? { duration: 0.01 } : shellSpring
+  const transition = reduceMotion ? { layout: { duration: 0.01 } } : { layout: shellSpring }
 
   return <MotionConfig reducedMotion="user">
     <header className="dynamic-island-playground-header" data-header-playground-state={compact ? 'compact' : 'expanded'}>
