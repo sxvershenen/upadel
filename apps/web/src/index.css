@@ -68,6 +68,11 @@ button:not(:disabled), a[href], [role="button"] { cursor: pointer; }
 }
 
 .desktop-header-island { width: min(960px, calc(100% - 2rem)); }
+.desktop-header-brand { flex: 0 0 auto; }
+.desktop-header-nav { flex: 0 0 auto; }
+.desktop-header-utilities { flex: 0 0 auto; }
+.desktop-header[data-header-compact="false"] .desktop-header-brand,
+.desktop-header[data-header-compact="false"] .desktop-header-nav { min-width: max-content; }
 @media (max-width: 1199px) {
   .desktop-header-island { width: min(880px, calc(100% - 2rem)); }
   .desktop-header-subtitle { display: none; }
@@ -77,6 +82,7 @@ button:not(:disabled), a[href], [role="button"] { cursor: pointer; }
 .desktop-header[data-header-compact="true"] .desktop-header-island { gap: 0; padding: .375rem .5rem .375rem .75rem; }
 .desktop-header[data-header-compact="true"] .desktop-header-nav { gap: 0; }
 .desktop-header[data-header-compact="true"] .desktop-header-utilities { gap: 0; }
+.desktop-header[data-header-compact="true"] .desktop-header-utilities > .desktop-header-compact-control:last-child { margin-left: .25rem; }
 .desktop-header[data-header-compact="true"] .desktop-header-utility-link { border-left: 0; background: transparent; }
 .desktop-header-tooltip {
   position: absolute;
