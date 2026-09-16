@@ -1,0 +1,52 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro'
+import { HeaderPlayground } from '../../components/navigation/HeaderPlayground'
+---
+
+<SiteLayout
+  title="Desktop header playground | UNLIM RIGA PADEL"
+  description="Изолированный playground для проверки Dynamic Island desktop-навигации UNLIM RIGA PADEL."
+  robots="noindex-follow"
+>
+  <HeaderPlayground client:load />
+
+  <main class="header-playground-page">
+    <section class="header-playground-hero container-page">
+      <span class="type-eyebrow text-text-accent">Header playground · Dynamic Island</span>
+      <h1 class="type-display mt-5 max-w-[900px] text-ink">Сначала проверяем механику. Потом переносим в production.</h1>
+      <p class="type-editorial mt-7 max-w-[660px] text-ink-soft">Отдельная лаборатория для desktop-навигации: чёрный shell меняет собственную геометрию spring-анимацией, а ExpandedNav и CompactNav перегруппировывают содержимое независимо.</p>
+      <div class="mt-8 flex flex-wrap gap-2 type-caption text-ink-muted">
+        <span class="se-1 bg-white px-3 py-2">down ≥ 24px → compact</span>
+        <span class="se-1 bg-white px-3 py-2">up ≥ 16px → expanded</span>
+        <span class="se-1 bg-white px-3 py-2">content: fade + blur + scale</span>
+      </div>
+    </section>
+
+    <section id="header-playground-content" class="header-playground-content container-page">
+      <div class="header-playground-panel se-3 bg-ink text-white">
+        <div>
+          <span class="type-eyebrow text-white/45">Scroll test</span>
+          <h2 class="type-section mt-4 max-w-[720px]">Прокрути страницу вниз, затем немного вверх.</h2>
+          <p class="type-body mt-6 max-w-[620px] text-white/60">Режим не переключается от каждого пикселя трекпада: состояние меняется только после накопления движения в одном направлении.</p>
+        </div>
+        <div class="mt-12 grid gap-3 sm:grid-cols-3">
+          <div class="se-2 bg-white/10 p-5"><strong class="type-title-card">Shell</strong><p class="mt-2 type-caption text-white/55">width, height и radius меняются у оболочки.</p></div>
+          <div class="se-2 bg-white/10 p-5"><strong class="type-title-card">Content</strong><p class="mt-2 type-caption text-white/55">Expanded и Compact — отдельные композиции.</p></div>
+          <div class="se-2 bg-white/10 p-5"><strong class="type-title-card">Safe test</strong><p class="mt-2 type-caption text-white/55">Рабочий production-header сюда не подключён.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="header-playground-spacer container-page" aria-label="Прокрутка playground">
+      <div class="grid gap-3 md:grid-cols-2">
+        {Array.from({ length: 6 }, (_, index) => (
+          <article class="se-3 min-h-[220px] bg-white p-6 md:p-8">
+            <span class="type-eyebrow text-ink-muted">Test block {String(index + 1).padStart(2, '0')}</span>
+            <h2 class="type-title-card mt-16 text-ink">Контент под навигацией</h2>
+            <p class="mt-3 max-w-[420px] type-body-sm text-ink-soft">Нужен только для проверки направления скролла и стабильности состояния на длинной странице.</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  </main>
+</SiteLayout>
