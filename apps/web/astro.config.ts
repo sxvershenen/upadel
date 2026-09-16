@@ -9,7 +9,7 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
     optimizeDeps: {
-      exclude: ['swup'],
+      exclude: ['swup', 'framer-motion', 'gsap', 'lucide-react', '@swup/scripts-plugin'],
     },
   },
 });

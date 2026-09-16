@@ -16,7 +16,11 @@ export function SiteFrame({ site, children, backLink }: { site: SiteDTO; childre
   const rootHref = (href: string) => href.startsWith('#') ? `/${href}` : href
   const innerSite: SiteDTO = {
     ...site,
-    desktopNavigation: site.desktopNavigation.map((item) => ({ ...item, href: rootHref(item.href) })),
+    desktopNavigation: site.desktopNavigation.map((item) => ({
+      ...item,
+      href: rootHref(item.href),
+      children: item.children?.map((child) => ({ ...child, href: rootHref(child.href) })),
+    })),
     mobileNavigation: site.mobileNavigation.map((item) => ({ ...item, href: rootHref(item.href) })),
     mobileMenuNavigation: site.mobileMenuNavigation.map((item) => ({ ...item, href: rootHref(item.href) })),
     footer: { ...site.footer, navigation: site.footer.navigation.map((item) => ({ ...item, href: rootHref(item.href) })) },

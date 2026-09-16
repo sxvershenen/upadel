@@ -123,6 +123,16 @@ function scanSiteSettings(target: Map<string, MediaUsage>, doc: Record<string, u
       href: '/admin/globals/site-settings',
       location: `Настройки сайта → Навигация → ${String(row.label ?? 'Пункт')} → иконка`,
     }, state)
+    for (const child of Array.isArray(row.children) ? row.children : []) {
+      if (!child || typeof child !== 'object') continue
+      const childRow = child as Record<string, unknown>
+      const childMediaID = relationID(childRow.icon)
+      if (childMediaID) addUsage(target, {
+        mediaID: childMediaID,
+        href: '/admin/globals/site-settings',
+        location: `Настройки сайта → Навигация → ${String(row.label ?? 'Пункт')} → ${String(childRow.label ?? 'Подпункт')} → иконка`,
+      }, state)
+    }
   }
 }
 

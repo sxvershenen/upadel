@@ -3,6 +3,7 @@ import { useSite } from '../content/ContentContext'
 import { Reveal } from '../components/ui/Reveal'
 import { Partners } from './Partners'
 import { useActionLayer } from '../actions/ActionLayer'
+import { VkIcon } from '../components/ui/VkIcon'
 
 export function Footer() {
   const site = useSite()
@@ -16,7 +17,7 @@ export function Footer() {
     { icon: Phone, label: contacts.labels.phone, value: contacts.phoneDisplay, href: `tel:${contacts.phoneValue}` },
     { icon: Mail, label: contacts.labels.email, value: contacts.email, href: `mailto:${contacts.email}` },
   ]
-  const socialIcons = { telegram: Send, video: Video }
+  const socialIcons = { telegram: Send, video: Video, vk: VkIcon }
   const mapURL = `https://yandex.ru/map-widget/v1/?ll=${contacts.map.longitude}%2C${contacts.map.latitude}&z=${contacts.map.zoom}&pt=${contacts.map.longitude},${contacts.map.latitude},pm2rdl`
   const navColumns = ['1', '2'].map((column) => footer.navigation.filter((item) => item.column === column))
 

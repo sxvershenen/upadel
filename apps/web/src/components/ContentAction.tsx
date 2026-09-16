@@ -1,4 +1,5 @@
 import type { ActionDTO } from '@unlim/content-contract'
+import type { Transition } from 'framer-motion'
 import type { ReactNode } from 'react'
 
 import { useSite } from '../content/ContentContext'
@@ -6,6 +7,7 @@ import { useActionLayer } from '../actions/ActionLayer'
 import { Button, ButtonLink, type ButtonSize, type ButtonVariant } from './ui/Button'
 
 type Props = {
+  'aria-label'?: string
   action: ActionDTO
   children?: ReactNode
   className?: string
@@ -18,6 +20,9 @@ type Props = {
   size?: ButtonSize
   sourceEntity?: string
   sourcePage?: string
+  title?: string
+  layout?: boolean | 'position' | 'size' | 'preserve-aspect'
+  transition?: Transition
   variant?: ButtonVariant
 }
 

@@ -17,6 +17,15 @@ export function navigationIconPreset(href: string): NavigationIconPreset {
   return 'default'
 }
 
+export type DesktopSubmenuKeyAction = 'close' | 'navigate' | 'open' | null
+
+export function desktopSubmenuKeyAction(key: string, open: boolean): DesktopSubmenuKeyAction {
+  if (key === 'Escape') return open ? 'close' : null
+  if (key === ' ') return 'open'
+  if (key === 'Enter') return open ? 'navigate' : 'open'
+  return null
+}
+
 export type HeaderScrollState = {
   anchorY: number
   compact: boolean

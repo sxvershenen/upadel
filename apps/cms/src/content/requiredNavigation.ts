@@ -8,6 +8,14 @@ export const requiredPageLinks = [
   { label: 'О нас', href: '/about' },
 ] as const
 
+export const priceNavigationChildren = [
+  { label: 'Аренда', href: '/prices' },
+  { label: 'Тренировки', href: '/training' },
+  { label: 'Тренеры', href: '/coaches' },
+] as const
+
+export const desktopNavigationLinks = requiredPageLinks.filter(({ href }) => href !== '/training' && href !== '/coaches')
+
 type NavigationRow = { label: string; href: string; [key: string]: unknown }
 
 const aliases: Record<string, string> = {
@@ -37,6 +45,19 @@ export function mergeRequiredNavigation<T extends NavigationRow>(rows: T[], addi
   return result.slice(0, Math.max(additions.length, maxRows))
 }
 
+export function ensureDesktopNavigationChildren<T extends NavigationRow>(rows: T[]): T[] {
+  return rows.map((row) => {
+    if (row.href !== '/prices' || row.children != null) return row
+    return { ...row, children: priceNavigationChildren.map((child) => ({ ...child })) }
+  })
+}
+
+export function normalizeDesktopNavigation<T extends NavigationRow>(rows: T[]): T[] {
+  const groupedHrefs = new Set<string>(priceNavigationChildren.map(({ href }) => href).filter((href) => href !== '/prices'))
+  const withoutGroupedTopLevel = rows.filter((row) => !groupedHrefs.has(row.href))
+  return ensureDesktopNavigationChildren(mergeRequiredNavigation(withoutGroupedTopLevel, desktopNavigationLinks))
+}
+
 export function navigationChanged<T extends NavigationRow>(before: T[], after: T[]): boolean {
-  return before.length !== after.length || after.some((row, index) => row.label !== before[index]?.label || row.href !== before[index]?.href || row.column !== before[index]?.column)
+  return before.length !== after.length || after.some((row, index) => row.label !== before[index]?.label || row.href !== before[index]?.href || row.column !== before[index]?.column || JSON.stringify(row.children ?? null) !== JSON.stringify(before[index]?.children ?? null))
 }

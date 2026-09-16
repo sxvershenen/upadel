@@ -15,7 +15,7 @@ export function FloatingBackLink({ href, label = 'Назад' }: BackLink) {
     whileHover={{ x: -3 }}
     whileTap={tapScaleSm}
     transition={springSnappy}
-    className="se-full fixed left-4 top-2.5 z-[60] hidden min-h-[var(--control-sm)] items-center gap-1.5 bg-control px-3 type-caption text-ink-soft shadow-[0_8px_18px_-12px_rgba(20,20,26,.8)] transition-colors hover:bg-control-hover hover:text-ink focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2 md:inline-flex xl:left-8"
+    className="se-full fixed left-[var(--page-gutter)] top-2.5 z-[60] hidden min-h-[var(--control-sm)] items-center gap-1.5 border border-white/55 bg-white/72 px-3 type-caption text-ink-soft shadow-[0_8px_24px_-14px_rgba(20,20,26,.72)] backdrop-blur-xl transition-colors hover:bg-white/90 hover:text-ink focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2 md:inline-flex"
   >
     <ArrowLeft aria-hidden="true" size={14} />
     {label}

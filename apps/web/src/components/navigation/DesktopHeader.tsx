@@ -1,12 +1,14 @@
-import { Dumbbell, Gift, Home, Info, LayoutGrid, Newspaper, Phone, Send, Tag, Trophy, UsersRound, type LucideIcon } from 'lucide-react'
-import { motion } from 'framer-motion'
-import { useEffect, useState } from 'react'
+import type { DesktopNavigationChild, DesktopNavigationItem } from '@unlim/content-contract'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { CalendarCheck, ChevronDown, Dumbbell, Gift, Home, Info, LayoutGrid, Newspaper, Phone, Send, Tag, Trophy, UsersRound, type LucideIcon } from 'lucide-react'
+import { useEffect, useId, useRef, useState, type FocusEvent, type KeyboardEvent, type PointerEvent } from 'react'
 
-import { ContentAction } from '../ContentAction'
-import { useHomeHref, useSite } from '../../content/ContentContext'
 import { useActionLayer } from '../../actions/ActionLayer'
-import { springLayout } from '../../lib/motion'
-import { initialHeaderScrollState, navigationIconPreset, nextHeaderScrollState, type HeaderScrollState, type NavigationIconPreset } from './desktopHeaderState'
+import { useHomeHref, useSite } from '../../content/ContentContext'
+import { VkIcon } from '../ui/VkIcon'
+import { springLayout, springSnappy } from '../../lib/motion'
+import { ContentAction } from '../ContentAction'
+import { desktopSubmenuKeyAction, initialHeaderScrollState, navigationIconPreset, nextHeaderScrollState, type HeaderScrollState, type NavigationIconPreset } from './desktopHeaderState'
 
 const navigationIcons: Record<NavigationIconPreset, LucideIcon> = {
   about: Info,
@@ -21,10 +23,190 @@ const navigationIcons: Record<NavigationIconPreset, LucideIcon> = {
   tournaments: Trophy,
 }
 
-function NavigationIcon({ href, icon }: { href: string; icon?: { url: string } | null }) {
+function NavigationIcon({ href, icon, size = 16 }: { href: string; icon?: { url: string } | null; size?: number }) {
   if (icon) return <img src={icon.url} alt="" aria-hidden="true" className="h-4 w-4 object-contain" />
   const Icon = navigationIcons[navigationIconPreset(href)]
-  return <Icon aria-hidden="true" size={16} strokeWidth={1.9} />
+  return <Icon aria-hidden="true" size={size} strokeWidth={1.9} />
+}
+
+function useWideHeader() {
+  const [wide, setWide] = useState(false)
+  useEffect(() => {
+    const query = window.matchMedia('(min-width: 1200px)')
+    const update = () => setWide(query.matches)
+    update()
+    query.addEventListener('change', update)
+    return () => query.removeEventListener('change', update)
+  }, [])
+  return wide
+}
+
+function AnimatedNavigationContents({ expanded, item }: { expanded: boolean; item: DesktopNavigationChild }) {
+  return <AnimatePresence initial={false} mode="popLayout">
+    {expanded ? <motion.span
+      key="label"
+      initial={{ opacity: 0, scale: 0.92, width: 0 }}
+      animate={{ opacity: 1, scale: 1, width: 'auto' }}
+      exit={{ opacity: 0, scale: 0.92, width: 0 }}
+      transition={springSnappy}
+      className="block overflow-hidden"
+    >{item.label}</motion.span> : <motion.span
+      key="icon"
+      initial={{ opacity: 0, scale: 0.75, width: 0 }}
+      animate={{ opacity: 1, scale: 1, width: 16 }}
+      exit={{ opacity: 0, scale: 0.75, width: 0 }}
+      transition={springSnappy}
+      className="inline-flex shrink-0 items-center justify-center overflow-hidden"
+      aria-hidden="true"
+    ><NavigationIcon href={item.href} icon={item.icon} /></motion.span>}
+  </AnimatePresence>
+}
+
+function MegaMenuPanel({ children, id, label, layoutId, reduceMotion, onNavigate }: { children: DesktopNavigationChild[]; id: string; label: string; layoutId: string; reduceMotion: boolean; onNavigate: () => void }) {
+  return <motion.div
+    className="absolute left-0 top-full z-20 w-[min(440px,calc(100vw-2rem))] pt-2"
+    initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.88, clipPath: 'inset(0 82% 82% 0 round 10px)' }}
+    animate={reduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1, clipPath: 'inset(0 0 0 0 round 20px)' }}
+    exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.9, clipPath: 'inset(0 82% 82% 0 round 10px)' }}
+    transition={reduceMotion ? { duration: 0.01 } : springLayout}
+    style={{ originX: 0.08, originY: 0 }}
+  >
+    <motion.div
+      id={id}
+      layoutId={reduceMotion ? undefined : layoutId}
+      role="group"
+      aria-label={`Раздел «${label}»`}
+      className="se-3 grid grid-cols-3 gap-1 bg-white p-2 text-ink shadow-[0_22px_70px_-28px_rgba(0,0,0,.65)] ring-1 ring-ink/8"
+      transition={springLayout}
+    >
+      {children.map((child) => <motion.a
+        key={`${child.href}-${child.label}`}
+        href={child.href}
+        data-analytics-action="internal"
+        onClick={onNavigate}
+        whileHover={reduceMotion ? undefined : { y: -2 }}
+        transition={springSnappy}
+        className="se-2 flex min-h-[92px] flex-col justify-between gap-4 bg-surface-subtle p-3 type-caption font-medium text-ink-soft transition-colors hover:bg-lime-soft hover:text-ink focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2"
+      >
+        <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white text-ink shadow-sm" aria-hidden="true"><NavigationIcon href={child.href} icon={child.icon} size={17} /></span>
+        <span className="flex items-center justify-between gap-2"><span>{child.label}</span><span aria-hidden="true">↗</span></span>
+      </motion.a>)}
+    </motion.div>
+  </motion.div>
+}
+
+function DesktopNavigationLink({ compact, item, wide }: { compact: boolean; item: DesktopNavigationItem; wide: boolean }) {
+  const children = item.children?.filter((child) => child.label && child.href) ?? []
+  const hasMenu = children.length > 0
+  const expanded = wide && !compact
+  const reduceMotion = useReducedMotion() ?? false
+  const [open, setOpen] = useState(false)
+  const rootRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLAnchorElement>(null)
+  const closeTimer = useRef<number | null>(null)
+  const reactId = useId().replaceAll(':', '')
+  const panelId = `desktop-submenu-${reactId}`
+  const layoutId = `desktop-submenu-surface-${reactId}`
+
+  const cancelClose = () => {
+    if (closeTimer.current !== null) window.clearTimeout(closeTimer.current)
+    closeTimer.current = null
+  }
+  const openMenu = () => {
+    if (!hasMenu) return
+    cancelClose()
+    setOpen(true)
+  }
+  const closeMenu = () => {
+    cancelClose()
+    setOpen(false)
+  }
+  const scheduleClose = () => {
+    cancelClose()
+    closeTimer.current = window.setTimeout(() => {
+      if (!rootRef.current?.matches(':focus-within')) setOpen(false)
+    }, 110)
+  }
+
+  useEffect(() => () => cancelClose(), [])
+  useEffect(() => {
+    if (!open) return
+    const outsidePointer = (event: globalThis.PointerEvent) => {
+      if (event.target instanceof Node && !rootRef.current?.contains(event.target)) closeMenu()
+    }
+    document.addEventListener('pointerdown', outsidePointer, true)
+    return () => document.removeEventListener('pointerdown', outsidePointer, true)
+  }, [open])
+
+  const handlePointerEnter = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType !== 'touch') openMenu()
+  }
+  const handleBlur = (event: FocusEvent<HTMLDivElement>) => {
+    if (!(event.relatedTarget instanceof Node) || !event.currentTarget.contains(event.relatedTarget)) closeMenu()
+  }
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (!hasMenu) return
+    const action = desktopSubmenuKeyAction(event.key, open)
+    if (action === 'open') {
+      event.preventDefault()
+      openMenu()
+    } else if (action === 'close') {
+      event.preventDefault()
+      closeMenu()
+      triggerRef.current?.focus()
+    }
+  }
+
+  return <div
+    ref={rootRef}
+    className="relative shrink-0"
+    onPointerEnter={handlePointerEnter}
+    onPointerLeave={hasMenu ? scheduleClose : undefined}
+    onFocusCapture={hasMenu ? openMenu : undefined}
+    onBlurCapture={hasMenu ? handleBlur : undefined}
+    onKeyDown={hasMenu ? handleKeyDown : undefined}
+  >
+    <motion.a
+      ref={triggerRef}
+      layout
+      href={item.href}
+      data-analytics-action="internal"
+      aria-label={item.label}
+      aria-haspopup={hasMenu ? true : undefined}
+      aria-expanded={hasMenu ? open : undefined}
+      aria-controls={hasMenu ? panelId : undefined}
+      title={item.label}
+      transition={springLayout}
+      className={`desktop-header-nav-link se-1 relative flex h-[var(--control-sm)] shrink-0 items-center justify-center gap-2 overflow-hidden py-1.5 font-medium text-white/70 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2 ${expanded ? 'px-2.5 type-caption' : 'w-[var(--control-sm)] px-0 type-caption'}`}
+    >
+      {hasMenu && !open && <motion.span layoutId={reduceMotion ? undefined : layoutId} className="pointer-events-none absolute inset-0 bg-white/8" transition={springLayout} />}
+      <AnimatedNavigationContents expanded={expanded} item={item} />
+      {hasMenu && expanded && <motion.span animate={{ rotate: open ? 180 : 0 }} transition={springSnappy} className="inline-flex" aria-hidden="true"><ChevronDown size={13} /></motion.span>}
+    </motion.a>
+    <AnimatePresence initial={false}>
+      {hasMenu && open && <MegaMenuPanel children={children} id={panelId} label={item.label} layoutId={layoutId} reduceMotion={reduceMotion} onNavigate={closeMenu} />}
+    </AnimatePresence>
+  </div>
+}
+
+function HeaderBrand({ compact, homeHref, logo, logoMode, name, subtitle }: { compact: boolean; homeHref: string; logo?: { url: string } | null; logoMode: 'text' | 'prefix' | 'replace'; name: string; subtitle: string }) {
+  const showLogo = Boolean(logo) && logoMode !== 'text'
+  const replaceBrand = showLogo && logoMode === 'replace'
+  return <motion.a
+    layout
+    href={homeHref}
+    aria-label={name}
+    title={name}
+    transition={springLayout}
+    className="flex h-[var(--control-sm)] shrink-0 items-center justify-center overflow-hidden leading-none focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2"
+  >
+    <AnimatePresence initial={false} mode="popLayout">
+      {compact ? <motion.span key="home" initial={{ opacity: 0, scale: 0.7, width: 0 }} animate={{ opacity: 1, scale: 1, width: 24 }} exit={{ opacity: 0, scale: 0.7, width: 0 }} transition={springSnappy} className="inline-flex items-center justify-center"><Home aria-hidden="true" size={17} /></motion.span> : <motion.span key="brand" initial={{ opacity: 0, scale: 0.96, width: 0 }} animate={{ opacity: 1, scale: 1, width: 'auto' }} exit={{ opacity: 0, scale: 0.96, width: 0 }} transition={springLayout} className="flex items-center gap-2.5 overflow-hidden">
+        {showLogo ? <img src={logo?.url} alt="" aria-hidden="true" className={replaceBrand ? 'h-9 max-w-[150px] object-contain' : 'h-7 w-7 object-contain'} /> : <span className="h-2.5 w-2.5 shrink-0 rounded-[3px] bg-lime" />}
+        {!replaceBrand && <span className="flex flex-col"><span className="text-[14px] font-semibold tracking-[0] text-white">{name}</span><span className="desktop-header-subtitle type-micro text-white/50">{subtitle}</span></span>}
+      </motion.span>}
+    </AnimatePresence>
+  </motion.a>
 }
 
 export function DesktopHeader() {
@@ -33,9 +215,8 @@ export function DesktopHeader() {
   const { requestContact } = useActionLayer()
   const telegram = site.footer.socialLinks.find(({ provider }) => provider === 'telegram')
   const vk = site.footer.socialLinks.find(({ provider }) => provider === 'vk')
-  const showLogo = Boolean(site.brandLogo) && site.brandLogoMode !== 'text'
-  const replaceBrand = showLogo && site.brandLogoMode === 'replace'
   const [scrollState, setScrollState] = useState<HeaderScrollState>(() => initialHeaderScrollState())
+  const wide = useWideHeader()
   const compact = scrollState.compact
 
   useEffect(() => {
@@ -57,6 +238,10 @@ export function DesktopHeader() {
     }
   }, [])
 
+  const utilityClass = compact
+    ? 'border-l border-white/15 bg-transparent text-white hover:bg-white/10'
+    : 'se-1 bg-white/10 text-white hover:bg-white/20'
+
   return <motion.header
     initial={{ opacity: 0, y: -24 }}
     animate={{ opacity: 1, y: 0 }}
@@ -65,64 +250,63 @@ export function DesktopHeader() {
     data-header-direction={scrollState.direction ?? 'none'}
     className="desktop-header fixed inset-x-0 top-0 z-50 hidden justify-center md:flex"
   >
-    <motion.div layout transition={springLayout} className={`desktop-header-island se-top-2 mx-4 flex items-center justify-between whitespace-nowrap bg-ink text-white ${compact ? 'gap-2 py-1.5 pl-4 pr-2' : 'gap-4 py-2.5 pl-7 pr-3'}`}>
-      <a href={homeHref} className="flex shrink-0 items-center gap-2.5 leading-none">
-        {showLogo ? <img src={site.brandLogo?.url} alt={site.brandName} className={replaceBrand ? 'h-9 max-w-[150px] object-contain' : 'h-7 w-7 object-contain'} /> : <span className="h-2.5 w-2.5 shrink-0 rounded-[3px] bg-lime" />}
-        {!replaceBrand && <span className="flex flex-col">
-          <span className="text-[14px] font-semibold tracking-[0] text-white">{site.brandName}</span>
-          <span className="desktop-header-subtitle type-micro text-white/50">{site.headerSubtitle}</span>
-        </span>}
-      </a>
+    <motion.div layout transition={springLayout} className={`desktop-header-island se-top-2 mx-4 flex items-center justify-between whitespace-nowrap bg-ink text-white ${compact ? 'gap-1.5 py-1.5 pl-3 pr-2' : 'gap-4 py-2.5 pl-7 pr-3'}`}>
+      <HeaderBrand compact={compact} homeHref={homeHref} logo={site.brandLogo} logoMode={site.brandLogoMode} name={site.brandName} subtitle={site.headerSubtitle} />
 
       <nav className="desktop-header-nav flex min-w-0 items-center gap-0.5" aria-label="Основная навигация">
-        {site.desktopNavigation.map((link) => (
-          <motion.a
-            key={`${link.href}-${link.label}`}
-            href={link.href}
-            aria-label={link.label}
-            title={link.label}
-            className="desktop-header-nav-link se-1 type-caption flex h-[var(--control-sm)] shrink-0 items-center justify-center gap-2 px-2.5 py-1.5 font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2"
-          >
-            <span className="desktop-header-nav-icon" aria-hidden="true"><NavigationIcon href={link.href} icon={link.icon} /></span>
-            <span className="desktop-header-nav-label">{link.label}</span>
-          </motion.a>
-        ))}
+        {site.desktopNavigation.map((item) => <DesktopNavigationLink key={`${item.href}-${item.label}`} compact={compact} item={item} wide={wide} />)}
       </nav>
 
-      <div className="flex shrink-0 items-center gap-2">
+      <motion.div layout transition={springLayout} className="flex shrink-0 items-center gap-1.5">
         {telegram && <motion.a
+          layout
           href={telegram.url}
           data-analytics-action="telegram"
           onClick={(event) => { event.preventDefault(); requestContact('telegram') }}
           target="_blank"
           rel="noreferrer"
           aria-label="Telegram"
-          className="se-1 hidden h-[var(--control-sm)] w-[var(--control-sm)] items-center justify-center bg-white/10 text-white hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2 lg:flex"
-        >
-          <Send size={14} />
-        </motion.a>}
+          title="Telegram"
+          transition={springLayout}
+          className={`hidden h-[var(--control-sm)] w-[var(--control-sm)] items-center justify-center focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2 lg:flex ${utilityClass}`}
+        ><Send aria-hidden="true" size={14} /></motion.a>}
         {vk && <motion.a
+          layout
           href={vk.url}
           data-analytics-action="vk"
           onClick={(event) => { event.preventDefault(); requestContact('vk') }}
           target="_blank"
           rel="noreferrer"
           aria-label="VK"
-          className="se-1 type-micro hidden h-[var(--control-sm)] w-[var(--control-sm)] items-center justify-center bg-white/10 font-semibold text-white hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2 lg:flex"
-        >
-          VK
-        </motion.a>}
+          title="VK"
+          transition={springLayout}
+          className={`type-micro hidden h-[var(--control-sm)] w-[var(--control-sm)] items-center justify-center font-semibold focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2 lg:flex ${utilityClass}`}
+        ><VkIcon size={15} /></motion.a>}
         <motion.a
+          layout
           href={`tel:${site.contacts.phoneValue}`}
           data-analytics-action="phone"
           onClick={(event) => { event.preventDefault(); requestContact('phone') }}
           aria-label="Позвонить"
-          className="se-1 flex h-[var(--control-sm)] w-[var(--control-sm)] items-center justify-center bg-white/10 text-white hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2"
+          title="Позвонить"
+          transition={springLayout}
+          className={`flex h-[var(--control-sm)] w-[var(--control-sm)] items-center justify-center focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2 ${utilityClass}`}
+        ><Phone aria-hidden="true" size={14} /></motion.a>
+        <ContentAction
+          action={{ mode: 'booking', label: site.booking.buttonLabel }}
+          variant="primary"
+          size="sm"
+          aria-label={site.booking.buttonLabel}
+          title={site.booking.buttonLabel}
+          layout
+          transition={springLayout}
+          className={`overflow-hidden ${compact ? 'w-[var(--control-sm)] px-0' : ''}`}
         >
-          <Phone size={14} />
-        </motion.a>
-        <ContentAction action={{ mode: 'booking', label: site.booking.buttonLabel }} variant="primary" size="sm" />
-      </div>
+          <AnimatePresence initial={false} mode="popLayout">
+            {compact ? <motion.span key="icon" initial={{ opacity: 0, scale: 0.7, width: 0 }} animate={{ opacity: 1, scale: 1, width: 18 }} exit={{ opacity: 0, scale: 0.7, width: 0 }} transition={springSnappy} className="inline-flex items-center justify-center"><CalendarCheck aria-hidden="true" size={17} /></motion.span> : <motion.span key="label" initial={{ opacity: 0, scale: 0.94, width: 0 }} animate={{ opacity: 1, scale: 1, width: 'auto' }} exit={{ opacity: 0, scale: 0.94, width: 0 }} transition={springSnappy} className="block overflow-hidden">{site.booking.buttonLabel}</motion.span>}
+          </AnimatePresence>
+        </ContentAction>
+      </motion.div>
     </motion.div>
   </motion.header>
 }

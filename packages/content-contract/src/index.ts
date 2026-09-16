@@ -1,4 +1,4 @@
-export const homepageDTOversion = 9 as const
+export const homepageDTOversion = 10 as const
 
 export const publicRouteRegistry = [
   { path: '/', parent: null, template: 'homepage', globalSlug: 'homepage' },
@@ -57,7 +57,8 @@ export type MediaDTO = {
 
 export type BrandLogoMode = 'text' | 'prefix' | 'replace'
 export type PageHeroDTO = { media: MediaDTO; grayscale: boolean }
-export type DesktopNavigationItem = { label: string; href: string; icon?: MediaDTO | null }
+export type DesktopNavigationChild = { label: string; href: string; icon?: MediaDTO | null }
+export type DesktopNavigationItem = DesktopNavigationChild & { children?: DesktopNavigationChild[] | null }
 
 export type ActionDTO = {
   href?: string | null
@@ -204,22 +205,31 @@ const sectionKeys = new Set<HomeSectionKey>(['hero', 'benefits', 'offers', 'cour
 const overlays = new Set(['overlay-lime', 'overlay-blue', 'overlay-cyan', 'overlay-violet', 'overlay-sunset', 'overlay-emerald', 'overlay-dark'])
 const meshes = new Set(['indigo', 'deep-blue', 'dark', 'lime', 'lime-soft', 'sky', 'lavender', 'sunset', 'navy-gold'])
 
+function assertNavigationIcon(icon: unknown) {
+  if (icon == null) return
+  if (typeof icon !== 'object') throw new Error('Desktop navigation contains an invalid icon.')
+  const media = icon as Partial<MediaDTO>
+  if (typeof media.alt !== 'string' || typeof media.url !== 'string' || typeof media.mimeType !== 'string' || !media.mimeType.startsWith('image/')) {
+    throw new Error('Desktop navigation contains an invalid icon.')
+  }
+}
+
+function assertNavigationItem(item: unknown, allowChildren: boolean) {
+  if (!item || typeof item !== 'object') throw new Error('Desktop navigation contains an invalid item.')
+  const { label, href, icon, children } = item as { label?: unknown; href?: unknown; icon?: unknown; children?: unknown }
+  if (typeof label !== 'string' || typeof href !== 'string') throw new Error('Desktop navigation contains an invalid item.')
+  assertNavigationIcon(icon)
+  if (children == null) return
+  if (!allowChildren || !Array.isArray(children)) throw new Error('Desktop navigation contains invalid children.')
+  children.forEach((child) => assertNavigationItem(child, false))
+}
+
 function assertDesktopNavigation(site: unknown) {
   if (!site || typeof site !== 'object') return
   const navigation = (site as { desktopNavigation?: unknown }).desktopNavigation
   if (navigation === undefined) return
   if (!Array.isArray(navigation)) throw new Error('Desktop navigation is invalid.')
-  for (const item of navigation) {
-    if (!item || typeof item !== 'object') throw new Error('Desktop navigation contains an invalid item.')
-    const { label, href, icon } = item as { label?: unknown; href?: unknown; icon?: unknown }
-    if (typeof label !== 'string' || typeof href !== 'string') throw new Error('Desktop navigation contains an invalid item.')
-    if (icon == null) continue
-    if (typeof icon !== 'object') throw new Error('Desktop navigation contains an invalid icon.')
-    const media = icon as Partial<MediaDTO>
-    if (typeof media.alt !== 'string' || typeof media.url !== 'string' || typeof media.mimeType !== 'string' || !media.mimeType.startsWith('image/')) {
-      throw new Error('Desktop navigation contains an invalid icon.')
-    }
-  }
+  navigation.forEach((item) => assertNavigationItem(item, true))
 }
 
 export function parseHomepageDTO(value: unknown): HomepageDTO {

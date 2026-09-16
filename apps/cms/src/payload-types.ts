@@ -2005,6 +2005,20 @@ export interface SiteSetting {
          * Необязательно. SVG отображается через безопасный <img>; без файла используется иконка по ссылке.
          */
         icon?: (number | null) | Media;
+        /**
+         * Необязательно. На desktop открывается при наведении или с клавиатуры.
+         */
+        children?:
+          | {
+              label: string;
+              href: string;
+              /**
+               * Необязательно. Без файла используется иконка по ссылке.
+               */
+              icon?: (number | null) | Media;
+              id?: string | null;
+            }[]
+          | null;
         id?: string | null;
       }[]
     | null;
@@ -3049,6 +3063,14 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         label?: T;
         href?: T;
         icon?: T;
+        children?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+              icon?: T;
+              id?: T;
+            };
         id?: T;
       };
   mobileNavigation?:

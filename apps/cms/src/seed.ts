@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url'
 import { getPayload, type CollectionSlug, type Payload } from 'payload'
 
 import config from './payload.config'
-import { mergeRequiredNavigation, navigationChanged, requiredPageLinks } from './content/requiredNavigation'
+import { mergeRequiredNavigation, navigationChanged, normalizeDesktopNavigation, priceNavigationChildren, requiredPageLinks } from './content/requiredNavigation'
 
 const seedVersion = 'prototype-v2'
 const dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -1004,7 +1004,7 @@ async function seed() {
       const desktopNavigation = currentSettings.desktopNavigation ?? []
       const mobileMenuNavigation = currentSettings.mobileMenuNavigation ?? []
       const footerNavigationValue = currentSettings.footerNavigation ?? []
-      const normalizedDesktopNavigation = mergeRequiredNavigation(desktopNavigation, requiredPageLinks)
+      const normalizedDesktopNavigation = normalizeDesktopNavigation(desktopNavigation)
       const normalizedMobileMenuNavigation = mergeRequiredNavigation(mobileMenuNavigation, requiredPageLinks)
       const normalizedFooterNavigation = mergeRequiredNavigation(footerNavigationValue, footerNavigation)
       const mobileNavigation = (currentSettings.mobileNavigation ?? []).map((item) => item.label === 'Главная' ? { ...item, href: '/' } : item.label === 'Тренировки' ? { ...item, href: '/training' } : item.label === 'Цены' ? { ...item, href: '/prices' } : item)
@@ -1035,7 +1035,7 @@ async function seed() {
           seedVersion,
           _status: 'published',
           brandName: 'UNLIM RIGA PADEL', brandLogoMode: 'prefix', headerSubtitle: 'Новорижское шоссе 3к1',
-          desktopNavigation: [...requiredPageLinks],
+          desktopNavigation: requiredPageLinks.filter(({ href }) => href !== '/training' && href !== '/coaches').map((item) => item.href === '/prices' ? { ...item, children: priceNavigationChildren.map((child) => ({ ...child })) } : item),
           mobileNavigation: [
             { label: 'Главная', href: '/', icon: 'Home' }, { label: 'Тренировки', href: '/training', icon: 'Dumbbell' }, { label: 'Цены', href: '/prices', icon: 'Tag' },
           ],

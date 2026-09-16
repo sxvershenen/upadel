@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { mergeRequiredNavigation, requiredPageLinks } from './requiredNavigation'
+import { ensureDesktopNavigationChildren, mergeRequiredNavigation, normalizeDesktopNavigation, requiredPageLinks } from './requiredNavigation'
 
 test('adds required absolute page links and preserves unrelated navigation rows', () => {
   const result = mergeRequiredNavigation([
@@ -35,4 +35,27 @@ test('keeps required links when legacy extras would exceed the CMS row limit', (
 
   assert.equal(result.length, 8)
   assert.deepEqual(result.slice(0, 7).map(({ label }) => label), requiredPageLinks.map(({ label }) => label))
+})
+
+test('adds the prices submenu without replacing configured children', () => {
+  const result = ensureDesktopNavigationChildren([
+    { label: 'Цены', href: '/prices' },
+    { label: 'Лига', href: '/league', children: [{ label: 'Таблица', href: '/league/table' }] },
+  ])
+
+  assert.deepEqual(result[0].children?.map(({ href }) => href), ['/prices', '/training', '/coaches'])
+  assert.deepEqual(result[1].children, [{ label: 'Таблица', href: '/league/table' }])
+})
+
+test('groups training and coaches under prices in desktop navigation', () => {
+  type TestNavigationRow = { label: string; href: string; children?: TestNavigationRow[] }
+  const result = normalizeDesktopNavigation<TestNavigationRow>([
+    { label: 'Цены', href: '/prices' },
+    { label: 'Тренировки', href: '/training' },
+    { label: 'Тренеры', href: '/coaches' },
+    { label: 'Турниры', href: '/tournaments' },
+  ])
+
+  assert.deepEqual(result.map(({ href }) => href), ['/prices', '/tournaments', '/blog', '/gift', '/about'])
+  assert.deepEqual(result[0].children?.map(({ href }) => href), ['/prices', '/training', '/coaches'])
 })

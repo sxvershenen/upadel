@@ -58,7 +58,7 @@ Use one tabbed `Главная` editor with live preview. Reusable entities live
 
 `Главная` uses these tabs: `Структура`, `Первый экран`, `Клуб`, `Услуги`, `Сообщество`, `SEO`. Catalog and thematic page globals additionally expose a `Шапка страницы` tab for hero media and grayscale. Reusable coaches, tournaments and articles remain collection-owned and are linked/resolved rather than copied.
 
-Shared header, mobile navigation/menu, contacts and footer belong to `Настройки сайта`, because every public page consumes them. Desktop navigation items may reference optional SVG icons from the Media collection; public rendering uses safe image URLs rather than editor-provided inline markup.
+Shared header, mobile navigation/menu, contacts and footer belong to `Настройки сайта`, because every public page consumes them. Desktop navigation items may contain typed submenu rows and both levels may reference optional SVG icons from the Media collection; public rendering uses safe image URLs rather than editor-provided inline markup.
 CMS users and SEO redirects are also managed from dedicated tabs inside `Настройки сайта`; their standalone navigation entries stay hidden.
 
 ## D11 — Catalog and detail routes — accepted

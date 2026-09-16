@@ -10,6 +10,6 @@ test('floating back link is desktop-only and positioned in the upper-left corner
   const html = renderToStaticMarkup(<FloatingBackLink href="/blog" />)
 
   assert.match(html, /href="\/blog"/)
-  assert.match(html, /class="[^"]*fixed[^"]*left-4[^"]*top-2\.5[^"]*hidden[^"]*md:inline-flex/)
+  assert.match(html, /class="[^"]*fixed[^"]*left-\[var\(--page-gutter\)\][^"]*top-2\.5[^"]*hidden[^"]*backdrop-blur-xl[^"]*md:inline-flex/)
   assert.match(html, />[\s\S]*Назад[\s\S]*<\/a>/)
 })

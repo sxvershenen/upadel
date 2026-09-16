@@ -53,9 +53,15 @@ export const SiteSettings: GlobalConfig = {
               label: 'Desktop-навигация',
               maxRows: 8,
               defaultValue: [
-                { label: 'Цены', href: '/prices' },
-                { label: 'Тренировки', href: '/training' },
-                { label: 'Тренеры', href: '/coaches' },
+                {
+                  label: 'Цены',
+                  href: '/prices',
+                  children: [
+                    { label: 'Аренда', href: '/prices' },
+                    { label: 'Тренировки', href: '/training' },
+                    { label: 'Тренеры', href: '/coaches' },
+                  ],
+                },
                 { label: 'Турниры', href: '/tournaments' },
                 { label: 'Статьи', href: '/blog' },
                 { label: 'Подарить', href: '/gift' },
@@ -65,6 +71,19 @@ export const SiteSettings: GlobalConfig = {
                 { name: 'label', type: 'text', label: 'Название', required: true },
                 { name: 'href', type: 'text', label: 'Ссылка', required: true, validate: validateInternalLink },
                 { name: 'icon', type: 'upload', relationTo: 'media', filterOptions: imageOnlyFilter, label: 'Иконка', admin: { description: 'Необязательно. SVG отображается через безопасный <img>; без файла используется иконка по ссылке.' } },
+                {
+                  name: 'children',
+                  type: 'array',
+                  dbName: 'desktop_nav_children',
+                  label: 'Подменю',
+                  maxRows: 6,
+                  admin: { description: 'Необязательно. На desktop открывается при наведении или с клавиатуры.' },
+                  fields: [
+                    { name: 'label', type: 'text', label: 'Название', required: true },
+                    { name: 'href', type: 'text', label: 'Ссылка', required: true, validate: validateInternalLink },
+                    { name: 'icon', type: 'upload', relationTo: 'media', filterOptions: imageOnlyFilter, label: 'Иконка', admin: { description: 'Необязательно. Без файла используется иконка по ссылке.' } },
+                  ],
+                },
               ],
             },
             {
