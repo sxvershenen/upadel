@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { desktopSubmenuKeyAction, initialHeaderScrollState, navigationIconPreset, nextHeaderScrollState } from './desktopHeaderState'
+import { bindHeaderScroll, desktopSubmenuKeyAction, initialHeaderScrollState, navigationIconPreset, nextHeaderScrollState } from './desktopHeaderState'
 
 test('header compacts after downward scroll and expands after upward scroll', () => {
   let state = initialHeaderScrollState()
@@ -31,4 +31,35 @@ test('submenu keyboard actions open, close, and preserve the link fallback', () 
   assert.equal(desktopSubmenuKeyAction('Escape', true), 'close')
   assert.equal(desktopSubmenuKeyAction('Enter', true), 'navigate')
   assert.equal(desktopSubmenuKeyAction('ArrowDown', true), null)
+})
+
+test('header scroll binding rebinds after an Astro page swap without duplicate listeners', () => {
+  let scrollY = 80
+  let nextFrame = 1
+  const scrollListeners = new Set<EventListener>()
+  const lifecycleListeners = new Set<EventListener>()
+  const scrollTarget = {
+    get scrollY() { return scrollY },
+    addEventListener: (_type: string, listener: EventListener) => { scrollListeners.add(listener) },
+    removeEventListener: (_type: string, listener: EventListener) => { scrollListeners.delete(listener) },
+    requestAnimationFrame: (callback: FrameRequestCallback) => { callback(0); return nextFrame++ },
+    cancelAnimationFrame: () => undefined,
+  }
+  const lifecycleTarget = {
+    addEventListener: (_type: string, listener: EventListener) => { lifecycleListeners.add(listener) },
+    removeEventListener: (_type: string, listener: EventListener) => { lifecycleListeners.delete(listener) },
+  }
+  const values: number[] = []
+  const dispose = bindHeaderScroll({ scrollTarget, lifecycleTarget, onScroll: (value) => values.push(value) })
+
+  scrollY = 140
+  scrollListeners.forEach((listener) => listener(new Event('scroll')))
+  lifecycleListeners.forEach((listener) => listener(new Event('astro:after-swap')))
+  scrollY = 170
+  scrollListeners.forEach((listener) => listener(new Event('scroll')))
+  dispose()
+
+  assert.deepEqual(values, [80, 140, 140, 170])
+  assert.equal(scrollListeners.size, 0)
+  assert.equal(lifecycleListeners.size, 0)
 })

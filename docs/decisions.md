@@ -86,3 +86,7 @@ Gallery management uses thumbnail cards, not a table. Media management shows liv
 CMS uses Payload's existing `theme-success-*` scale as one shared blue accent system. Light theme uses a clear royal blue (`#2563eb`), dark theme uses the same hue family with a calmer blue (`#6fa7d7`), and all active, focus, hover, status and analytics states consume shared `admin-accent-*` aliases. Neutral surfaces remain theme-driven; no shadows or glow are added.
 
 The reusable control sizes, field/button states and split-button rules are defined in `docs/cms-ui-system.md` and implemented through shared `admin-*` tokens in the Payload custom stylesheet.
+
+## D15 — Desktop navigation interaction — accepted
+
+On desktop, `Цены` is the only grouped top-level item; `Тренировки` and `Тренеры` remain its typed CMS-managed children. The black header compacts into an icon row while scrolling down (and expands on upward scroll), with spring transitions, animated tooltips and a dark morphing mega-menu. The compact state must survive Swup page replacement and respect reduced-motion preferences.

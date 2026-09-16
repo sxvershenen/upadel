@@ -26,6 +26,44 @@ export function desktopSubmenuKeyAction(key: string, open: boolean): DesktopSubm
   return null
 }
 
+type HeaderEventTarget = {
+  addEventListener: (type: string, listener: EventListener, options?: AddEventListenerOptions | boolean) => void
+  removeEventListener: (type: string, listener: EventListener, options?: EventListenerOptions | boolean) => void
+}
+
+type HeaderScrollTarget = HeaderEventTarget & {
+  scrollY: number
+  requestAnimationFrame: (callback: FrameRequestCallback) => number
+  cancelAnimationFrame: (handle: number) => void
+}
+
+/** Rebinds the global scroll listener after Astro/Swup swaps the page surface. */
+export function bindHeaderScroll({ scrollTarget, lifecycleTarget, onScroll }: { scrollTarget: HeaderScrollTarget; lifecycleTarget: HeaderEventTarget; onScroll: (scrollY: number) => void }): () => void {
+  let frame: number | null = null
+  const update = () => {
+    frame = null
+    onScroll(scrollTarget.scrollY)
+  }
+  const handleScroll: EventListener = () => {
+    if (frame !== null) return
+    frame = scrollTarget.requestAnimationFrame(update)
+  }
+  const bind = () => {
+    scrollTarget.removeEventListener('scroll', handleScroll)
+    scrollTarget.addEventListener('scroll', handleScroll, { passive: true })
+    update()
+  }
+  const handleSwap: EventListener = () => bind()
+
+  bind()
+  lifecycleTarget.addEventListener('astro:after-swap', handleSwap)
+  return () => {
+    scrollTarget.removeEventListener('scroll', handleScroll)
+    lifecycleTarget.removeEventListener('astro:after-swap', handleSwap)
+    if (frame !== null) scrollTarget.cancelAnimationFrame(frame)
+  }
+}
+
 export type HeaderScrollState = {
   anchorY: number
   compact: boolean

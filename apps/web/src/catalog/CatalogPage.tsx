@@ -46,5 +46,5 @@ function TournamentsCatalog({ dto }: { dto: TournamentsCatalogDTO }) {
 }
 
 export function CatalogPage({ dto }: { dto: CatalogDTO }) {
-  return <SiteFrame site={dto.site} backLink={{ href: '/' }}>{dto.kind === 'blog' ? <BlogCatalog dto={dto} /> : dto.kind === 'coaches' ? <CoachesCatalog dto={dto} /> : <TournamentsCatalog dto={dto} />}</SiteFrame>
+  return <SiteFrame site={dto.site}>{dto.kind === 'blog' ? <BlogCatalog dto={dto} /> : dto.kind === 'coaches' ? <CoachesCatalog dto={dto} /> : <TournamentsCatalog dto={dto} />}</SiteFrame>
 }

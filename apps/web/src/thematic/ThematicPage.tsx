@@ -120,5 +120,5 @@ function PageBody({ dto }: { dto: Exclude<ThematicPageDTO, PricesPageDTO> }) {
 }
 
 export function ThematicPage({ dto }: { dto: ThematicPageDTO }) {
-  return <SiteFrame site={dto.site} backLink={{ href: '/' }}><PageHeader page={dto.page} />{dto.kind === 'prices' ? <Prices dto={dto} /> : <PageBody dto={dto} />}</SiteFrame>
+  return <SiteFrame site={dto.site}><PageHeader page={dto.page} />{dto.kind === 'prices' ? <Prices dto={dto} /> : <PageBody dto={dto} />}</SiteFrame>
 }

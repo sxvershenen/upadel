@@ -256,7 +256,7 @@ function ActionPair({ entity, inverse = false }: { entity: string; inverse?: boo
 }
 
 export function PadelCourtsLanding({ site }: { site: SiteDTO }) {
-  return <SiteFrame site={site} backLink={{ href: '/' }}>
+  return <SiteFrame site={site}>
     <PageHeader
       page={{
         eyebrow: 'Официальные корты JUBO в России',

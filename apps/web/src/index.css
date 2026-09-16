@@ -30,9 +30,13 @@ button:not(:disabled), a[href], [role="button"] { cursor: pointer; }
   .desktop-header-subtitle { display: none; }
   .desktop-header-nav { gap: 0; }
 }
-.desktop-header[data-header-compact="true"] .desktop-header-island { width: min(840px, calc(100% - 2rem)); }
+.desktop-header[data-header-compact="true"] .desktop-header-island { width: fit-content; max-width: calc(100% - 2rem); }
+.desktop-header[data-header-compact="true"] .desktop-header-island { gap: 0; padding: .375rem .5rem .375rem 1.25rem; }
+.desktop-header[data-header-compact="true"] .desktop-header-nav { gap: 0; }
+.desktop-header[data-header-compact="true"] .desktop-header-utilities { gap: 0; }
+.desktop-header[data-header-compact="true"] .desktop-header-utility-link { border-left: 0; background: transparent; }
 @media (max-width: 1199px) {
-  .desktop-header[data-header-compact="true"] .desktop-header-island { width: min(820px, calc(100% - 2rem)); }
+  .desktop-header[data-header-compact="true"] .desktop-header-island { width: fit-content; }
 }
 .ui-select { appearance: none; background-color: #fff; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='none' stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.8' d='m5.5 7.5 4.5 4.5 4.5-4.5'/%3E%3C/svg%3E"); background-position: right 14px center; background-repeat: no-repeat; background-size: 18px; padding-right: 44px; cursor: pointer; }
 .ui-select option { background: #fff; color: var(--color-ink); }
