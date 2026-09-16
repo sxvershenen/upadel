@@ -89,4 +89,4 @@ The reusable control sizes, field/button states and split-button rules are defin
 
 ## D15 — Desktop navigation interaction — accepted
 
-On desktop, `Цены` is the only grouped top-level item; `Тренировки` and `Тренеры` remain its typed CMS-managed children. The black header compacts into an evenly spaced icon row while scrolling down (and expands on upward scroll), with non-stretching crossfades, animated tooltips and a dark gooey mega-menu. Desktop and mobile navigation chrome stays outside the Swup replacement surface; compact/menu state survives page replacement and respects reduced-motion preferences.
+On desktop, `Цены` is the only grouped top-level item; `Тренировки` and `Тренеры` remain its typed CMS-managed children. The black header compacts into an evenly spaced icon row while scrolling down (and expands on upward scroll), with spring layout motion, non-stretching crossfades, animated tooltips and a dark gooey mega-menu. Desktop and mobile navigation chrome stays outside the Swup replacement surface; compact/menu state survives page replacement and respects reduced-motion preferences.

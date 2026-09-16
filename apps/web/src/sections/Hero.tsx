@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CalendarCheck, MapPin, Play, Star, Users } from "lucide-react";
@@ -55,24 +55,6 @@ export function Hero() {
   const replaceBrand = Boolean(site.brandLogo) && site.brandLogoMode === "replace";
   const sectionRef = useRef<HTMLDivElement>(null);
   const mediaRef = useRef<HTMLImageElement | HTMLVideoElement>(null);
-
-  useLayoutEffect(() => {
-    const section = sectionRef.current;
-    if (!section || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    const ctx = gsap.context(() => {
-      const timeline = gsap.timeline({ defaults: { ease: "power3.out" } });
-      timeline
-        .fromTo("[data-hero-word]", { autoAlpha: 0, y: "0.7em", filter: "blur(5px)" }, { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 0.7, stagger: 0.045 }, 0)
-        .fromTo("[data-hero-accent]", { autoAlpha: 0, y: "0.5em", filter: "blur(5px)" }, { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 0.65 }, 0.28)
-        .fromTo("[data-hero-description]", { autoAlpha: 0, y: 28 }, { autoAlpha: 1, y: 0, duration: 0.65 }, 0.18)
-        .fromTo("[data-hero-cta]", { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.58, stagger: 0.12 }, 0.3)
-        .fromTo("[data-hero-social-proof]", { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.6 }, 0.4)
-        .fromTo("[data-hero-stat]", { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.55, stagger: 0.08 }, 0.42);
-    }, section);
-
-    return () => ctx.revert();
-  }, []);
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -146,10 +128,10 @@ export function Hero() {
             {hero.description}
           </p>
           <div className="mt-8 flex flex-nowrap items-center gap-2 sm:gap-3">
-            <div data-hero-cta="" className="flex-1 sm:flex-none">
+            <div data-hero-cta="primary" className="flex-1 sm:flex-none">
               <ContentAction action={hero.primaryAction} variant="primary" size="lg" icon={<CalendarCheck size={17} />} className="w-full px-5 sm:w-auto" />
             </div>
-            <div data-hero-cta="" className="flex-1 sm:flex-none">
+            <div data-hero-cta="secondary" className="flex-1 sm:flex-none">
               <ContentAction action={hero.secondaryAction} variant="glass" size="lg" icon={<Play size={17} />} className="w-full px-5 sm:w-auto" />
             </div>
             <SocialProof className="hidden md:flex" />

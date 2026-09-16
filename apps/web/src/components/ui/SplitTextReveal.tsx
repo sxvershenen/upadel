@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import type { CSSProperties } from "react";
 import { cn } from "../../utils/cn";
 import { springSoft } from "../../lib/motion";
 
@@ -48,7 +49,7 @@ export function SplitTextReveal({
       {...(animateOnMount ? {} : { initial: "hidden", whileInView: "show", viewport: { once: true, margin: "-80px" } })}
     >
       {words.map((item, index) => (
-        <motion.span key={`${item}-${index}`} data-hero-word={animateOnMount ? "" : undefined} className="mr-[0.25em] inline-block last:mr-0" variants={word}>
+        <motion.span key={`${item}-${index}`} data-hero-word={animateOnMount ? "" : undefined} style={animateOnMount ? { "--hero-word-index": index } as CSSProperties : undefined} className="mr-[0.25em] inline-block last:mr-0" variants={word}>
           {item}
         </motion.span>
       ))}

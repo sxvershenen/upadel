@@ -1,7 +1,7 @@
 import type { PricesPageDTO, ThematicPageDTO, TrainingPageDTO } from '@unlim/content-contract'
 import { BadgeCheck, Calendar, CalendarCheck, Car, Clock, Gift, Layers3, Lightbulb, MapPin, PanelTop, RefreshCw, Sparkles, Target, Thermometer, Train, TrendingUp, Users } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { useRef, useState, type KeyboardEvent } from 'react'
+import { useRef, useState, type CSSProperties, type KeyboardEvent } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import type { Swiper as SwiperType } from 'swiper'
 import 'swiper/css'
@@ -120,5 +120,5 @@ function PageBody({ dto }: { dto: Exclude<ThematicPageDTO, PricesPageDTO> }) {
 }
 
 export function ThematicPage({ dto }: { dto: ThematicPageDTO }) {
-  return <SiteFrame site={dto.site}><PageHeader page={dto.page} />{dto.kind === 'prices' ? <Prices dto={dto} /> : <PageBody dto={dto} />}</SiteFrame>
+  return <SiteFrame site={dto.site}><PageHeader page={dto.page} /><div data-page-enter="content" style={{ '--page-enter-delay': '160ms' } as CSSProperties}>{dto.kind === 'prices' ? <Prices dto={dto} /> : <PageBody dto={dto} />}</div></SiteFrame>
 }
