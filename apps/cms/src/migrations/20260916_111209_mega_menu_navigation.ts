@@ -3,24 +3,24 @@ import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   await db.execute(sql`
    CREATE TABLE "desktop_nav_children" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" varchar NOT NULL,
-  	"id" varchar PRIMARY KEY NOT NULL,
-  	"label" varchar,
-  	"href" varchar,
-  	"icon_id" integer
+    "_order" integer NOT NULL,
+    "_parent_id" varchar NOT NULL,
+    "id" varchar PRIMARY KEY NOT NULL,
+    "label" varchar,
+    "href" varchar,
+    "icon_id" integer
   );
-  
+
   CREATE TABLE "_desktop_nav_children_v" (
-  	"_order" integer NOT NULL,
-  	"_parent_id" integer NOT NULL,
-  	"id" serial PRIMARY KEY NOT NULL,
-  	"label" varchar,
-  	"href" varchar,
-  	"icon_id" integer,
-  	"_uuid" varchar
+    "_order" integer NOT NULL,
+    "_parent_id" integer NOT NULL,
+    "id" serial PRIMARY KEY NOT NULL,
+    "label" varchar,
+    "href" varchar,
+    "icon_id" integer,
+    "_uuid" varchar
   );
-  
+
   ALTER TABLE "desktop_nav_children" ADD CONSTRAINT "desktop_nav_children_icon_id_media_id_fk" FOREIGN KEY ("icon_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "desktop_nav_children" ADD CONSTRAINT "desktop_nav_children_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."site_settings_desktop_navigation"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "_desktop_nav_children_v" ADD CONSTRAINT "_desktop_nav_children_v_icon_id_media_id_fk" FOREIGN KEY ("icon_id") REFERENCES "public"."media"("id") ON DELETE set null ON UPDATE no action;
