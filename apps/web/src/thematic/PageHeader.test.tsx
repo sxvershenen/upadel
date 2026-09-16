@@ -6,7 +6,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 
 import { PageHeader } from './PageHeader'
 
-test('compact page header renders one heading and a floating back link', () => {
+test('page header renders one heading without an extra back-link wrapper or spacer', () => {
   const html = renderToStaticMarkup(<PageHeader page={{
     eyebrow: 'Раздел',
     title: 'Заголовок страницы',
@@ -15,8 +15,7 @@ test('compact page header renders one heading and a floating back link', () => {
   }} />)
 
   assert.equal((html.match(/<h1/g) ?? []).length, 1)
-  assert.match(html, /<a href="\/" class="[^"]*fixed[^\"]*right-4[^\"]*top-4[^\"]*md:top-\[30px\][^\"]*">[\s\S]*Назад/)
-  assert.doesNotMatch(html, /sticky top-0/)
-  assert.doesNotMatch(html, /border-b border-ink\/5/)
+  assert.doesNotMatch(html, /Назад/)
+  assert.doesNotMatch(html, /h-\[60px\]/)
   assert.doesNotMatch(html, /min-h-\[760px\]/)
 })

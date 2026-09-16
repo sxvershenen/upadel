@@ -1,4 +1,4 @@
-export const homepageDTOversion = 8 as const
+export const homepageDTOversion = 9 as const
 
 export const publicRouteRegistry = [
   { path: '/', parent: null, template: 'homepage', globalSlug: 'homepage' },
@@ -46,6 +46,7 @@ export type MediaDTO = {
 
 export type BrandLogoMode = 'text' | 'prefix' | 'replace'
 export type PageHeroDTO = { media: MediaDTO; grayscale: boolean }
+export type DesktopNavigationItem = { label: string; href: string; icon?: MediaDTO | null }
 
 export type ActionDTO = {
   href?: string | null
@@ -69,7 +70,7 @@ export type HomepageDTO = {
     brandLogo?: MediaDTO | null
     brandLogoMode: BrandLogoMode
     headerSubtitle: string
-    desktopNavigation: Array<{ label: string; href: string }>
+    desktopNavigation: DesktopNavigationItem[]
     mobileNavigation: Array<{ label: string; href: string; icon: 'Home' | 'Dumbbell' | 'Tag' }>
     mobileMenuNavigation: Array<{ label: string; href: string }>
     mobileActions: { playLabel: string; menuLabel: string; menuTitle: string; quickActionsTitle: string; bookCourtLabel: string; callLabel: string; directionsLabel: string }
@@ -192,11 +193,30 @@ const sectionKeys = new Set<HomeSectionKey>(['hero', 'benefits', 'offers', 'cour
 const overlays = new Set(['overlay-lime', 'overlay-blue', 'overlay-cyan', 'overlay-violet', 'overlay-sunset', 'overlay-emerald', 'overlay-dark'])
 const meshes = new Set(['indigo', 'deep-blue', 'dark', 'lime', 'lime-soft', 'sky', 'lavender', 'sunset', 'navy-gold'])
 
+function assertDesktopNavigation(site: unknown) {
+  if (!site || typeof site !== 'object') return
+  const navigation = (site as { desktopNavigation?: unknown }).desktopNavigation
+  if (navigation === undefined) return
+  if (!Array.isArray(navigation)) throw new Error('Desktop navigation is invalid.')
+  for (const item of navigation) {
+    if (!item || typeof item !== 'object') throw new Error('Desktop navigation contains an invalid item.')
+    const { label, href, icon } = item as { label?: unknown; href?: unknown; icon?: unknown }
+    if (typeof label !== 'string' || typeof href !== 'string') throw new Error('Desktop navigation contains an invalid item.')
+    if (icon == null) continue
+    if (typeof icon !== 'object') throw new Error('Desktop navigation contains an invalid icon.')
+    const media = icon as Partial<MediaDTO>
+    if (typeof media.alt !== 'string' || typeof media.url !== 'string' || typeof media.mimeType !== 'string' || !media.mimeType.startsWith('image/')) {
+      throw new Error('Desktop navigation contains an invalid icon.')
+    }
+  }
+}
+
 export function parseHomepageDTO(value: unknown): HomepageDTO {
   if (!value || typeof value !== 'object') throw new Error('Homepage DTO must be an object.')
   const dto = value as Partial<HomepageDTO>
   if (dto.version !== homepageDTOversion) throw new Error(`Unsupported homepage DTO version: ${String(dto.version)}.`)
   if (!dto.site || !dto.home || !dto.entities || !Array.isArray(dto.sections)) throw new Error('Homepage DTO is incomplete.')
+  assertDesktopNavigation(dto.site)
   if (dto.sections.some((section) => !section || !sectionKeys.has(section.key) || typeof section.visible !== 'boolean')) {
     throw new Error('Homepage DTO contains an invalid section definition.')
   }
@@ -227,6 +247,7 @@ export function parseCatalogDTO(value: unknown): CatalogDTO {
   const dto = value as Partial<CatalogDTO>
   if (dto.version !== homepageDTOversion || !dto.site || !dto.page || !Array.isArray(dto.items)) throw new Error('Catalog DTO is incomplete.')
   if (dto.kind !== 'blog' && dto.kind !== 'coaches' && dto.kind !== 'tournaments') throw new Error('Catalog DTO kind is invalid.')
+  assertDesktopNavigation(dto.site)
   return dto as CatalogDTO
 }
 
@@ -235,6 +256,7 @@ export function parseDetailDTO(value: unknown): DetailDTO {
   const dto = value as Partial<DetailDTO>
   if (dto.version !== homepageDTOversion || !dto.site || !dto.page || !dto.item || !Array.isArray(dto.related)) throw new Error('Detail DTO is incomplete.')
   if (dto.kind !== 'blog' && dto.kind !== 'coaches' && dto.kind !== 'tournaments') throw new Error('Detail DTO kind is invalid.')
+  assertDesktopNavigation(dto.site)
   return dto as DetailDTO
 }
 
@@ -243,5 +265,6 @@ export function parseThematicPageDTO(value: unknown): ThematicPageDTO {
   const dto = value as Partial<ThematicPageDTO>
   if (dto.version !== homepageDTOversion || !dto.site || !dto.page) throw new Error('Page DTO is incomplete.')
   if (!['prices', 'training', 'gift', 'courts', 'gallery', 'about', 'contacts', 'policy', 'oferta'].includes(String(dto.kind))) throw new Error('Page DTO kind is invalid.')
+  assertDesktopNavigation(dto.site)
   return dto as ThematicPageDTO
 }

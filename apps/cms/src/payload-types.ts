@@ -2001,6 +2001,10 @@ export interface SiteSetting {
     | {
         label: string;
         href: string;
+        /**
+         * Необязательно. SVG отображается через безопасный <img>; без файла используется иконка по ссылке.
+         */
+        icon?: (number | null) | Media;
         id?: string | null;
       }[]
     | null;
@@ -3044,6 +3048,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
     | {
         label?: T;
         href?: T;
+        icon?: T;
         id?: T;
       };
   mobileNavigation?:

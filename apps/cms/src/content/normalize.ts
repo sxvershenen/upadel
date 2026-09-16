@@ -52,7 +52,7 @@ export function siteDTO(site: SiteSetting, origin: string, partners: Array<Recor
     brandLogo: mediaDTO(site.brandLogo, origin, 'original'),
     brandLogoMode: (site.brandLogoMode ?? 'prefix') as BrandLogoMode,
     headerSubtitle: site.headerSubtitle ?? '',
-    desktopNavigation: (site.desktopNavigation ?? []).map(({ label, href }) => ({ label, href })),
+    desktopNavigation: (site.desktopNavigation ?? []).map(({ label, href, icon }) => ({ label, href, icon: mediaDTO(icon, origin, 'original') })),
     mobileNavigation: (site.mobileNavigation ?? []).map(({ label, href, icon }) => ({ label, href, icon })),
     mobileMenuNavigation: (site.mobileMenuNavigation ?? []).map(({ label, href }) => ({ label, href })),
     mobileActions: {

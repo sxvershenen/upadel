@@ -8,6 +8,7 @@ import * as migration_20260915_142020_tournament_regulation from './20260915_142
 import * as migration_20260915_202623_training_gift_pages from './20260915_202623_training_gift_pages';
 import * as migration_20260915_203042_editable_section_headings from './20260915_203042_editable_section_headings';
 import * as migration_20260915_234500_add_lead_vk from './20260915_234500_add_lead_vk';
+import * as migration_20260916_065756_desktop_navigation_icon from './20260916_065756_desktop_navigation_icon';
 
 export const migrations = [
   {
@@ -59,5 +60,10 @@ export const migrations = [
     up: migration_20260915_234500_add_lead_vk.up,
     down: migration_20260915_234500_add_lead_vk.down,
     name: '20260915_234500_add_lead_vk'
+  },
+  {
+    up: migration_20260916_065756_desktop_navigation_icon.up,
+    down: migration_20260916_065756_desktop_navigation_icon.down,
+    name: '20260916_065756_desktop_navigation_icon'
   },
 ];

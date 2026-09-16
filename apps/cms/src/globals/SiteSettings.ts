@@ -64,6 +64,7 @@ export const SiteSettings: GlobalConfig = {
               fields: [
                 { name: 'label', type: 'text', label: 'Название', required: true },
                 { name: 'href', type: 'text', label: 'Ссылка', required: true, validate: validateInternalLink },
+                { name: 'icon', type: 'upload', relationTo: 'media', filterOptions: imageOnlyFilter, label: 'Иконка', admin: { description: 'Необязательно. SVG отображается через безопасный <img>; без файла используется иконка по ссылке.' } },
               ],
             },
             {

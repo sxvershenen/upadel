@@ -114,6 +114,16 @@ function scanSiteSettings(target: Map<string, MediaUsage>, doc: Record<string, u
       if (mediaID) addUsage(target, { mediaID, href: '/admin/globals/site-settings', location }, state)
     }
   }
+  for (const item of valuesAtPath(doc, 'desktopNavigation')) {
+    if (!item || typeof item !== 'object') continue
+    const row = item as Record<string, unknown>
+    const mediaID = relationID(row.icon)
+    if (mediaID) addUsage(target, {
+      mediaID,
+      href: '/admin/globals/site-settings',
+      location: `Настройки сайта → Навигация → ${String(row.label ?? 'Пункт')} → иконка`,
+    }, state)
+  }
 }
 
 function scanCatalogPage(target: Map<string, MediaUsage>, doc: Record<string, unknown>, state: MediaUsage['state'], label: string, slug: string) {
