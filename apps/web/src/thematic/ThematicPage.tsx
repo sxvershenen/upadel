@@ -36,7 +36,8 @@ function Prices({ dto }: { dto: PricesPageDTO }) {
     event.preventDefault(); setActive(tabs[next].key); refs.current[next]?.focus()
   }
   return <>
-    <div className="container-page sticky top-14 z-30 bg-page/95 pb-8 pt-8 backdrop-blur md:static md:pb-12 md:pt-8"><div role="tablist" aria-label="Разделы цен" className="grid grid-cols-3 gap-1 rounded-2xl bg-ink p-1 md:mx-auto md:max-w-[760px] md:gap-2 md:p-2">
+    <div aria-hidden="true" className="h-8 md:hidden" />
+    <div className="container-page sticky top-[var(--page-gutter)] z-30 pb-8 md:static md:pb-12 md:pt-8"><div role="tablist" aria-label="Разделы цен" className="grid grid-cols-3 gap-1 rounded-2xl bg-ink p-1 md:mx-auto md:max-w-[760px] md:gap-2 md:p-2">
       {tabs.map((tab, index) => <button key={tab.key} ref={(node) => { refs.current[index] = node }} id={`price-tab-${tab.key}`} role="tab" aria-selected={active === tab.key} aria-controls={`price-panel-${tab.key}`} tabIndex={active === tab.key ? 0 : -1} onKeyDown={(event) => onKeyDown(event, index)} onClick={() => setActive(tab.key)} className={`relative min-h-12 rounded-xl px-2 py-3 type-ui font-semibold transition-colors md:min-h-14 md:px-6 ${active === tab.key ? 'text-lime-ink' : 'text-white/65 hover:bg-white/10 hover:text-white'}`}>{active === tab.key && <motion.span layoutId="prices-tab-indicator" className="absolute inset-0 rounded-xl bg-lime" transition={springLayout} />}<span className="relative z-10">{tab.label}</span></button>)}
     </div></div>
     <div className="container-page pb-8 md:pb-12">

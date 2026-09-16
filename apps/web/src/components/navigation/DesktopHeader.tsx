@@ -5,7 +5,7 @@ import { useEffect, useId, useRef, useState, type FocusEvent, type KeyboardEvent
 
 import { useActionLayer } from '../../actions/ActionLayer'
 import { useHomeHref, useSite } from '../../content/ContentContext'
-import { springLayout, springSnappy, tapScaleSm } from '../../lib/motion'
+import { springSnappy, tapScaleSm } from '../../lib/motion'
 import { ContentAction } from '../ContentAction'
 import { VkIcon } from '../ui/VkIcon'
 import { bindHeaderScroll, desktopSubmenuKeyAction, initialHeaderScrollState, navigationIconPreset, nextHeaderScrollState, type HeaderScrollState, type NavigationIconPreset } from './desktopHeaderState'
@@ -24,7 +24,8 @@ const navigationIcons: Record<NavigationIconPreset, LucideIcon> = {
 }
 
 const iconHover = { scale: 1.08, y: -1 }
-const fadeSwap = { duration: 0.16, ease: 'easeOut' as const }
+const headerLayoutSpring = { type: 'spring' as const, visualDuration: 0.26, bounce: 0.08 }
+const headerSwapSpring = (visible: boolean) => ({ type: 'spring' as const, visualDuration: 0.18, bounce: 0.1, delay: visible ? 0.03 : 0 })
 
 function NavigationIcon({ href, icon, size = 16 }: { href: string; icon?: { url: string } | null; size?: number }) {
   if (icon) return <img src={icon.url} alt="" aria-hidden="true" className="h-4 w-4 object-contain" />
@@ -69,8 +70,8 @@ function CompactTooltip({ children, filterId, reduceMotion }: { children: ReactN
 
 function AnimatedNavigationContents({ expanded, item }: { expanded: boolean; item: DesktopNavigationChild }) {
   return <span className="relative grid place-items-center overflow-hidden">
-    <motion.span aria-hidden={!expanded} animate={{ opacity: expanded ? 1 : 0, y: expanded ? 0 : -3 }} transition={fadeSwap} className="desktop-header-nav-label col-start-1 row-start-1 block">{item.label}</motion.span>
-    <motion.span aria-hidden="true" animate={{ opacity: expanded ? 0 : 1, y: expanded ? 3 : 0 }} transition={fadeSwap} className="desktop-header-nav-icon col-start-1 row-start-1 inline-flex items-center justify-center"><NavigationIcon href={item.href} icon={item.icon} /></motion.span>
+    <motion.span aria-hidden={!expanded} animate={{ opacity: expanded ? 1 : 0, scale: expanded ? 1 : 0.68, y: expanded ? 0 : -2 }} transition={headerSwapSpring(expanded)} className="desktop-header-nav-label col-start-1 row-start-1 block origin-center">{item.label}</motion.span>
+    <motion.span aria-hidden="true" animate={{ opacity: expanded ? 0 : 1, scale: expanded ? 0.68 : 1, y: expanded ? 2 : 0 }} transition={headerSwapSpring(!expanded)} className="desktop-header-nav-icon col-start-1 row-start-1 inline-flex origin-center items-center justify-center"><NavigationIcon href={item.href} icon={item.icon} /></motion.span>
   </span>
 }
 
@@ -204,8 +205,10 @@ function DesktopNavigationLink({ compact, filterId, item, wide }: { compact: boo
     }
   }
 
-  return <div
+  return <motion.div
     ref={rootRef}
+    layout="position"
+    transition={headerLayoutSpring}
     data-submenu-open={open ? 'true' : 'false'}
     className="desktop-header-compact-control relative shrink-0"
     onPointerEnter={handlePointerEnter}
@@ -216,7 +219,6 @@ function DesktopNavigationLink({ compact, filterId, item, wide }: { compact: boo
   >
     <motion.a
       ref={triggerRef}
-      layout
       href={item.href}
       data-analytics-action="internal"
       aria-label={item.label}
@@ -225,7 +227,7 @@ function DesktopNavigationLink({ compact, filterId, item, wide }: { compact: boo
       aria-controls={hasMenu ? panelId : undefined}
       whileHover={reduceMotion ? undefined : iconHover}
       whileTap={reduceMotion ? undefined : tapScaleSm}
-      transition={springLayout}
+      transition={springSnappy}
       className={`desktop-header-nav-link se-1 relative flex h-[var(--control-sm)] shrink-0 items-center justify-center gap-2 overflow-hidden py-1.5 font-medium text-white/70 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2 ${expanded ? 'px-2.5 type-caption' : 'w-[var(--control-sm)] px-0 type-caption'}`}
     >
       <AnimatedNavigationContents expanded={expanded} item={item} />
@@ -235,17 +237,17 @@ function DesktopNavigationLink({ compact, filterId, item, wide }: { compact: boo
     <AnimatePresence initial={false}>
       {hasMenu && open && <MegaMenuPanel children={children} id={panelId} label={item.label} reduceMotion={reduceMotion} triggerWidth={triggerWidth} onNavigate={closeMenu} />}
     </AnimatePresence>
-  </div>
+  </motion.div>
 }
 
 function HeaderBrand({ compact, filterId, homeHref, logo, logoMode, name, reduceMotion, subtitle }: { compact: boolean; filterId: string; homeHref: string; logo?: { url: string } | null; logoMode: 'text' | 'prefix' | 'replace'; name: string; reduceMotion: boolean; subtitle: string }) {
   const showLogo = Boolean(logo) && logoMode !== 'text'
   const replaceBrand = showLogo && logoMode === 'replace'
-  return <motion.div layout transition={springLayout} className="desktop-header-compact-control relative shrink-0">
-    <motion.a layout href={homeHref} aria-label={name} whileHover={compact && !reduceMotion ? iconHover : undefined} whileTap={compact && !reduceMotion ? tapScaleSm : undefined} transition={springLayout} className={`flex h-[var(--control-sm)] shrink-0 items-center justify-center overflow-hidden leading-none focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2 ${compact ? 'w-[var(--control-sm)] text-white/70 hover:text-white' : 'text-white'}`}>
+  return <motion.div layout="position" transition={headerLayoutSpring} className="desktop-header-compact-control relative shrink-0">
+    <motion.a href={homeHref} aria-label={name} whileHover={compact && !reduceMotion ? iconHover : undefined} whileTap={compact && !reduceMotion ? tapScaleSm : undefined} transition={springSnappy} className={`flex h-[var(--control-sm)] shrink-0 items-center justify-center overflow-hidden leading-none focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2 ${compact ? 'w-[var(--control-sm)] text-white/70 hover:text-white' : 'text-white'}`}>
       <span className="grid place-items-center">
-        <motion.span animate={{ opacity: compact ? 1 : 0, y: compact ? 0 : 3 }} transition={fadeSwap} className="col-start-1 row-start-1 inline-flex items-center justify-center" aria-hidden={!compact}><Home aria-hidden="true" size={17} strokeWidth={1.9} /></motion.span>
-        <motion.span animate={{ opacity: compact ? 0 : 1, y: compact ? -3 : 0 }} transition={fadeSwap} className="col-start-1 row-start-1 flex items-center gap-2.5" aria-hidden={compact}>
+        <motion.span animate={{ opacity: compact ? 1 : 0, scale: compact ? 1 : 0.68, y: compact ? 0 : 2 }} transition={headerSwapSpring(compact)} className="col-start-1 row-start-1 inline-flex origin-center items-center justify-center" aria-hidden={!compact}><Home aria-hidden="true" size={17} strokeWidth={1.9} /></motion.span>
+        <motion.span animate={{ opacity: compact ? 0 : 1, scale: compact ? 0.68 : 1, y: compact ? -2 : 0 }} transition={headerSwapSpring(!compact)} className="col-start-1 row-start-1 flex origin-center items-center gap-2.5" aria-hidden={compact}>
           {showLogo ? <img src={logo?.url} alt="" aria-hidden="true" className={replaceBrand ? 'h-9 max-w-[150px] object-contain' : 'h-7 w-7 object-contain'} /> : <span className="h-2.5 w-2.5 shrink-0 rounded-[3px] bg-lime" />}
           {!replaceBrand && <span className="flex flex-col"><span className="text-[14px] font-semibold tracking-[0] text-white">{name}</span><span className="desktop-header-subtitle type-micro text-white/50">{subtitle}</span></span>}
         </motion.span>
@@ -256,7 +258,7 @@ function HeaderBrand({ compact, filterId, homeHref, logo, logoMode, name, reduce
 }
 
 function UtilityControl({ className = '', compact, filterId, label, reduceMotion, children }: { className?: string; compact: boolean; filterId: string; label: string; reduceMotion: boolean; children: ReactNode }) {
-  return <motion.div layout transition={springLayout} className={`desktop-header-compact-control relative shrink-0 ${className}`}>{children}{compact && <CompactTooltip filterId={filterId} reduceMotion={reduceMotion}>{label}</CompactTooltip>}</motion.div>
+  return <motion.div layout="position" transition={headerLayoutSpring} className={`desktop-header-compact-control relative shrink-0 ${className}`}>{children}{compact && <CompactTooltip filterId={filterId} reduceMotion={reduceMotion}>{label}</CompactTooltip>}</motion.div>
 }
 
 export function DesktopHeader() {
@@ -266,6 +268,7 @@ export function DesktopHeader() {
   const telegram = site.footer.socialLinks.find(({ provider }) => provider === 'telegram')
   const vk = site.footer.socialLinks.find(({ provider }) => provider === 'vk')
   const [scrollState, setScrollState] = useState<HeaderScrollState>(() => initialHeaderScrollState())
+  const [tooltipSuppressed, setTooltipSuppressed] = useState(false)
   const headerRef = useRef<HTMLElement>(null)
   const wide = useWideHeader()
   const compact = scrollState.compact
@@ -274,34 +277,41 @@ export function DesktopHeader() {
 
   useEffect(() => {
     headerRef.current?.setAttribute('data-header-hydrated', 'true')
+    const suppressTooltips = () => setTooltipSuppressed(true)
     const disposeScroll = bindHeaderScroll({
       scrollTarget: window,
       lifecycleTarget: document,
       onScroll: (scrollY) => setScrollState((current) => nextHeaderScrollState(current, scrollY)),
     })
+    window.addEventListener('scroll', suppressTooltips, { passive: true })
+    document.addEventListener('astro:after-swap', suppressTooltips)
+    document.addEventListener('swup:page:view', suppressTooltips)
     return () => {
       disposeScroll()
+      window.removeEventListener('scroll', suppressTooltips)
+      document.removeEventListener('astro:after-swap', suppressTooltips)
+      document.removeEventListener('swup:page:view', suppressTooltips)
       headerRef.current?.removeAttribute('data-header-hydrated')
     }
   }, [])
 
   const utilityClass = compact ? 'bg-transparent text-white/70 hover:text-white' : 'se-1 bg-white/10 text-white hover:bg-white/20'
 
-  return <motion.header ref={headerRef} initial={{ opacity: 0, y: -24 }} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring', stiffness: 180, damping: 26, mass: 1.1 }} data-header-compact={compact ? 'true' : 'false'} data-header-direction={scrollState.direction ?? 'none'} data-header-hydrated="false" data-header-scroll="true" className="desktop-header fixed inset-x-0 top-0 z-50 hidden justify-center md:flex">
+  return <motion.header ref={headerRef} initial={{ opacity: 0, y: -24 }} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring', stiffness: 180, damping: 26, mass: 1.1 }} data-header-compact={compact ? 'true' : 'false'} data-header-direction={scrollState.direction ?? 'none'} data-header-hydrated="false" data-header-scroll="true" data-header-tooltips={tooltipSuppressed ? 'suppressed' : 'ready'} onClickCapture={() => setTooltipSuppressed(true)} onFocusCapture={() => setTooltipSuppressed(false)} onPointerLeave={() => setTooltipSuppressed(false)} onPointerMove={() => setTooltipSuppressed(false)} className="desktop-header fixed inset-x-0 top-0 z-50 hidden justify-center md:flex">
     <GooFilter id={tooltipFilterId} strength={5} />
-    <motion.div layout transition={springLayout} className={`desktop-header-island se-top-2 mx-4 flex items-center whitespace-nowrap bg-black text-white ${compact ? 'gap-0 py-1.5 pl-3 pr-2' : 'justify-between gap-4 py-2.5 pl-7 pr-3'}`}>
+    <motion.div layout transition={headerLayoutSpring} className={`desktop-header-island se-top-2 mx-4 flex items-center whitespace-nowrap bg-black text-white ${compact ? 'gap-0 py-1.5 pl-3 pr-2' : 'justify-between gap-4 py-2.5 pl-7 pr-3'}`}>
       <HeaderBrand compact={compact} filterId={tooltipFilterId} homeHref={homeHref} logo={site.brandLogo} logoMode={site.brandLogoMode} name={site.brandName} reduceMotion={reduceMotion} subtitle={site.headerSubtitle} />
-      <nav className={`desktop-header-nav flex min-w-0 items-center ${compact ? 'gap-0' : 'gap-0.5'}`} aria-label="Основная навигация">
+      <motion.nav layout="position" transition={headerLayoutSpring} className={`desktop-header-nav flex min-w-0 items-center ${compact ? 'gap-0' : 'gap-0.5'}`} aria-label="Основная навигация">
         {site.desktopNavigation.map((item) => <DesktopNavigationLink key={`${item.href}-${item.label}`} compact={compact} filterId={tooltipFilterId} item={item} wide={wide} />)}
-      </nav>
-      <motion.div layout transition={springLayout} className={`desktop-header-utilities flex shrink-0 items-center ${compact ? 'gap-0' : 'gap-1.5'}`}>
+      </motion.nav>
+      <motion.div layout="position" transition={headerLayoutSpring} className={`desktop-header-utilities flex shrink-0 items-center ${compact ? 'gap-0' : 'gap-1.5'}`}>
         {telegram && <UtilityControl className="hidden lg:block" compact={compact} filterId={tooltipFilterId} label="Telegram" reduceMotion={reduceMotion}><motion.a href={telegram.url} data-contact-confirmed data-analytics-action="telegram" onClick={(event) => { event.preventDefault(); requestContact('telegram') }} target="_blank" rel="noreferrer" aria-label="Telegram" whileHover={reduceMotion ? undefined : iconHover} whileTap={reduceMotion ? undefined : tapScaleSm} transition={springSnappy} className={`desktop-header-utility-link flex h-[var(--control-sm)] w-[var(--control-sm)] items-center justify-center focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2 ${utilityClass}`}><Send aria-hidden="true" size={16} strokeWidth={1.9} /></motion.a></UtilityControl>}
         {vk && <UtilityControl className="hidden lg:block" compact={compact} filterId={tooltipFilterId} label="VK" reduceMotion={reduceMotion}><motion.a href={vk.url} data-contact-confirmed data-analytics-action="vk" onClick={(event) => { event.preventDefault(); requestContact('vk') }} target="_blank" rel="noreferrer" aria-label="VK" whileHover={reduceMotion ? undefined : iconHover} whileTap={reduceMotion ? undefined : tapScaleSm} transition={springSnappy} className={`desktop-header-utility-link flex h-[var(--control-sm)] w-[var(--control-sm)] items-center justify-center focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2 ${utilityClass}`}><VkIcon size={16} /></motion.a></UtilityControl>}
         <UtilityControl compact={compact} filterId={tooltipFilterId} label="Позвонить" reduceMotion={reduceMotion}><motion.a href={`tel:${site.contacts.phoneValue}`} data-contact-confirmed data-analytics-action="phone" onClick={(event) => { event.preventDefault(); requestContact('phone') }} aria-label="Позвонить" whileHover={reduceMotion ? undefined : iconHover} whileTap={reduceMotion ? undefined : tapScaleSm} transition={springSnappy} className={`desktop-header-utility-link flex h-[var(--control-sm)] w-[var(--control-sm)] items-center justify-center focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2 ${utilityClass}`}><Phone aria-hidden="true" size={16} strokeWidth={1.9} /></motion.a></UtilityControl>
-        <UtilityControl compact={compact} filterId={tooltipFilterId} label={site.booking.buttonLabel} reduceMotion={reduceMotion}><ContentAction action={{ mode: 'booking', label: site.booking.buttonLabel }} variant="primary" size="sm" aria-label={site.booking.buttonLabel} layout transition={springLayout} className={`overflow-hidden ${compact ? 'w-[var(--control-sm)] px-0' : ''}`}>
+        <UtilityControl compact={compact} filterId={tooltipFilterId} label={site.booking.buttonLabel} reduceMotion={reduceMotion}><ContentAction action={{ mode: 'booking', label: site.booking.buttonLabel }} variant="primary" size="sm" aria-label={site.booking.buttonLabel} className={`overflow-hidden ${compact ? 'w-[var(--control-sm)] px-0' : ''}`}>
           <span className="grid place-items-center">
-            <motion.span animate={{ opacity: compact ? 1 : 0, y: compact ? 0 : 3 }} transition={fadeSwap} className="col-start-1 row-start-1 inline-flex items-center justify-center" aria-hidden={!compact}><CalendarCheck aria-hidden="true" size={17} strokeWidth={1.9} /></motion.span>
-            <motion.span animate={{ opacity: compact ? 0 : 1, y: compact ? -3 : 0 }} transition={fadeSwap} className="col-start-1 row-start-1 block" aria-hidden={compact}>{site.booking.buttonLabel}</motion.span>
+            <motion.span animate={{ opacity: compact ? 1 : 0, scale: compact ? 1 : 0.68, y: compact ? 0 : 2 }} transition={headerSwapSpring(compact)} className="col-start-1 row-start-1 inline-flex origin-center items-center justify-center" aria-hidden={!compact}><CalendarCheck aria-hidden="true" size={17} strokeWidth={1.9} /></motion.span>
+            <motion.span animate={{ opacity: compact ? 0 : 1, scale: compact ? 0.68 : 1, y: compact ? -2 : 0 }} transition={headerSwapSpring(!compact)} className="col-start-1 row-start-1 block origin-center" aria-hidden={compact}>{site.booking.buttonLabel}</motion.span>
           </span>
         </ContentAction></UtilityControl>
       </motion.div>

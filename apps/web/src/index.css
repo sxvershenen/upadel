@@ -34,6 +34,7 @@ button:not(:disabled), a[href], [role="button"] { cursor: pointer; }
   to { opacity: 1; filter: blur(0); transform: none; }
 }
 @media (prefers-reduced-motion: no-preference) {
+  [data-hero-parallax-media] { transform: scale(1.08); will-change: transform; }
   [data-hero-word] {
     animation: unlim-enter-word .7s cubic-bezier(.16, 1, .3, 1) backwards;
     animation-delay: calc(var(--hero-word-index, 0) * 45ms);
@@ -56,6 +57,14 @@ button:not(:disabled), a[href], [role="button"] { cursor: pointer; }
   [data-page-enter="title"] { --page-enter-delay: 60ms; }
   [data-page-enter="intro"] { --page-enter-delay: 120ms; }
   [data-page-enter="actions"] { --page-enter-delay: 180ms; }
+}
+
+@keyframes mobile-nav-enter {
+  from { opacity: 0; transform: translate3d(0, 100%, 0); }
+  to { opacity: 1; transform: none; }
+}
+@media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
+  [data-mobile-nav-enter] { animation: mobile-nav-enter .44s cubic-bezier(.16, 1, .3, 1) backwards; }
 }
 
 .desktop-header-island { width: min(960px, calc(100% - 2rem)); }
@@ -124,7 +133,7 @@ button:not(:disabled), a[href], [role="button"] { cursor: pointer; }
   position: relative;
   z-index: 1;
   display: block;
-  padding: .6rem .75rem .35rem;
+  padding: .725rem .75rem .225rem;
   color: #fff;
   font-size: .6875rem;
   font-weight: 500;
@@ -133,19 +142,19 @@ button:not(:disabled), a[href], [role="button"] { cursor: pointer; }
   transform: translateY(-.15rem);
   transition: opacity 100ms ease 80ms, transform 180ms ease 60ms;
 }
-.desktop-header-compact-control:hover > .desktop-header-tooltip,
-.desktop-header-compact-control:focus-within > .desktop-header-tooltip {
+.desktop-header[data-header-tooltips="ready"] .desktop-header-compact-control:hover > .desktop-header-tooltip,
+.desktop-header[data-header-tooltips="ready"] .desktop-header-compact-control:has(:focus-visible) > .desktop-header-tooltip {
   opacity: 1;
   transform: translate(-50%, 0);
 }
-.desktop-header-compact-control:hover > .desktop-header-tooltip .desktop-header-tooltip-source,
-.desktop-header-compact-control:focus-within > .desktop-header-tooltip .desktop-header-tooltip-source { transform: translateX(-50%) scale(1); }
-.desktop-header-compact-control:hover > .desktop-header-tooltip .desktop-header-tooltip-bead,
-.desktop-header-compact-control:focus-within > .desktop-header-tooltip .desktop-header-tooltip-bead { transform: translateX(-50%) scale(.8); }
-.desktop-header-compact-control:hover > .desktop-header-tooltip .desktop-header-tooltip-body,
-.desktop-header-compact-control:focus-within > .desktop-header-tooltip .desktop-header-tooltip-body { transform: scaleX(1) scaleY(1); }
-.desktop-header-compact-control:hover > .desktop-header-tooltip .desktop-header-tooltip-label,
-.desktop-header-compact-control:focus-within > .desktop-header-tooltip .desktop-header-tooltip-label { opacity: 1; transform: translateY(0); }
+.desktop-header[data-header-tooltips="ready"] .desktop-header-compact-control:hover > .desktop-header-tooltip .desktop-header-tooltip-source,
+.desktop-header[data-header-tooltips="ready"] .desktop-header-compact-control:has(:focus-visible) > .desktop-header-tooltip .desktop-header-tooltip-source { transform: translateX(-50%) scale(1); }
+.desktop-header[data-header-tooltips="ready"] .desktop-header-compact-control:hover > .desktop-header-tooltip .desktop-header-tooltip-bead,
+.desktop-header[data-header-tooltips="ready"] .desktop-header-compact-control:has(:focus-visible) > .desktop-header-tooltip .desktop-header-tooltip-bead { transform: translateX(-50%) scale(.8); }
+.desktop-header[data-header-tooltips="ready"] .desktop-header-compact-control:hover > .desktop-header-tooltip .desktop-header-tooltip-body,
+.desktop-header[data-header-tooltips="ready"] .desktop-header-compact-control:has(:focus-visible) > .desktop-header-tooltip .desktop-header-tooltip-body { transform: scaleX(1) scaleY(1); }
+.desktop-header[data-header-tooltips="ready"] .desktop-header-compact-control:hover > .desktop-header-tooltip .desktop-header-tooltip-label,
+.desktop-header[data-header-tooltips="ready"] .desktop-header-compact-control:has(:focus-visible) > .desktop-header-tooltip .desktop-header-tooltip-label { opacity: 1; transform: translateY(0); }
 @media (max-width: 1199px) {
   .desktop-header[data-header-compact="true"] .desktop-header-island { width: fit-content; }
 }

@@ -17,9 +17,8 @@ export function MobileBottomNav() {
   return (
     <>
       <motion.nav
-        initial={{ opacity: 0, y: "100%" }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ type: "spring", stiffness: 180, damping: 26, mass: 1.1, delay: 0.25 }}
+        initial={false}
+        data-mobile-nav-enter=""
         className="fixed inset-x-0 bottom-0 z-50 flex justify-center pb-[env(safe-area-inset-bottom)] md:hidden"
       >
         <div className="mb-0 flex w-full items-center justify-between bg-ink px-3 pb-2 pt-2.5">

@@ -13,8 +13,8 @@ gsap.registerPlugin(ScrollTrigger);
 function HeroBackgroundMedia({ media, poster, className, setRef }: { media: MediaDTO; poster?: MediaDTO | null; className?: string; setRef?: (node: HTMLImageElement | HTMLVideoElement | null) => void }) {
   const classes = cn("absolute inset-0 h-full w-full object-cover", className);
   return media.mimeType.startsWith("video/")
-    ? <video ref={setRef} autoPlay muted loop playsInline poster={poster?.url} className={classes}><source src={media.url} type={media.mimeType} /></video>
-    : <img ref={setRef} src={media.url} alt={media.alt} className={classes} />;
+    ? <video ref={setRef} data-hero-parallax-media={setRef ? "" : undefined} autoPlay muted loop playsInline poster={poster?.url} className={classes}><source src={media.url} type={media.mimeType} /></video>
+    : <img ref={setRef} data-hero-parallax-media={setRef ? "" : undefined} src={media.url} alt={media.alt} className={classes} />;
 }
 
 function SocialProof({ className }: { className?: string }) {

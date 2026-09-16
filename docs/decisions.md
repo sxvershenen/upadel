@@ -72,7 +72,7 @@ Gallery management uses thumbnail cards, not a table. Media management shows liv
 
 ## D12 — Thematic page layouts — accepted
 
-- `/prices`: clearly styled `Аренда / Тренировки / Абонементы` tabs, designed especially for mobile usability.
+- `/prices`: clearly styled `Аренда / Тренировки / Абонементы` tabs; on mobile the transparent sticky wrapper uses the same top inset as the page's side gutter.
 - `/training`: a compact CMS-managed methodology infographic leads into program cards in the upper half, followed by an editable rich-text SEO article.
 - `/courts`: infographic court information; desktop masonry gallery with lightbox, mobile swipe sliders.
 - `/gift`: a code-defined, CMS-managed certificate landing with typed benefits, steps, FAQ, CTA and rich-text SEO article.
@@ -89,4 +89,4 @@ The reusable control sizes, field/button states and split-button rules are defin
 
 ## D15 — Desktop navigation interaction — accepted
 
-On desktop, `Цены` is the only grouped top-level item; `Тренировки` and `Тренеры` remain its typed CMS-managed children. The black header compacts into an evenly spaced icon row while scrolling down (and expands on upward scroll), with spring layout motion, non-stretching crossfades, animated tooltips and a dark gooey mega-menu. Desktop and mobile navigation chrome stays outside the Swup replacement surface; compact/menu state survives page replacement and respects reduced-motion preferences.
+On desktop, `Цены` is the only grouped top-level item; `Тренировки` and `Тренеры` remain its typed CMS-managed children. The black header compacts into an evenly spaced icon row while scrolling down (and expands on upward scroll): the pill morphs with spring layout motion while labels and fixed-aspect icons swap through independent scale-and-fade springs. Tooltips require current pointer hover or keyboard-visible focus, and scroll/page navigation clears stale intent. The grouped item keeps its dark gooey mega-menu. Desktop and mobile navigation chrome stays outside the Swup replacement surface; compact/menu state survives page replacement and respects reduced-motion preferences.
