@@ -15,10 +15,6 @@ function getSurface() {
   return surface
 }
 
-function getHeaders(surface: HTMLElement) {
-  return Array.from(surface.querySelectorAll<HTMLElement>('header, .page-hero, [data-transition-hero]'))
-}
-
 function resetTransitionStyles() {
   const surface = document.querySelector<HTMLElement>('#swup')
   if (!surface) return
@@ -26,10 +22,6 @@ function resetTransitionStyles() {
   gsap.killTweensOf(surface)
   surface.style.removeProperty('opacity')
   surface.style.removeProperty('transform')
-  getHeaders(surface).forEach((header) => {
-    gsap.killTweensOf(header)
-    header.style.removeProperty('border-radius')
-  })
 }
 
 function updateMetadata(nextDocument: Document) {
@@ -48,8 +40,6 @@ function waitFor(animation: gsap.core.Animation) {
 function animateOut() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return Promise.resolve()
   const surface = getSurface()
-  const headers = getHeaders(surface)
-  headers.forEach((header) => gsap.to(header, { borderRadius: 48, duration: 0.42, ease: 'power2.in' }))
   return waitFor(gsap.to(surface, {
     opacity: 0.2,
     y: -25,
@@ -62,16 +52,13 @@ function animateOut() {
 function animateIn() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return Promise.resolve()
   const surface = getSurface()
-  const headers = getHeaders(surface)
   gsap.set(surface, { opacity: 0, y: 35, scale: 0.95 })
-  gsap.set(headers, { borderRadius: 48 })
   return waitFor(gsap.to(surface, {
     opacity: 1,
     y: 0,
     scale: 1,
     duration: 0.6,
     ease: 'power4.out',
-    onStart: () => headers.forEach((header) => gsap.to(header, { borderRadius: 0, duration: 0.6, ease: 'power4.out' })),
     onComplete: () => gsap.set(surface, { clearProps: 'transform,opacity' }),
   }))
 }

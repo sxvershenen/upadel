@@ -63,7 +63,7 @@ const enableGlobalTransitions = !Astro.url.pathname.startsWith('/transitions/') 
         return target.closest('a[href], button[data-prefetch-href]')
       }
       const prefetch = (target) => {
-        if (!target || target.dataset.unlimPrefetched === 'true') return
+        if (!target) return
         const rawHref = target.getAttribute('href') || target.getAttribute('data-prefetch-href')
         if (!rawHref || rawHref.startsWith('#') || target.hasAttribute('download')) return
         if (target.getAttribute('target') === '_blank' || target.getAttribute('data-no-prefetch') !== null) return
@@ -77,7 +77,6 @@ const enableGlobalTransitions = !Astro.url.pathname.startsWith('/transitions/') 
         if (url.pathname === location.pathname && url.search === location.search) return
         if (prefetches.has(url.href)) return
         prefetches.add(url.href)
-        target.dataset.unlimPrefetched = 'true'
         const link = document.createElement('link')
         link.rel = 'prefetch'
         link.as = 'document'
