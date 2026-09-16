@@ -19,6 +19,19 @@ function getHeaders(surface: HTMLElement) {
   return Array.from(surface.querySelectorAll<HTMLElement>('header, .page-hero, [data-transition-hero]'))
 }
 
+function resetTransitionStyles() {
+  const surface = document.querySelector<HTMLElement>('#swup')
+  if (!surface) return
+
+  gsap.killTweensOf(surface)
+  surface.style.removeProperty('opacity')
+  surface.style.removeProperty('transform')
+  getHeaders(surface).forEach((header) => {
+    gsap.killTweensOf(header)
+    header.style.removeProperty('border-radius')
+  })
+}
+
 function updateMetadata(nextDocument: Document) {
   document.title = nextDocument.title
   const description = nextDocument.querySelector('meta[name="description"]')?.getAttribute('content')
@@ -85,8 +98,13 @@ export function GlobalPageTransition() {
         'page:view': (visit) => {
           if (visit.to.document) updateMetadata(visit.to.document)
         },
+        'visit:abort': () => {
+          ballRef.current?.cancel()
+          resetTransitionStyles()
+        },
         'visit:fail': () => {
           ballRef.current?.cancel()
+          resetTransitionStyles()
         },
       },
     })
@@ -96,6 +114,7 @@ export function GlobalPageTransition() {
 
     return () => {
       ballRef.current?.cancel()
+      resetTransitionStyles()
       void swup.destroy()
     }
   }, [])
