@@ -1,0 +1,63 @@
+import * as migration_20260914_230951_analytics_mvp from './20260914_230951_analytics_mvp';
+import * as migration_20260914_232431_analytics_late_event_marker from './20260914_232431_analytics_late_event_marker';
+import * as migration_20260914_234029_page_map_redirects from './20260914_234029_page_map_redirects';
+import * as migration_20260915_000622_external_integrations_notifications from './20260915_000622_external_integrations_notifications';
+import * as migration_20260915_092628_cms_admin_pages from './20260915_092628_cms_admin_pages';
+import * as migration_20260915_124056_add_page_hero_logo from './20260915_124056_add_page_hero_logo';
+import * as migration_20260915_142020_tournament_regulation from './20260915_142020_tournament_regulation';
+import * as migration_20260915_202623_training_gift_pages from './20260915_202623_training_gift_pages';
+import * as migration_20260915_203042_editable_section_headings from './20260915_203042_editable_section_headings';
+import * as migration_20260915_234500_add_lead_vk from './20260915_234500_add_lead_vk';
+
+export const migrations = [
+  {
+    up: migration_20260914_230951_analytics_mvp.up,
+    down: migration_20260914_230951_analytics_mvp.down,
+    name: '20260914_230951_analytics_mvp',
+  },
+  {
+    up: migration_20260914_232431_analytics_late_event_marker.up,
+    down: migration_20260914_232431_analytics_late_event_marker.down,
+    name: '20260914_232431_analytics_late_event_marker',
+  },
+  {
+    up: migration_20260914_234029_page_map_redirects.up,
+    down: migration_20260914_234029_page_map_redirects.down,
+    name: '20260914_234029_page_map_redirects',
+  },
+  {
+    up: migration_20260915_000622_external_integrations_notifications.up,
+    down: migration_20260915_000622_external_integrations_notifications.down,
+    name: '20260915_000622_external_integrations_notifications',
+  },
+  {
+    up: migration_20260915_092628_cms_admin_pages.up,
+    down: migration_20260915_092628_cms_admin_pages.down,
+    name: '20260915_092628_cms_admin_pages',
+  },
+  {
+    up: migration_20260915_124056_add_page_hero_logo.up,
+    down: migration_20260915_124056_add_page_hero_logo.down,
+    name: '20260915_124056_add_page_hero_logo',
+  },
+  {
+    up: migration_20260915_142020_tournament_regulation.up,
+    down: migration_20260915_142020_tournament_regulation.down,
+    name: '20260915_142020_tournament_regulation',
+  },
+  {
+    up: migration_20260915_202623_training_gift_pages.up,
+    down: migration_20260915_202623_training_gift_pages.down,
+    name: '20260915_202623_training_gift_pages',
+  },
+  {
+    up: migration_20260915_203042_editable_section_headings.up,
+    down: migration_20260915_203042_editable_section_headings.down,
+    name: '20260915_203042_editable_section_headings'
+  },
+  {
+    up: migration_20260915_234500_add_lead_vk.up,
+    down: migration_20260915_234500_add_lead_vk.down,
+    name: '20260915_234500_add_lead_vk'
+  },
+];

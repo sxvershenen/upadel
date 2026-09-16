@@ -1,0 +1,91 @@
+---
+import type { TransitionPageKey } from './TransitionDemoData'
+import { transitionPageLinks, transitionPages } from './TransitionDemoData'
+
+const { page } = Astro.props as { page: TransitionPageKey }
+const content = transitionPages[page]
+---
+
+<article class="transition-demo-page min-h-screen overflow-hidden bg-page text-ink">
+  <header class="transition-element transition-hero transition-demo-hero relative isolate overflow-hidden bg-ink text-white">
+    <img src={content.image} alt={content.imageAlt} class="absolute inset-0 -z-20 h-full w-full object-cover" />
+    <div class="absolute inset-0 -z-10 bg-[linear-gradient(110deg,rgba(12,14,18,.97)_0%,rgba(12,14,18,.75)_42%,rgba(12,14,18,.2)_100%)]"></div>
+    <div class="absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-t from-ink to-transparent"></div>
+
+    <div class="container-page flex min-h-[430px] flex-col justify-between gap-12 pb-10 pt-28 md:min-h-[480px] md:pb-14 md:pt-32">
+      <div class="flex items-start justify-between gap-6">
+        <div class="flex items-center gap-3 type-caption text-white/60">
+          <span class="flex h-8 w-8 items-center justify-center rounded-full border border-white/20 text-[11px] text-white/80">{content.index}</span>
+          <span>{content.kicker}</span>
+        </div>
+        <span class="hidden rounded-full border border-white/15 px-3 py-1.5 type-micro uppercase text-white/50 sm:inline-flex">Server rendered demo</span>
+      </div>
+
+      <div class="max-w-[920px]">
+        <h1 class="max-w-[760px] text-[clamp(2.75rem,6vw,6.7rem)] font-semibold leading-[.88] tracking-[-.075em] text-white">{content.title}</h1>
+        <p class="mt-8 max-w-[640px] type-editorial text-white/65 md:mt-10">{content.intro}</p>
+        <div class="mt-8 flex flex-wrap items-center gap-2 md:mt-10">
+          {transitionPageLinks.map((link) => (
+            <a
+              href={'/transitions/' + link.key}
+              data-transition-link
+              data-transition-page={link.key}
+              aria-current={page === link.key ? 'page' : undefined}
+              class:list={[
+                'se-1 inline-flex min-h-11 items-center gap-3 px-4 type-ui font-semibold transition-colors',
+                page === link.key ? 'bg-lime text-lime-ink' : 'bg-white/10 text-white/70 hover:bg-white/20 hover:text-white',
+              ]}
+            >
+              {link.label}
+              {page === link.key && <span class="transition-demo-current-dot" aria-hidden="true"></span>}
+            </a>
+          ))}
+          <a href="#transition-details" class="se-1 inline-flex min-h-11 items-center gap-2 px-4 type-ui text-white/60 transition-colors hover:text-white">Scroll to explore <span aria-hidden="true">→</span></a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="transition-details" class="container-page py-12 md:py-16">
+    <section class="grid gap-12 lg:grid-cols-[.95fr_1.05fr] lg:gap-20">
+      <div class="transition-element transition-copy">
+        <span class="type-eyebrow text-ink-soft">Why this composition</span>
+        <h2 class="type-section mt-4 max-w-[680px] text-ink">Короткий маршрут, в котором страница уступает место следующей</h2>
+        <p class="type-body mt-6 max-w-[580px] text-ink-soft">Это не отдельный шаблон сайта, а изолированная лаборатория переходов. Навигация остаётся обычными ссылками с реальными URL — анимация подключается только в браузере поверх уже готовой HTML-разметки.</p>
+        <div class="mt-8 flex items-center gap-3 type-caption text-ink-muted"><span class="text-text-accent" aria-hidden="true">✦</span> У каждой версии один и тот же сценарий и один исполнитель: Swup + GSAP.</div>
+      </div>
+
+      <dl class="transition-element transition-stats grid grid-cols-3 gap-3 self-start">
+        {content.stats.map((stat) => (
+          <div class="se-3 bg-white p-4 md:p-6">
+            <dt class="text-[clamp(1.65rem,4vw,3.6rem)] font-semibold leading-none tracking-[-.07em] text-ink">{stat.value}</dt>
+            <dd class="mt-3 type-caption text-ink-soft">{stat.label}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+
+    <section class="transition-element transition-cards mt-20 grid gap-3 md:mt-24 md:grid-cols-3">
+      {content.features.map((feature) => (
+        <article class="transition-element transition-card se-3 border border-ink/10 bg-white p-6 md:min-h-[265px] md:p-7">
+          <span class="type-caption text-ink-muted">{feature.number}</span>
+          <h3 class="type-title-card mt-16 text-ink md:mt-24">{feature.title}</h3>
+          <p class="type-body-sm mt-3 text-ink-soft">{feature.body}</p>
+        </article>
+      ))}
+    </section>
+
+    <section class:list={[
+      'transition-element transition-quote transition-demo-quote mt-16 overflow-hidden p-7 text-white md:mt-20 md:p-12',
+      content.accent === 'cyan' ? 'bg-[#083a43]' : 'bg-[#2b4108]',
+    ]}>
+      <div class="flex items-start justify-between gap-8"><span class="type-eyebrow text-white/50">A note on the feeling</span><span class="type-caption text-white/35">{content.index} / 02</span></div>
+      <p class="mt-16 max-w-[820px] text-[clamp(2rem,5vw,5rem)] font-semibold leading-[.96] tracking-[-.06em] text-white">{content.quote}</p>
+    </section>
+
+    <nav aria-label="Перейти на другую тестовую страницу" class="transition-element transition-footer mt-12 flex flex-col justify-between gap-5 border-t border-ink/10 pt-6 sm:flex-row sm:items-center">
+      <span class="type-caption text-ink-muted">Мяч летит по новой траектории на каждом переходе.</span>
+      <a href={'/transitions/' + (page === 'serve' ? 'rally' : 'serve')} data-transition-link data-transition-page={page === 'serve' ? 'rally' : 'serve'} class="inline-flex items-center gap-2 type-ui font-semibold text-ink transition-colors hover:text-text-accent">Следующая композиция <span aria-hidden="true">→</span></a>
+    </nav>
+  </main>
+</article>

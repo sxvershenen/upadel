@@ -1,0 +1,844 @@
+/* Keep Payload's underline affordance for ordinary admin navigation while
+   making custom views and card/list links read like native admin controls.
+   Lexical editor/content links are outside these scoped selectors. */
+@layer payload-default {
+  /*
+   * CMS palette: shadcn-inspired neutral surfaces with one blue accent.
+   * Keep every accent state in this scale so custom views cannot drift into
+   * a collection of unrelated blues.
+   */
+  :root,
+  html[data-theme='light'] {
+    --theme-success-50: #eff6ff;
+    --theme-success-100: #dbeafe;
+    --theme-success-150: #bfdbfe;
+    --theme-success-200: #93c5fd;
+    --theme-success-250: #7fb5f4;
+    --theme-success-300: #60a5fa;
+    --theme-success-350: #4f91ed;
+    --theme-success-400: #3b82f6;
+    --theme-success-450: #3275e2;
+    --theme-success-500: #2563eb;
+    --theme-success-550: #1d4ed8;
+    --theme-success-600: #1e40af;
+    --theme-success-650: #1e3a8a;
+    --theme-success-700: #1e3a8a;
+    --theme-success-750: #172554;
+    --theme-success-800: #172554;
+    --theme-success-850: #102044;
+    --theme-success-900: #0f172a;
+    --theme-success-950: #020617;
+
+    --admin-accent: var(--theme-success-500);
+    --admin-accent-hover: var(--theme-success-550);
+    --admin-accent-muted: var(--theme-success-100);
+    --admin-accent-subtle: var(--theme-success-150);
+    --admin-accent-text: var(--theme-success-700);
+    --admin-accent-contrast: #fff;
+    --admin-accent-soft: var(--admin-accent-muted);
+  }
+
+  html[data-theme='dark'] {
+    --theme-success-50: #0f1722;
+    --theme-success-100: #162335;
+    --theme-success-150: #1d3049;
+    --theme-success-200: #284666;
+    --theme-success-250: #345b86;
+    --theme-success-300: #4271a7;
+    --theme-success-350: #4f84b9;
+    --theme-success-400: #5b94c9;
+    --theme-success-450: #659ed0;
+    --theme-success-500: #6fa7d7;
+    --theme-success-550: #7fb0dc;
+    --theme-success-600: #8fbbe2;
+    --theme-success-650: #a1c5e7;
+    --theme-success-700: #b3d0eb;
+    --theme-success-750: #c3daf0;
+    --theme-success-800: #d2e3f5;
+    --theme-success-850: #ddeaf8;
+    --theme-success-900: #e7f0fa;
+    --theme-success-950: #f1f6fc;
+
+    --admin-accent: var(--theme-success-500);
+    --admin-accent-hover: var(--theme-success-550);
+    --admin-accent-muted: var(--theme-success-100);
+    --admin-accent-subtle: var(--theme-success-150);
+    --admin-accent-text: var(--theme-success-800);
+    --admin-accent-contrast: #fff;
+    --admin-accent-soft: var(--admin-accent-muted);
+  }
+
+  /* Shared CMS control contract. Custom admin views use the same values. */
+  :root {
+    --admin-surface-background: var(--theme-elevation-50);
+    --admin-surface-raised: var(--theme-elevation-100);
+    --admin-surface-hover: var(--theme-elevation-150);
+    --admin-divider: var(--theme-elevation-150);
+    --admin-page-title-size: 32px;
+    --admin-page-title-line-height: 36px;
+    --admin-page-title-offset: 2px;
+    --admin-page-title-band-min-height: var(--admin-control-height);
+    --admin-section-title-size: 20px;
+    --admin-page-padding-block: 20px;
+    --admin-surface-padding: 20px;
+    --admin-control-height: 40px;
+    --admin-control-height-icon: 40px;
+    --admin-tab-item-height: 32px;
+    --admin-tab-inset: 4px;
+    --admin-control-radius: var(--style-radius-s);
+    --admin-control-padding-x: 12px;
+    --admin-control-gap: 8px;
+    --admin-control-icon-size: 18px;
+    --admin-field-background: var(--theme-elevation-100);
+    --admin-field-hover-background: var(--theme-elevation-150);
+    --admin-field-disabled-background: var(--theme-elevation-50);
+    --admin-field-disabled-foreground: var(--theme-elevation-500);
+    --admin-button-background: var(--theme-elevation-100);
+    --admin-button-hover-background: var(--theme-elevation-150);
+  }
+
+  .template-default *,
+  .template-default *::before,
+  .template-default *::after {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  .template-default :focus-visible {
+    outline: 2px solid var(--admin-accent);
+    outline-offset: 2px;
+  }
+
+  .template-default input:not([type='checkbox']):not([type='radio']),
+  .template-default textarea,
+  .template-default select {
+    border: 0;
+    min-height: var(--admin-control-height);
+    border-radius: var(--admin-control-radius);
+    background: var(--admin-field-background);
+    color: var(--theme-text);
+    box-sizing: border-box;
+    font: inherit;
+    line-height: 1.25;
+    transition: background-color 120ms ease;
+  }
+
+  .template-default input:not([type='checkbox']):not([type='radio']):hover:not(:disabled),
+  .template-default textarea:hover:not(:disabled),
+  .template-default select:hover:not(:disabled) {
+    background: var(--admin-field-hover-background);
+  }
+
+  .template-default input:not([type='checkbox']):not([type='radio']):disabled,
+  .template-default textarea:disabled,
+  .template-default select:disabled {
+    cursor: not-allowed;
+    opacity: .65;
+  }
+
+  .template-default select:not([multiple]) {
+    appearance: none;
+    padding-inline-end: 36px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='none' stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.8' d='m5.5 7.5 4.5 4.5 4.5-4.5'/%3E%3C/svg%3E");
+    background-position: right 10px center;
+    background-repeat: no-repeat;
+    background-size: 18px;
+  }
+
+  .template-default input:not([type='checkbox']):not([type='radio']),
+  .template-default select,
+  .template-default .react-select .rs__control,
+  .template-default .react-select-container .rs__control {
+    height: var(--admin-control-height) !important;
+    min-height: var(--admin-control-height) !important;
+    max-height: var(--admin-control-height) !important;
+    box-sizing: border-box;
+  }
+
+  .template-default .react-select .rs__control,
+  .template-default .react-select-container .rs__control {
+    padding: 0 10px !important;
+  }
+
+  .template-default .react-select .rs__value-container,
+  .template-default .react-select-container .rs__value-container,
+  .template-default .react-select .rs__indicators,
+  .template-default .react-select-container .rs__indicators {
+    height: var(--admin-control-height);
+    min-height: 0;
+  }
+
+  .template-default .react-select .rs__value-container,
+  .template-default .react-select-container .rs__value-container {
+    padding-inline: 0;
+  }
+
+  .template-default .react-select .rs__indicators,
+  .template-default .react-select-container .rs__indicators {
+    padding-inline-end: 2px;
+  }
+
+  .template-default .react-select .rs__indicator,
+  .template-default .react-select-container .rs__indicator {
+    padding: 0 2px;
+  }
+
+  .template-default .where-builder .btn,
+  .template-default .where-builder .popup-button {
+    height: var(--admin-control-height) !important;
+    min-height: var(--admin-control-height) !important;
+    margin: 0;
+    padding-inline: var(--admin-control-padding-x);
+    box-sizing: border-box;
+  }
+
+  .template-default small {
+    line-height: 1.35;
+  }
+
+  .template-default input:not([type='checkbox']):not([type='radio']),
+  .template-default textarea {
+    padding-inline: 12px;
+  }
+
+  .template-default .btn__content {
+    display: inline-flex;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    align-items: center;
+    justify-content: center;
+    gap: var(--admin-control-gap);
+    box-sizing: border-box;
+    line-height: 1;
+  }
+
+  .template-default .btn__label {
+    min-width: 0;
+    line-height: 1.2;
+    text-align: center;
+  }
+
+  .template-default .doc-header__title,
+  .template-default .list-header__title {
+    font-size: var(--admin-page-title-size);
+    line-height: var(--admin-page-title-line-height);
+  }
+
+  .template-default .doc-header,
+  .template-default .list-header {
+    margin-top: var(--admin-page-title-offset);
+  }
+
+  .template-default .admin-page-frame {
+    width: 100%;
+    max-width: 1500px;
+    min-width: 0;
+    margin-inline: auto;
+    padding-block: var(--admin-page-title-offset) var(--admin-page-padding-block);
+  }
+
+  .template-default .admin-page-title-band {
+    display: flex;
+    min-height: var(--admin-page-title-band-min-height);
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .template-default .admin-page-title-band > :first-child {
+    min-width: 0;
+  }
+
+  .template-default .doc-header__header {
+    min-height: var(--admin-control-height);
+  }
+
+  .template-default .list-header__title-and-actions {
+    min-height: var(--admin-page-title-band-min-height);
+    align-items: flex-start;
+  }
+
+  @media (min-width: 769px) {
+    .template-default .list-header {
+      align-items: flex-start;
+    }
+
+    .template-default .list-header__title-actions,
+    .template-default .list-header__actions {
+      margin-bottom: 0;
+    }
+
+    .template-default .doc-header__header {
+      flex-direction: row;
+      align-items: flex-start;
+    }
+
+    .template-default .doc-header__title {
+      min-width: 0;
+    }
+
+    .template-default .doc-tabs {
+      width: auto;
+      flex: 0 0 auto;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    .template-default .collection-list {
+      margin-top: var(--admin-page-title-offset);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .template-default .doc-header__title {
+      display: flex;
+      min-height: var(--admin-page-title-line-height);
+      align-items: center;
+    }
+
+    .template-default .doc-tabs {
+      width: 100%;
+    }
+  }
+
+  .template-default .btn__icon,
+  .template-default .btn__icon svg {
+    width: var(--admin-control-icon-size) !important;
+    height: var(--admin-control-icon-size) !important;
+    flex: 0 0 var(--admin-control-icon-size);
+  }
+
+  .template-default .btn--icon-only .btn__content {
+    gap: 0;
+  }
+
+  .template-default .search-bar .search-filter input,
+  .template-default .search-filter__input,
+  .template-default .item-search__input {
+    min-height: var(--admin-control-height);
+    padding-inline-start: var(--admin-control-height);
+    padding-inline-end: var(--admin-control-padding-x);
+    border: 0;
+    border-radius: var(--admin-control-radius);
+    background: var(--admin-field-background);
+  }
+
+  .template-default .search-bar {
+    height: var(--admin-control-height);
+    min-height: var(--admin-control-height);
+    background: transparent;
+  }
+
+  .template-default .search-bar .icon--search,
+  .template-default .search-filter > svg,
+  .template-default .item-search .icon--search {
+    width: var(--admin-control-height);
+    height: var(--admin-control-height);
+    padding: 12px;
+    box-sizing: border-box;
+  }
+
+  .template-default .search-bar .search-filter input {
+    height: var(--admin-control-height);
+    box-sizing: border-box;
+  }
+
+  @media (min-width: 769px) {
+    .template-default .search-bar:has(.search-bar__actions),
+    .template-default .search-bar:has(.search-bar__actions) .search-filter,
+    .template-default .search-bar:has(.search-bar__actions) .search-bar__actions {
+      height: var(--admin-control-height);
+      min-height: var(--admin-control-height);
+    }
+
+    .template-default .search-bar:has(.search-bar__actions) .search-filter {
+      align-self: start;
+    }
+
+    .template-default .search-bar:has(.search-bar__actions) .search-bar__actions {
+      align-items: center;
+      padding: 0;
+    }
+
+    .template-default .search-bar:has(.search-bar__actions) .search-bar__actions > * {
+      margin-block: 0;
+    }
+
+  .template-default .search-bar:has(.search-bar__actions) .icon--search {
+      align-self: start;
+    }
+
+    .template-default .search-bar:has(.search-bar__actions) {
+      column-gap: var(--admin-control-gap);
+    }
+  }
+
+  .template-default .field-type.textarea textarea {
+    min-height: 96px;
+    height: auto;
+    padding: 10px 12px;
+    border: 0;
+    border-radius: var(--admin-control-radius);
+    background: var(--admin-field-background);
+    color: var(--theme-text);
+    box-sizing: border-box;
+    font: inherit;
+    line-height: 1.25;
+    resize: vertical;
+  }
+
+  .template-default .rs__control {
+    min-height: var(--admin-control-height);
+    border: 0;
+    border-radius: var(--admin-control-radius);
+    background: var(--admin-field-background);
+  }
+
+  .template-default .rs__control:hover,
+  .template-default .rs__control--is-focused {
+    border: 0;
+    outline: 2px solid color-mix(in srgb, var(--admin-accent) 35%, transparent);
+    outline-offset: 0;
+  }
+
+  .template-default .rs__menu {
+    overflow: hidden;
+    margin-top: 4px;
+    border: 0;
+    border-radius: var(--admin-control-radius);
+    background: var(--admin-field-background);
+  }
+
+  .template-default .rs__option {
+    padding: 10px 12px;
+  }
+
+  .template-default .rs__option--is-focused,
+  .template-default .rs__option--is-selected {
+    background: var(--admin-accent-muted);
+    color: var(--theme-text);
+  }
+
+  .template-default .rs__indicators {
+    padding-inline-end: 8px;
+  }
+
+  .template-default .list-controls__toggle-columns,
+  .template-default .list-controls__toggle-where,
+  .template-default .list-controls__toggle-sort,
+  .template-default .list-controls__toggle-group-by {
+    display: inline-flex;
+    min-height: var(--admin-control-height) !important;
+    height: var(--admin-control-height) !important;
+    align-items: center;
+    gap: var(--admin-control-gap);
+    padding: 0 var(--admin-control-padding-x) !important;
+    border: 0;
+    border-radius: var(--admin-control-radius);
+    background: var(--admin-button-background);
+    color: var(--theme-text);
+    font: inherit;
+    box-sizing: border-box;
+  }
+
+  .template-default .list-controls__toggle-columns:hover,
+  .template-default .list-controls__toggle-where:hover,
+  .template-default .list-controls__toggle-sort:hover,
+  .template-default .list-controls__toggle-group-by:hover {
+    background: var(--admin-button-hover-background);
+  }
+
+  .template-default .list-controls__toggle-columns .pill__icon,
+  .template-default .list-controls__toggle-where .pill__icon,
+  .template-default .list-controls__toggle-sort .pill__icon,
+  .template-default .list-controls__toggle-group-by .pill__icon {
+    display: inline-flex;
+    width: var(--admin-control-icon-size);
+    height: var(--admin-control-icon-size);
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 var(--admin-control-icon-size);
+  }
+
+  .template-default .btn,
+  .template-default .btn:hover,
+  .template-default .btn:focus-visible {
+    border-width: 0;
+    min-height: var(--admin-control-height);
+    border-radius: var(--admin-control-radius);
+    box-sizing: border-box;
+    font: inherit;
+  }
+
+  .template-default .btn:not(.btn--style-tab):not(.btn--style-primary):not(.btn--style-none) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--admin-control-height);
+    padding-inline: var(--admin-control-padding-x);
+    background: var(--admin-button-background);
+    color: var(--theme-text);
+  }
+
+  .template-default .btn:not(.btn--style-tab):not(.btn--style-primary):hover {
+    background: var(--admin-button-hover-background);
+  }
+
+  /* Payload uses style-none links as transparent click targets over cards. */
+  .template-default .card__click {
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+  }
+
+  .template-default .card__click {
+    height: 100% !important;
+  }
+
+  .template-default .document-fields__fields > .field-type.tabs-field:first-of-type {
+    margin-top: 0;
+  }
+
+  .template-default .card {
+    border: 0 !important;
+    border-radius: var(--admin-control-radius);
+    background: var(--admin-surface-background);
+  }
+
+  .template-default .card:hover {
+    background: var(--admin-surface-hover);
+  }
+
+  .template-default .btn--style-primary {
+    --bg-color: var(--admin-accent);
+    --hover-bg: var(--admin-accent-hover);
+    --color: var(--admin-accent-contrast);
+    --hover-color: var(--admin-accent-contrast);
+    display: inline-flex;
+    min-height: var(--admin-control-height);
+    height: var(--admin-control-height);
+    align-items: center;
+    justify-content: center;
+    padding-inline: var(--admin-control-padding-x);
+    border: 0;
+    background: var(--admin-accent) !important;
+    color: var(--admin-accent-contrast) !important;
+  }
+
+  .template-default .btn--style-primary:hover,
+  .template-default #action-save:hover:not(:disabled) {
+    background: var(--admin-accent-hover) !important;
+  }
+
+  .template-default .btn--style-primary.btn--disabled,
+  .template-default .btn--style-primary:disabled,
+  .template-default .btn--withPopup.btn--disabled,
+  .template-default .btn--withPopup .btn.btn--disabled,
+  .template-default .btn--withPopup .btn:disabled,
+  .template-default #action-save.btn--disabled,
+  .template-default #action-save:disabled {
+    --bg-color: var(--admin-field-disabled-background);
+    --hover-bg: var(--admin-field-disabled-background);
+    --color: var(--admin-field-disabled-foreground);
+    --hover-color: var(--admin-field-disabled-foreground);
+    background: var(--admin-field-disabled-background) !important;
+    color: var(--admin-field-disabled-foreground) !important;
+    cursor: not-allowed;
+    opacity: 1;
+  }
+
+  /* Payload's split buttons need an explicit shared box, otherwise the
+     popup segment keeps its own intrinsic height and drifts vertically. */
+  .template-default .btn--withPopup {
+    display: inline-flex;
+    height: var(--admin-control-height);
+    min-height: var(--admin-control-height);
+    align-items: stretch;
+    margin-block: 0;
+    padding: 0 !important;
+  }
+
+  .template-default .btn--withPopup > .btn,
+  .template-default .btn--withPopup .popup-button {
+    height: var(--admin-control-height) !important;
+    min-height: var(--admin-control-height) !important;
+    margin: 0 !important;
+    box-sizing: border-box;
+  }
+
+  .template-default .btn--withPopup .popup-button {
+    width: var(--admin-control-height);
+    min-width: var(--admin-control-height);
+    flex: 0 0 var(--admin-control-height);
+    padding: 0 !important;
+    border: 0 !important;
+    border-inline-start: 1px solid color-mix(in srgb, currentColor 28%, transparent) !important;
+  }
+
+  .template-default .btn--withPopup .popup-button .btn__content {
+    width: 100%;
+    min-width: 0;
+    gap: 0;
+  }
+
+  /* The document toolbar has two icon controls next to the publish action.
+     Keep them in the same 40px control grid and use surfaces instead of
+     Payload's default 1px outline. */
+  .template-default .live-preview-toggler,
+  .template-default .doc-controls__dots {
+    display: inline-flex;
+    width: var(--admin-control-height-icon) !important;
+    height: var(--admin-control-height-icon) !important;
+    min-width: var(--admin-control-height-icon);
+    min-height: var(--admin-control-height-icon);
+    align-items: center;
+    justify-content: center;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: var(--admin-control-radius);
+    background: var(--admin-button-background);
+    color: var(--theme-text);
+    box-sizing: border-box;
+  }
+
+  .template-default .live-preview-toggler:hover,
+  .template-default .live-preview-toggler--active,
+  .template-default .doc-controls__dots:hover,
+  .template-default .popup--active .doc-controls__dots {
+    border: 0 !important;
+    background: var(--admin-button-hover-background);
+  }
+
+  .template-default .doc-controls__dots > div {
+    width: 3px;
+    height: 3px;
+  }
+
+  .template-default .doc-controls__controls,
+  .template-default .doc-controls__controls-wrapper,
+  .template-default .doc-controls__meta-icons {
+    align-items: center;
+  }
+
+  .template-default .doc-controls__controls > *,
+  .template-default .doc-controls__meta-icons > * {
+    margin-block: 0;
+  }
+
+  .template-default #action-save {
+    min-height: var(--admin-control-height);
+    height: var(--admin-control-height);
+    background: var(--admin-accent) !important;
+    color: var(--admin-accent-contrast) !important;
+  }
+
+  .template-default #action-save:disabled {
+    cursor: not-allowed;
+  }
+
+  .template-default .btn--style-secondary,
+  .template-default .btn--style-subtle,
+  .template-default .btn--style-pill,
+  .template-default .btn--style-icon-label {
+    --bg-color: var(--theme-elevation-100);
+    --hover-bg: var(--theme-elevation-150);
+    --btn-border: 0;
+    --hover-btn-border: 0;
+  }
+
+  .template-default .btn--style-tab {
+    min-height: var(--admin-control-height);
+    height: var(--admin-control-height);
+    background: transparent;
+  }
+
+  /* Payload field tabs and custom-view tabs share one segmented pattern. */
+  .template-default .tabs-field__tabs {
+    display: inline-flex;
+    min-width: fit-content;
+    height: var(--admin-control-height);
+    gap: 4px;
+    align-items: center;
+    padding: var(--admin-tab-inset);
+    border: 0;
+    border-radius: var(--admin-control-radius);
+    background: var(--admin-button-background);
+    overflow: hidden;
+  }
+
+  .template-default .tabs-field__tabs::before,
+  .template-default .tabs-field__tabs::after {
+    display: none;
+  }
+
+  .template-default .tabs-field__tabs-wrap {
+    box-sizing: border-box;
+    padding-inline: var(--gutter-h);
+  }
+
+  .template-default .tabs-field__tab-button {
+    display: inline-flex;
+    min-height: var(--admin-tab-item-height);
+    height: var(--admin-tab-item-height);
+    align-items: center;
+    margin: 0;
+    padding: 0 var(--admin-control-padding-x);
+    border-radius: var(--admin-control-radius);
+    color: var(--theme-elevation-600);
+    font: inherit;
+    opacity: 1;
+    box-sizing: border-box;
+  }
+
+  .template-default .tabs-field__tab-button:hover {
+    background: var(--admin-button-hover-background);
+    color: var(--theme-text);
+    opacity: 1;
+  }
+
+  .template-default .tabs-field__tab-button::after {
+    display: none;
+  }
+
+  .template-default .tabs-field__tab-button--active {
+    height: var(--admin-tab-item-height);
+    min-height: var(--admin-tab-item-height);
+    background: var(--theme-bg);
+    color: var(--theme-text);
+    font-weight: 600;
+  }
+
+  .template-default .btn__icon {
+    border: 0;
+  }
+
+  .template-default .auth-fields {
+    padding: 0;
+    background: transparent;
+  }
+
+  .template-default .auth-fields .field-type.email,
+  .template-default .auth-fields .field-type.email .field-type__wrap {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+  }
+
+  .template-default .auth-fields .field-type.email input {
+    width: 100%;
+  }
+
+  .template-default .settings-collection-field {
+    display: grid;
+    gap: 16px;
+    padding: 16px;
+    border-radius: var(--style-radius-m);
+    background: var(--theme-elevation-50);
+  }
+
+  .template-default .settings-collection-field__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .template-default .settings-collection-field__header h3,
+  .template-default .settings-collection-field__header p {
+    margin: 0;
+  }
+
+  .template-default .settings-collection-field__header p {
+    margin-top: 4px;
+    color: var(--theme-elevation-600);
+  }
+
+  .template-default .settings-collection-action,
+  .template-default .settings-collection-row {
+    display: flex;
+    min-height: 40px;
+    align-items: center;
+    border-radius: var(--style-radius-s);
+    background: var(--theme-elevation-100);
+    color: var(--theme-text);
+    text-decoration: none;
+  }
+
+  .template-default .settings-collection-action {
+    flex: 0 0 auto;
+    padding: 0 12px;
+    font-weight: 600;
+  }
+
+  .template-default .settings-collection-action:hover,
+  .template-default .settings-collection-row:hover,
+  .template-default .settings-collection-action:focus-visible,
+  .template-default .settings-collection-row:focus-visible {
+    background: var(--theme-elevation-150);
+    outline: none;
+  }
+
+  .template-default .settings-collection-list {
+    display: grid;
+    gap: 6px;
+  }
+
+  .template-default .settings-collection-row {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 16px;
+    padding: 8px 12px;
+  }
+
+  .template-default .settings-collection-row span,
+  .template-default .settings-collection-state {
+    color: var(--theme-elevation-600);
+  }
+
+  .template-default .settings-collection-state {
+    margin: 0;
+  }
+
+  .template-default .settings-collection-state--error {
+    color: var(--theme-error-700);
+  }
+
+  @media (max-width: 640px) {
+    .template-default .settings-collection-field__header {
+      display: grid;
+    }
+
+    .template-default .settings-collection-action {
+      width: fit-content;
+    }
+  }
+
+  .template-default .nav a.nav__link,
+  .template-default .nav a.nav__link:hover,
+  .template-default .nav a.nav__link:focus-visible,
+  .template-default .admin-custom-view-gutter a,
+  .template-default .admin-custom-view-gutter a:hover,
+  .template-default .admin-custom-view-gutter a:focus-visible {
+    text-decoration: none;
+  }
+
+  .template-default .collection-list--media .media-admin-card a,
+  .template-default .collection-list--media .media-admin-card a:hover,
+  .template-default .collection-list--media .media-admin-card a:focus-visible,
+  .template-default .collection-list--gallery-items .gallery-admin-card,
+  .template-default .collection-list--gallery-items .gallery-admin-card:hover,
+  .template-default .collection-list--gallery-items .gallery-admin-card:focus-visible {
+    text-decoration: none;
+  }
+
+  .template-default .admin-custom-view-gutter .page-map,
+  .template-default .admin-custom-view-gutter .analytics-view,
+  .template-default .admin-custom-view-gutter .analytics-card,
+  .template-default .admin-custom-view-gutter .analytics-panel,
+  .template-default .admin-custom-view-gutter .page-map-table,
+  .template-default .admin-custom-view-gutter .page-map-card {
+    border-radius: var(--style-radius-m);
+  }
+}

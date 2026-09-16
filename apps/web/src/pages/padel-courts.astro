@@ -1,0 +1,20 @@
+---
+import { padelCourtsRoute } from '@unlim/content-contract'
+import { loadHomepage } from '../content/loadHomepage'
+import { PadelCourtsLanding } from '../landing/PadelCourtsLanding'
+import SiteLayout from '../layouts/SiteLayout.astro'
+
+const content = await loadHomepage({ cmsURL: import.meta.env.CMS_URL })
+const canonical = new URL(padelCourtsRoute.path, import.meta.env.PUBLIC_SITE_URL ?? Astro.url.origin).toString()
+---
+
+<SiteLayout
+  title={padelCourtsRoute.title}
+  description={padelCourtsRoute.description}
+  canonical={canonical}
+  robots={padelCourtsRoute.robots}
+  socialImage={padelCourtsRoute.socialImage}
+  webmasterVerification={content.site.analytics.vendors.webmasterVerification}
+>
+  <PadelCourtsLanding client:load site={content.site} />
+</SiteLayout>

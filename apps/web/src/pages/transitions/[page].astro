@@ -1,0 +1,24 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro'
+import { TransitionController } from '../../transition-demo/TransitionController'
+import TransitionDemoPage from '../../transition-demo/TransitionDemoPage.astro'
+import type { TransitionPageKey } from '../../transition-demo/TransitionDemoData'
+
+export function getStaticPaths() {
+  return (['serve', 'rally'] as TransitionPageKey[]).map((page) => ({ params: { page }, props: { page } }))
+}
+
+const page = Astro.props.page as TransitionPageKey
+const content = page === 'rally' ? 'Rally' : 'Serve'
+---
+
+<SiteLayout
+  title={`Transition lab — ${content} | UNLIM RIGA PADEL`}
+  description="Интерактивная лаборатория переходов между страницами UNLIM RIGA PADEL: Swup, Motion и GSAP."
+  robots="noindex-follow"
+>
+  <TransitionController client:load initialPage={page} />
+  <div id="transition-surface" class="transition-page">
+    <TransitionDemoPage page={page} />
+  </div>
+</SiteLayout>

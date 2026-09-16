@@ -1,0 +1,73 @@
+# Architecture
+
+Status: core split accepted; open product choices remain in `decisions.md`.
+
+## Runtime boundaries
+
+```text
+Visitor -> prerendered Astro page <- versioned Payload projection <- PostgreSQL
+                  \-> media storage/CDN
+                  \-> first-party event endpoint -> event store/aggregates
+
+Owner -> Payload admin -> content, entities, leads, settings, analytics
+      \-> protected Astro preview route -> draft Payload projection
+Booking CTA -> centrally configured external provider adapter
+```
+
+Astro owns public routing, SEO HTML and interaction shells. React islands own only stateful UI such as menus, filters, lightbox, forms, dialogs and booking widgets. Payload owns editorial workflows, validation, access control, preview and admin views. Business timezone is `Europe/Moscow`.
+
+The isolated `/transitions/serve` and `/transitions/rally` playground routes are server-rendered Astro `noindex, follow` demos. A small React island adds the Swup + GSAP enhancement around the static page HTML and a persistent transparent viewport-sized Three.js WebGL layer with a textured 3D ball; the routes are intentionally excluded from the CMS SEO index and sitemap. The code-defined `/padel-courts` landing uses the shared site shell and lead action layer, with the path included in the web sitemap.
+The shared Astro layout adds intent-based prefetching for internal links and a DOM text typographer for non-breaking short Russian words, while preserving semantic HTML and explicit opt-out selectors for code-like content.
+The transition demo uses the local reference project's raw Three.js scene: a client-only canvas renders the procedural textured/fuzzy ball, 3D bezier position, perspective depth, spin and particle trail over a fixed 1-second flight; Swup still replaces only the SSR content container.
+
+Migration stage: the CMS-backed homepage prerenders as HTML plus one `client:load` React island. A dedicated `/preview/homepage` route uses the interim Node adapter for secure live drafts; normal `/` remains static. Split the island later, guided by measured runtime cost and visual regression checks.
+
+## Content model
+
+- Globals: site identity, navigation, contacts, footer, integrations, booking provider and homepage composition.
+- Pages: code-defined page templates with parent/child relationships, CMS-managed content/SEO and per-page hero image/grayscale settings; `/gift` is a typed certificate landing page, not a free-form page builder.
+- Collections: articles/categories, coaches, courts, training types, prices/memberships, tournaments/leagues, reviews, FAQ, partners and leads.
+- Media: raster uploads are normalized to WebP quality 80 before storage; alt/focal point/rights, schema-aware reverse usage links and referenced-file deletion safeguards remain in Payload.
+- Shared SEO group: title, description, canonical, robots, social image and optional structured-data inputs.
+
+Editing model: typed fields for core pages and repeatable entities. Homepage sections can be hidden or reordered, but their markup and animations remain code-defined. New landing layouts are implemented in code from the shared design system/UI kit, then exposed as typed CMS fields.
+
+## Single source of truth
+
+- Coaches, tournaments and articles are created once in their collections. Detail/catalog pages and homepage cards read the same record.
+- Coaches and tournaments use homepage visibility/order fields; the homepage never stores copied card content.
+- The blog homepage resolves three slots: explicitly pinned articles first, then newest published articles for empty slots. Preview images come from the article record.
+- Unpublishing or deleting an entity removes it from every consumer; references must not leave copied stale content.
+
+## Delivery rules
+
+- Published content invalidates or rebuilds affected Astro pages; Payload contains a live preview of secure Astro draft URLs.
+- `npm run seed:cms` idempotently seeds the prototype demo data/media. Production web reads only the versioned `/api/public/homepage` projection.
+- Convert uploaded raster images to WebP quality 80 before storage and generate responsive derivatives; inputs are capped at 25 MiB. MP4/WebM inputs are capped at 100 MiB and stored without transcoding until production storage is selected.
+- Booking buttons call one adapter; provider configuration is global and validated before publish.
+- The shared code route registry drives the authenticated page map and public SEO index. Redirects are loaded once when Astro starts and require restart/deploy to change.
+- Payload custom tools use the native admin shell and grouped navigation. The page map renders the code registry as a collapsed-by-default hierarchy and can create an immutable-path draft placeholder under an existing route; a page becomes public only after its code-defined template and typed projection are implemented.
+- Track a versioned event contract. Store raw events for a bounded period and query mergeable daily aggregates for long historical ranges.
+- Analytics uses deduplicated raw events, 30-minute sessions and HLL p=14 daily sketches; retention aggregates and verifies all expired days before deleting any raw day.
+- External analytics is code-defined and consent-gated. Lead notification secrets are server-only; delivery failure never rolls back a saved lead.
+- Before production launch, choose Russian hosting/data-processing vendors and review the privacy policy, form consents, analytics basis and operator obligations under applicable Russian law.
+
+## Initial repository map
+
+```text
+apps/web/                 Astro public site
+apps/cms/                 Payload config, admin, API and jobs
+docs/                     Stable architecture and decisions
+packages/content-contract/  Versioned public DTO and boundary validation
+reference/prototype-baseline/  Immutable migration/recovery snapshot
+```
+
+## Reference prototype map
+
+- `apps/web/src/App.tsx` — current one-page section order.
+- `apps/web/src/sections/*` — visual section recipes, not CMS boundaries.
+- `apps/cms/src/seed.ts` — idempotent imported demo data; PostgreSQL is the editable source of truth after seeding.
+- `apps/web/src/design-system`, `components` and `styles` — UI contracts to preserve.
+- `reference/prototype-baseline/docs/design-system.md` — existing component and accessibility rules.
+
+The verified untouched copy is `reference/prototype-baseline`; production migration must not modify it.

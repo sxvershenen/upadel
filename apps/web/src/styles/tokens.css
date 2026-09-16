@@ -1,0 +1,52 @@
+@theme {
+  --font-sans: "Inter Tight", "Inter", system-ui, sans-serif;
+  --color-page: #f4f4f4;
+  --color-ink: #14141a;
+  --color-ink-hover: #26262e;
+  --color-ink-soft: #4b4b55;
+  --color-ink-muted: #85858e;
+  --color-line: rgb(20 20 26 / 8%);
+  --color-lime: #c2f542;
+  --color-lime-hover: #d7ff70;
+  --color-lime-deep: #74b910;
+  --color-lime-ink: #132000;
+  --color-lime-soft: #efffd3;
+  --color-lime-soft-ink: #315600;
+  --color-sky: #38bdf8;
+  --color-blue: #2563eb;
+  --color-violet: #a855f7;
+  --color-sunset: #fb923c;
+  --color-sunset-soft: #ffd6ad;
+  --color-sunset-soft-ink: #9a4b17;
+  --color-cyan: #22d3ee;
+  --color-emerald: #34d399;
+  --color-gold: #f1dfad;
+  --color-gold-ink: #33250a;
+  --color-control: #ececec;
+  --color-control-hover: #e2e2e2;
+  --color-surface-subtle: #f4f4f4;
+  --color-surface-muted: #ededed;
+  --color-danger: #b42318;
+  --color-focus: #2563eb;
+  --color-text-accent: #527d0e;
+  --breakpoint-xs: 420px;
+}
+
+:root {
+  color-scheme: light;
+  --color-danger-soft: #fee4e2;
+  --container-page: 1980px;
+  --page-gutter: 20px;
+  --control-sm: 40px;
+  --control-md: 48px;
+  --control-lg: 52px;
+  --se-1: 10px;
+  --se-2: 14px;
+  --se-3: 20px;
+  --se-4: 28px;
+  --se-5: 36px;
+  --se-6: 46px;
+}
+
+@media (min-width: 768px) { :root { --page-gutter: 32px; } }
+@media (min-width: 1280px) { :root { --page-gutter: 48px; } }

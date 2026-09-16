@@ -1,0 +1,30 @@
+{
+  "name": "unlim-riga-padel",
+  "private": true,
+  "version": "0.0.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev --workspace @unlim/web",
+    "dev:cms": "npm run dev --workspace @unlim/cms",
+    "seed:cms": "npm run seed --workspace @unlim/cms",
+    "admin:create": "npm run admin:create --workspace @unlim/cms",
+    "analytics:demo": "npm run analytics:demo --workspace @unlim/cms",
+    "build": "npm run build --workspaces --if-present",
+    "build:web": "npm run build --workspace @unlim/web",
+    "build:cms": "npm run build --workspace @unlim/cms",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "typecheck:web": "npm run typecheck --workspace @unlim/web",
+    "typecheck:cms": "npm run typecheck --workspace @unlim/cms",
+    "analytics:maintain": "npm run analytics:maintain --workspace @unlim/cms",
+    "test:analytics:db": "npm run test:analytics:db --workspace @unlim/cms",
+    "test:analytics": "npm run test:analytics --workspace @unlim/cms",
+    "test:integrations": "npm run test:integrations --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=22.12.0",
+    "npm": ">=9.6.5"
+  }
+}

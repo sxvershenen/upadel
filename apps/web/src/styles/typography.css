@@ -1,0 +1,50 @@
+.type-micro { font-size: 11px; line-height: 1.25; font-weight: 500; letter-spacing: 0; }
+.type-caption { font-size: 12px; line-height: 1.35; font-weight: 500; letter-spacing: 0; }
+.type-ui { font-size: 14px; line-height: 1.2; font-weight: 500; letter-spacing: -0.01em; }
+.type-body-sm { font-size: 14px; line-height: 1.55; font-weight: 500; letter-spacing: -0.011em; }
+.type-body { font-size: 16px; line-height: 1.55; font-weight: 500; letter-spacing: -0.011em; }
+.type-editorial { font-size: 18px; line-height: 1.55; font-weight: 500; letter-spacing: -0.011em; }
+.type-hero-lead { font-size: 16px; line-height: 1.55; font-weight: 500; letter-spacing: -0.011em; }
+.type-title-compact { font-size: 20px; line-height: 1.2; font-weight: 600; letter-spacing: -0.02em; }
+.type-title-dense { font-size: 22px; line-height: 1.15; font-weight: 600; letter-spacing: -0.02em; }
+.type-title-card { font-size: 24px; line-height: 1.15; font-weight: 600; letter-spacing: -0.025em; }
+.type-title-large { font-size: 28px; line-height: 1.1; font-weight: 600; letter-spacing: -0.03em; }
+.type-price { font-size: 30px; line-height: 1; font-weight: 600; letter-spacing: -0.04em; }
+.type-section { font-size: 32px; line-height: 1.08; font-weight: 600; letter-spacing: -0.025em; }
+.type-hero { font-size: 48px; line-height: .96; font-weight: 600; letter-spacing: -.045em; }
+.type-eyebrow { font-size: 12px; line-height: 1.2; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; }
+
+/* Role defaults live in base so explicit utilities and semantic tone modifiers win. */
+@layer base {
+  .type-micro { color: var(--color-ink-muted); }
+  .type-caption { color: var(--color-ink-soft); }
+  .type-ui { color: var(--color-ink); }
+  .type-body-sm { color: var(--color-ink-soft); }
+  .type-body { color: var(--color-ink); }
+  .type-editorial { color: var(--color-ink); }
+  .type-hero-lead { color: rgb(255 255 255 / 75%); }
+  .type-title-compact,
+  .type-title-dense,
+  .type-title-card,
+  .type-title-large,
+  .type-price,
+  .type-section { color: var(--color-ink); }
+  .type-hero { color: #fff; }
+  .type-eyebrow { color: var(--color-ink-muted); }
+}
+
+.type-tone-default { color: var(--color-ink); }
+.type-tone-muted { color: var(--color-ink-soft); }
+.type-tone-subtle { color: var(--color-ink-muted); }
+.type-tone-inverse { color: #fff; }
+.type-tone-inverse-strong { color: rgb(255 255 255 / 90%); }
+.type-tone-inverse-muted { color: rgb(255 255 255 / 65%); }
+.type-tone-inverse-subtle { color: rgb(255 255 255 / 45%); }
+.type-tone-accent { color: var(--color-text-accent); }
+.type-tone-danger { color: var(--color-danger); }
+
+@media (min-width: 640px) { .type-section { font-size: 40px; } .type-hero { font-size: 66px; } .type-hero-lead { font-size: 18px; } }
+@media (min-width: 768px) { .type-title-compact { font-size: 22px; } .type-title-card { font-size: 26px; } .type-title-large { font-size: 32px; } }
+@media (min-width: 1024px) { .type-section { font-size: 46px; } .type-hero { font-size: 84px; } }
+@media (min-width: 1280px) { .type-hero { font-size: 102px; } }
+@media (min-width: 1536px) { .type-hero { font-size: 112px; } }

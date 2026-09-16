@@ -1,0 +1,43 @@
+{
+  "name": "@unlim/cms",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
+    "build": "cross-env NODE_OPTIONS=--no-deprecation next build",
+    "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
+    "typecheck": "tsc --noEmit",
+    "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
+    "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
+    "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
+    "seed": "cross-env NODE_OPTIONS=--no-deprecation payload run src/seed.ts",
+    "admin:create": "cross-env NODE_OPTIONS=--no-deprecation payload run src/scripts/ensureDevAdmin.ts",
+    "analytics:demo": "cross-env NODE_OPTIONS=--no-deprecation payload run src/scripts/analyticsDemo.ts",
+    "analytics:maintain": "cross-env NODE_OPTIONS=--no-deprecation payload run src/scripts/analyticsMaintenance.ts",
+    "test:analytics:db": "cross-env NODE_OPTIONS=--no-deprecation payload run src/scripts/analyticsIntegration.ts",
+    "test:analytics": "node --import tsx --test src/analytics/*.test.ts ../web/src/analytics/*.test.ts",
+    "test:integrations": "node --import tsx --test src/integrations/validation.test.ts src/notifications/leadNotifications.test.ts src/collections/Redirects.test.ts src/uploads/mediaPolicy.test.ts src/pageMap/*.test.ts src/content/requiredNavigation.test.ts"
+  },
+  "dependencies": {
+    "@payloadcms/db-postgres": "3.89.0",
+    "@payloadcms/next": "3.89.0",
+    "@payloadcms/richtext-lexical": "3.89.0",
+    "@payloadcms/ui": "3.89.0",
+    "@unlim/content-contract": "0.0.2",
+    "cross-env": "7.0.3",
+    "graphql": "16.11.0",
+    "next": "16.3.5",
+    "payload": "3.89.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "sharp": "0.35.4"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.17",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "tsx": "^4.22.4",
+    "typescript": "5.9.3"
+  }
+}

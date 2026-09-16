@@ -1,0 +1,17 @@
+---
+import type { CatalogDTO } from '@unlim/content-contract'
+import { CatalogPage } from '../../catalog/CatalogPage'
+import { CatalogLoadError, loadCatalog } from '../../content/loadCatalog'
+import SiteLayout from '../../layouts/SiteLayout.astro'
+export const prerender = false
+const type = Astro.url.searchParams.get('type')
+const secret = Astro.url.searchParams.get('secret')
+const allowed = type === 'blog' || type === 'coaches' || type === 'tournaments'
+let dto: CatalogDTO | null = null
+let denied = !allowed || !secret
+if (allowed && secret) { try { dto = await loadCatalog(import.meta.env.CMS_URL, type, secret) } catch (error) { if (error instanceof CatalogLoadError && error.status === 403) denied = true; else throw error } }
+if (denied) Astro.response.status = 403
+Astro.response.headers.set('Cache-Control', 'no-store')
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow')
+---
+{dto ? <SiteLayout title={dto.page.title} description={dto.page.intro} robots="noindex,nofollow"><CatalogPage client:load dto={dto} /></SiteLayout> : <html lang="ru"><head><meta charset="utf-8" /><meta name="robots" content="noindex,nofollow" /><title>Preview access denied</title></head><body><main><h1>Доступ к предпросмотру запрещён</h1></main></body></html>}

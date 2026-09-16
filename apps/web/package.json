@@ -1,0 +1,40 @@
+{
+  "name": "@unlim/web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "typecheck": "astro check",
+    "test:integrations": "node --import tsx --test src/analytics/ExternalAnalytics.test.ts src/seo/sitemap.test.ts"
+  },
+  "dependencies": {
+    "@astrojs/react": "6.0.5",
+    "@swup/scripts-plugin": "^2.1.0",
+    "@tailwindcss/vite": "4.1.17",
+    "@types/three": "^0.181.0",
+    "@unlim/content-contract": "0.0.2",
+    "astro": "7.3.2",
+    "clsx": "2.1.1",
+    "framer-motion": "13.2.0",
+    "gsap": "3.15.0",
+    "lucide-react": "1.45.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "swiper": "14.2.0",
+    "swup": "^4.10.0",
+    "tailwind-merge": "3.4.0",
+    "tailwindcss": "4.1.17",
+    "three": "^0.181.2"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.10",
+    "@astrojs/node": "11.1.5",
+    "@types/node": "22.19.17",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "typescript": "5.9.3"
+  }
+}

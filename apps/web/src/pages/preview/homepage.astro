@@ -1,0 +1,24 @@
+---
+import App from '../../App'
+import { HomepageLoadError, loadHomepage } from '../../content/loadHomepage'
+import SiteLayout from '../../layouts/SiteLayout.astro'
+
+export const prerender = false
+
+const previewSecret = Astro.url.searchParams.get('secret')
+let content = null
+let denied = !previewSecret
+if (previewSecret) {
+  try {
+    content = await loadHomepage({ cmsURL: import.meta.env.CMS_URL, previewSecret })
+  } catch (error) {
+    if (error instanceof HomepageLoadError && error.status === 403) denied = true
+    else throw error
+  }
+}
+if (denied) Astro.response.status = 403
+Astro.response.headers.set('Cache-Control', 'no-store')
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow')
+---
+
+{content ? <SiteLayout title={content.seo.title ?? undefined} description={content.seo.description ?? undefined} robots="noindex,nofollow"><App client:load content={content} /></SiteLayout> : <html lang="ru"><head><meta charset="utf-8" /><meta name="robots" content="noindex,nofollow" /><title>Preview access denied</title></head><body><main><h1>Доступ к предпросмотру запрещён</h1></main></body></html>}

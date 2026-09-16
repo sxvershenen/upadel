@@ -1,0 +1,22 @@
+node_modules/
+
+# Build output
+.astro/
+dist/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+
+# Local configuration and generated uploads
+.env
+.env.*
+!.env.example
+media/
+
+# Tooling and OS files
+.DS_Store
+*.log
+.vercel/
+.idea/
+.vscode/

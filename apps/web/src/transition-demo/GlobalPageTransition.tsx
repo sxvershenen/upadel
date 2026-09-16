@@ -1,0 +1,104 @@
+import gsap from 'gsap'
+import Swup from 'swup'
+import SwupScriptsPlugin from '@swup/scripts-plugin'
+import { useEffect, useRef } from 'react'
+
+import { ReferenceBallScene, type ReferenceBallSceneHandle } from './ReferenceBallScene'
+import { computeReferenceTrajectory } from './referenceTrajectories'
+import { transitionAudio } from './transitionAudio'
+
+const duration = 1000
+
+function getSurface() {
+  const surface = document.querySelector<HTMLElement>('#swup')
+  if (!surface) throw new Error('Global Swup surface is missing')
+  return surface
+}
+
+function getHeaders(surface: HTMLElement) {
+  return Array.from(surface.querySelectorAll<HTMLElement>('header, .page-hero, [data-transition-hero]'))
+}
+
+function updateMetadata(nextDocument: Document) {
+  document.title = nextDocument.title
+  const description = nextDocument.querySelector('meta[name="description"]')?.getAttribute('content')
+  document.querySelector('meta[name="description"]')?.setAttribute('content', description ?? '')
+  const canonical = nextDocument.querySelector('link[rel="canonical"]')?.getAttribute('href')
+  document.querySelector('link[rel="canonical"]')?.setAttribute('href', canonical ?? '')
+}
+
+function waitFor(animation: gsap.core.Animation) {
+  if (animation.progress() >= 1) return Promise.resolve()
+  return new Promise<void>((resolve) => animation.eventCallback('onComplete', resolve))
+}
+
+function animateOut() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return Promise.resolve()
+  const surface = getSurface()
+  const headers = getHeaders(surface)
+  headers.forEach((header) => gsap.to(header, { borderRadius: 48, duration: 0.42, ease: 'power2.in' }))
+  return waitFor(gsap.to(surface, {
+    opacity: 0.2,
+    y: -25,
+    scale: 1.03,
+    duration: 0.45,
+    ease: 'power2.in',
+  }))
+}
+
+function animateIn() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return Promise.resolve()
+  const surface = getSurface()
+  const headers = getHeaders(surface)
+  gsap.set(surface, { opacity: 0, y: 35, scale: 0.95 })
+  gsap.set(headers, { borderRadius: 48 })
+  return waitFor(gsap.to(surface, {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    duration: 0.6,
+    ease: 'power4.out',
+    onStart: () => headers.forEach((header) => gsap.to(header, { borderRadius: 0, duration: 0.6, ease: 'power4.out' })),
+    onComplete: () => gsap.set(surface, { clearProps: 'transform,opacity' }),
+  }))
+}
+
+export function GlobalPageTransition() {
+  const ballRef = useRef<ReferenceBallSceneHandle | null>(null)
+
+  useEffect(() => {
+    const swup = new Swup({
+      containers: ['#swup'],
+      linkSelector: 'a[href]:not([data-transition-link])',
+      animationSelector: false,
+      plugins: [new SwupScriptsPlugin({ head: false, body: true })],
+      ignoreVisit: (url, { el } = {}) => {
+        if (el?.closest('[data-no-swup]')) return true
+        return new URL(url, window.location.href).pathname.startsWith('/transitions/')
+      },
+      hooks: {
+        'visit:start': () => {
+          const trajectory = computeReferenceTrajectory()
+          ballRef.current?.startFlight(trajectory, duration)
+          transitionAudio.playWhoosh(duration / 1000)
+        },
+        'page:view': (visit) => {
+          if (visit.to.document) updateMetadata(visit.to.document)
+        },
+        'visit:fail': () => {
+          ballRef.current?.cancel()
+        },
+      },
+    })
+
+    swup.hooks.replace('animation:out:await', () => animateOut())
+    swup.hooks.replace('animation:in:await', () => animateIn())
+
+    return () => {
+      ballRef.current?.cancel()
+      void swup.destroy()
+    }
+  }, [])
+
+  return <ReferenceBallScene ref={ballRef} />
+}

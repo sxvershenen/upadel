@@ -1,0 +1,13 @@
+---
+import App from '../App'
+import { loadHomepage } from '../content/loadHomepage'
+import SiteLayout from '../layouts/SiteLayout.astro'
+const content = await loadHomepage({ cmsURL: import.meta.env.CMS_URL })
+---
+
+<SiteLayout
+  description="Компоненты и визуальные контракты дизайн-системы UNLIM RIGA PADEL."
+  title="UI Kit — UNLIM RIGA PADEL"
+>
+  <App client:load view="ui-kit" content={content} />
+</SiteLayout>
