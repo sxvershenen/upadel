@@ -3,10 +3,11 @@
 @import "./styles/typography.css";
 @import "./styles/surfaces.css";
 
-html { scroll-behavior: smooth; scrollbar-width: none; }
-html::-webkit-scrollbar { display: none; width: 0; height: 0; }
-.unlim-scroll-thumb { position: fixed; top: 2px; right: 2px; z-index: 9999; width: 4px; min-height: 32px; border-radius: 999px; background: rgb(20 20 26 / 72%); box-shadow: 0 0 0 1px rgb(255 255 255 / 12%); opacity: 0; pointer-events: none; transition: opacity .2s ease; }
-.unlim-scroll-thumb.is-visible { opacity: 1; }
+html { scroll-behavior: smooth; overflow-y: overlay; scrollbar-width: thin; scrollbar-color: rgb(20 20 26 / 72%) transparent; }
+html::-webkit-scrollbar { width: 5px; height: 5px; background: transparent; }
+html::-webkit-scrollbar-track { background: transparent; }
+html::-webkit-scrollbar-thumb { background: rgb(20 20 26 / 72%); border-radius: 999px; border: 1px solid transparent; background-clip: content-box; }
+html::-webkit-scrollbar-thumb:hover { background: #14141a; background-clip: content-box; }
 [id] { scroll-margin-top: 96px; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 
