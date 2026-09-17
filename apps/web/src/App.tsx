@@ -59,7 +59,7 @@ export default function App({ content, view = "home" }: AppProps) {
   }
 
   if (view === "ui-kit") {
-    return <ContentProvider content={content}><MotionConfig reducedMotion="user"><CoolModeEffects /><UiKitPage /></MotionConfig></ContentProvider>;
+    return <ContentProvider content={content}><MotionConfig reducedMotion="user"><CoolModeEffects /><main><UiKitPage /><MainContentReady /></main></MotionConfig></ContentProvider>;
   }
 
   return (
