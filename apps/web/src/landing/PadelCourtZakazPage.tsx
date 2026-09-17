@@ -932,7 +932,7 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
             <Typography as="h1" role="hero" className="max-w-[960px] text-white font-semibold leading-[1.08]">
               <SplitTextReveal
                 text="Падел корт купить под ключ — цена, строительство, монтаж"
-                animateOnMount
+                reveal={false}
               />
             </Typography>
 

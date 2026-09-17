@@ -24,17 +24,19 @@ export function SplitTextReveal({
   className,
   animateOnMount = false,
   delay = 0,
+  reveal = true,
 }: {
   text: string;
   className?: string;
   animateOnMount?: boolean;
   delay?: number;
+  reveal?: boolean;
 }) {
   const words = joinWords(text);
   const revealStyle = { "--reveal-delay": `${delay}s` } as CSSProperties;
-  return <span data-reveal-text={!animateOnMount || undefined} className={cn("inline", className)} style={revealStyle}>
+  return <span data-reveal-text={reveal && !animateOnMount ? true : undefined} className={cn("inline", className)} style={reveal && !animateOnMount ? revealStyle : undefined}>
       {words.map((item, index) => (
-        <span key={`${item}-${index}`} data-hero-word={animateOnMount ? "" : undefined} data-reveal-word={!animateOnMount || undefined} style={animateOnMount ? { "--hero-word-index": index } as CSSProperties : undefined} className="mr-[0.25em] inline-block last:mr-0">
+        <span key={`${item}-${index}`} data-hero-word={animateOnMount && reveal ? "" : undefined} data-reveal-word={reveal && !animateOnMount ? true : undefined} style={animateOnMount && reveal ? { "--hero-word-index": index } as CSSProperties : undefined} className="mr-[0.25em] inline-block last:mr-0">
           {item}
         </span>
       ))}
