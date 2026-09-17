@@ -23,7 +23,7 @@ export function Courts() {
     <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,6,10,.82)_0%,rgba(4,6,10,.72)_45%,rgba(4,6,10,.86)_100%)]" />
     <div className="container-page relative z-10">
       <Reveal><SectionHeader light title={<><SplitTextReveal text={home.courtsSection.titleLineOne} className="block" /><SplitTextReveal text={home.courtsSection.titleLineTwo} className="block" /></>} className="mb-12" /></Reveal>
-      <div className="grid gap-4 lg:grid-cols-12">{entities.courts.map((court, index) => { const columns = court.cardVariant === "panoramic" ? 7 : court.cardVariant === "metrics" ? 5 : 6; return <Reveal key={court.id} delay={cardDelays[index]} initial={{ opacity: 1, y: 26 }} className={columnClasses[columns]}><CourtCard court={court} /></Reveal> })}</div>
+      <div className="grid gap-4 lg:grid-cols-12">{entities.courts.map((court, index) => { const columns = court.cardVariant === "panoramic" ? 7 : court.cardVariant === "metrics" ? 5 : 6; return <Reveal key={court.id} delay={cardDelays[index]} className={columnClasses[columns]}><CourtCard court={court} /></Reveal> })}</div>
     </div>
   </section>;
 }
