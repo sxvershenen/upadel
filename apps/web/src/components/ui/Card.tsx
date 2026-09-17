@@ -43,7 +43,7 @@ export function MeshCard({ tone, className, children, interactive = true, ...pro
 }
 
 export function GlassCard({ className, children, interactive = true, ...props }: Omit<SurfaceCardProps, "tone">) {
-  return <SurfaceCard tone="glass" interactive={interactive} className={cn("transform-gpu backdrop-blur-xl", className)} {...props}>{children}</SurfaceCard>;
+  return <SurfaceCard tone="glass" interactive={interactive} className={cn("transform-gpu", className)} {...props}>{children}</SurfaceCard>;
 }
 
 /** @deprecated Use MeshCard tone="dark". */
