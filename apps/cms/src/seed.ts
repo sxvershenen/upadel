@@ -487,7 +487,7 @@ async function seed() {
       {
         slug: 'americano', title: 'Game Party / Americano', category: 'Клубная пятница', lifecycle: 'active',
         scheduleLabel: 'Каждую пятницу · 19:30–22:30', format: 'Americano (смена напарников каждый сет)',
-        entryFee: '2 500 ₽ / участник', description: 'Самый душевный формат для знакомства с игроками клуба. Музыкальный сет, напитки, фруктовый бар и динамичные матчи.',
+        entryFee: '2 500 ₽ / участник', description: 'Самый душевный формат для знакомства с игроками клуба. Музыкальный сет, питьевая вода и динамичные матчи.',
         prizeLabel: 'Стоимость за участника', prize: '2 500 ₽', visualStyle: 'image', image: mediaID(images.tournamentParty),
         imageOverlay: 'overlay-dark', icon: 'PartyPopper', regulation: richText('Регистрация закрывается за 2 часа до начала. Формат — Americano со сменой напарников каждый сет. На матч приезжайте за 15 минут до старта.'),
       },
@@ -521,6 +521,12 @@ async function seed() {
       await fillMissingSeededFields(payload, 'tournaments', seededTournament.id, { regulation: tournament.regulation })
       await migrateSeededField(payload, 'tournaments', seededTournament.id, 'action', { label: null, mode: 'none', href: null }, facets.action)
       if (index > 0) await migrateSeededField(payload, 'tournaments', seededTournament.id, 'lifecycle', 'upcoming', 'finished')
+      if (index === 0) {
+        const doc = await payload.findByID({ collection: 'tournaments', id: seededTournament.id, depth: 0, overrideAccess: true, showHiddenFields: true } as never) as unknown as Record<string, unknown>
+        if (typeof doc.description === 'string' && doc.description.includes('фруктовый')) {
+          await payload.update({ collection: 'tournaments', id: seededTournament.id, data: { description: tournament.description, _status: 'published' }, draft: false, depth: 0, overrideAccess: true } as never)
+        }
+      }
     }
 
     const courts = [

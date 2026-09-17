@@ -90,7 +90,7 @@ const mockTournamentDTO = {
     scheduleLabel: 'Каждую пятницу · 19:30–22:30',
     format: 'Americano (смена напарников каждый сет)',
     entryFee: '2 500 ₽ / участник',
-    description: 'Самый душевный формат для знакомства с игроками клуба. Музыкальный сет, напитки, фруктовый бар и динамичные матчи.',
+    description: 'Самый душевный формат для знакомства с игроками клуба. Музыкальный сет, питьевая вода и динамичные матчи.',
     prizeLabel: 'Стоимость за участника',
     prize: '2 500 ₽',
     visualStyle: 'image',
@@ -126,61 +126,65 @@ const mockTournamentDTO = {
   ],
 }
 
-test('TournamentDetailPage renders hero intact and Swiss structure with passport, regulations, timeline and FAQ', () => {
+test('TournamentDetailPage renders hero without buttons/badge/eyebrows and Swiss structure with passport, regulations, side-by-side timeline and FAQ', () => {
   const html = renderToStaticMarkup(
     <ActionLayerProvider site={mockSite as any}>
       <TournamentDetailPage dto={mockTournamentDTO as unknown as TournamentDetailDTO} />
     </ActionLayerProvider>
   )
 
-  // 1. Hero block checks: unchanged H1, eyebrow, lead, CTA button
+  // 1. Hero block checks: unchanged H1, intro; no actions, no badge, no eyebrow
   assert.match(html, /<header[^>]*class="page-hero[^>]*>/)
   assert.match(html, /<h1[^>]*>[\s\S]*?Game Party \/ Americano[\s\S]*?<\/h1>/)
-  assert.match(html, /Клубная пятница/)
-  assert.match(html, /Записаться/)
+  assert.doesNotMatch(html, /data-page-enter="eyebrow"/)
+  assert.doesNotMatch(html, /data-page-enter="actions"/)
 
-  // 2. Breadcrumbs
-  assert.match(html, /aria-label="Хлебные крошки"/)
-  assert.match(html, /href="\/tournaments"/)
+  // 2. Breadcrumbs removed
+  assert.doesNotMatch(html, /aria-label="Хлебные крошки"/)
 
-  // 3. Tournament passport metrics
+  // 3. Tournament passport metrics (no 01-04 numbers, bottom aligned)
   assert.match(html, /aria-label="Паспорт турнира"/)
-  assert.match(html, /01 · Расписание/)
+  assert.match(html, /Расписание/)
+  assert.doesNotMatch(html, /01\s*·/)
   assert.match(html, /19:30–22:30/)
-  assert.match(html, /02 · Формат/)
+  assert.match(html, /Формат/)
+  assert.doesNotMatch(html, /02\s*·/)
   assert.match(html, /Americano/)
-  assert.match(html, /03 · Взнос/)
+  assert.match(html, /Взнос/)
+  assert.doesNotMatch(html, /03\s*·/)
   assert.match(html, /2[\s\u00A0]500[\s\u00A0]₽ \/ участник/)
+  assert.match(html, /mt-auto/)
 
   // 4. Regulations and Checklist
   assert.match(html, /Регламент турнира/)
   assert.match(html, /Перед выходом на\u00A0корт/)
   assert.match(html, /Включено для\u00A0каждого игрока/)
-  assert.match(html, /Особенности формата/)
+  assert.doesNotMatch(html, /Особенности формата/)
+  assert.match(html, /type-body/)
+  assert.match(html, /Питьевая вода/)
+  assert.doesNotMatch(html, /фруктовый бар/)
+  assert.doesNotMatch(html, /без ограничений/)
 
-  // 5. Matchday Timeline
-  assert.match(html, /aria-label="Расписание игрового дня"/)
+  // 5. Side-by-side Matchday Timeline and FAQ on PC
+  assert.match(html, /aria-label="Игровой день и вопросы"/)
   assert.match(html, /Как проходит игровой день/)
   assert.match(html, /Сбор и\u00A0разминка/)
   assert.match(html, /Брифинг и\u00A0жеребьёвка/)
-
-  // 6. Registration block
-  assert.match(html, /aria-label="Запись на турнир"/)
-  assert.match(html, /Готовы выйти на\u00A0корт\?/)
-  assert.match(html, /Регистрация открыта/)
-
-  // 7. FAQ (Accordion without heavy wrapper card)
-  assert.match(html, /aria-label="Частые вопросы"/)
-  assert.match(html, /Частые вопросы об\u00A0участии/)
+  assert.match(html, /Частые вопросы/)
   assert.match(html, /Нужен ли постоянный напарник для\u00A0участия\?/)
 
-  // 8. Related Tournaments
+  // 6. Registration CTA block (no badges)
+  assert.match(html, /aria-label="Запись на турнир"/)
+  assert.match(html, /Готовы выйти на\u00A0корт\?/)
+  assert.doesNotMatch(html, /Регистрация открыта/)
+
+  // 7. Related Tournaments
   assert.match(html, /aria-label="Другие турниры"/)
   assert.match(html, /Другие турниры и\u00A0лиги/)
   assert.match(html, /Unlim Riga Masters Cup/)
 })
 
-test('TournamentDetailPage renders completed lifecycle state appropriately', () => {
+test('TournamentDetailPage renders completed lifecycle state appropriately without badges', () => {
   const completedDTO = {
     ...mockTournamentDTO,
     item: {
@@ -199,8 +203,7 @@ test('TournamentDetailPage renders completed lifecycle state appropriately', () 
     </ActionLayerProvider>
   )
 
-  // Badge 'Завершено' in hero and CTA
-  assert.match(html, /Завершено/)
+  assert.doesNotMatch(html, /Завершённый турнир/)
   assert.match(html, /Этот турнир уже завершился/)
   assert.match(html, /80[\s\u00A0]000[\s\u00A0]₽/)
   assert.match(html, /Все турниры/)
