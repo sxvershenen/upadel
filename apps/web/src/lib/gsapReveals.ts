@@ -39,7 +39,12 @@ export async function startGsapReveals() {
 
   const refresh = () => {
     const allTargets = Array.from(document.querySelectorAll<RevealTarget>('[data-gsap-reveal]'))
-    const targets = allTargets.filter((target) => !target.querySelector('[data-gsap-reveal]'))
+    const targets = allTargets.filter((target) => {
+      const hasBoundaryAncestor = Boolean(target.parentElement?.closest('[data-gsap-reveal-boundary="true"]'))
+      if (hasBoundaryAncestor) return false
+      if (target.dataset.gsapRevealBoundary === 'true') return true
+      return !target.querySelector('[data-gsap-reveal-boundary="true"], [data-gsap-reveal]')
+    })
     const targetSet = new Set(targets)
     allTargets.forEach((target) => {
       if (targetSet.has(target)) target.dataset.gsapRevealOwner = 'true'

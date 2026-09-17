@@ -26,7 +26,7 @@ type SurfaceCardProps = HTMLMotionProps<"div"> & {
 export function SurfaceCard({ tone = "white", interactive = true, reveal = true, className, children, style, ...props }: SurfaceCardProps) {
   const isMesh = tone in meshMap;
   const toneClass = tone === "white" ? "bg-white text-ink" : tone === "glass" ? "glass text-white" : cn("relative isolate overflow-hidden", meshMap[tone as MeshTone], meshTextTone[tone as MeshTone]);
-  const revealProps = revealAttributes(reveal, style);
+  const revealProps = revealAttributes(reveal, style, true);
   return <motion.div
     {...props}
     {...revealProps}
@@ -69,7 +69,7 @@ export interface ImageCardProps extends Omit<HTMLMotionProps<"div">, "children">
 export function ImageCard({ src, alt, overlay, className, children, imgClassName, interactive = true, reveal = true, style, ...props }: ImageCardProps & { reveal?: RevealConfig }) {
   const imageRef = useRef<HTMLDivElement>(null);
   const imageY = useImageParallax(imageRef);
-  const revealProps = revealAttributes(reveal, style);
+  const revealProps = revealAttributes(reveal, style, true);
   return <motion.div
     {...props}
     {...revealProps}

@@ -6,18 +6,20 @@ type RevealStyle = CSSProperties | MotionStyle
 
 type RevealAttributeResult<T> = {
   'data-gsap-reveal'?: string
+  'data-gsap-reveal-boundary'?: string
   'data-gsap-reveal-fade'?: string
   'data-gsap-reveal-y'?: number
   style?: T
 }
 
-export function revealAttributes(reveal: RevealConfig | undefined, style?: CSSProperties): RevealAttributeResult<CSSProperties>
-export function revealAttributes(reveal: RevealConfig | undefined, style?: MotionStyle): RevealAttributeResult<MotionStyle>
-export function revealAttributes(reveal: RevealConfig | undefined, style?: RevealStyle): RevealAttributeResult<CSSProperties> | RevealAttributeResult<MotionStyle> {
+export function revealAttributes(reveal: RevealConfig | undefined, style?: CSSProperties, boundary?: boolean): RevealAttributeResult<CSSProperties>
+export function revealAttributes(reveal: RevealConfig | undefined, style?: MotionStyle, boundary?: boolean): RevealAttributeResult<MotionStyle>
+export function revealAttributes(reveal: RevealConfig | undefined, style?: RevealStyle, boundary = false): RevealAttributeResult<CSSProperties> | RevealAttributeResult<MotionStyle> {
   if (reveal !== true && typeof reveal !== 'object') return { style }
   const settings = typeof reveal === 'object' ? reveal : {}
   return {
     'data-gsap-reveal': 'true',
+    'data-gsap-reveal-boundary': boundary ? 'true' : undefined,
     'data-gsap-reveal-fade': settings.fade === false ? 'false' : undefined,
     'data-gsap-reveal-y': settings.y ?? 24,
     style: {
