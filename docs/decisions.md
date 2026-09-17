@@ -64,7 +64,7 @@ CMS users and SEO redirects are also managed from dedicated tabs inside `Нас�
 ## D11 — Catalog and detail routes — accepted
 
 - `/coaches`: filtered catalog, quick profile, then `/coaches/[slug]` detail.
-- `/tournaments`: filtered catalog and `/tournaments/[slug]` detail.
+- `/tournaments`: filtered catalog and `/tournaments/[slug]` detail rendered with modern Swiss-style layout (original PageHeader hero preserved intact, 4-metric tournament passport, split regulations and pre-match checklist with club perks, 4-step matchday timeline, unwrapped Accordion FAQ, registration CTA conversion block, and related tournaments grid with glued Russian prepositions).
 - `/blog`: catalog and `/blog/[slug]` article.
 - Courts, prices, training and about remain single thematic pages; `/contacts` redirects to `/about`, while shared contact details stay in the footer and site settings.
 
