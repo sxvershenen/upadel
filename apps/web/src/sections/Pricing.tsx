@@ -68,7 +68,7 @@ export function Pricing() {
         <Tabs layoutId="pricing-tabs-mobile" tabs={pricingTabs} value={active} onChange={changeTab} />
       </div>
 
-      <AnimatePresence initial={false} mode="wait">
+      <AnimatePresence mode="wait">
         <motion.div
           id="pricing-panel"
           role="tabpanel"

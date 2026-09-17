@@ -5,7 +5,6 @@ import { springSoft } from "../../lib/motion";
 import { useImageParallax } from "../../lib/useImageParallax";
 import { ArrowAction } from "../ui/ArrowAction";
 import { Badge } from "../ui/Badge";
-import { useSsrReveal } from "../ui/useSsrReveal";
 
 export type Article = HomepageDTO["entities"]["articles"][number] | ArticleCatalogItem;
 export type ArticleSummary = Pick<Article, "title" | "excerpt" | "slug">;
@@ -24,8 +23,7 @@ export function ArticleCard({ post, mobilePlain = false }: { post: Article; mobi
 }
 
 export function ArticleRow({ post, delay = 0 }: { post: ArticleSummary; delay?: number }) {
-  const { ref, controls } = useSsrReveal<HTMLAnchorElement>("-50px")
-  return <motion.a ref={ref} href={`/blog/${post.slug}`} initial="show" animate={controls} whileHover="hover" variants={{ hidden: { opacity: 0, y: 14 }, show: { opacity: 1, y: 0 }, hover: { x: 4 } }} transition={{ ...springSoft, delay }} className="card-spring group group/card flex cursor-pointer items-center justify-between gap-4 border-b border-ink/10 py-5 first:pt-0">
+  return <motion.a href={`/blog/${post.slug}`} initial="hidden" whileInView="visible" whileHover="hover" viewport={{ once: true, margin: "-50px" }} variants={{ hidden: { opacity: 0, y: 14 }, visible: { opacity: 1, y: 0 }, hover: { x: 4 } }} transition={{ ...springSoft, delay }} className="card-spring group group/card flex cursor-pointer items-center justify-between gap-4 border-b border-ink/10 py-5 first:pt-0">
     <div><h4 className="type-body text-ink">{post.title}</h4><p className="type-body-sm mt-1 text-ink-soft">{post.excerpt}</p></div>
     <ArrowAction tone="light" size="sm" cardHover className="shrink-0 !bg-control !text-ink transition-colors group-hover/card:!bg-lime group-hover/card:!text-ink" />
   </motion.a>;

@@ -7,6 +7,8 @@ import { useContent } from "../content/ContentContext";
 import { IconButton } from "../components/ui/Button";
 import { SectionHeader } from "../components/ui/SectionHeader";
 import { Reveal } from "../components/ui/Reveal";
+import { motion } from "framer-motion";
+import { springSoft } from "../lib/motion";
 import { useMobileSwipeHint } from "../lib/useMobileSwipeHint";
 import { horizontalSwiperProps } from "../lib/swiper";
 import { CoachCard } from "../components/cards/CoachCard";
@@ -70,9 +72,14 @@ export function Coaches() {
           >
             {entities.coaches.map((coach, index) => (
               <SwiperSlide key={coach.id} className="!h-auto">
-                <Reveal delay={index * 0.06}>
+                <motion.div
+                  initial={{ opacity: 0, y: 18 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-60px" }}
+                  transition={{ ...springSoft, delay: index * 0.06 }}
+                >
                   <CoachCard coach={coach} />
-                </Reveal>
+                </motion.div>
               </SwiperSlide>
             ))}
           </Swiper>
