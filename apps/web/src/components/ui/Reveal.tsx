@@ -13,6 +13,6 @@ export function Reveal({
   className?: string;
   fade?: boolean;
 }) {
-  const style = { "--reveal-delay": `${delay}s`, "--reveal-y": `${y}px` } as CSSProperties;
-  return <div data-reveal={true} data-reveal-fade={fade ? undefined : "false"} style={style} className={className}>{children}</div>;
+  const style = { "--gsap-reveal-delay": `${delay}s`, "--gsap-reveal-y": `${y}px` } as CSSProperties;
+  return <div data-gsap-reveal="true" data-gsap-reveal-fade={fade ? undefined : "false"} data-gsap-reveal-y={y} style={style} className={className}>{children}</div>;
 }

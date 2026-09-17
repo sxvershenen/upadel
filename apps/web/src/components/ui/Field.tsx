@@ -30,7 +30,7 @@ export const Field = forwardRef<HTMLInputElement, FieldProps>(
         disabled && "cursor-not-allowed opacity-50",
         fieldClassName,
       )}>
-        <input ref={ref} id={id} disabled={disabled} aria-invalid={error ? true : suppliedInvalid} aria-describedby={describedBy} className={cn("type-ui w-full bg-transparent font-medium outline-none placeholder:opacity-45 disabled:cursor-not-allowed", dark ? "text-white" : "text-ink", className)} {...nativeProps} />
+        <input ref={ref} id={id} disabled={disabled} aria-invalid={error ? true : suppliedInvalid} aria-describedby={describedBy} className={cn("type-ui w-full bg-transparent font-medium outline-none placeholder:text-ink-soft/75 disabled:cursor-not-allowed", dark ? "text-white placeholder:text-white/65" : "text-ink", className)} {...nativeProps} />
         {suffix && <span className={cn("type-ui shrink-0 font-medium", dark ? "text-white/60" : "text-ink-soft")}>{suffix}</span>}
       </div>
       {description && <p id={descriptionId} className={cn("type-caption mt-1.5", dark ? "text-white/55" : "text-ink-soft")}>{description}</p>}

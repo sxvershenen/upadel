@@ -19,18 +19,32 @@ const meshTextTone: Record<MeshTone, string> = {
 type SurfaceCardProps = HTMLMotionProps<"div"> & {
   tone?: "white" | "glass" | MeshTone;
   interactive?: boolean;
+  reveal?: boolean | { delay?: number; y?: number; fade?: boolean };
 };
 
-export function SurfaceCard({ tone = "white", interactive = true, className, children, ...props }: SurfaceCardProps) {
+function revealAttributes(reveal: SurfaceCardProps["reveal"], style: HTMLMotionProps<"div">["style"]) {
+  if (reveal === false) return { style };
+  const settings = typeof reveal === "object" ? reveal : {};
+  return {
+    "data-gsap-reveal": "true",
+    "data-gsap-reveal-fade": settings.fade === false ? "false" : undefined,
+    "data-gsap-reveal-y": settings.y ?? 24,
+    style: { ...style, "--gsap-reveal-delay": `${settings.delay ?? 0}s`, "--gsap-reveal-y": `${settings.y ?? 24}px` } as HTMLMotionProps<"div">["style"],
+  };
+}
+
+export function SurfaceCard({ tone = "white", interactive = true, reveal = true, className, children, style, ...props }: SurfaceCardProps) {
   const isMesh = tone in meshMap;
   const toneClass = tone === "white" ? "bg-white text-ink" : tone === "glass" ? "glass text-white" : cn("relative isolate overflow-hidden", meshMap[tone as MeshTone], meshTextTone[tone as MeshTone]);
+  const revealProps = revealAttributes(reveal, style);
   return <motion.div
+    {...props}
+    {...revealProps}
     initial={interactive ? "rest" : undefined}
     whileHover={interactive ? "hover" : undefined}
     variants={interactive ? cardVariants : undefined}
     transition={interactive ? springSoft : undefined}
     className={cn("group/card se-3", interactive && "card-spring cursor-pointer", isMesh && "group/mesh", toneClass, className)}
-    {...props}
   >{children}</motion.div>;
 }
 
@@ -62,16 +76,18 @@ export interface ImageCardProps extends Omit<HTMLMotionProps<"div">, "children">
 }
 
 /** Full-bleed image card with a mandatory colorized overlay. */
-export function ImageCard({ src, alt, overlay, className, children, imgClassName, interactive = true, ...props }: ImageCardProps) {
+export function ImageCard({ src, alt, overlay, className, children, imgClassName, interactive = true, reveal = true, style, ...props }: ImageCardProps & { reveal?: boolean | { delay?: number; y?: number; fade?: boolean } }) {
   const imageRef = useRef<HTMLDivElement>(null);
   const imageY = useImageParallax(imageRef);
+  const revealProps = revealAttributes(reveal, style);
   return <motion.div
+    {...props}
+    {...revealProps}
     initial={interactive ? "rest" : undefined}
     whileHover={interactive ? "hover" : undefined}
     variants={interactive ? cardVariants : undefined}
     transition={interactive ? springSoft : undefined}
     className={cn("group/card group se-3 relative isolate flex flex-col overflow-hidden text-white", interactive && "card-spring cursor-pointer", overlay, className)}
-    {...props}
   >
     <div ref={imageRef} data-parallax-viewport className="parallax-viewport absolute inset-0 z-0">
       <motion.div

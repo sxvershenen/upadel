@@ -405,8 +405,7 @@ export function CourtModelTabs({ onSelectModel }: { onSelectModel?: (modelId: Mo
 
   return (
     <div>
-      <div className="relative -mx-5 md:mx-0">
-        <div className="sticky top-5 z-30 bg-page/95 px-5 py-3 backdrop-blur-md md:static md:bg-transparent md:p-0 md:backdrop-blur-none">
+      <div className="sticky top-5 z-30 -mx-5 bg-page/95 px-5 py-3 backdrop-blur-md md:static md:mx-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
           <Tabs
             aria-label="Модели кортов JUBO"
             className="no-scrollbar w-full"
@@ -419,8 +418,7 @@ export function CourtModelTabs({ onSelectModel }: { onSelectModel?: (modelId: Mo
             value={activeModel}
             onChange={handleTabChange}
           />
-        </div>
-        <span aria-hidden="true" className="pointer-events-none absolute right-5 top-1/2 z-40 flex -translate-y-1/2 items-center bg-gradient-to-r from-transparent via-page/80 to-page pl-5 pr-1 text-ink-soft md:hidden"><ArrowRight size={16} /></span>
+        <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 flex w-12 items-center justify-end bg-gradient-to-l from-page via-page/80 to-transparent pr-1 text-ink-soft md:hidden"><ArrowRight size={14} strokeWidth={1.7} /></span>
       </div>
 
       <SurfaceCard tone="white" interactive={false} className="mt-6 p-6 md:p-10">
@@ -704,42 +702,42 @@ function InlineLeadCalculatorForm({
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
+                aria-label="Связаться по телефону"
                 onClick={() => setPreferredChannel('phone')}
                 className={cn(
-                  'se-2 flex items-center gap-2 py-2 px-3.5 type-ui font-medium transition-colors cursor-pointer',
+                  'se-2 flex h-[var(--control-md)] w-[var(--control-md)] items-center justify-center type-ui font-medium transition-colors cursor-pointer',
                   preferredChannel === 'phone'
                     ? 'bg-ink text-white'
                     : 'bg-control text-ink-soft hover:bg-control-hover'
                 )}
               >
                 <PhoneIcon size={15} />
-                <span>Звонок</span>
               </button>
               <button
                 type="button"
+                aria-label="Связаться в Telegram"
                 onClick={() => setPreferredChannel('telegram')}
                 className={cn(
-                  'se-2 flex items-center gap-2 py-2 px-3.5 type-ui font-medium transition-colors cursor-pointer',
+                  'se-2 flex h-[var(--control-md)] w-[var(--control-md)] items-center justify-center type-ui font-medium transition-colors cursor-pointer',
                   preferredChannel === 'telegram'
                     ? 'bg-ink text-white'
                     : 'bg-control text-ink-soft hover:bg-control-hover'
                 )}
               >
                 <TelegramIcon size={15} />
-                <span>Telegram</span>
               </button>
               <button
                 type="button"
+                aria-label="Связаться во ВКонтакте"
                 onClick={() => setPreferredChannel('vk')}
                 className={cn(
-                  'se-2 flex items-center gap-2 py-2 px-3.5 type-ui font-medium transition-colors cursor-pointer',
+                  'se-2 flex h-[var(--control-md)] w-[var(--control-md)] items-center justify-center type-ui font-medium transition-colors cursor-pointer',
                   preferredChannel === 'vk'
                     ? 'bg-ink text-white'
                     : 'bg-control text-ink-soft hover:bg-control-hover'
                 )}
               >
                 <VkIcon size={17} />
-                <span>ВКонтакте</span>
               </button>
             </div>
           </div>
@@ -794,7 +792,7 @@ function DirectContactButtons() {
   const { requestContact } = useActionLayer()
 
   return (
-    <div className="mt-8 flex flex-wrap items-center gap-2.5">
+    <div className="mt-8 flex flex-wrap items-center gap-2.5 overflow-clip">
       <ButtonLink
         href="https://t.me/unlim_padel"
         target="_blank"
@@ -803,13 +801,10 @@ function DirectContactButtons() {
         size="md"
         icon={<TelegramIcon size={15} />}
         iconPosition="left"
-        iconOnly
-        aria-label="Написать в Telegram"
-        className="!h-[var(--control-md)] !w-[var(--control-md)] !p-0"
         onClick={() => {
           trackAnalytics({ name: 'direct_messenger_click', actionKind: 'telegram', objectType: 'lead' })
         }}
-      />
+      >Telegram</ButtonLink>
 
       <ButtonLink
         href="https://vk.com/unlim_padel"
@@ -819,27 +814,21 @@ function DirectContactButtons() {
         size="md"
         icon={<VkIcon size={17} />}
         iconPosition="left"
-        iconOnly
-        aria-label="Написать во ВКонтакте"
-        className="!h-[var(--control-md)] !w-[var(--control-md)] !p-0"
         onClick={() => {
           trackAnalytics({ name: 'direct_messenger_click', actionKind: 'vk', objectType: 'lead' })
         }}
-      />
+      >ВКонтакте</ButtonLink>
 
       <Button
         variant="neutral"
         size="md"
         icon={<PhoneIcon size={15} />}
         iconPosition="left"
-        iconOnly
-        aria-label="Позвонить"
-        className="!h-[var(--control-md)] !w-[var(--control-md)] !p-0"
         onClick={() => {
           trackAnalytics({ name: 'direct_call_click', actionKind: 'phone', objectType: 'lead' })
           requestContact('phone')
         }}
-      />
+      >По телефону</Button>
     </div>
   )
 }

@@ -30,11 +30,10 @@ function LeadForm({ site, lead, onClose, onContact }: { site: SiteDTO; lead: Lea
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setError('')
     const data = Object.fromEntries(new FormData(event.currentTarget))
-    const name = String(data.name ?? '').trim(), phone = String(data.phone ?? '').trim(), email = String(data.email ?? '').trim(), telegram = String(data.telegram ?? '').trim(), vk = String(data.vk ?? '').trim()
+    const name = String(data.name ?? '').trim(), phone = String(data.phone ?? '').trim(), telegram = String(data.telegram ?? '').trim(), vk = String(data.vk ?? '').trim()
     const errors: string[] = []
     if (name.length < 2) errors.push('Укажите имя — минимум 2 символа.')
-    if (!phone && !email && !telegram && !vk) errors.push('Укажите телефон, email, Telegram или VK.')
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.push('Проверьте формат email.')
+    if (!phone && !telegram && !vk) errors.push('Оставьте телефон, Telegram или VK — достаточно одного поля.')
     if (phone && !/^[+\d\s()-]{6,40}$/.test(phone)) errors.push('Проверьте формат телефона.')
     if (telegram && !/^@?[\p{L}\p{N}_.-]{3,80}$/u.test(telegram)) errors.push('Проверьте Telegram-логин.')
     if (vk && !/^@?[\p{L}\p{N}_.-]{3,80}$/u.test(vk)) errors.push('Проверьте VK-логин.')
@@ -56,11 +55,10 @@ function LeadForm({ site, lead, onClose, onContact }: { site: SiteDTO; lead: Lea
   if (state === 'success') return <div role="status"><h3 className="type-title-card text-ink">{site.contactConfirmation.successTitle}</h3><p className="type-body mt-3 text-ink-soft">{site.contactConfirmation.successText}</p><Button className="mt-6" onClick={onClose}>Закрыть</Button></div>
   return <form onSubmit={submit} onFocusCapture={start} noValidate className="grid gap-4">
     <Field label="Имя" labelVisibility="sr-only" name="name" autoComplete="name" required minLength={2} maxLength={120} placeholder="Ваше имя" />
-    <fieldset className="grid gap-3"><legend className="type-caption mb-1">Как с вами связаться — заполните хотя бы одно поле</legend>
-      <Field label="Телефон" labelVisibility="sr-only" name="phone" autoComplete="tel" inputMode="tel" maxLength={40} placeholder="Номер телефона" />
-      <Field label="Email" labelVisibility="sr-only" name="email" type="email" autoComplete="email" maxLength={160} placeholder="you@example.com" />
-      <Field label="Telegram / логин" labelVisibility="sr-only" name="telegram" autoComplete="off" placeholder="@username" maxLength={80} />
-      <Field label="VK / логин" labelVisibility="sr-only" name="vk" autoComplete="off" placeholder="id или @username" maxLength={80} />
+    <fieldset className="grid gap-3"><legend className="type-caption mb-1">Как с вами связаться? Заполните любое одно поле</legend>
+      <Field label="Телефон" labelVisibility="sr-only" name="phone" autoComplete="tel" inputMode="tel" maxLength={40} placeholder="Телефон — например +7 999 000-00-00" />
+      <Field label="Telegram / логин" labelVisibility="sr-only" name="telegram" autoComplete="off" placeholder="Telegram — например @username" maxLength={80} />
+      <Field label="VK / логин" labelVisibility="sr-only" name="vk" autoComplete="off" placeholder="VK — id или @username" maxLength={80} />
     </fieldset>
     <TextareaField label="Комментарий" labelVisibility="sr-only" name="comment" maxLength={2000} placeholder="Например, удобный день и время" />
     <label className="absolute -left-[10000px]" aria-hidden="true">Компания<input name="company" tabIndex={-1} autoComplete="off" /></label>

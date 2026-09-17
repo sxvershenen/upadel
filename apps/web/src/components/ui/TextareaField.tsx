@@ -28,8 +28,8 @@ export const TextareaField = forwardRef<HTMLTextAreaElement, TextareaFieldProps>
         aria-invalid={error ? true : suppliedInvalid}
         aria-describedby={describedBy}
         className={cn(
-          "se-2 min-h-24 w-full resize-y bg-control px-4 py-3 type-ui font-medium outline-none placeholder:opacity-45 transition-colors focus-visible:outline-2 focus-visible:outline-[var(--color-focus)] focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-          dark ? "bg-white/10 text-white" : "text-ink",
+          "se-2 min-h-24 w-full resize-y bg-control px-4 py-3 type-ui font-medium outline-none placeholder:text-ink-soft/75 transition-colors focus-visible:outline-2 focus-visible:outline-[var(--color-focus)] focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+          dark ? "bg-white/10 text-white placeholder:text-white/65" : "text-ink",
           error && (dark ? "outline-2 outline-red-300" : "outline-2 outline-[var(--color-danger)]"),
           className,
         )}

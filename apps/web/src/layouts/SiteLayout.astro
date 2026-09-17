@@ -213,4 +213,18 @@ const enableGlobalTransitions = !Astro.url.pathname.startsWith('/transitions/') 
       }).observe(document.body, { childList: true, characterData: true, subtree: true })
     })()
   </script>
+  <script>
+    import { startGsapReveals, stopGsapReveals } from '../lib/gsapReveals'
+
+    let revealIdle: ReturnType<typeof setTimeout> | 0 = 0
+    const scheduleGsapReveals = () => {
+      if (revealIdle) clearTimeout(revealIdle)
+      const start = () => { void startGsapReveals() }
+      if ('requestIdleCallback' in window) window.requestIdleCallback(start, { timeout: 1200 })
+      else revealIdle = setTimeout(start, 700)
+    }
+    document.addEventListener('astro:before-swap', stopGsapReveals)
+    document.addEventListener('astro:after-swap', scheduleGsapReveals)
+    scheduleGsapReveals()
+  </script>
 </html>
