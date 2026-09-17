@@ -5,6 +5,10 @@ import sharp from 'sharp'
 
 import { validateMediaUploadBeforeOperation } from './mediaPolicy'
 
+export async function optimizeRasterImage(input: Buffer | string): Promise<Buffer> {
+  return sharp(input).autoOrient().webp({ quality: 80 }).toBuffer()
+}
+
 export const optimizeMediaUploadBeforeOperation: CollectionBeforeOperationHook<'media'> = async (input) => {
   await validateMediaUploadBeforeOperation(input)
   const { req, operation } = input
@@ -14,8 +18,7 @@ export const optimizeMediaUploadBeforeOperation: CollectionBeforeOperationHook<'
   const mimeType = file.type || file.mimetype || ''
   if (!mimeType.startsWith('image/') || mimeType === 'image/svg+xml' || mimeType === 'image/gif') return input.args
 
-  const inputImage = file.tempFilePath ? sharp(file.tempFilePath) : sharp(file.data)
-  const data = await inputImage.webp({ quality: 80 }).toBuffer()
+  const data = await optimizeRasterImage(file.tempFilePath ?? file.data)
   file.data = data
   file.mimetype = 'image/webp'
   file.type = 'image/webp'

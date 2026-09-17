@@ -1,6 +1,6 @@
 'use client'
 
-import { Button, DefaultListView, useConfig, useListQuery } from '@payloadcms/ui'
+import { Button, DefaultListView, useConfig, useListDrawerContext, useListQuery } from '@payloadcms/ui'
 import { EditIcon } from '@payloadcms/ui/icons/Edit'
 import { ExternalLinkIcon } from '@payloadcms/ui/icons/ExternalLink'
 import type { ListViewClientProps } from 'payload'
@@ -8,6 +8,7 @@ import { formatAdminURL } from 'payload/shared'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { formatFileSize } from '../../uploads/mediaPolicy'
+import { selectMediaDocument } from './mediaDrawerSelection'
 import { UsageList } from './UsageList'
 import { useMediaUsage } from './useMediaUsage'
 import './adminCards.scss'
@@ -72,14 +73,15 @@ function mediaPreviewURL(doc: Record<string, unknown>): string | undefined {
 function MediaUsageGrid() {
   const { data, query, refineListData } = useListQuery()
   const { config } = useConfig()
+  const { isInDrawer, onSelect } = useListDrawerContext()
   const docs = (data?.docs ?? []) as MediaDocument[]
   const [tab, setTab] = useState<'all' | 'unused'>('all')
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [busy, setBusy] = useState(false)
   const [actionError, setActionError] = useState('')
-  const allMedia = useAllMedia(docs, tab === 'unused', data?.totalDocs)
-  const sourceDocs = tab === 'unused' ? allMedia.docs : docs
-  const ids = (tab === 'unused' && allMedia.loaded ? allMedia.docs : docs).map((doc) => String(doc.id))
+  const allMedia = useAllMedia(docs, !isInDrawer && tab === 'unused', data?.totalDocs)
+  const sourceDocs = !isInDrawer && tab === 'unused' ? allMedia.docs : docs
+  const ids = isInDrawer ? [] : (tab === 'unused' && allMedia.loaded ? allMedia.docs : docs).map((doc) => String(doc.id))
   const { error, loading, usage } = useMediaUsage(ids)
   const usageByMedia = useMemo(() => {
     const result = new Map<string, typeof usage>()
@@ -87,7 +89,7 @@ function MediaUsageGrid() {
     return result
   }, [usage])
   const unusedDocs = useMemo(() => allMedia.loaded ? allMedia.docs.filter((doc) => !(usageByMedia.get(String(doc.id))?.length)) : [], [allMedia.docs, allMedia.loaded, usageByMedia])
-  const visibleDocs = tab === 'unused' ? unusedDocs : sourceDocs
+  const visibleDocs = !isInDrawer && tab === 'unused' ? unusedDocs : sourceDocs
 
   const toggleSelected = (id: string) => setSelected((current) => {
     const next = new Set(current)
@@ -117,7 +119,8 @@ function MediaUsageGrid() {
 
   return (
     <>
-      <div className="media-admin-toolbar">
+      <div className={`media-admin-toolbar${isInDrawer ? ' media-admin-toolbar--drawer' : ''}`}>
+        {isInDrawer ? <p className="media-admin-drawer-hint">Выберите изображение — оно сразу появится в тексте статьи.</p> : <>
         <div className="media-admin-tabs" role="tablist" aria-label="Фильтр медиа">
           <button type="button" role="tab" aria-selected={tab === 'all'} className={tab === 'all' ? 'active' : ''} onClick={() => { setTab('all'); setSelected(new Set()) }}>Все <span>{data?.totalDocs ?? docs.length}</span></button>
           <button type="button" role="tab" aria-selected={tab === 'unused'} className={tab === 'unused' ? 'active' : ''} onClick={() => { setTab('unused'); setSelected(new Set()) }}>Неиспользуемые {allMedia.loaded && <span>{unusedDocs.length}</span>}</button>
@@ -127,6 +130,7 @@ function MediaUsageGrid() {
           {selected.size > 0 && <><button type="button" className="media-admin-action-button" disabled={busy} onClick={() => void deleteSelected()}>{busy ? 'Удаляем…' : 'Удалить выбранные'}</button><button type="button" className="media-admin-action-button media-admin-action-button--muted" disabled={busy} onClick={() => setSelected(new Set())}>Снять</button></>}
         </div>
         {actionError && <p className="media-admin-action-error" role="alert">{actionError}</p>}
+        </>}
       </div>
       <div className="media-admin-list" aria-busy={loading || allMedia.loading}>
       {tab === 'unused' && allMedia.loading && <div className="media-admin-empty">Загружаем полный список медиафайлов…</div>}
@@ -141,12 +145,10 @@ function MediaUsageGrid() {
         const video = mimeType === 'video/mp4' || mimeType === 'video/webm'
         const title = String(doc.filename ?? doc.alt ?? 'Медиа')
         const alt = String(doc.alt ?? '')
-        const usageCount = itemUsage.length
-
         return (
           <article className="media-admin-card" key={id}>
             <div className="media-admin-card__preview">
-              <a className="media-admin-card__media-link" href={href} aria-label={`Открыть ${title}`}>
+              {isInDrawer ? <button className="media-admin-card__media-link media-admin-card__media-select" type="button" onClick={() => selectMediaDocument(onSelect, doc)} aria-label={`Выбрать ${title}`}>
               {video && imageURL ? (
                 <video src={imageURL} preload="metadata" muted playsInline aria-label={`Видео: ${alt || title}`} />
               ) : mimeType.startsWith('image/') && imageURL ? (
@@ -154,17 +156,25 @@ function MediaUsageGrid() {
               ) : (
                 <span className="media-admin-card__placeholder">Файл без превью</span>
               )}
-              </a>
-              <label className="media-admin-card__select" title={`Выбрать ${title}`}>
+              </button> : <a className="media-admin-card__media-link" href={href} aria-label={`Открыть ${title}`}>
+              {video && imageURL ? (
+                <video src={imageURL} preload="metadata" muted playsInline aria-label={`Видео: ${alt || title}`} />
+              ) : mimeType.startsWith('image/') && imageURL ? (
+                <img src={imageURL} alt={alt} decoding="async" loading="lazy" />
+              ) : (
+                <span className="media-admin-card__placeholder">Файл без превью</span>
+              )}
+              </a>}
+              {!isInDrawer && <label className="media-admin-card__select" title={`Выбрать ${title}`}>
                 <input type="checkbox" checked={selected.has(id)} onChange={() => toggleSelected(id)} aria-label={`Выбрать ${title}`} />
-              </label>
+              </label>}
               <span className="media-admin-card__type">
                 {video ? `Видео · ${mimeType.replace('video/', '').toUpperCase()}` : mimeType.replace('image/', '').toUpperCase() || 'Файл'}
               </span>
               <div className="media-admin-card__overlay">
                 <div className="media-admin-card__topline">
                   <span aria-hidden="true" />
-                  <Button
+                  {!isInDrawer && <Button
                     aria-label={`Редактировать ${title}`}
                     buttonStyle="none"
                     el="link"
@@ -173,20 +183,20 @@ function MediaUsageGrid() {
                     margin={false}
                     size="small"
                     to={href}
-                  />
+                  />}
                 </div>
                 <div className="media-admin-card__bottomline">
                   <div className="media-admin-card__copy">
                     <strong className="media-admin-card__title" title={title}>{title}</strong>
                     {alt && <span className="media-admin-card__alt" title={alt}>{alt}</span>}
                   </div>
-                  <span className="media-admin-card__file" title="Размер файла">
+                  {isInDrawer ? <button type="button" className="media-admin-card__choose" onClick={() => selectMediaDocument(onSelect, doc)}>Выбрать</button> : <span className="media-admin-card__file" title="Размер файла">
                     <span aria-hidden="true">◫</span>{formatFileSize(doc.filesize)}
-                  </span>
+                  </span>}
                 </div>
               </div>
             </div>
-            <UsagePopover loading={loading} usage={itemUsage} />
+            {!isInDrawer && <UsagePopover loading={loading} usage={itemUsage} />}
           </article>
         )
       })}

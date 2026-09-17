@@ -4,7 +4,7 @@ export type MediaUsage = {
   href: string
   location: string
   mediaID: string
-  state: 'draft-only' | 'live'
+  state: 'draft-only' | 'live' | 'version'
 }
 
 type RegistryEntry = {
@@ -72,6 +72,40 @@ function scanCollectionDocs(
           location: `${entry.entityLabel} → ${title} → ${field.label}`,
         }, state)
       }
+    }
+  }
+}
+
+export function articleBodyMediaIDs(value: unknown): string[] {
+  const ids = new Set<string>()
+  const visit = (node: unknown) => {
+    if (!node || typeof node !== 'object') return
+    const record = node as { children?: unknown[]; relationTo?: string; root?: unknown; type?: string; value?: unknown }
+    if (record.type === 'upload' && record.relationTo === 'media') {
+      const id = relationID(record.value)
+      if (id) ids.add(id)
+    }
+    if (record.root) visit(record.root)
+    for (const child of record.children ?? []) visit(child)
+  }
+  visit(value)
+  return [...ids]
+}
+
+function scanArticleBodies(
+  target: Map<string, MediaUsage>,
+  docs: Array<Record<string, unknown>>,
+  state: MediaUsage['state'],
+  version = false,
+) {
+  for (const doc of docs) {
+    const title = String(doc.title ?? 'Без названия')
+    for (const mediaID of articleBodyMediaIDs(doc.content)) {
+      addUsage(target, {
+        mediaID,
+        href: `/admin/collections/articles/${String(doc.id)}`,
+        location: `Статья → ${title} → текст статьи${version ? ' (сохранённая версия)' : ''}`,
+      }, state)
     }
   }
 }
@@ -191,6 +225,28 @@ export async function getMediaUsage(payload: Payload, mediaIDs: Array<number | s
     await Promise.all(collectionTasks.map((task) => task()))
   }
 
+  const articleBodyTasks = [
+    () => payload.find({ collection: 'articles', depth: 0, draft: false, pagination: false, overrideAccess: true, req, where: { _status: { equals: 'published' } } } as never),
+    () => payload.find({ collection: 'articles', depth: 0, draft: true, pagination: false, overrideAccess: true, req } as never),
+  ] as const
+  const articleBodyResults = req
+    ? [await articleBodyTasks[0](), await articleBodyTasks[1]()]
+    : await Promise.all(articleBodyTasks.map((task) => task()))
+  scanArticleBodies(usage, articleBodyResults[0].docs as unknown as Array<Record<string, unknown>>, 'live')
+  scanArticleBodies(usage, articleBodyResults[1].docs as unknown as Array<Record<string, unknown>>, 'draft-only')
+
+  const versions = await payload.findVersions({
+    collection: 'articles',
+    depth: 0,
+    pagination: false,
+    overrideAccess: true,
+    req,
+  })
+  scanArticleBodies(usage, versions.docs.map((entry) => {
+    const version = entry.version as unknown as Record<string, unknown>
+    return { ...version, id: entry.parent ?? version.id }
+  }), 'version', true)
+
   const globalTasks = [
     () => payload.findGlobal({ slug: 'homepage', depth: 0, draft: false, overrideAccess: true, req }),
     () => payload.findGlobal({ slug: 'homepage', depth: 0, draft: true, overrideAccess: true, req }),
@@ -199,9 +255,12 @@ export async function getMediaUsage(payload: Payload, mediaIDs: Array<number | s
     () => payload.findGlobal({ slug: 'padel-court-zakaz-page', depth: 0, draft: false, overrideAccess: true, req } as never),
     () => payload.findGlobal({ slug: 'padel-court-zakaz-page', depth: 0, draft: true, overrideAccess: true, req } as never),
   ] as const
-  const globalResults = req
-    ? [await globalTasks[0](), await globalTasks[1](), await globalTasks[2](), await globalTasks[3]()]
-    : await Promise.all(globalTasks.map((task) => task()))
+  const globalResults: Array<Record<string, unknown>> = []
+  if (req) {
+    for (const task of globalTasks) globalResults.push(await task() as unknown as Record<string, unknown>)
+  } else {
+    globalResults.push(...await Promise.all(globalTasks.map((task) => task())) as unknown as Array<Record<string, unknown>>)
+  }
   const [publishedHome, draftHome, publishedSite, draftSite, publishedPadel, draftPadel] = globalResults
   if (publishedHome._status === 'published') scanHomepage(usage, publishedHome as unknown as Record<string, unknown>, 'live')
   scanHomepage(usage, draftHome as unknown as Record<string, unknown>, 'draft-only')

@@ -2,6 +2,7 @@ import { homepageDTOversion, type ArticleCatalogItem, type CatalogDTO, type Cata
 import type { Payload } from 'payload'
 
 import type { Article, Coach, Tournament } from '../payload-types'
+import { articleContentHTML } from './articleContent'
 import { actionDTO, mediaDTO, pageHeroDTO, requiredMedia, seoDTO, siteDTO } from './normalize'
 
 export type CatalogKind = 'blog' | 'coaches' | 'tournaments'
@@ -94,9 +95,9 @@ export async function createDetailProjection(payload: Payload, options: { kind: 
   const result = await payload.find({ collection: collectionSlugs[kind], depth: 2, draft: preview, limit: 1, overrideAccess: true, where } as never) as unknown as { docs: Array<Article | Coach | Tournament> }
   const item = result.docs[0]
   if (!item) return null
-  const relatedResult = await payload.find({ collection: collectionSlugs[kind], depth: 2, draft: preview, limit: 3, overrideAccess: true, where: { and: [{ id: { not_equals: item.id } }, ...(!preview ? [{ _status: { equals: 'published' } }] : []), ...(kind === 'coaches' && !preview ? [{ isActive: { equals: true } }] : [])] } } as never) as unknown as { docs: Array<Article | Coach | Tournament> }
+  const relatedResult = await payload.find({ collection: collectionSlugs[kind], depth: 2, draft: false, limit: 3, overrideAccess: true, where: { and: [{ id: { not_equals: item.id } }, { _status: { equals: 'published' } }, ...(kind === 'coaches' ? [{ isActive: { equals: true } }] : [])] } } as never) as unknown as { docs: Array<Article | Coach | Tournament> }
   const base = { version: homepageDTOversion, preview, generatedAt: new Date().toISOString(), page: header, site }
-  if (kind === 'blog') { const article = item as Article; return { ...base, kind, item: { ...articleItem(article, origin), contentHTML: richContentHTML(article.content), seo: seoDTO(article.seo, origin) }, related: (relatedResult.docs as Article[]).map((entry) => articleItem(entry, origin)) } }
+  if (kind === 'blog') { const article = item as Article; return { ...base, kind, item: { ...articleItem(article, origin), contentHTML: await articleContentHTML(article.content, { origin, payload }), seo: seoDTO(article.seo, origin) }, related: (relatedResult.docs as Article[]).map((entry) => articleItem(entry, origin)) } }
   if (kind === 'coaches') { const coach = item as Coach; return { ...base, kind, item: { ...coachItem(coach, origin), seo: seoDTO(coach.seo, origin) }, related: (relatedResult.docs as Coach[]).map((entry) => coachItem(entry, origin)) } }
   const tournament = item as Tournament
   return { ...base, kind, item: { ...tournamentItem(tournament, origin), seo: seoDTO(tournament.seo, origin) }, related: (relatedResult.docs as Tournament[]).map((entry) => tournamentItem(entry, origin)) }

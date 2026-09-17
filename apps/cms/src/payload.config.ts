@@ -27,6 +27,7 @@ import { AnalyticsBrowsers } from './collections/AnalyticsBrowsers'
 import { AnalyticsSessions } from './collections/AnalyticsSessions'
 import { AnalyticsDaily } from './collections/AnalyticsDaily'
 import { Redirects } from './collections/Redirects'
+import { payloadPublicURLConfig } from './config/publicURLs'
 import { HomePage } from './globals/HomePage'
 import { SiteSettings } from './globals/SiteSettings'
 import { BlogPage } from './globals/BlogPage'
@@ -37,6 +38,10 @@ import { AboutPage, ContactsPage, CourtsPage, GalleryPage, GiftPage, OfertaPage,
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export default buildConfig({
+  ...payloadPublicURLConfig({
+    PUBLIC_CMS_URL: process.env.PUBLIC_CMS_URL,
+    PUBLIC_WEB_URL: process.env.PUBLIC_WEB_URL,
+  }),
   admin: {
     components: {
       afterNavLinks: ['/components/admin/AdminToolsNav#AdminToolsNav'],

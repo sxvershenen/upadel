@@ -188,6 +188,13 @@ export async function GET(request: Request): Promise<Response> {
                 "Нет alt у основного изображения",
             ].filter(Boolean);
             const path = `${route.parent}/${encodeURIComponent(doc.slug)}`;
+            let preview: string | null = null;
+            if (route.collection === "articles" && process.env.PUBLIC_WEB_URL && process.env.PREVIEW_SECRET) {
+              const previewURL = new URL("/preview/article", process.env.PUBLIC_WEB_URL);
+              previewURL.searchParams.set("slug", doc.slug);
+              previewURL.searchParams.set("secret", process.env.PREVIEW_SECRET);
+              preview = previewURL.toString();
+            }
             return [
               {
                 path,
@@ -205,7 +212,7 @@ export async function GET(request: Request): Promise<Response> {
                   publicBase && hasPublished
                     ? new URL(path, publicBase).toString()
                     : null,
-                preview: null,
+                preview,
               },
             ];
           });

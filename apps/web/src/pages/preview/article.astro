@@ -1,0 +1,28 @@
+---
+import type { BlogDetailDTO } from '@unlim/content-contract'
+import { DetailPage } from '../../catalog/DetailPage'
+import { CatalogLoadError, loadDetail } from '../../content/loadCatalog'
+import SiteLayout from '../../layouts/SiteLayout.astro'
+
+export const prerender = false
+
+const slug = Astro.url.searchParams.get('slug')
+const secret = Astro.url.searchParams.get('secret')
+let dto: BlogDetailDTO | null = null
+let status = !secret ? 403 : !slug ? 400 : 200
+
+if (slug && secret) {
+  try {
+    dto = await loadDetail(import.meta.env.CMS_URL, 'blog', slug, secret) as BlogDetailDTO
+  } catch (error) {
+    if (error instanceof CatalogLoadError && error.status) status = error.status
+    else throw error
+  }
+}
+
+if (!dto) Astro.response.status = status
+Astro.response.headers.set('Cache-Control', 'no-store')
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow')
+---
+
+{dto ? <SiteLayout site={dto.site} title={dto.item.seo.title ?? dto.item.title} description={dto.item.seo.description ?? dto.item.excerpt} robots="noindex,nofollow" socialImage={dto.item.seo.socialImage?.url ?? dto.item.image.url}><DetailPage client:load dto={dto} /></SiteLayout> : <html lang="ru"><head><meta charset="utf-8" /><meta name="robots" content="noindex,nofollow" /><title>Article preview unavailable</title></head><body><main><h1>Предпросмотр статьи недоступен</h1></main></body></html>}

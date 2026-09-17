@@ -90,3 +90,7 @@ The reusable control sizes, field/button states and split-button rules are defin
 ## D15 — Desktop navigation interaction — accepted
 
 On desktop, `Цены` is the only grouped top-level item; `Тренировки` and `Тренеры` remain its typed CMS-managed children. The black header compacts into an evenly spaced icon row while scrolling down (and expands on upward scroll): the pill morphs through a short spring layout transition while labels and fixed-aspect icons swap through quick independent scale-and-fade transitions. Tooltips require current pointer hover or keyboard-visible focus, and scroll/page navigation clears stale intent. The grouped item keeps its dark gooey mega-menu. Desktop and mobile navigation chrome stays outside the Swup replacement surface; compact/menu state survives page replacement and respects reduced-motion preferences.
+
+## D16 — Article editor — accepted
+
+Keep Payload Lexical for article bodies. The article title is the only H1; body authors can use H2, H3 and H4, fixed formatting controls, lists/checklists, quotes, rules, links and Media uploads. Public article rendering uses escaped code-defined HTML and UI-kit typography (`type-title-large`, `type-title-card`, `type-title-compact`, `type-body`), never editor-provided raw HTML. Media selection inside a drawer inserts the selected record, while the standalone Media section retains edit navigation and batch tools.
