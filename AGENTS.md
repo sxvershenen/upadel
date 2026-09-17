@@ -24,6 +24,7 @@
 
 - Every public entity needs draft/publish state, stable slug, SEO fields and preview support where useful.
 - Keep Core Web Vitals, accessibility, responsive behavior and semantic HTML intact.
+- Form fields: render without visible labels above them (use labelVisibility="sr-only"); convey field purpose via concise in-field ghost placeholder text (e.g. 'Telegram @username').
 - Analytics must not block navigation or rendering. Define event names and required properties centrally; avoid collecting personal data without a stated purpose and retention rule.
 - Tests should cover changed behavior and failure paths. Do not weaken assertions to make checks pass.
 

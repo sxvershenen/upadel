@@ -7,17 +7,16 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { ActionLayerProvider } from '../actions/ActionLayer'
 import {
   GiftLandingPage,
-  giftPackages,
   useCases,
   giftFormats,
   termsList,
-  padelFacts,
   faqItems,
   typograph,
 } from './GiftLandingPage'
 
 const mockSite = {
   title: 'UNLIM RIGA PADEL',
+  brandName: 'UNLIM RIGA PADEL',
   navigation: [],
   contacts: {
     phone: '+7 999 000-00-00',
@@ -58,7 +57,6 @@ test('GiftLandingPage renders server HTML with SEO content, schema.org metadata 
 
   // H1 heading and key SEO texts
   assert.match(html, /<h1[^>]*>[\s\S]*?Подарочный сертификат на\u00A0падел в\u00A0Москве[\s\S]*?<\/h1>/)
-  assert.match(html, /id="packages"/)
   assert.match(html, /id="terms"/)
   assert.match(html, /id="order-section"/)
 
@@ -69,22 +67,21 @@ test('GiftLandingPage renders server HTML with SEO content, schema.org metadata 
   assert.match(html, /"BreadcrumbList"/)
   assert.match(html, /"Product"/)
 
-  // Packages count
-  assert.equal(giftPackages.length, 6)
-  for (const pkg of giftPackages) {
-    assert.match(html, new RegExp(pkg.title))
-  }
-
-  // Use cases, formats, terms, facts, and FAQs counts
-  assert.equal(useCases.length, 4)
+  // Formats (physical box on left, digital PDF on right)
   assert.equal(giftFormats.length, 2)
+  assert.equal(giftFormats[0].id, 'box')
+  assert.equal(giftFormats[1].id, 'digital')
+  assert.match(html, /Физический бокс/)
+  assert.match(html, /Электронный PDF/)
+
+  // Use cases, terms, and FAQs counts
+  assert.equal(useCases.length, 4)
   assert.equal(termsList.length, 6)
-  assert.equal(padelFacts.length, 4)
   assert.equal(faqItems.length, 6)
 
-  // Varlion partnership badge and mentions
-  assert.match(html, /Официальный партнер Varlion/)
-  assert.match(html, /Varlion/)
+  // Form inputs have sr-only labels
+  assert.match(html, /class="[^"]*sr-only[^"]*"[^>]*>Ваше имя<\/label>/)
+  assert.match(html, /class="[^"]*sr-only[^"]*"[^>]*>Контакт для связи<\/label>/)
 })
 
 test('typograph helper binds prepositions and short words with non-breaking spaces', () => {
