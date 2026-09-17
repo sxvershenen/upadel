@@ -4,11 +4,12 @@ import { springLayout } from "../../lib/motion";
 import { springSnappy, tapScaleSm } from "../../lib/motion";
 import { cn } from "../../utils/cn";
 
-export function Tabs<T extends string>({ tabs, value, onChange, className, layoutId = "tab-indicator", "aria-label": ariaLabel = "Разделы" }: {
+export function Tabs<T extends string>({ tabs, value, onChange, className, fullWidth = false, layoutId = "tab-indicator", "aria-label": ariaLabel = "Разделы" }: {
   tabs: { id: T; label: string; panelId?: string }[];
   value: T;
   onChange: (id: T) => void;
   className?: string;
+  fullWidth?: boolean;
   layoutId?: string;
   "aria-label"?: string;
 }) {
@@ -29,7 +30,7 @@ export function Tabs<T extends string>({ tabs, value, onChange, className, layou
     if (event.key === "End") { event.preventDefault(); selectAt(tabs.length - 1); }
   }
 
-  return <div role="tablist" aria-label={ariaLabel} className={cn("se-2 inline-flex max-w-full items-center gap-1 overflow-x-auto bg-control p-1", className)}>
+  return <div role="tablist" aria-label={ariaLabel} className={cn("se-2 inline-flex max-w-full items-center gap-1 overflow-x-auto bg-control p-1", fullWidth && "w-full [&>button]:flex-1 [&>button]:text-center", className)}>
     {tabs.map((tab, index) => {
       const active = tab.id === value;
       return <motion.button

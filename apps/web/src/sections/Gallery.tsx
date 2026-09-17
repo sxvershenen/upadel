@@ -17,7 +17,7 @@ export function Gallery() {
             eyebrow={home.gallerySection.eyebrow}
             title={home.gallerySection.title}
             action={
-              <ContentAction action={home.gallerySection.action} variant="neutral" size="sm" icon={<Camera size={15} />} iconPosition="left" iconDivider={false} />
+              <ContentAction action={home.gallerySection.action} variant="neutral" size="sm" icon={<Camera size={15} />} iconPosition="left" iconDivider={false}>Смотреть</ContentAction>
             }
             className="mb-10"
           />

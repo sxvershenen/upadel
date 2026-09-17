@@ -27,7 +27,7 @@ export function Dialog({ open, onClose, title, children }: { open: boolean; onCl
 
   function trapFocus(event: KeyboardEvent<HTMLDivElement>) {
     if (event.key !== "Tab" || !dialogRef.current) return;
-    const focusable = Array.from(dialogRef.current.querySelectorAll<HTMLElement>('a[href], button:not(:disabled), input:not(:disabled), [tabindex]:not([tabindex="-1"])'));
+    const focusable = Array.from(dialogRef.current.querySelectorAll<HTMLElement>('a[href], button:not(:disabled), input:not(:disabled):not([tabindex="-1"]), textarea:not(:disabled), select:not(:disabled), [tabindex]:not([tabindex="-1"])'));
     if (!focusable.length) return;
     const first = focusable[0];
     const last = focusable[focusable.length - 1];
@@ -50,13 +50,13 @@ export function Dialog({ open, onClose, title, children }: { open: boolean; onCl
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 20, scale: 0.985 }}
           transition={{ type: "spring", stiffness: 260, damping: 28 }}
-          className="dialog-surface relative z-10 max-h-[92svh] w-full overflow-y-auto bg-white p-5 md:max-w-[780px] md:p-7"
+          className="dialog-surface relative z-10 flex max-h-[92svh] w-full flex-col overflow-hidden bg-white p-5 md:max-w-[780px] md:p-7"
         >
-          <div className="mb-5 flex items-start justify-between gap-4">
+          <div className="mb-5 flex shrink-0 items-start justify-between gap-4">
             <h2 id={titleId} className="type-title-card text-ink">{title}</h2>
             <IconButton ref={closeRef} data-cool-mode="off" size="sm" aria-label="Закрыть" onClick={onClose}><X size={17} /></IconButton>
           </div>
-          {children}
+          <div className="dialog-scroll min-h-0 flex-1 overflow-y-auto pr-1">{children}</div>
         </motion.div>
       </div>}
     </AnimatePresence>,

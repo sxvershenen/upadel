@@ -4,7 +4,10 @@ import React, { createContext, useContext, useEffect, useRef, useState, type For
 import { analyticsServerContext, trackAnalytics } from '../analytics/AnalyticsTracker'
 
 import { Button, ButtonLink } from '../components/ui/Button'
+import { CheckboxField } from '../components/ui/CheckboxField'
 import { Dialog } from '../components/ui/Dialog'
+import { Field } from '../components/ui/Field'
+import { TextareaField } from '../components/ui/TextareaField'
 
 type LeadRequest = { type: NonNullable<ActionDTO['leadType']>; sourcePage: string; sourceEntity?: string }
 type Channel = SiteDTO['contactConfirmation']['channels'][number]
@@ -15,8 +18,6 @@ type ActionLayerValue = {
   requestExternal: (request: ExternalRequest) => void
 }
 const ActionLayerContext = createContext<ActionLayerValue | null>(null)
-
-const inputClass = 'se-1 min-h-12 w-full bg-surface-muted px-4 type-body-sm placeholder:text-ink-soft/55 border-b border-ink/20 focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2'
 
 function LeadForm({ site, lead, onClose, onContact }: { site: SiteDTO; lead: LeadRequest; onClose: () => void; onContact: (channel: Channel['channel']) => void }) {
   const [state, setState] = useState<'form' | 'sending' | 'success'>('form')
@@ -54,11 +55,16 @@ function LeadForm({ site, lead, onClose, onContact }: { site: SiteDTO; lead: Lea
   }
   if (state === 'success') return <div role="status"><h3 className="type-title-card text-ink">{site.contactConfirmation.successTitle}</h3><p className="type-body mt-3 text-ink-soft">{site.contactConfirmation.successText}</p><Button className="mt-6" onClick={onClose}>Закрыть</Button></div>
   return <form onSubmit={submit} onFocusCapture={start} noValidate className="grid gap-4">
-    <label className="type-caption grid gap-1.5">Имя<input className={inputClass} name="name" autoComplete="name" required minLength={2} maxLength={120} placeholder="Ваше имя" /></label>
-    <fieldset className="grid gap-3"><legend className="type-caption mb-1">Как с вами связаться — заполните хотя бы одно поле</legend><label className="type-caption grid gap-1.5">Телефон<input className={inputClass} name="phone" autoComplete="tel" inputMode="tel" maxLength={40} placeholder="Номер телефона" /></label><label className="type-caption grid gap-1.5">Email<input className={inputClass} name="email" type="email" autoComplete="email" maxLength={160} placeholder="you@example.com" /></label><label className="type-caption grid gap-1.5">Telegram / логин<input className={inputClass} name="telegram" autoComplete="off" placeholder="@username" maxLength={80} /></label><label className="type-caption grid gap-1.5">VK / логин<input className={inputClass} name="vk" autoComplete="off" placeholder="id или @username" maxLength={80} /></label></fieldset>
-    <label className="type-caption grid gap-1.5">Комментарий, необязательно<textarea className={`${inputClass} min-h-24 py-3`} name="comment" maxLength={2000} placeholder="Например, удобный день и время" /></label>
+    <Field label="Имя" labelVisibility="sr-only" name="name" autoComplete="name" required minLength={2} maxLength={120} placeholder="Ваше имя" />
+    <fieldset className="grid gap-3"><legend className="type-caption mb-1">Как с вами связаться — заполните хотя бы одно поле</legend>
+      <Field label="Телефон" labelVisibility="sr-only" name="phone" autoComplete="tel" inputMode="tel" maxLength={40} placeholder="Номер телефона" />
+      <Field label="Email" labelVisibility="sr-only" name="email" type="email" autoComplete="email" maxLength={160} placeholder="you@example.com" />
+      <Field label="Telegram / логин" labelVisibility="sr-only" name="telegram" autoComplete="off" placeholder="@username" maxLength={80} />
+      <Field label="VK / логин" labelVisibility="sr-only" name="vk" autoComplete="off" placeholder="id или @username" maxLength={80} />
+    </fieldset>
+    <TextareaField label="Комментарий" labelVisibility="sr-only" name="comment" maxLength={2000} placeholder="Например, удобный день и время" />
     <label className="absolute -left-[10000px]" aria-hidden="true">Компания<input name="company" tabIndex={-1} autoComplete="off" /></label>
-    <label className="type-body-sm flex items-start gap-3"><input type="checkbox" name="consent" required className="mt-1 h-5 w-5 shrink-0 accent-lime" /><span>{site.contactConfirmation.consentLabel} · <a href={site.contactConfirmation.policyHref} target="_blank" rel="noreferrer" className="underline">политика</a></span></label>
+    <CheckboxField name="consent" required label={<>{site.contactConfirmation.consentLabel} · <a href={site.contactConfirmation.policyHref} target="_blank" rel="noreferrer" className="underline">политика</a></>} />
     {error && <p role="alert" className="type-body-sm text-red-700">{error}</p>}
     <Button type="submit" loading={state === 'sending'} fullWidth>{site.contactConfirmation.submitLabel}</Button>
     <div className="border-t border-ink/10 pt-4"><p className="type-caption mb-3 text-ink-soft">Или свяжитесь напрямую</p><div className="flex flex-wrap gap-2">{site.contactConfirmation.channels.filter(({ enabled, channel }) => enabled && channel !== 'email').map((channel) => <Button key={channel.channel} variant="neutral" size="sm" onClick={() => onContact(channel.channel)}>{channel.label}</Button>)}</div></div>

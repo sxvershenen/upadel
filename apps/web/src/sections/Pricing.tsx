@@ -65,7 +65,7 @@ export function Pricing() {
       </Reveal>
 
       <div className="mb-10 md:hidden">
-        <Tabs layoutId="pricing-tabs-mobile" tabs={pricingTabs} value={active} onChange={changeTab} />
+        <Tabs fullWidth layoutId="pricing-tabs-mobile" tabs={pricingTabs} value={active} onChange={changeTab} />
       </div>
 
       <AnimatePresence initial={false} mode="wait">

@@ -6,7 +6,6 @@ import {
   ClipboardCheck,
   Factory,
   Layers3,
-  MessageCircle,
   Ruler,
   Settings2,
   ShieldCheck,
@@ -24,8 +23,13 @@ import { Tabs } from '../components/ui/Tabs'
 import { Button, ButtonLink } from '../components/ui/Button'
 import { Badge } from '../components/ui/Badge'
 import { Typography } from '../components/ui/Typography'
-import { SurfaceCard } from '../components/ui/Card'
+import { ImageCard, SurfaceCard, type ImageOverlay } from '../components/ui/Card'
 import { PhoneIcon, TelegramIcon } from '../components/ui/ContactIcons'
+import { VkIcon } from '../components/ui/VkIcon'
+import { Field } from '../components/ui/Field'
+import { SelectField } from '../components/ui/SelectField'
+import { TextareaField } from '../components/ui/TextareaField'
+import { CheckboxField } from '../components/ui/CheckboxField'
 import { Reveal } from '../components/ui/Reveal'
 import { SplitTextReveal } from '../components/ui/SplitTextReveal'
 import { cn } from '../utils/cn'
@@ -51,7 +55,7 @@ export function typograph(text: string): string {
       parts[i + 1] = '\u00A0'
     }
   }
-  return parts.join('')
+  return parts.join('').replace(/(?<=\S)-(?=\S)/g, '‑')
 }
 
 export const heroImage = {
@@ -126,30 +130,40 @@ export const turnkeySteps = [
     number: '01',
     title: 'Аудит локации и основания',
     text: 'Выезд инженера или детальный аудит площадки: геометрия зала, качество бетонного основания, снеговые и ветровые нагрузки, высоты потолков и коммуникации.',
+    image: '/turnkey/site-audit.webp',
+    overlay: 'overlay-blue',
   },
   {
     icon: Settings2,
     number: '02',
     title: 'Подбор модели и кастомизация',
     text: 'Выбор конструкции под задачи клуба, подбор цвета металлокаркаса по шкале RAL, освещения (4×200W или 8×200W), спортивного газона FIP и брендинга.',
+    image: '/turnkey/logistics.webp',
+    overlay: 'overlay-violet',
   },
   {
     icon: Truck,
     number: '03',
     title: 'Поставка и таможенная логистика',
     text: 'Прямая транспортировка еврофурами с фабрики в Испании, полное таможенное оформление, страхование 100% груза и ответственное хранение до монтажа.',
+    image: '/turnkey/handover.webp',
+    overlay: 'overlay-emerald',
   },
   {
     icon: Wrench,
     number: '04',
     title: 'Профессиональный монтаж',
     text: 'Сборка силового металлокаркаса, вакуумная посадка закалённого стекла 12 мм, бесшовная стыковка сетки заподлицо, укладка газона и засыпка кварцевым песком.',
+    image: '/turnkey/assembly.webp',
+    overlay: 'overlay-lime',
   },
   {
     icon: ClipboardCheck,
     number: '05',
     title: 'Сдача в эксплуатацию и сервис',
     text: 'Инструментальная проверка плоскостности, замер освещенности по стандарту FIP, передача исполнительной документации, гарантийный талон и регламентное ТО.',
+    image: '/turnkey/glass-installation.webp',
+    overlay: 'overlay-dark',
   },
 ] as const
 
@@ -391,20 +405,25 @@ export function CourtModelTabs({ onSelectModel }: { onSelectModel?: (modelId: Mo
 
   return (
     <div>
-      <Tabs
-        aria-label="Модели кортов JUBO"
-        className="no-scrollbar w-full"
-        layoutId="court-model-tabs"
-        tabs={models.map((model) => ({
-          id: model.id,
-          label: model.name,
-          panelId: `court-model-panel-${model.id}`,
-        }))}
-        value={activeModel}
-        onChange={handleTabChange}
-      />
+      <div className="relative -mx-5 md:mx-0">
+        <div className="sticky top-5 z-30 bg-page/95 px-5 py-3 backdrop-blur-md md:static md:bg-transparent md:p-0 md:backdrop-blur-none">
+          <Tabs
+            aria-label="Модели кортов JUBO"
+            className="no-scrollbar w-full"
+            layoutId="court-model-tabs"
+            tabs={models.map((model) => ({
+              id: model.id,
+              label: model.name,
+              panelId: `court-model-panel-${model.id}`,
+            }))}
+            value={activeModel}
+            onChange={handleTabChange}
+          />
+        </div>
+        <span aria-hidden="true" className="pointer-events-none absolute right-5 top-1/2 z-40 flex -translate-y-1/2 items-center bg-gradient-to-r from-transparent via-page/80 to-page pl-5 pr-1 text-ink-soft md:hidden"><ArrowRight size={16} /></span>
+      </div>
 
-      <SurfaceCard tone="white" interactive={false} className="mt-6 p-6 md:p-10 border border-ink/5">
+      <SurfaceCard tone="white" interactive={false} className="mt-6 p-6 md:p-10">
         <div ref={panelRef}>
           {models.map((model) => {
             const isSelected = activeModel === model.id
@@ -460,10 +479,10 @@ export function CourtModelTabs({ onSelectModel }: { onSelectModel?: (modelId: Mo
                         {model.specs.map((item) => (
                           <div
                             key={item.label}
-                            className="se-2 bg-surface-subtle px-3.5 py-2.5 flex flex-col justify-center"
+                            className="se-2 bg-surface-subtle px-3.5 py-2.5 flex flex-col justify-start"
                           >
                             <dt className="type-caption text-ink-muted">{item.label}</dt>
-                            <dd className="type-body-sm font-medium text-ink mt-0.5">
+                            <dd className="type-body-sm mt-0.5 font-medium leading-snug text-ink [hyphens:none] [overflow-wrap:normal]">
                               {typograph(item.value)}
                             </dd>
                           </div>
@@ -668,11 +687,8 @@ function InlineLeadCalculatorForm({
     )
   }
 
-  const inputClass =
-    'se-2 min-h-12 w-full bg-page px-4 type-body-sm placeholder:text-ink-soft/45 border border-ink/10 focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2 transition-colors'
-
   return (
-    <SurfaceCard tone="white" interactive={false} className="p-6 md:p-8 border border-ink/5">
+    <SurfaceCard tone="white" interactive={false} className="p-6 md:p-8">
       <form onSubmit={handleSubmit} onFocusCapture={handleFocus} noValidate>
         <div className="mb-6">
           <Typography as="h3" role="title-card" className="font-semibold text-ink">
@@ -683,7 +699,7 @@ function InlineLeadCalculatorForm({
         <div className="grid gap-5">
           <div>
             <span className="type-caption text-ink-muted mb-2 block font-medium">
-              {typograph('Куда направить предварительную смету:')}
+              {typograph('Куда направить?')}
             </span>
             <div className="flex flex-wrap gap-2">
               <button
@@ -722,112 +738,40 @@ function InlineLeadCalculatorForm({
                     : 'bg-control text-ink-soft hover:bg-control-hover'
                 )}
               >
-                <MessageCircle size={15} />
+                <VkIcon size={17} />
                 <span>ВКонтакте</span>
               </button>
             </div>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <input
-              className={inputClass}
-              name="name"
-              autoComplete="name"
-              required
-              minLength={2}
-              maxLength={120}
-              placeholder="Ваше имя *"
-              aria-label="Ваше имя"
-            />
-
-            <input
-              className={inputClass}
+            <Field label="Имя" labelVisibility="sr-only" name="name" autoComplete="name" required minLength={2} maxLength={120} placeholder="Ваше имя" />
+            <Field
+              label={preferredChannel === 'phone' ? 'Номер телефона' : preferredChannel === 'telegram' ? 'Telegram логин' : 'ВКонтакте'}
+              labelVisibility="sr-only"
               name="contactValue"
               type={preferredChannel === 'phone' ? 'tel' : 'text'}
               autoComplete={preferredChannel === 'phone' ? 'tel' : 'off'}
               required
               maxLength={80}
-              placeholder={
-                preferredChannel === 'phone'
-                  ? 'Номер телефона: +7 (999) 000-00-00 *'
-                  : preferredChannel === 'telegram'
-                  ? 'Telegram: @username *'
-                  : 'ВКонтакте: vk.com/id *'
-              }
-              aria-label={
-                preferredChannel === 'phone'
-                  ? 'Номер телефона'
-                  : preferredChannel === 'telegram'
-                  ? 'Telegram логин'
-                  : 'ВКонтакте'
-              }
+              placeholder={preferredChannel === 'phone' ? 'Номер телефона: +7 (999) 000-00-00' : preferredChannel === 'telegram' ? 'Telegram: @username' : 'ВКонтакте: vk.com/id'}
             />
           </div>
 
           <div className="grid gap-4 sm:grid-cols-3">
-            <select
-              value={selectedModel}
-              onChange={(e) => setSelectedModel(e.target.value)}
-              aria-label="Модель корта"
-              className={inputClass}
-            >
-              {models.map((m) => (
-                <option key={m.id} value={m.id}>
-                  Модель: {m.name}
-                </option>
-              ))}
-              <option value="consultation">Помочь с выбором модели</option>
-            </select>
-
-            <select
-              value={courtCount}
-              onChange={(e) => setCourtCount(e.target.value)}
-              aria-label="Количество кортов"
-              className={inputClass}
-            >
-              <option value="1">Количество: 1 корт</option>
-              <option value="2-3">Количество: 2–3 корта</option>
-              <option value="4-6">Количество: 4–6 кортов</option>
-              <option value="7+">Количество: 7+ кортов</option>
-            </select>
-
-            <input
-              className={inputClass}
-              name="city"
-              placeholder="Город / локация (напр. Москва)"
-              aria-label="Город или локация"
-              maxLength={100}
-            />
+            <SelectField label="Модель корта" labelVisibility="sr-only" value={selectedModel} onChange={(e) => setSelectedModel(e.target.value)} options={[...models.map((m) => ({ value: m.id, label: `Модель: ${m.name}` })), { value: 'consultation', label: 'Помочь с выбором модели' }]} />
+            <SelectField label="Количество кортов" labelVisibility="sr-only" value={courtCount} onChange={(e) => setCourtCount(e.target.value)} options={[{ value: '1', label: 'Количество: 1 корт' }, { value: '2-3', label: 'Количество: 2–3 корта' }, { value: '4-6', label: 'Количество: 4–6 кортов' }, { value: '7+', label: 'Количество: 7+ кортов' }]} />
+            <Field label="Город или локация" labelVisibility="sr-only" name="city" placeholder="Город / локация (напр. Москва)" maxLength={100} />
           </div>
 
-          <textarea
-            className={cn(inputClass, 'min-h-20 py-3')}
-            name="comment"
-            maxLength={1000}
-            placeholder="Комментарий: тип объекта (indoor/outdoor), готовность фундамента, сроки..."
-            aria-label="Комментарий к объекту"
-          />
+          <TextareaField label="Комментарий к объекту" labelVisibility="sr-only" name="comment" maxLength={1000} placeholder="Тип объекта (indoor/outdoor), готовность фундамента, сроки..." />
 
           <label className="absolute -left-[10000px]" aria-hidden="true">
             Компания
             <input name="company" tabIndex={-1} autoComplete="off" />
           </label>
 
-          <label className="type-body-sm flex items-start gap-3 cursor-pointer text-ink-soft">
-            <input
-              type="checkbox"
-              name="consent"
-              required
-              defaultChecked
-              className="mt-1 h-5 w-5 shrink-0 accent-lime cursor-pointer"
-            />
-            <span>
-              {site.contactConfirmation.consentLabel} ·{' '}
-              <a href={site.contactConfirmation.policyHref} target="_blank" rel="noreferrer" className="underline hover:text-ink">
-                политика конфиденциальности
-              </a>
-            </span>
-          </label>
+          <CheckboxField name="consent" required defaultChecked label={<>{site.contactConfirmation.consentLabel} ·{' '}<a href={site.contactConfirmation.policyHref} target="_blank" rel="noreferrer" className="underline hover:text-ink">политика конфиденциальности</a></>} />
 
           {error && (
             <p role="alert" className="type-body-sm font-semibold text-danger">
@@ -837,7 +781,7 @@ function InlineLeadCalculatorForm({
 
           <div>
             <Button type="submit" variant="primary" size="lg" loading={state === 'sending'} fullWidth>
-              {typograph('Получить расчёт и спецификацию корта')}
+              {typograph('Получить смету')}
             </Button>
           </div>
         </div>
@@ -859,12 +803,13 @@ function DirectContactButtons() {
         size="md"
         icon={<TelegramIcon size={15} />}
         iconPosition="left"
+        iconOnly
+        aria-label="Написать в Telegram"
+        className="!h-[var(--control-md)] !w-[var(--control-md)] !p-0"
         onClick={() => {
           trackAnalytics({ name: 'direct_messenger_click', actionKind: 'telegram', objectType: 'lead' })
         }}
-      >
-        Telegram
-      </ButtonLink>
+      />
 
       <ButtonLink
         href="https://vk.com/unlim_padel"
@@ -872,27 +817,29 @@ function DirectContactButtons() {
         rel="noreferrer"
         variant="neutral"
         size="md"
-        icon={<MessageCircle size={15} />}
+        icon={<VkIcon size={17} />}
         iconPosition="left"
+        iconOnly
+        aria-label="Написать во ВКонтакте"
+        className="!h-[var(--control-md)] !w-[var(--control-md)] !p-0"
         onClick={() => {
           trackAnalytics({ name: 'direct_messenger_click', actionKind: 'vk', objectType: 'lead' })
         }}
-      >
-        ВКонтакте
-      </ButtonLink>
+      />
 
       <Button
         variant="neutral"
         size="md"
         icon={<PhoneIcon size={15} />}
         iconPosition="left"
+        iconOnly
+        aria-label="Позвонить"
+        className="!h-[var(--control-md)] !w-[var(--control-md)] !p-0"
         onClick={() => {
           trackAnalytics({ name: 'direct_call_click', actionKind: 'phone', objectType: 'lead' })
           requestContact('phone')
         }}
-      >
-        По телефону
-      </Button>
+      />
     </div>
   )
 }
@@ -1067,7 +1014,7 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
             <div className="grid gap-4 sm:grid-cols-2">
               {distributorAdvantages.map((adv, idx) => (
                 <Reveal key={adv.title} delay={idx * 0.08} className="h-full">
-                  <SurfaceCard tone="white" interactive={false} className="p-6 h-full border border-ink/5">
+                  <SurfaceCard tone="white" interactive={false} className="p-6 h-full">
                     <Typography as="h3" role="title-card" className="font-semibold text-ink">
                       {typograph(adv.title)}
                     </Typography>
@@ -1097,19 +1044,18 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
             {turnkeySteps.map((step, idx) => (
               <Reveal key={step.title} delay={idx * 0.08} className="h-full">
-                <SurfaceCard tone="white" interactive={false} className="flex flex-col justify-between p-6 h-full border border-ink/5">
-                  <div>
-                    <span className="se-2 flex h-10 w-10 items-center justify-center bg-surface-muted text-ink">
-                      <step.icon size={20} />
-                    </span>
-                    <Typography as="h3" role="title-card" className="mt-5 font-semibold text-ink">
-                      {typograph(step.title)}
-                    </Typography>
-                    <Typography role="body-small" tone="subtle" className="mt-2.5 leading-relaxed">
-                      {typograph(step.text)}
-                    </Typography>
+                <ImageCard src={step.image} alt={step.title} overlay={step.overlay as ImageOverlay} className="min-h-[360px] h-full" imgClassName="object-center">
+                  <div className="flex h-full flex-col justify-between p-6">
+                    <div className="flex items-start justify-between gap-3">
+                      <span className="se-2 flex h-10 w-10 items-center justify-center bg-white/15 text-white backdrop-blur-sm"><step.icon size={20} /></span>
+                      <span className="type-eyebrow text-white/75">{step.number}</span>
+                    </div>
+                    <div>
+                      <Typography as="h3" role="title-card" className="font-semibold text-white">{typograph(step.title)}</Typography>
+                      <Typography role="body-small" className="mt-2.5 leading-relaxed text-white/80">{typograph(step.text)}</Typography>
+                    </div>
                   </div>
-                </SurfaceCard>
+                </ImageCard>
               </Reveal>
             ))}
           </div>
@@ -1117,7 +1063,7 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
 
         {/* 4. ЦЕНА КОРТА И ФАКТОРЫ СМЕТЫ (БЕЗ EYEBROWS) */}
         <section className="container-page pb-16 md:pb-24" aria-labelledby="price-factors-title">
-          <SurfaceCard tone="white" interactive={false} className="p-6 md:p-12 lg:p-14 border border-ink/5">
+          <SurfaceCard tone="white" interactive={false} className="p-6 md:p-12 lg:p-14">
             <div className="grid gap-10 lg:grid-cols-[.9fr_1.1fr] lg:items-center">
               <div>
                 <Typography as="h2" id="price-factors-title" role="section" className="text-ink">
@@ -1130,7 +1076,7 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
                 </Typography>
                 <div className="mt-8">
                   <ButtonLink href="#cta-section" variant="dark" size="md" icon={<ArrowRight size={16} />}>
-                    {typograph('Запросить детальный сметный расчёт')}
+                    {typograph('Рассчитать стоимость')}
                   </ButtonLink>
                 </div>
               </div>
@@ -1139,7 +1085,7 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
                 {priceFactors.map((factor) => (
                   <li
                     key={factor.label}
-                    className="se-2 bg-surface-subtle p-4 border border-ink/5 flex flex-col justify-center"
+                    className="se-2 bg-surface-subtle p-4 flex flex-col justify-start"
                   >
                     <Typography role="body-small" className="font-semibold text-ink">
                       {typograph(factor.label)}
@@ -1224,7 +1170,7 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
           <div className="grid gap-6 lg:grid-cols-2">
             {galleryImages.map((image, idx) => (
               <Reveal key={image.src} delay={idx * 0.1}>
-                <SurfaceCard tone="white" interactive={false} className="p-3 overflow-hidden border border-ink/5">
+                <SurfaceCard tone="white" interactive={false} className="p-3 overflow-hidden">
                   <figure className="group">
                     <div className="se-3 aspect-[16/9] overflow-hidden bg-control">
                       <img

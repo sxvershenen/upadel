@@ -27,7 +27,7 @@ export function Accordion({ items }: { items: { q: string; a: string }[] }) {
               onClick={() => setOpen(isOpen ? null : i)}
               aria-expanded={isOpen}
               aria-controls={panelId}
-              className="group/faq flex w-full items-center justify-between gap-4 py-5 text-left transition-colors hover:bg-control/45 focus-visible:bg-control/45 focus-visible:outline-2 focus-visible:outline-[var(--color-focus)] focus-visible:outline-offset-2"
+              className="group/faq flex w-full items-center justify-between gap-4 py-5 text-left focus-visible:outline-2 focus-visible:outline-[var(--color-focus)] focus-visible:outline-offset-2"
             >
               <span className="type-body font-medium text-ink transition-transform duration-200 group-hover/faq:translate-x-1">{item.q}</span>
               <motion.span

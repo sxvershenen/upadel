@@ -7,12 +7,13 @@ export interface FieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
   error?: ReactNode;
   suffix?: ReactNode;
   tone?: "light" | "dark";
+  labelVisibility?: "visible" | "sr-only";
   fieldClassName?: string;
   containerClassName?: string;
 }
 
 export const Field = forwardRef<HTMLInputElement, FieldProps>(
-  ({ id: suppliedId, label, description, error, suffix, tone = "light", className, fieldClassName, containerClassName, disabled, "aria-describedby": suppliedDescribedBy, "aria-invalid": suppliedInvalid, ...nativeProps }, ref) => {
+  ({ id: suppliedId, label, description, error, suffix, tone = "light", labelVisibility = "visible", className, fieldClassName, containerClassName, disabled, "aria-describedby": suppliedDescribedBy, "aria-invalid": suppliedInvalid, ...nativeProps }, ref) => {
     const generatedId = useId();
     const id = suppliedId ?? `field-${generatedId}`;
     const descriptionId = description ? `${id}-description` : undefined;
@@ -21,10 +22,10 @@ export const Field = forwardRef<HTMLInputElement, FieldProps>(
     const dark = tone === "dark";
 
     return <div className={cn("flex flex-col", containerClassName)}>
-      <label htmlFor={id} className={cn("type-caption mb-2 font-medium", dark ? "text-white/70" : "text-ink-soft")}>{label}</label>
+      <label htmlFor={id} className={cn("type-caption mb-2 font-medium", labelVisibility === "sr-only" && "sr-only", dark ? "text-white/70" : "text-ink-soft")}>{label}</label>
       <div className={cn(
         "se-2 flex h-[var(--control-md)] items-center gap-2 px-4 transition-colors focus-within:outline-2 focus-within:outline-[var(--color-focus)] focus-within:outline-offset-2",
-        dark ? "bg-white/10 text-white" : "bg-white text-ink",
+        dark ? "bg-white/10 text-white" : "bg-control text-ink",
         error && (dark ? "outline-2 outline-red-300" : "outline-2 outline-[var(--color-danger)]"),
         disabled && "cursor-not-allowed opacity-50",
         fieldClassName,
