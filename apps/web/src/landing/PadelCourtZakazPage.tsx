@@ -921,9 +921,59 @@ function InlineLeadCalculatorForm({
   )
 }
 
+function DirectContactButtons() {
+  const { requestContact } = useActionLayer()
+
+  return (
+    <div className="mt-8 flex flex-wrap items-center gap-2.5">
+      <ButtonLink
+        href="https://t.me/unlim_padel"
+        target="_blank"
+        rel="noreferrer"
+        variant="neutral"
+        size="md"
+        icon={<Send size={15} />}
+        iconPosition="left"
+        onClick={() => {
+          trackAnalytics({ name: 'direct_messenger_click', actionKind: 'telegram', objectType: 'lead' })
+        }}
+      >
+        Telegram
+      </ButtonLink>
+
+      <ButtonLink
+        href="https://vk.com/unlim_padel"
+        target="_blank"
+        rel="noreferrer"
+        variant="neutral"
+        size="md"
+        icon={<MessageCircle size={15} />}
+        iconPosition="left"
+        onClick={() => {
+          trackAnalytics({ name: 'direct_messenger_click', actionKind: 'vk', objectType: 'lead' })
+        }}
+      >
+        ВКонтакте
+      </ButtonLink>
+
+      <Button
+        variant="neutral"
+        size="md"
+        icon={<Phone size={15} />}
+        iconPosition="left"
+        onClick={() => {
+          trackAnalytics({ name: 'direct_call_click', actionKind: 'phone', objectType: 'lead' })
+          requestContact('phone')
+        }}
+      >
+        По телефону
+      </Button>
+    </div>
+  )
+}
+
 export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
   const [activeModelForForm, setActiveModelForForm] = useState<ModelId>('infinity')
-  const { requestContact } = useActionLayer()
 
   return (
     <SiteFrame site={site} backLink={{ href: '/' }}>
@@ -1315,50 +1365,7 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
                 </Typography>
 
                 {/* Лаконичные швейцарские кнопки мессенджеров */}
-                <div className="mt-8 flex flex-wrap items-center gap-2.5">
-                  <ButtonLink
-                    href="https://t.me/unlim_padel"
-                    target="_blank"
-                    rel="noreferrer"
-                    variant="neutral"
-                    size="md"
-                    icon={<Send size={15} />}
-                    iconPosition="left"
-                    onClick={() => {
-                      trackAnalytics({ name: 'direct_messenger_click', actionKind: 'telegram', objectType: 'lead' })
-                    }}
-                  >
-                    Telegram
-                  </ButtonLink>
-
-                  <ButtonLink
-                    href="https://vk.com/unlim_padel"
-                    target="_blank"
-                    rel="noreferrer"
-                    variant="neutral"
-                    size="md"
-                    icon={<MessageCircle size={15} />}
-                    iconPosition="left"
-                    onClick={() => {
-                      trackAnalytics({ name: 'direct_messenger_click', actionKind: 'vk', objectType: 'lead' })
-                    }}
-                  >
-                    ВКонтакте
-                  </ButtonLink>
-
-                  <Button
-                    variant="neutral"
-                    size="md"
-                    icon={<Phone size={15} />}
-                    iconPosition="left"
-                    onClick={() => {
-                      trackAnalytics({ name: 'direct_call_click', actionKind: 'phone', objectType: 'lead' })
-                      requestContact('phone')
-                    }}
-                  >
-                    По телефону
-                  </Button>
-                </div>
+                <DirectContactButtons />
 
                 {/* Гарантии и факты */}
                 <div className="mt-10 space-y-3.5 border-t border-ink/10 pt-8">

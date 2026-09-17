@@ -1,3 +1,4 @@
+import React from "react";
 import { useSite } from "../content/ContentContext";
 import { Marquee } from "../components/ui/Marquee";
 

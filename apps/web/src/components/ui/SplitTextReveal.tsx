@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import type { CSSProperties } from "react";
+import React, { type CSSProperties } from "react";
 import { cn } from "../../utils/cn";
 import { springSoft } from "../../lib/motion";
 

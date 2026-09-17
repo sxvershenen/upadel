@@ -1,4 +1,4 @@
-import { forwardRef, type ReactNode } from "react";
+import React, { forwardRef, type ReactNode } from "react";
 import { motion, type HTMLMotionProps } from "framer-motion";
 import { LoaderCircle } from "lucide-react";
 import { cn } from "../../utils/cn";

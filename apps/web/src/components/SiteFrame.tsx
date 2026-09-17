@@ -1,6 +1,6 @@
 import type { SiteDTO } from '@unlim/content-contract'
 import { MotionConfig } from 'framer-motion'
-import type { ReactNode } from 'react'
+import React, { type ReactNode } from 'react'
 
 import { SiteProvider } from '../content/ContentContext'
 import { CookieBanner } from './CookieBanner'

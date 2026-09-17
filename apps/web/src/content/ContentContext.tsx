@@ -1,4 +1,4 @@
-import { createContext, useContext, type ReactNode } from 'react'
+import React, { createContext, useContext, type ReactNode } from 'react'
 import type { HomepageDTO, SiteDTO } from '@unlim/content-contract'
 import { ActionLayerProvider } from '../actions/ActionLayer'
 

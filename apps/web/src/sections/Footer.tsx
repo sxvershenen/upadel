@@ -1,3 +1,4 @@
+import React from 'react'
 import { CircleParking, Clock3, Mail, MapPin, Phone, Send, TrainFront, Video } from 'lucide-react'
 import { useSite } from '../content/ContentContext'
 import { Reveal } from '../components/ui/Reveal'
