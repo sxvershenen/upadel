@@ -6,7 +6,6 @@ import {
   ClipboardCheck,
   Factory,
   Layers3,
-  Phone,
   Ruler,
   Settings2,
   ShieldCheck,
@@ -17,6 +16,7 @@ import {
 import React, { useState } from 'react'
 
 import { ContentAction } from '../components/ContentAction'
+import { PhoneIcon } from '../components/ui/ContactIcons'
 import { SiteFrame } from '../components/SiteFrame'
 import { Tabs } from '../components/ui/Tabs'
 import { PageHeader } from '../thematic/PageHeader'
@@ -248,7 +248,7 @@ function ActionPair({ entity, inverse = false }: { entity: string; inverse?: boo
       sourceEntity={entity}
       variant={inverse ? 'neutral' : 'glass'}
       size="lg"
-      icon={<Phone aria-hidden="true" size={18} />}
+      icon={<PhoneIcon size={18} />}
       iconPosition="left"
       className={cn('w-full sm:w-auto', inverse && '!bg-control !text-ink')}
     />

@@ -1,8 +1,9 @@
 import { AnimatePresence, MotionConfig, motion, useReducedMotion } from 'framer-motion'
-import { CalendarCheck, Dumbbell, Gift, Home, Info, Newspaper, Phone, Send, Tag, Trophy, type LucideIcon } from 'lucide-react'
+import { CalendarCheck, Dumbbell, Gift, Home, Info, Newspaper, Tag, Trophy, type LucideIcon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
 import { VkIcon } from '../ui/VkIcon'
+import { PhoneIcon, TelegramIcon } from '../ui/ContactIcons'
 import { HEADER_MORPH_LOCK_MS, HEADER_TOP_THRESHOLD } from './desktopHeaderState'
 import { initialHeaderPlaygroundScrollState, nextHeaderPlaygroundScrollState } from './headerPlaygroundState'
 
@@ -77,9 +78,9 @@ function ExpandedNav() {
       {navItems.map(({ href, label }) => <a key={href} href={href}>{label}</a>)}
     </nav>
     <div className="dynamic-island-actions">
-      <a href="https://t.me" target="_blank" rel="noreferrer" aria-label="Telegram"><Send aria-hidden="true" size={17} strokeWidth={1.9} /></a>
+      <a href="https://t.me" target="_blank" rel="noreferrer" aria-label="Telegram"><TelegramIcon size={17} /></a>
       <a href="https://vk.com" target="_blank" rel="noreferrer" aria-label="VK"><VkIcon size={18} /></a>
-      <a href="tel:+79990000000" aria-label="Позвонить"><Phone aria-hidden="true" size={17} strokeWidth={1.9} /></a>
+      <a href="tel:+79990000000" aria-label="Позвонить"><PhoneIcon size={17} /></a>
       <a href="#header-playground-content" className="dynamic-island-booking"><span>Забронировать</span><CalendarCheck aria-hidden="true" size={17} strokeWidth={1.9} /></a>
     </div>
   </motion.div>
@@ -96,9 +97,9 @@ function CompactNav() {
   >
     <a href="/" aria-label="Главная"><Home aria-hidden="true" size={18} strokeWidth={1.9} /></a>
     {navItems.map(({ href, label, icon: Icon }) => <a key={href} href={href} aria-label={label}><Icon aria-hidden="true" size={17} strokeWidth={1.9} /></a>)}
-    <a href="https://t.me" target="_blank" rel="noreferrer" aria-label="Telegram"><Send aria-hidden="true" size={17} strokeWidth={1.9} /></a>
+    <a href="https://t.me" target="_blank" rel="noreferrer" aria-label="Telegram"><TelegramIcon size={17} /></a>
     <a href="https://vk.com" target="_blank" rel="noreferrer" aria-label="VK"><VkIcon size={18} /></a>
-    <a href="tel:+79990000000" aria-label="Позвонить"><Phone aria-hidden="true" size={17} strokeWidth={1.9} /></a>
+    <a href="tel:+79990000000" aria-label="Позвонить"><PhoneIcon size={17} /></a>
     <a href="#header-playground-content" className="dynamic-island-compact-booking" aria-label="Забронировать"><CalendarCheck aria-hidden="true" size={18} strokeWidth={1.9} /></a>
   </motion.div>
 }

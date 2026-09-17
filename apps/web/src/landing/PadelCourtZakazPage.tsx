@@ -7,9 +7,7 @@ import {
   Factory,
   Layers3,
   MessageCircle,
-  Phone,
   Ruler,
-  Send,
   Settings2,
   ShieldCheck,
   Sparkles,
@@ -26,6 +24,7 @@ import { Button, ButtonLink } from '../components/ui/Button'
 import { Badge } from '../components/ui/Badge'
 import { Typography } from '../components/ui/Typography'
 import { SurfaceCard } from '../components/ui/Card'
+import { PhoneIcon, TelegramIcon } from '../components/ui/ContactIcons'
 import { Reveal } from '../components/ui/Reveal'
 import { SplitTextReveal } from '../components/ui/SplitTextReveal'
 import { springSoft } from '../lib/motion'
@@ -759,7 +758,7 @@ function InlineLeadCalculatorForm({
                     : 'bg-control text-ink-soft hover:bg-control-hover'
                 )}
               >
-                <Phone size={15} />
+                <PhoneIcon size={15} />
                 <span>Звонок</span>
               </button>
               <button
@@ -772,7 +771,7 @@ function InlineLeadCalculatorForm({
                     : 'bg-control text-ink-soft hover:bg-control-hover'
                 )}
               >
-                <Send size={15} />
+                <TelegramIcon size={15} />
                 <span>Telegram</span>
               </button>
               <button
@@ -932,7 +931,7 @@ function DirectContactButtons() {
         rel="noreferrer"
         variant="neutral"
         size="md"
-        icon={<Send size={15} />}
+        icon={<TelegramIcon size={15} />}
         iconPosition="left"
         onClick={() => {
           trackAnalytics({ name: 'direct_messenger_click', actionKind: 'telegram', objectType: 'lead' })
@@ -959,7 +958,7 @@ function DirectContactButtons() {
       <Button
         variant="neutral"
         size="md"
-        icon={<Phone size={15} />}
+        icon={<PhoneIcon size={15} />}
         iconPosition="left"
         onClick={() => {
           trackAnalytics({ name: 'direct_call_click', actionKind: 'phone', objectType: 'lead' })
