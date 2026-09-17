@@ -1,6 +1,7 @@
 import type { SiteDTO } from '@unlim/content-contract'
 import {
   ArrowRight,
+  ChevronRight,
   Check,
   CheckCircle2,
   ClipboardCheck,
@@ -392,15 +393,31 @@ type ModelId = (typeof models)[number]['id']
 
 export function CourtModelTabs({ onSelectModel }: { onSelectModel?: (modelId: ModelId) => void }) {
   const [activeModel, setActiveModel] = useState<ModelId>(models[0].id)
+  const [showTabHint, setShowTabHint] = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
+  const tabsRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const tabsNode = tabsRef.current
+    if (!tabsNode) return
+    const syncHint = () => setShowTabHint(tabsNode.scrollWidth > tabsNode.clientWidth + 4 && tabsNode.scrollLeft < 8)
+    syncHint()
+    window.addEventListener('resize', syncHint)
+    return () => window.removeEventListener('resize', syncHint)
+  }, [])
+
+  useEffect(() => {
+    if (!panelRef.current) return
+    const ctx = gsap.context(() => {
+      gsap.fromTo(panelRef.current, { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.48, ease: 'power3.out', clearProps: 'opacity,visibility,transform' })
+    }, panelRef)
+    return () => ctx.revert()
+  }, [activeModel])
 
   const handleTabChange = (val: string) => {
     const id = val as ModelId
     setActiveModel(id)
     onSelectModel?.(id)
-    if (panelRef.current) {
-      gsap.fromTo(panelRef.current, { y: 8 }, { y: 0, duration: 0.25, ease: 'power2.out' })
-    }
   }
 
   return (
@@ -408,6 +425,8 @@ export function CourtModelTabs({ onSelectModel }: { onSelectModel?: (modelId: Mo
       <div className="sticky top-5 z-30 -mx-5 bg-page/95 px-5 py-3 backdrop-blur-md md:static md:mx-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
           <Tabs
             aria-label="Модели кортов JUBO"
+            containerRef={tabsRef}
+            onScroll={() => { if (tabsRef.current && tabsRef.current.scrollLeft > 8) setShowTabHint(false) }}
             className="no-scrollbar w-full"
             layoutId="court-model-tabs"
             tabs={models.map((model) => ({
@@ -418,7 +437,7 @@ export function CourtModelTabs({ onSelectModel }: { onSelectModel?: (modelId: Mo
             value={activeModel}
             onChange={handleTabChange}
           />
-        <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 flex w-12 items-center justify-end bg-gradient-to-l from-page via-page/80 to-transparent pr-1 text-ink-soft md:hidden"><ArrowRight size={14} strokeWidth={1.7} /></span>
+        {showTabHint && <span aria-hidden="true" className="pointer-events-none absolute right-3 top-1/2 z-40 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-page/90 text-ink-soft shadow-sm md:hidden"><ChevronRight size={16} strokeWidth={2} /></span>}
       </div>
 
       <SurfaceCard tone="white" interactive={false} className="mt-6 p-6 md:p-10">
@@ -458,10 +477,6 @@ export function CourtModelTabs({ onSelectModel }: { onSelectModel?: (modelId: Mo
 
                     <Typography as="h3" role="title-large" className="mt-3 font-semibold text-ink min-h-[3.25rem] flex items-center">
                       {typograph(model.title)}
-                    </Typography>
-
-                    <Typography role="caption" tone="muted" className="mt-1 font-medium min-h-[1.25rem] flex items-center">
-                      {typograph(model.tagline)}
                     </Typography>
 
                     <Typography role="body" tone="subtle" className="mt-3 min-h-[4.5rem]">
