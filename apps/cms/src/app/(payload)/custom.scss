@@ -675,7 +675,15 @@
 
   .template-default .tabs-field__tabs-wrap {
     box-sizing: border-box;
+    max-width: 100%;
+    overflow-x: auto;
     padding-inline: var(--gutter-h);
+    scrollbar-width: thin;
+  }
+
+  .template-default .tabs-field__tabs {
+    overflow: visible;
+    white-space: nowrap;
   }
 
   .template-default .tabs-field__tab-button {

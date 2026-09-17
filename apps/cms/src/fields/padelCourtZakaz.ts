@@ -52,7 +52,7 @@ const mediaField = (name: string, label: string, required = true): Field => ({
   required,
 })
 
-export const padelCourtZakazFields: Field[] = [
+const padelCourtZakazFields: Field[] = [
   {
     name: 'heroVideo',
     type: 'upload',
@@ -293,3 +293,23 @@ export const padelCourtZakazFields: Field[] = [
     ],
   },
 ]
+
+function field(name: string): Field {
+  const result = padelCourtZakazFields.find((candidate) => 'name' in candidate && candidate.name === name)
+  if (!result) throw new Error(`Unknown padel court page field: ${name}`)
+  return result
+}
+
+export const padelCourtZakazContentTabs = [
+  {
+    label: 'Первый экран',
+    fields: ['heroVideo', 'heroPrimaryLabel', 'heroSecondaryLabel', 'heroMetrics'].map(field),
+  },
+  { label: 'Дистрибьютор', fields: [field('distributor')] },
+  { label: 'Строительство', fields: [field('turnkey')] },
+  { label: 'Стоимость', fields: [field('price')] },
+  { label: 'Технологии', fields: [field('technology')] },
+  { label: 'Галерея', fields: [field('gallery')] },
+  { label: 'Модельный ряд', fields: [field('models')] },
+  { label: 'Заявка', fields: [field('cta')] },
+] satisfies Array<{ label: string; fields: Field[] }>

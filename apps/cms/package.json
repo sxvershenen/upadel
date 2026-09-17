@@ -17,7 +17,7 @@
     "analytics:maintain": "cross-env NODE_OPTIONS=--no-deprecation payload run src/scripts/analyticsMaintenance.ts",
     "test:analytics:db": "cross-env NODE_OPTIONS=--no-deprecation payload run src/scripts/analyticsIntegration.ts",
     "test:analytics": "node --import tsx --test src/analytics/*.test.ts ../web/src/analytics/*.test.ts",
-    "test:integrations": "node --import tsx --test src/integrations/validation.test.ts src/notifications/leadNotifications.test.ts src/collections/Redirects.test.ts src/uploads/mediaPolicy.test.ts src/pageMap/*.test.ts src/content/requiredNavigation.test.ts src/content/normalize.test.ts src/lib/mediaUsage.test.ts"
+    "test:integrations": "node --import tsx --test src/integrations/validation.test.ts src/notifications/leadNotifications.test.ts src/collections/Redirects.test.ts src/uploads/mediaPolicy.test.ts src/pageMap/*.test.ts src/content/requiredNavigation.test.ts src/content/normalize.test.ts src/lib/mediaUsage.test.ts src/globals/ThematicPages.test.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.89.0",

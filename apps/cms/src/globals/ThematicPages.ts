@@ -3,7 +3,7 @@ import type { Field, GlobalConfig } from 'payload'
 import { authenticated } from '../fields/access'
 import { createActionField } from '../fields/action'
 import { pageHeroFields } from '../fields/pageHero'
-import { padelCourtZakazFields } from '../fields/padelCourtZakaz'
+import { padelCourtZakazContentTabs } from '../fields/padelCourtZakaz'
 import { seoField } from '../fields/seo'
 import { requirePublishedGlobal } from '../hooks/requirePublishedGlobal'
 
@@ -11,7 +11,26 @@ export type ThematicPageKind = 'prices' | 'training' | 'gift' | 'courts' | 'gall
 export type CodeDefinedPageKind = 'padel-court-zakaz'
 export type ThematicPageSlug = `${ThematicPageKind | CodeDefinedPageKind}-page`
 
-function createThematicPage(args: { slug: ThematicPageSlug; label: string; kind: ThematicPageKind | CodeDefinedPageKind; fields?: Field[]; hidden?: boolean; dbName?: string }): GlobalConfig {
+type ContentTab = { label: string; fields: Field[] }
+
+function createThematicPage(args: {
+  slug: ThematicPageSlug
+  label: string
+  kind: ThematicPageKind | CodeDefinedPageKind
+  fields?: Field[]
+  contentTabs?: ContentTab[]
+  hidden?: boolean
+  dbName?: string
+}): GlobalConfig {
+  const commonContentFields: Field[] = [
+    { name: 'eyebrow', type: 'text', label: 'Надзаголовок', required: true },
+    { name: 'title', type: 'text', label: 'Заголовок', required: true },
+    { name: 'intro', type: 'textarea', label: 'Вводный текст', required: true },
+  ]
+  const contentTabs = args.contentTabs
+    ? args.contentTabs.map((tab, index) => index === 0 ? { ...tab, fields: [...commonContentFields, ...tab.fields] } : tab)
+    : [{ label: 'Содержание', fields: [...commonContentFields, ...(args.fields ?? [])] }]
+
   return {
     slug: args.slug,
     ...(args.dbName ? { dbName: args.dbName } : {}),
@@ -35,15 +54,7 @@ function createThematicPage(args: { slug: ThematicPageSlug; label: string; kind:
       {
         type: 'tabs',
         tabs: [
-          {
-            label: 'Содержание',
-            fields: [
-              { name: 'eyebrow', type: 'text', label: 'Надзаголовок', required: true },
-              { name: 'title', type: 'text', label: 'Заголовок', required: true },
-              { name: 'intro', type: 'textarea', label: 'Вводный текст', required: true },
-              ...(args.fields ?? []),
-            ],
-          },
+          ...contentTabs,
           { label: 'Шапка страницы', fields: pageHeroFields },
           { label: 'SEO', fields: [seoField] },
         ],
@@ -152,7 +163,7 @@ export const PadelCourtZakazPage = createThematicPage({
   label: 'Падел-корты JUBO под ключ',
   kind: 'padel-court-zakaz',
   dbName: 'padel_court_page',
-  fields: padelCourtZakazFields,
+  contentTabs: padelCourtZakazContentTabs,
 })
 
 export const GalleryPage = createThematicPage({ slug: 'gallery-page', label: 'Галерея', kind: 'gallery' })
