@@ -15,8 +15,9 @@ import {
   Wind,
   Wrench,
 } from 'lucide-react'
-import React, { useState, useRef, type FormEvent } from 'react'
-import { motion } from 'framer-motion'
+import React, { useState, useRef, useEffect, type FormEvent } from 'react'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 import { SiteFrame } from '../components/SiteFrame'
 import { Tabs } from '../components/ui/Tabs'
@@ -27,10 +28,13 @@ import { SurfaceCard } from '../components/ui/Card'
 import { PhoneIcon, TelegramIcon } from '../components/ui/ContactIcons'
 import { Reveal } from '../components/ui/Reveal'
 import { SplitTextReveal } from '../components/ui/SplitTextReveal'
-import { springSoft } from '../lib/motion'
 import { cn } from '../utils/cn'
 import { analyticsServerContext, trackAnalytics } from '../analytics/AnalyticsTracker'
 import { useActionLayer } from '../actions/ActionLayer'
+
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger)
+}
 
 const sourcePage = '/padel-court-zakaz'
 
@@ -59,28 +63,20 @@ export const heroImage = {
 
 export const heroMetrics = [
   {
-    number: '01',
-    tag: 'Прямой импорт',
-    title: 'Прямой контракт с JUBO (Испания)',
-    caption: 'Таможня, сертификаты, логистика',
+    title: 'Прямой импорт из Испании',
+    caption: 'Завод JUBO в Валенсии',
   },
   {
-    number: '02',
-    tag: '6 моделей',
-    title: 'От клубных до ураганных (260 км/ч)',
-    caption: 'Infinity, Super Panoramic, Xtrem',
+    title: '6 моделей в линейке',
+    caption: 'От клубов до Premier Padel',
   },
   {
-    number: '03',
-    tag: 'Монтаж по РФ',
-    title: 'Собственные сертифицированные бригады',
-    caption: 'Лазерная юстировка стекла 12 мм',
+    title: 'Монтаж под ключ по РФ',
+    caption: 'Сертифицированная бригада',
   },
   {
-    number: '04',
-    tag: 'Склад и ТО',
-    title: 'Запасные стекла и комплектующие',
-    caption: 'Оперативный сервис без простоя кортов',
+    title: 'Склад запчастей и сервис',
+    caption: 'Стекла, сетки и ТО в наличии',
   },
 ] as const
 
@@ -215,12 +211,12 @@ export const models = [
     title: 'Патентованная панорамная система без угловых стоек',
     tagline: 'Идеальный выбор для главных ТВ-кортов и премиальных клубов',
     description:
-      'Флагман модельного ряда JUBO с патентованной конструкцией, полностью лишённой угловых металлических профилей. Разработана для турниров высшего уровня и флагманских клубов, где приоритетны безупречная обзорность, эстетика и премиальный статус.',
+      'Флагман линейки JUBO без угловых металлических стоек для безупречного обзора. Разработан для турниров высшего ранга и флагманских клубов с повышенными требованиями к эстетике.',
     image: {
-      src: 'https://jubopadel.com/wp-content/uploads/2026/05/supportinfinitypk-1024x576.png',
+      src: 'https://jubopadel.com/wp-content/uploads/2026/05/3c.png',
       alt: 'Панорамный падел-корт JUBO Infinity без угловых стоек',
-      width: 1024,
-      height: 576,
+      width: 1920,
+      height: 1080,
     },
     specs: [
       { label: 'Остекление', value: '12 мм закалённое FIP (18 панелей, 108 м²)' },
@@ -240,15 +236,15 @@ export const models = [
     id: 'super-panoramic',
     name: 'Super Panoramic',
     eyebrow: 'Чемпионский обзор',
-    title: 'Открытая панорама и максимальная конструктивная жёсткость',
+    title: 'Открытая панорама и максимальная жёсткость каркаса',
     tagline: 'Турнирный стандарт для престижных международных соревнований',
     description:
-      'Сертифицированный корт с непрерывным остеклением задней и боковых линий. Оснащён усиленным силовым периметром, нейтрализующим вибрации при ударах о стекло и обеспечивающим равномерный отскок мяча по всей площади.',
+      'Турнирный корт со сплошным остеклением задней и боковых линий и усиленным силовым периметром. Исключает нежелательные вибрации и гарантирует правильный и предсказуемый отскок мяча.',
     image: {
-      src: 'https://jubopadel.com/wp-content/uploads/2026/05/superpanoramic-1024x576.png',
+      src: 'https://jubopadel.com/wp-content/uploads/2026/05/3a.png',
       alt: 'Падел-корт JUBO Super Panoramic для профессиональных турниров',
-      width: 1024,
-      height: 576,
+      width: 1920,
+      height: 1080,
     },
     specs: [
       { label: 'Остекление', value: '12 мм закалённое с полированной еврофаской' },
@@ -268,15 +264,15 @@ export const models = [
     id: 'panoramic',
     name: 'Panoramic',
     eyebrow: 'Клубный стандарт',
-    title: 'Широкий обзор и оптимальный клубный бюджет',
+    title: 'Широкий обзор и оптимальный клубный бюджет проекта',
     tagline: 'Баланс открытой панорамы и проверенной клубной надёжности',
     description:
-      'Классическая панорамная модель без внутренних металлических стоек в задней игровой зоне. Идеальное решение для клубов, которым требуется современная эстетика открытого корта при оптимальной инвестиционной стоимости.',
+      'Классическая панорамная модель без промежуточных стоек на торцах для коммерческих центров. Обеспечивает эстетику открытого корта при минимальных начальных капиталовложениях.',
     image: {
-      src: 'https://jubopadel.com/wp-content/uploads/2026/05/panoramic-1024x576.png',
+      src: 'https://jubopadel.com/wp-content/uploads/2026/05/3.png',
       alt: 'Панорамный падел-корт JUBO Panoramic для спортивных клубов',
-      width: 1024,
-      height: 576,
+      width: 1920,
+      height: 1080,
     },
     specs: [
       { label: 'Остекление', value: '10 мм или 12 мм закалённое безопасное стекло' },
@@ -296,15 +292,15 @@ export const models = [
     id: 'vision-pro',
     name: 'Vision Pro',
     eyebrow: 'Интенсивная эксплуатация',
-    title: 'Сверхжёсткая металлоконструкция для высокой проходимости',
+    title: 'Сверхжёсткая металлоконструкция для непрерывной игры',
     tagline: 'Максимальная прочность и долговечность для коммерческих кортов 24/7',
     description:
-      'Эволюция легендарной модели Vision с усиленным сечением стоек, утолщёнными рамами и дополнительными рёбрами жесткости. Спроектирована специально для клубов с непрерывным потоком игроков и высокими ударными нагрузками.',
+      'Усиленная модификация с утолщённым профилем стоек и защитой кромок закалённого остекления. Рассчитана на непрерывную эксплуатацию 24/7 в центрах с максимальным трафиком игроков.',
     image: {
-      src: 'https://jubopadel.com/wp-content/uploads/2026/05/visionpro-glass-1024x576.png',
+      src: 'https://jubopadel.com/wp-content/uploads/2026/05/visiopro-side.png',
       alt: 'Падел-корт JUBO Vision Pro с усиленным каркасом',
-      width: 1024,
-      height: 576,
+      width: 1920,
+      height: 1080,
     },
     specs: [
       { label: 'Остекление', value: '10 мм или 12 мм закалённое монолитное стекло' },
@@ -324,15 +320,15 @@ export const models = [
     id: 'infinity-tournament',
     name: 'Infinity Tournament',
     eyebrow: 'Мобильный Pop-up корт',
-    title: 'Турнирный корт для временных локаций без анкерования в основание',
+    title: 'Мобильный турнирный корт без анкерования в основание',
     tagline: 'Быстрый монтаж и демонтаж на площадях, стадионах и выставочных центрах',
     description:
-      'Специальная переносная конфигурация линейки Infinity с самонесущей балансировочной рамой. Позволяет собрать полноценный турнирный падел-корт международного класса без сверления отверстий и разрушения чистового покрытия пола.',
+      'Переносная соревновательная конфигурация с автономной балансировочной рамой по периметру. Позволяет быстро развернуть площадку на стадионах и выставках без повреждения чистового пола.',
     image: {
-      src: 'https://jubopadel.com/wp-content/uploads/2026/05/infinity20264_2.120-1-1024x565.png',
+      src: 'https://jubopadel.com/wp-content/uploads/2026/05/infinity_ParaWbTournament.107.png',
       alt: 'Мобильный переносной падел-корт JUBO Infinity Tournament',
-      width: 1024,
-      height: 565,
+      width: 1920,
+      height: 1080,
     },
     specs: [
       { label: 'Остекление', value: '12 мм закалённое соревновательное стекло FIP' },
@@ -355,12 +351,12 @@ export const models = [
     title: 'Инженерная защита от ветровых порывов до 260 км/ч (160 mph)',
     tagline: 'Создан для морских побережий, крыш зданий и открытых ветровых зон',
     description:
-      'Высокопрочная модификация Infinity для проектов в зонах экстремальных климатических нагрузок. Усиленный треугольный периметр 150×70×3 мм и массивные опорные плиты распределяют колоссальные аэродинамические нагрузки как единый силовой блок.',
+      'Высокопрочная модификация с усиленным треугольным контуром 150×70×3 мм для экстремального климата. Разработана для открытых локаций на морских побережьях и эксплуатируемых крышах зданий.',
     image: {
-      src: 'https://jubopadel.com/wp-content/uploads/2026/05/xtrem-1024x576.jpg',
+      src: 'https://jubopadel.com/wp-content/uploads/2026/05/3-1.png',
       alt: 'Ветростойкий падел-корт JUBO Infinity Xtrem для побережий и крыш',
-      width: 1024,
-      height: 576,
+      width: 1920,
+      height: 1080,
     },
     specs: [
       { label: 'Остекление', value: '12 мм закалённое с усиленными эластичными прокладками' },
@@ -382,11 +378,15 @@ type ModelId = (typeof models)[number]['id']
 
 export function CourtModelTabs({ onSelectModel }: { onSelectModel?: (modelId: ModelId) => void }) {
   const [activeModel, setActiveModel] = useState<ModelId>(models[0].id)
+  const panelRef = useRef<HTMLDivElement>(null)
 
   const handleTabChange = (val: string) => {
     const id = val as ModelId
     setActiveModel(id)
     onSelectModel?.(id)
+    if (panelRef.current) {
+      gsap.fromTo(panelRef.current, { y: 8 }, { y: 0, duration: 0.25, ease: 'power2.out' })
+    }
   }
 
   return (
@@ -405,88 +405,24 @@ export function CourtModelTabs({ onSelectModel }: { onSelectModel?: (modelId: Mo
       />
 
       <SurfaceCard tone="white" interactive={false} className="mt-6 p-6 md:p-10 border border-ink/5">
-        {models.map((model) => {
-          const isSelected = activeModel === model.id
-          return (
-            <div
-              key={model.id}
-              id={`court-model-panel-${model.id}`}
-              role="tabpanel"
-              aria-label={model.name}
-              tabIndex={0}
-              hidden={!isSelected}
-              className={cn(
-                isSelected ? 'block' : 'hidden',
-                'focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2'
-              )}
-            >
-              {isSelected ? (
-                <motion.div
-                  key={model.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={springSoft}
-                  className="grid gap-8 lg:grid-cols-[1.15fr_.85fr] lg:gap-12 lg:items-start"
-                >
-                  <div className="relative aspect-[16/9] w-full overflow-hidden bg-white">
-                    <img
-                      src={model.image.src}
-                      alt={model.image.alt}
-                      width={model.image.width}
-                      height={model.image.height}
-                      loading="lazy"
-                      decoding="async"
-                      className="h-full w-full object-contain object-top"
-                    />
-                  </div>
-
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Badge tone="muted">{model.eyebrow}</Badge>
-                      <Badge tone="dark">JUBO · Испания</Badge>
-                    </div>
-
-                    <Typography as="h3" role="title-large" className="mt-3 font-semibold text-ink">
-                      {typograph(model.title)}
-                    </Typography>
-
-                    <Typography role="caption" tone="muted" className="mt-1 font-semibold">
-                      {typograph(model.tagline)}
-                    </Typography>
-
-                    <Typography role="body" tone="subtle" className="mt-4">
-                      {typograph(model.description)}
-                    </Typography>
-
-                    <div className="mt-6 border-y border-ink/10 py-5">
-                      <Typography role="eyebrow" tone="muted" className="mb-3">
-                        {typograph('Технические спецификации:')}
-                      </Typography>
-                      <dl className="grid gap-2.5 sm:grid-cols-2">
-                        {model.specs.map((item) => (
-                          <div key={item.label} className="type-body-sm leading-snug">
-                            <dt className="text-ink-muted type-caption">{item.label}</dt>
-                            <dd className="font-semibold text-ink">{typograph(item.value)}</dd>
-                          </div>
-                        ))}
-                      </dl>
-                    </div>
-
-                    <ul className="mt-5 grid gap-2" aria-label={`Преимущества ${model.name}`}>
-                      {model.highlights.map((point) => (
-                        <li key={point} className="type-body-sm flex items-start gap-2.5 text-ink-soft">
-                          <span className="se-1 mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center bg-lime text-lime-ink">
-                            <Check aria-hidden="true" size={13} strokeWidth={2.8} />
-                          </span>
-                          <span>{typograph(point)}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </motion.div>
-              ) : (
+        <div ref={panelRef}>
+          {models.map((model) => {
+            const isSelected = activeModel === model.id
+            return (
+              <div
+                key={model.id}
+                id={`court-model-panel-${model.id}`}
+                role="tabpanel"
+                aria-label={model.name}
+                tabIndex={0}
+                hidden={!isSelected}
+                className={cn(
+                  isSelected ? 'block' : 'hidden',
+                  'focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2'
+                )}
+              >
                 <div className="grid gap-8 lg:grid-cols-[1.15fr_.85fr] lg:gap-12 lg:items-start">
-                  <div className="relative aspect-[16/9] w-full overflow-hidden bg-white">
+                  <div className="relative aspect-[16/9] w-full overflow-hidden bg-white flex items-center justify-center">
                     <img
                       src={model.image.src}
                       alt={model.image.alt}
@@ -494,37 +430,42 @@ export function CourtModelTabs({ onSelectModel }: { onSelectModel?: (modelId: Mo
                       height={model.image.height}
                       loading="lazy"
                       decoding="async"
-                      className="h-full w-full object-contain object-top"
+                      className="h-full w-full object-contain"
                     />
                   </div>
 
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <Badge tone="muted">{model.eyebrow}</Badge>
                       <Badge tone="dark">JUBO · Испания</Badge>
                     </div>
 
-                    <Typography as="h3" role="title-large" className="mt-3 font-semibold text-ink">
+                    <Typography as="h3" role="title-large" className="mt-3 font-semibold text-ink min-h-[3.25rem] flex items-center">
                       {typograph(model.title)}
                     </Typography>
 
-                    <Typography role="caption" tone="muted" className="mt-1 font-semibold">
+                    <Typography role="caption" tone="muted" className="mt-1 font-medium min-h-[1.25rem] flex items-center">
                       {typograph(model.tagline)}
                     </Typography>
 
-                    <Typography role="body" tone="subtle" className="mt-4">
+                    <Typography role="body" tone="subtle" className="mt-3 min-h-[4.5rem]">
                       {typograph(model.description)}
                     </Typography>
 
-                    <div className="mt-6 border-y border-ink/10 py-5">
-                      <Typography role="eyebrow" tone="muted" className="mb-3">
+                    {/* Технические спецификации: обёрнуты в плашки, не жирный шрифт */}
+                    <div className="mt-5 border-t border-ink/10 pt-5">
+                      <Typography role="caption" tone="muted" className="mb-3 font-medium">
                         {typograph('Технические спецификации:')}
                       </Typography>
-                      <dl className="grid gap-2.5 sm:grid-cols-2">
+                      <dl className="grid gap-2 sm:grid-cols-2">
                         {model.specs.map((item) => (
-                          <div key={item.label} className="type-body-sm leading-snug">
-                            <dt className="text-ink-muted type-caption">{item.label}</dt>
-                            <dd className="font-semibold text-ink">{typograph(item.value)}</dd>
+                          <div
+                            key={item.label}
+                            className="se-2 bg-surface-subtle px-3.5 py-2.5 flex flex-col justify-center"
+                          >
+                            <dt className="type-caption text-ink-muted">{item.label}</dt>
+                            <dd className="type-body-sm font-medium text-ink mt-0.5">
+                              {typograph(item.value)}
+                            </dd>
                           </div>
                         ))}
                       </dl>
@@ -536,16 +477,16 @@ export function CourtModelTabs({ onSelectModel }: { onSelectModel?: (modelId: Mo
                           <span className="se-1 mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center bg-lime text-lime-ink">
                             <Check aria-hidden="true" size={13} strokeWidth={2.8} />
                           </span>
-                          <span>{typograph(point)}</span>
+                          <span className="font-medium">{typograph(point)}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
                 </div>
-              )}
-            </div>
-          )
-        })}
+              </div>
+            )
+          })}
+        </div>
       </SurfaceCard>
     </div>
   )
@@ -734,19 +675,16 @@ function InlineLeadCalculatorForm({
     <SurfaceCard tone="white" interactive={false} className="p-6 md:p-8 border border-ink/5">
       <form onSubmit={handleSubmit} onFocusCapture={handleFocus} noValidate>
         <div className="mb-6">
-          <Typography role="eyebrow" tone="muted">
-            {typograph('Параметры площадки и смета')}
-          </Typography>
-          <Typography as="h3" role="title-card" className="mt-1 font-semibold text-ink">
+          <Typography as="h3" role="title-card" className="font-semibold text-ink">
             {typograph('Заполните данные для расчёта')}
           </Typography>
         </div>
 
         <div className="grid gap-5">
           <div>
-            <Typography role="caption" tone="default" className="mb-2 block font-semibold">
-              {typograph('1. Куда направить предварительную смету:')}
-            </Typography>
+            <span className="type-caption text-ink-muted mb-2 block font-medium">
+              {typograph('Куда направить предварительную смету:')}
+            </span>
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
@@ -791,96 +729,84 @@ function InlineLeadCalculatorForm({
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <Typography as="label" role="caption" className="grid gap-1.5 font-semibold text-ink">
-              {typograph('Ваше имя *')}
-              <input
-                className={inputClass}
-                name="name"
-                autoComplete="name"
-                required
-                minLength={2}
-                maxLength={120}
-                placeholder="Как к вам обращаться"
-              />
-            </Typography>
+            <input
+              className={inputClass}
+              name="name"
+              autoComplete="name"
+              required
+              minLength={2}
+              maxLength={120}
+              placeholder="Ваше имя *"
+              aria-label="Ваше имя"
+            />
 
-            <Typography as="label" role="caption" className="grid gap-1.5 font-semibold text-ink">
-              {typograph(
+            <input
+              className={inputClass}
+              name="contactValue"
+              type={preferredChannel === 'phone' ? 'tel' : 'text'}
+              autoComplete={preferredChannel === 'phone' ? 'tel' : 'off'}
+              required
+              maxLength={80}
+              placeholder={
                 preferredChannel === 'phone'
-                  ? 'Номер телефона *'
+                  ? 'Номер телефона: +7 (999) 000-00-00 *'
                   : preferredChannel === 'telegram'
-                  ? 'Telegram логин *'
-                  : 'VK логин или ссылка *'
-              )}
-              <input
-                className={inputClass}
-                name="contactValue"
-                type={preferredChannel === 'phone' ? 'tel' : 'text'}
-                autoComplete={preferredChannel === 'phone' ? 'tel' : 'off'}
-                required
-                maxLength={80}
-                placeholder={
-                  preferredChannel === 'phone'
-                    ? '+7 (999) 000-00-00'
-                    : preferredChannel === 'telegram'
-                    ? '@username'
-                    : 'vk.com/username или id'
-                }
-              />
-            </Typography>
+                  ? 'Telegram: @username *'
+                  : 'ВКонтакте: vk.com/id *'
+              }
+              aria-label={
+                preferredChannel === 'phone'
+                  ? 'Номер телефона'
+                  : preferredChannel === 'telegram'
+                  ? 'Telegram логин'
+                  : 'ВКонтакте'
+              }
+            />
           </div>
 
           <div className="grid gap-4 sm:grid-cols-3">
-            <Typography as="label" role="caption" className="grid gap-1.5 font-semibold text-ink">
-              {typograph('Модель корта')}
-              <select
-                value={selectedModel}
-                onChange={(e) => setSelectedModel(e.target.value)}
-                className={inputClass}
-              >
-                {models.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.name} ({m.eyebrow})
-                  </option>
-                ))}
-                <option value="consultation">Помочь с выбором модели</option>
-              </select>
-            </Typography>
+            <select
+              value={selectedModel}
+              onChange={(e) => setSelectedModel(e.target.value)}
+              aria-label="Модель корта"
+              className={inputClass}
+            >
+              {models.map((m) => (
+                <option key={m.id} value={m.id}>
+                  Модель: {m.name}
+                </option>
+              ))}
+              <option value="consultation">Помочь с выбором модели</option>
+            </select>
 
-            <Typography as="label" role="caption" className="grid gap-1.5 font-semibold text-ink">
-              {typograph('Количество кортов')}
-              <select
-                value={courtCount}
-                onChange={(e) => setCourtCount(e.target.value)}
-                className={inputClass}
-              >
-                <option value="1">1 корт</option>
-                <option value="2-3">2–3 корта</option>
-                <option value="4-6">4–6 кортов</option>
-                <option value="7+">7+ кортов (большой клуб)</option>
-              </select>
-            </Typography>
+            <select
+              value={courtCount}
+              onChange={(e) => setCourtCount(e.target.value)}
+              aria-label="Количество кортов"
+              className={inputClass}
+            >
+              <option value="1">Количество: 1 корт</option>
+              <option value="2-3">Количество: 2–3 корта</option>
+              <option value="4-6">Количество: 4–6 кортов</option>
+              <option value="7+">Количество: 7+ кортов</option>
+            </select>
 
-            <Typography as="label" role="caption" className="grid gap-1.5 font-semibold text-ink">
-              {typograph('Город / локация')}
-              <input
-                className={inputClass}
-                name="city"
-                placeholder="Москва, СПб, Сочи..."
-                maxLength={100}
-              />
-            </Typography>
+            <input
+              className={inputClass}
+              name="city"
+              placeholder="Город / локация (напр. Москва)"
+              aria-label="Город или локация"
+              maxLength={100}
+            />
           </div>
 
-          <Typography as="label" role="caption" className="grid gap-1.5 font-semibold text-ink">
-            {typograph('Комментарий к объекту (необязательно)')}
-            <textarea
-              className={cn(inputClass, 'min-h-20 py-3')}
-              name="comment"
-              maxLength={1000}
-              placeholder="Indoor ангар или открытая площадка, готовность основания, сроки..."
-            />
-          </Typography>
+          <textarea
+            className={cn(inputClass, 'min-h-20 py-3')}
+            name="comment"
+            maxLength={1000}
+            placeholder="Комментарий: тип объекта (indoor/outdoor), готовность фундамента, сроки..."
+            aria-label="Комментарий к объекту"
+          />
 
           <label className="absolute -left-[10000px]" aria-hidden="true">
             Компания
@@ -973,6 +899,32 @@ function DirectContactButtons() {
 
 export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
   const [activeModelForForm, setActiveModelForForm] = useState<ModelId>('infinity')
+  const heroRef = useRef<HTMLElement>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  useEffect(() => {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduce || !heroRef.current || !videoRef.current) return
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        videoRef.current,
+        { scale: 1 },
+        {
+          scale: 1.15,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: heroRef.current,
+            start: 'top top',
+            end: 'bottom top',
+            scrub: 0.6,
+          },
+        }
+      )
+    }, heroRef)
+
+    return () => ctx.revert()
+  }, [])
 
   return (
     <SiteFrame site={site} backLink={{ href: '/' }}>
@@ -1017,9 +969,13 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
         }}
       />
 
-      {/* 1. HERO-ШАПКА: ЧИСТОЕ ВИДЕО С ПОСТЕРОМ, БЕЗ НАЛОЖЕНИЯ КАРТИНКИ */}
-      <header className="page-hero relative overflow-hidden pb-12 pt-28 text-white md:pb-16 md:pt-36 bg-ink">
+      {/* 1. HERO-ШАПКА: КОМПАКТНАЯ ВЫСОТА НА ОДИН ЭКРАН, GSAP ПАРАЛЛАКС, БЕЗ 01-04 И EYEBROWS */}
+      <header
+        ref={heroRef}
+        className="page-hero relative overflow-hidden text-white bg-ink min-h-[100svh] flex flex-col justify-between pt-20 pb-6 md:pt-24 md:pb-8"
+      >
         <video
+          ref={videoRef}
           src="https://jubopadel.com/wp-content/uploads/2026/05/Header-Super-Pano-2400-1080-H265.webm"
           poster={heroImage.src}
           autoPlay
@@ -1028,34 +984,34 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
           playsInline
           className="absolute inset-0 h-full w-full object-cover"
         />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,5,8,.58)_0%,rgba(3,5,8,.84)_65%,rgba(3,5,8,.98)_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,5,8,.52)_0%,rgba(3,5,8,.82)_65%,rgba(3,5,8,.98)_100%)]" />
 
-        <div className="container-page relative z-10">
-          <div className="pt-6 sm:pt-10">
-            <Badge tone="glass" className="mb-5">
+        <div className="container-page relative z-10 flex flex-col justify-between flex-1">
+          <div className="pt-2 sm:pt-4">
+            <Badge tone="glass" className="mb-4">
               <span className="mr-1.5 h-2 w-2 rounded-full bg-lime animate-pulse" />
               {typograph('Официальный дистрибьютор JUBO Padel в РФ')}
             </Badge>
 
-            <Typography as="h1" role="hero" className="max-w-[960px] text-white font-semibold leading-[1.05]">
+            <Typography as="h1" role="hero" className="max-w-[960px] text-white font-semibold leading-[1.08]">
               <SplitTextReveal
                 text="Падел корт купить под ключ — цена, строительство, монтаж"
                 animateOnMount
               />
             </Typography>
 
-            <Typography role="editorial" className="mt-5 max-w-[840px] text-white/80">
+            <Typography role="editorial" className="mt-4 max-w-[800px] text-white/80 text-base md:text-lg">
               {typograph(
-                'UNLIM — официальный представитель испанского производителя JUBO Padel в России. Подберём конфигурацию корта, организуем прямую поставку с фабрики в Валенсии и выполним сертифицированный монтаж под ключ с гарантией.'
+                'UNLIM — официальный представитель испанского производителя JUBO Padel в России. Прямая поставка с завода в Валенсии и сертифицированный монтаж под ключ с гарантией.'
               )}
             </Typography>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
               <ButtonLink
                 href="#cta-section"
                 variant="primary"
-                size="lg"
-                icon={<ArrowRight size={18} />}
+                size="md"
+                icon={<ArrowRight size={16} />}
               >
                 {typograph('Получить расчёт сметы')}
               </ButtonLink>
@@ -1063,41 +1019,35 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
               <ButtonLink
                 href="#models-section"
                 variant="glass"
-                size="lg"
+                size="md"
               >
                 {typograph('Выбрать модель корта')}
               </ButtonLink>
             </div>
+          </div>
 
-            {/* Swiss-сетка силовых линий первого экрана */}
-            <div className="mt-12 grid grid-cols-2 gap-4 border-t border-white/15 pt-8 md:grid-cols-4 md:gap-6">
-              {heroMetrics.map((metric) => (
-                <div key={metric.number} className="space-y-1">
-                  <Typography role="micro" className="uppercase tracking-wider text-lime font-semibold">
-                    {metric.number} / {metric.tag}
-                  </Typography>
-                  <Typography role="body-small" className="font-semibold text-white">
-                    {typograph(metric.title)}
-                  </Typography>
-                  <Typography role="caption" className="text-white/60">
-                    {typograph(metric.caption)}
-                  </Typography>
-                </div>
-              ))}
-            </div>
+          {/* 4 пункта в хиро: лаконично, без 01-04 и без eyebrows */}
+          <div className="mt-8 grid grid-cols-2 gap-4 border-t border-white/15 pt-6 md:grid-cols-4 md:gap-6">
+            {heroMetrics.map((metric) => (
+              <div key={metric.title} className="space-y-0.5">
+                <Typography role="body-small" className="font-semibold text-white">
+                  {typograph(metric.title)}
+                </Typography>
+                <Typography role="caption" className="text-white/60">
+                  {typograph(metric.caption)}
+                </Typography>
+              </div>
+            ))}
           </div>
         </div>
       </header>
 
       <article>
-        {/* 2. СТАТУС ДИСТРИБЬЮТОРА И ГАРАНТИИ */}
+        {/* 2. СТАТУС ДИСТРИБЬЮТОРА И ГАРАНТИИ (БЕЗ EYEBROWS И БЕЗ 01-04) */}
         <section className="container-page py-16 md:py-24 border-b border-ink/10" aria-labelledby="distributor-title">
           <div className="grid gap-12 lg:grid-cols-[.85fr_1.15fr] lg:items-start">
             <div>
-              <Typography role="eyebrow" tone="muted">
-                {typograph('Официальный дистрибьютор')}
-              </Typography>
-              <Typography as="h2" id="distributor-title" role="section" className="mt-3 text-ink">
+              <Typography as="h2" id="distributor-title" role="section" className="text-ink">
                 {typograph('Прямые поставки JUBO в Россию без посредников')}
               </Typography>
               <Typography role="body" tone="subtle" className="mt-5 leading-relaxed">
@@ -1116,15 +1066,12 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
 
             <div className="grid gap-4 sm:grid-cols-2">
               {distributorAdvantages.map((adv, idx) => (
-                <Reveal key={adv.index} delay={idx * 0.08} className="h-full">
+                <Reveal key={adv.title} delay={idx * 0.08} className="h-full">
                   <SurfaceCard tone="white" interactive={false} className="p-6 h-full border border-ink/5">
-                    <Typography role="micro" tone="muted" className="font-semibold">
-                      {adv.index}
-                    </Typography>
-                    <Typography as="h3" role="title-card" className="mt-2 font-semibold text-ink">
+                    <Typography as="h3" role="title-card" className="font-semibold text-ink">
                       {typograph(adv.title)}
                     </Typography>
-                    <Typography role="body-small" tone="subtle" className="mt-3 leading-relaxed">
+                    <Typography role="body-small" tone="subtle" className="mt-2.5 leading-relaxed">
                       {typograph(adv.text)}
                     </Typography>
                   </SurfaceCard>
@@ -1134,13 +1081,10 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
           </div>
         </section>
 
-        {/* 3. ЧТО ВХОДИТ В УСЛУГИ ПОД КЛЮЧ: 5 ЭТАПОВ */}
+        {/* 3. ЧТО ВХОДИТ В УСЛУГИ ПОД КЛЮЧ: 5 ЭТАПОВ (БЕЗ EYEBROWS И БЕЗ 01-05) */}
         <section className="container-page py-16 md:py-24" aria-labelledby="turnkey-title">
           <div className="mb-12 max-w-[760px]">
-            <Typography role="eyebrow" tone="muted">
-              {typograph('Полный цикл реализации')}
-            </Typography>
-            <Typography as="h2" id="turnkey-title" role="section" className="mt-3 text-ink">
+            <Typography as="h2" id="turnkey-title" role="section" className="text-ink">
               {typograph('Что входит в строительство и монтаж корта под ключ')}
             </Typography>
             <Typography role="body" tone="subtle" className="mt-4">
@@ -1152,21 +1096,16 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
             {turnkeySteps.map((step, idx) => (
-              <Reveal key={step.number} delay={idx * 0.08} className="h-full">
+              <Reveal key={step.title} delay={idx * 0.08} className="h-full">
                 <SurfaceCard tone="white" interactive={false} className="flex flex-col justify-between p-6 h-full border border-ink/5">
                   <div>
-                    <div className="flex items-center justify-between">
-                      <span className="se-2 flex h-10 w-10 items-center justify-center bg-surface-muted text-ink">
-                        <step.icon size={20} />
-                      </span>
-                      <Typography role="price" tone="muted">
-                        {step.number}
-                      </Typography>
-                    </div>
-                    <Typography as="h3" role="title-card" className="mt-6 font-semibold text-ink">
+                    <span className="se-2 flex h-10 w-10 items-center justify-center bg-surface-muted text-ink">
+                      <step.icon size={20} />
+                    </span>
+                    <Typography as="h3" role="title-card" className="mt-5 font-semibold text-ink">
                       {typograph(step.title)}
                     </Typography>
-                    <Typography role="body-small" tone="subtle" className="mt-3 leading-relaxed">
+                    <Typography role="body-small" tone="subtle" className="mt-2.5 leading-relaxed">
                       {typograph(step.text)}
                     </Typography>
                   </div>
@@ -1176,15 +1115,12 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
           </div>
         </section>
 
-        {/* 4. ЦЕНА КОРТА И ФАКТОРЫ СМЕТЫ */}
+        {/* 4. ЦЕНА КОРТА И ФАКТОРЫ СМЕТЫ (БЕЗ EYEBROWS) */}
         <section className="container-page pb-16 md:pb-24" aria-labelledby="price-factors-title">
           <SurfaceCard tone="white" interactive={false} className="p-6 md:p-12 lg:p-14 border border-ink/5">
             <div className="grid gap-10 lg:grid-cols-[.9fr_1.1fr] lg:items-center">
               <div>
-                <Typography role="eyebrow" tone="muted">
-                  {typograph('Честное ценообразование')}
-                </Typography>
-                <Typography as="h2" id="price-factors-title" role="section" className="mt-3 text-ink">
+                <Typography as="h2" id="price-factors-title" role="section" className="text-ink">
                   {typograph('Из чего складывается реальная стоимость падел-корта')}
                 </Typography>
                 <Typography role="body" tone="subtle" className="mt-5 leading-relaxed">
@@ -1218,7 +1154,7 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
           </SurfaceCard>
         </section>
 
-        {/* 5. ИНФОГРАФИКА ТЕХНОЛОГИЙ JUBO (ФОНОВОЕ ФОТО + СТРОГО МОНОХРОМ БЕЗ АКЦЕНТНЫХ ЦВЕТОВ) */}
+        {/* 5. ИНФОГРАФИКА ТЕХНОЛОГИЙ JUBO (НЕТ БЛЮРА НА КАРТИНКЕ, НЕТ ОБВОДОК У ПЛАШЕК, АНИМАЦИЯ БЕЗ 0 OPACITY) */}
         <section className="relative isolate overflow-hidden py-16 text-white md:py-24 bg-ink" aria-labelledby="tech-title">
           <div
             className="absolute inset-0 bg-cover bg-center"
@@ -1227,15 +1163,13 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
                 "url('https://jubopadel.com/wp-content/uploads/2026/05/showroom-aereal-1536x848.jpg')",
             }}
           />
-          <div className="absolute inset-0 bg-ink/90 backdrop-blur-xs" />
+          {/* Чистое затемнение без размытия/блюра фонового изображения */}
+          <div className="absolute inset-0 bg-ink/80" />
 
           <div className="container-page relative z-10">
             <div className="grid gap-6 lg:grid-cols-[1fr_.8fr] lg:items-end">
               <div>
-                <Typography role="eyebrow" tone="inverse-subtle">
-                  {typograph('Инженерные инновации')}
-                </Typography>
-                <Typography as="h2" id="tech-title" role="section" tone="inverse" className="mt-3">
+                <Typography as="h2" id="tech-title" role="section" tone="inverse">
                   {typograph('Технологии и стандарты JUBO')}
                 </Typography>
               </div>
@@ -1248,8 +1182,9 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
 
             <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {technologies.map((tech, idx) => (
-                <Reveal key={tech.title} delay={idx * 0.07} className="h-full">
-                  <div className="se-3 bg-white/[0.07] p-6 backdrop-blur-md border border-white/10 h-full flex flex-col justify-between">
+                <Reveal key={tech.title} fade={false} y={20} delay={idx * 0.06} className="h-full">
+                  {/* Плашки без обводки border, backdrop-blur не ломается так как fade={false} держит opacity 1 */}
+                  <div className="se-3 bg-white/[0.08] p-6 backdrop-blur-md h-full flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between">
                         <span className="se-2 flex h-11 w-11 items-center justify-center bg-white/10 text-white">
@@ -1273,13 +1208,10 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
           </div>
         </section>
 
-        {/* ГАЛЕРЕЯ КЛУБНЫХ РЕАЛИЗАЦИЙ JUBO */}
+        {/* ГАЛЕРЕЯ КЛУБНЫХ РЕАЛИЗАЦИЙ JUBO (БЕЗ EYEBROWS) */}
         <section className="container-page py-16 md:py-24" aria-labelledby="gallery-title">
           <div className="mb-10 max-w-[760px]">
-            <Typography role="eyebrow" tone="muted">
-              {typograph('Реализованные комплексы')}
-            </Typography>
-            <Typography as="h2" id="gallery-title" role="section" className="mt-3 text-ink">
+            <Typography as="h2" id="gallery-title" role="section" className="text-ink">
               {typograph('Как корты JUBO выглядят в реальных клубных проектах')}
             </Typography>
             <Typography role="body" tone="subtle" className="mt-4">
@@ -1320,15 +1252,12 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
           </div>
         </section>
 
-        {/* 6. МОДЕЛЬНЫЙ РЯД КОРТОВ JUBO: СЕКЦИЯ BG-PAGE, ТАБЫ НА БЕЛОМ SURFACE-CARD */}
+        {/* 6. МОДЕЛЬНЫЙ РЯД КОРТОВ JUBO (БЕЗ EYEBROWS) */}
         <section id="models-section" className="bg-page py-16 md:py-24 border-t border-ink/10" aria-labelledby="models-title">
           <div className="container-page">
             <div className="grid gap-6 lg:grid-cols-[1fr_.7fr] lg:items-end">
               <div>
-                <Typography role="eyebrow" tone="muted">
-                  {typograph('Линейка кортов JUBO')}
-                </Typography>
-                <Typography as="h2" id="models-title" role="section" className="mt-3 max-w-[720px] text-ink">
+                <Typography as="h2" id="models-title" role="section" className="max-w-[720px] text-ink">
                   {typograph('Выберите модель корта под условия вашей площадки')}
                 </Typography>
               </div>
@@ -1345,16 +1274,13 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
           </div>
         </section>
 
-        {/* 7. CTA БЛОК: ШВЕЙЦАРСКИЙ ЛЕВООРИЕНТИРОВАННЫЙ СТИЛЬ С ЛАКОНИЧНЫМИ КНОПКАМИ */}
+        {/* 7. CTA БЛОК: ШВЕЙЦАРСКИЙ ЛЕВООРИЕНТИРОВАННЫЙ СТИЛЬ (БЕЗ EYEBROWS) */}
         <section id="cta-section" className="bg-page py-16 md:py-24 border-t border-ink/10" aria-labelledby="cta-heading">
           <div className="container-page">
             <div className="grid gap-12 lg:grid-cols-[.9fr_1.1fr] lg:items-start">
               {/* Левая колонка: швейцарская типографика, лаконичные кнопки, гарантии */}
               <div>
-                <Typography role="eyebrow" tone="muted">
-                  {typograph('Связь с официальным дистрибьютором')}
-                </Typography>
-                <Typography as="h2" id="cta-heading" role="section" className="mt-3 text-ink">
+                <Typography as="h2" id="cta-heading" role="section" className="text-ink">
                   {typograph('Рассчитать проект падел-корта под ключ')}
                 </Typography>
                 <Typography role="body" tone="subtle" className="mt-4 leading-relaxed">

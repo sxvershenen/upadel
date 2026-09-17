@@ -27,14 +27,14 @@ test('court model tabs expose all 6 JUBO models, crisp photos, and standardized 
     assert.match(html, new RegExp(`id="court-model-panel-${id}"[^>]+role="tabpanel"`))
   }
 
-  // Check 6 crisp court photos from jubopadel.com
+  // Check 6 matching-angle court photos from jubopadel.com
   for (const src of [
-    'supportinfinitypk-1024x576.png',
-    'superpanoramic-1024x576.png',
-    'panoramic-1024x576.png',
-    'visionpro-glass-1024x576.png',
-    'infinity20264_2.120-1-1024x565.png',
-    'xtrem-1024x576.jpg',
+    '3c.png',
+    '3a.png',
+    '3.png',
+    'visiopro-side.png',
+    'infinity_ParaWbTournament.107.png',
+    '3-1.png',
   ]) {
     assert.match(html, new RegExp(`src="[^"]*${src.replace('.', '\\.')}`))
   }
