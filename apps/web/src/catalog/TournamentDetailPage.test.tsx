@@ -142,7 +142,7 @@ test('TournamentDetailPage renders hero without buttons/badge/eyebrows and Swiss
   // 2. Breadcrumbs removed
   assert.doesNotMatch(html, /aria-label="Хлебные крошки"/)
 
-  // 3. Tournament passport metrics (no 01-04 numbers, bottom aligned)
+  // 3. Tournament passport metrics (unified Swiss dl without card borders or 01-04 numbers)
   assert.match(html, /aria-label="Паспорт турнира"/)
   assert.match(html, /Расписание/)
   assert.doesNotMatch(html, /01\s*·/)
@@ -153,7 +153,8 @@ test('TournamentDetailPage renders hero without buttons/badge/eyebrows and Swiss
   assert.match(html, /Взнос/)
   assert.doesNotMatch(html, /03\s*·/)
   assert.match(html, /2[\s\u00A0]500[\s\u00A0]₽ \/ участник/)
-  assert.match(html, /mt-auto/)
+  assert.doesNotMatch(html, /border border-ink\/5/)
+  assert.doesNotMatch(html, /border border-ink\/10/)
 
   // 4. Regulations and Checklist
   assert.match(html, /Регламент турнира/)
@@ -165,22 +166,22 @@ test('TournamentDetailPage renders hero without buttons/badge/eyebrows and Swiss
   assert.doesNotMatch(html, /фруктовый бар/)
   assert.doesNotMatch(html, /без ограничений/)
 
-  // 5. Side-by-side Matchday Timeline and FAQ on PC
+  // 5. Side-by-side Matchday Timeline and FAQ on PC with SectionHeader
   assert.match(html, /aria-label="Игровой день и вопросы"/)
-  assert.match(html, /Как проходит игровой день/)
+  assert.match(html, /Как[\s\S]*?проходит[\s\S]*?игровой[\s\S]*?день/)
   assert.match(html, /Сбор и\u00A0разминка/)
   assert.match(html, /Брифинг и\u00A0жеребьёвка/)
-  assert.match(html, /Частые вопросы/)
+  assert.match(html, /Частые[\s\S]*?вопросы/)
   assert.match(html, /Нужен ли постоянный напарник для\u00A0участия\?/)
 
-  // 6. Registration CTA block (no badges)
+  // 6. Registration CTA block (no badges, no borders)
   assert.match(html, /aria-label="Запись на турнир"/)
   assert.match(html, /Готовы выйти на\u00A0корт\?/)
   assert.doesNotMatch(html, /Регистрация открыта/)
 
   // 7. Related Tournaments
   assert.match(html, /aria-label="Другие турниры"/)
-  assert.match(html, /Другие турниры и\u00A0лиги/)
+  assert.match(html, /Другие[\s\S]*?турниры[\s\S]*?и[\s\S]*?лиги/)
   assert.match(html, /Unlim Riga Masters Cup/)
 })
 

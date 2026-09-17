@@ -1,19 +1,15 @@
 import React from 'react'
 import type { TournamentDetailDTO } from '@unlim/content-contract'
 import {
-  CalendarDays,
   Camera,
   Check,
   ChevronRight,
   Clock,
   Droplets,
-  Medal,
   Phone,
   Send,
   ShowerHead,
   Sparkles,
-  Trophy,
-  Wallet,
 } from 'lucide-react'
 
 import { ContentAction } from '../components/ContentAction'
@@ -22,7 +18,7 @@ import { TournamentCard } from '../components/cards/TournamentCard'
 import { Accordion } from '../components/ui/Accordion'
 import { ButtonLink } from '../components/ui/Button'
 import { SurfaceCard } from '../components/ui/Card'
-import { Typography } from '../components/ui/Typography'
+import { SectionHeader } from '../components/ui/SectionHeader'
 import { PageHeader } from '../thematic/PageHeader'
 
 // Неразрывные пробелы для предлогов и союзов по правилам русской типографики
@@ -126,33 +122,6 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
       : 'После регистрации координатор подтвердит бронь вашего слота.',
   ]
 
-  const passportCards = [
-    {
-      label: 'Расписание',
-      icon: CalendarDays,
-      value: dto.item.scheduleLabel,
-      caption: completed ? 'Турнирный этап завершён' : 'Сбор игроков за 20–30 минут',
-    },
-    {
-      label: 'Формат',
-      icon: Medal,
-      value: dto.item.format,
-      caption: `Категория: ${dto.item.category}`,
-    },
-    {
-      label: 'Взнос',
-      icon: Wallet,
-      value: dto.item.entryFee,
-      caption: 'Включает мячи, корт и судейство',
-    },
-    {
-      label: hasDistinctPrize ? dto.item.prizeLabel : 'Награды',
-      icon: Trophy,
-      value: hasDistinctPrize ? dto.item.prize : 'Кубки и клубные призы',
-      caption: hasDistinctPrize ? 'Победителям турнира' : 'От клуба и партнёров',
-    },
-  ]
-
   const faqItems = getFaqItems(dto.item.category, dto.item.format)
 
   return (
@@ -169,48 +138,74 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
 
       {/* 2. Контентная часть страницы в Swiss-стиле */}
       <article data-page-enter="content" className="container-page pb-16 pt-8 md:pb-24 md:pt-10">
-        {/* Секция: Паспорт турнира (4 карточки, контент прижат к низу) */}
+        {/* Секция: Паспорт турнира (единая карточка со строгой типографикой из CMS без обводок) */}
         <section aria-label="Паспорт турнира">
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {passportCards.map((card) => {
-              const Icon = card.icon
-              return (
-                <SurfaceCard
-                  key={card.label}
-                  tone="white"
-                  interactive={false}
-                  className="flex min-h-[144px] flex-col justify-between border border-ink/5 p-5 md:p-6"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="type-caption font-medium text-ink-muted">
-                      {typograph(card.label)}
+          <SurfaceCard tone="white" interactive={false} className="p-6 md:p-8">
+            <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 sm:gap-6 lg:gap-0 lg:divide-x lg:divide-ink/10">
+              {/* Расписание */}
+              <div className="flex flex-col justify-between py-4 first:pt-0 last:pb-0 border-b border-ink/10 last:border-b-0 sm:border-b-0 sm:py-0 lg:px-6 lg:first:pl-0">
+                <dt className="type-caption font-medium text-ink-muted">
+                  {typograph('Расписание')}
+                </dt>
+                <dd className="mt-2">
+                  <span className="type-title-card font-semibold text-ink block leading-snug">
+                    {typograph(dto.item.scheduleLabel)}
+                  </span>
+                </dd>
+              </div>
+
+              {/* Формат и уровень */}
+              <div className="flex flex-col justify-between py-4 first:pt-0 last:pb-0 border-b border-ink/10 last:border-b-0 sm:border-b-0 sm:py-0 lg:px-6">
+                <dt className="type-caption font-medium text-ink-muted">
+                  {typograph('Формат')}
+                </dt>
+                <dd className="mt-2">
+                  <span className="type-title-card font-semibold text-ink block leading-snug">
+                    {typograph(dto.item.format)}
+                  </span>
+                  {dto.item.category && (
+                    <span className="type-caption text-ink-soft mt-1 block">
+                      {typograph(dto.item.category)}
                     </span>
-                    <span className="text-ink-muted/60">
-                      <Icon size={18} />
-                    </span>
-                  </div>
-                  <div className="mt-auto pt-3">
-                    <Typography role="title-card" className="font-semibold text-ink leading-snug">
-                      {typograph(card.value)}
-                    </Typography>
-                    <p className="type-caption mt-1 text-ink-muted">
-                      {typograph(card.caption)}
-                    </p>
-                  </div>
-                </SurfaceCard>
-              )
-            })}
-          </div>
+                  )}
+                </dd>
+              </div>
+
+              {/* Взнос */}
+              <div className="flex flex-col justify-between py-4 first:pt-0 last:pb-0 border-b border-ink/10 last:border-b-0 sm:border-b-0 sm:py-0 lg:px-6">
+                <dt className="type-caption font-medium text-ink-muted">
+                  {typograph('Взнос')}
+                </dt>
+                <dd className="mt-2">
+                  <span className="type-title-card font-semibold text-ink block leading-snug">
+                    {typograph(dto.item.entryFee)}
+                  </span>
+                </dd>
+              </div>
+
+              {/* Награды / Призовой фонд */}
+              <div className="flex flex-col justify-between py-4 first:pt-0 last:pb-0 border-b border-ink/10 last:border-b-0 sm:border-b-0 sm:py-0 lg:px-6 lg:last:pr-0">
+                <dt className="type-caption font-medium text-ink-muted">
+                  {typograph(hasDistinctPrize ? dto.item.prizeLabel : 'Награды')}
+                </dt>
+                <dd className="mt-2">
+                  <span className="type-title-card font-semibold text-ink block leading-snug">
+                    {typograph(hasDistinctPrize ? dto.item.prize : 'Кубки и клубные призы')}
+                  </span>
+                </dd>
+              </div>
+            </dl>
+          </SurfaceCard>
         </section>
 
         {/* Секция: Регламент соревнований и подготовка (2 колонки) */}
         <section aria-label="Регламент и подготовка" className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,1.3fr)_minmax(320px,0.7fr)]">
-          {/* Левая колонка: Официальный регламент с body typography */}
-          <SurfaceCard tone="white" interactive={false} className="border border-ink/5 p-6 md:p-8">
+          {/* Левая колонка: Официальный регламент */}
+          <SurfaceCard tone="white" interactive={false} className="p-6 md:p-8">
             <div className="border-b border-ink/10 pb-5">
-              <Typography as="h2" role="title-large" className="font-semibold text-ink">
+              <h2 className="type-title-card font-semibold text-ink">
                 {typograph('Регламент турнира')}
-              </Typography>
+              </h2>
             </div>
 
             {dto.item.regulationHTML ? (
@@ -228,14 +223,14 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
           {/* Правая колонка: Чек-лист подготовки и сервисы клуба */}
           <div className="space-y-6">
             {/* Чек-лист перед стартом */}
-            <SurfaceCard tone="white" interactive={false} className="border border-ink/5 p-6 md:p-7">
+            <SurfaceCard tone="white" interactive={false} className="p-6 md:p-7">
               <div className="flex items-center gap-3 border-b border-ink/10 pb-4">
                 <span className="se-2 flex h-8 w-8 items-center justify-center bg-surface-muted text-ink">
                   <Clock size={16} />
                 </span>
-                <Typography as="h3" role="title-card" className="font-semibold text-ink">
+                <h3 className="type-title-card font-semibold text-ink">
                   {typograph('Перед выходом на корт')}
-                </Typography>
+                </h3>
               </div>
               <ul className="mt-5 grid gap-3">
                 {checklist.map((item) => (
@@ -250,14 +245,14 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
             </SurfaceCard>
 
             {/* Сервис клуба: что включено */}
-            <SurfaceCard tone="white" interactive={false} className="border border-ink/5 p-6 md:p-7">
+            <SurfaceCard tone="white" interactive={false} className="p-6 md:p-7">
               <div className="flex items-center gap-3 border-b border-ink/10 pb-4">
                 <span className="se-2 flex h-8 w-8 items-center justify-center bg-surface-muted text-ink">
                   <Sparkles size={16} />
                 </span>
-                <Typography as="h3" role="title-card" className="font-semibold text-ink">
+                <h3 className="type-title-card font-semibold text-ink">
                   {typograph('Включено для каждого игрока')}
-                </Typography>
+                </h3>
               </div>
               <ul className="mt-5 grid gap-3.5">
                 {includedPerks.map((perk) => {
@@ -279,66 +274,50 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
           </div>
         </section>
 
-        {/* Секция: Как проходит игровой день (слева) и FAQ (справа) на ПК */}
-        <section aria-label="Игровой день и вопросы" className="mt-12 md:mt-16 grid items-start gap-8 lg:grid-cols-2">
-          {/* Левая колонка: Как проходит игровой день */}
+        {/* Секция: Как проходит игровой день (слева) и FAQ (справа) на ПК с синхронной типографикой и ритмом */}
+        <section aria-label="Игровой день и вопросы" className="mt-12 md:mt-16 grid items-start gap-12 lg:grid-cols-2 lg:gap-16">
+          {/* Левая колонка: Как проходит игровой день (эдиториал-таймлайн созвучный с FAQ) */}
           <div>
-            <Typography as="h2" role="title-large" className="font-semibold text-ink">
-              {typograph('Как проходит игровой день')}
-            </Typography>
-            <p className="type-body-sm mt-2 text-ink-soft">
-              {typograph('Чёткая структура мероприятия позволяет отыграть серию матчей без задержек.')}
-            </p>
-
-            <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+            <SectionHeader title={typograph('Как проходит игровой день')} className="mb-6 md:mb-8" />
+            <div className="flex flex-col">
               {matchdaySteps.map((step) => (
-                <SurfaceCard
+                <div
                   key={step.title}
-                  tone="white"
-                  interactive={false}
-                  className="flex min-h-[104px] flex-col justify-between border border-ink/5 p-4 md:p-5"
+                  className="border-b border-ink/10 first:border-t py-5"
                 >
-                  <span className="type-caption font-medium text-ink-muted">
-                    {typograph(step.timing)}
-                  </span>
-                  <div className="mt-auto pt-2">
-                    <Typography as="h3" role="title-compact" className="font-semibold text-ink">
+                  <div className="flex items-baseline justify-between gap-4">
+                    <h3 className="type-body font-medium text-ink">
                       {typograph(step.title)}
-                    </Typography>
-                    <p className="type-caption mt-1 text-ink-soft leading-snug">
-                      {typograph(step.desc)}
-                    </p>
+                    </h3>
+                    <span className="type-caption font-medium text-ink-muted shrink-0">
+                      {typograph(step.timing)}
+                    </span>
                   </div>
-                </SurfaceCard>
+                  <p className="type-body-sm mt-1.5 text-ink-soft leading-relaxed">
+                    {typograph(step.desc)}
+                  </p>
+                </div>
               ))}
             </div>
           </div>
 
           {/* Правая колонка: Частые вопросы */}
           <div>
-            <Typography as="h2" role="title-large" className="font-semibold text-ink">
-              {typograph('Частые вопросы')}
-            </Typography>
-            <p className="type-body-sm mt-2 text-ink-soft">
-              {typograph('Всё, что важно знать перед турнирным выходом на корты UNLIM PADEL.')}
-            </p>
-
-            <div className="mt-6">
-              <Accordion items={faqItems.map((item) => ({ q: typograph(item.q), a: typograph(item.a) }))} />
-            </div>
+            <SectionHeader title={typograph('Частые вопросы')} className="mb-6 md:mb-8" />
+            <Accordion items={faqItems.map((item) => ({ q: typograph(item.q), a: typograph(item.a) }))} />
           </div>
         </section>
 
-        {/* Секция: Блок записи и конверсии */}
+        {/* Секция: Блок записи и конверсии (без обводок) */}
         <section aria-label="Запись на турнир" className="mt-12 md:mt-16">
-          <SurfaceCard tone="white" interactive={false} className="border border-ink/10 p-6 md:p-10">
+          <SurfaceCard tone="white" interactive={false} className="p-6 md:p-10">
             {completed ? (
               <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
                 <div>
-                  <Typography as="h2" role="title-large" className="font-semibold text-ink">
+                  <h2 className="type-section font-semibold text-ink leading-tight">
                     {typograph('Этот турнир уже завершился')}
-                  </Typography>
-                  <p className="type-body-sm mt-2 max-w-xl text-ink-soft">
+                  </h2>
+                  <p className="type-body mt-3 max-w-xl text-ink-soft leading-relaxed">
                     {typograph('Следите за расписанием новых турниров в календаре клуба или запишитесь на персональную тренировку для подготовки к следующим стартам.')}
                   </p>
                 </div>
@@ -354,10 +333,10 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
             ) : (
               <div className="flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-center">
                 <div>
-                  <Typography as="h2" role="title-large" className="font-semibold text-ink">
+                  <h2 className="type-section font-semibold text-ink leading-tight">
                     {typograph('Готовы выйти на корт?')}
-                  </Typography>
-                  <p className="type-body-sm mt-2 max-w-xl text-ink-soft">
+                  </h2>
+                  <p className="type-body mt-3 max-w-xl text-ink-soft leading-relaxed">
                     {typograph('Количество слотов ограничено форматом кортов (16–24 участника). Оставьте заявку — координатор свяжется с вами и закрепит место в турнирной сетке.')}
                   </p>
                 </div>
@@ -394,14 +373,15 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
         {/* Секция: Другие турниры */}
         {dto.related.length > 0 && (
           <section aria-label="Другие турниры" className="mt-14 md:mt-20">
-            <div className="mb-6 flex items-end justify-between gap-4">
-              <Typography as="h2" role="section" className="font-semibold text-ink">
-                {typograph('Другие турниры и лиги')}
-              </Typography>
-              <ButtonLink href="/tournaments" variant="neutral" size="sm" icon={<ChevronRight size={15} />}>
-                Все события
-              </ButtonLink>
-            </div>
+            <SectionHeader
+              title={typograph('Другие турниры и лиги')}
+              action={
+                <ButtonLink href="/tournaments" variant="neutral" size="sm" icon={<ChevronRight size={15} />}>
+                  Все события
+                </ButtonLink>
+              }
+              className="mb-6 md:mb-8"
+            />
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
               {dto.related.map((item) => (
                 <div key={item.id} className="h-full">
