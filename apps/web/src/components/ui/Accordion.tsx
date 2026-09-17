@@ -17,7 +17,7 @@ export function Accordion({ items }: { items: { q: string; a: string }[] }) {
         return (
           <motion.div
             key={`${item.q}-${i}`}
-            initial={{ opacity: 0, y: 14 }}
+            initial={false}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ ...springSoft, delay: i * 0.05 }}

@@ -46,7 +46,7 @@ export function SplitTextReveal({
     <motion.span
       className={cn("inline", className)}
       variants={container}
-      {...(animateOnMount ? {} : { initial: "hidden", whileInView: "show", viewport: { once: true, margin: "-80px" } })}
+      {...(animateOnMount ? {} : { initial: false, whileInView: "show", viewport: { once: true, margin: "-80px" } })}
     >
       {words.map((item, index) => (
         <motion.span key={`${item}-${index}`} data-hero-word={animateOnMount ? "" : undefined} style={animateOnMount ? { "--hero-word-index": index } as CSSProperties : undefined} className="mr-[0.25em] inline-block last:mr-0" variants={word}>

@@ -16,7 +16,7 @@ export function Reveal({
 } & MotionProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y }}
+      initial={false}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ ...springSoft, delay }}

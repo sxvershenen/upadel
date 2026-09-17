@@ -73,7 +73,7 @@ export function Coaches() {
             {entities.coaches.map((coach, index) => (
               <SwiperSlide key={coach.id} className="!h-auto">
                 <motion.div
-                  initial={{ opacity: 0, y: 18 }}
+                  initial={false}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-60px" }}
                   transition={{ ...springSoft, delay: index * 0.06 }}
