@@ -1,4 +1,4 @@
-import type { HTMLAttributes, ReactNode } from "react";
+import React, { type HTMLAttributes, type ReactNode } from "react";
 import { cn } from "../../utils/cn";
 
 export type BadgeTone = "dark" | "light" | "lime" | "lime-soft" | "sunset" | "gold" | "muted" | "glass" | "outline-light" | "outline-dark";

@@ -1,4 +1,4 @@
-import { createElement, type ElementType, type HTMLAttributes, type ReactNode } from "react";
+import React, { createElement, type ElementType, type HTMLAttributes, type ReactNode } from "react";
 import { cn } from "../../utils/cn";
 
 export type TypeRole = "micro" | "caption" | "ui" | "body-small" | "body" | "editorial" | "hero-lead" | "title-compact" | "title-dense" | "title-card" | "title-large" | "price" | "section" | "hero" | "eyebrow";

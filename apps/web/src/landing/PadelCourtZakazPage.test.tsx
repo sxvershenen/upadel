@@ -4,9 +4,17 @@ import test from 'node:test'
 import React from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 
-import { CourtModelTabs, models, turnkeySteps, technologies, distributorAdvantages, priceFactors } from './PadelCourtZakazPage'
+import {
+  CourtModelTabs,
+  models,
+  turnkeySteps,
+  technologies,
+  distributorAdvantages,
+  priceFactors,
+  typograph,
+} from './PadelCourtZakazPage'
 
-test('court model tabs expose all 6 JUBO models and matching panels in server HTML', () => {
+test('court model tabs expose all 6 JUBO models, crisp photos, and standardized specs in server HTML', () => {
   const html = renderToStaticMarkup(<CourtModelTabs />)
 
   assert.equal((html.match(/role="tab"/g) ?? []).length, 6)
@@ -19,16 +27,27 @@ test('court model tabs expose all 6 JUBO models and matching panels in server HT
     assert.match(html, new RegExp(`id="court-model-panel-${id}"[^>]+role="tabpanel"`))
   }
 
-  // Check key image sources (in img src or video poster)
-  for (const src of ['fondoAzul.377.png', 'super_panoraic_inicio.png', 'panoramic_presentation.png', 'presentation_vision.png', 'destacada.png', '3-4.png']) {
-    assert.match(html, new RegExp(`(?:src|poster)="[^"]*${src.replace('.', '\\.')}`))
+  // Check 6 crisp court photos from jubopadel.com
+  for (const src of [
+    'supportinfinitypk-1024x576.png',
+    'superpanoramic-1024x576.png',
+    'panoramic-1024x576.png',
+    'visionpro-glass-1024x576.png',
+    'infinity20264_2.120-1-1024x565.png',
+    'xtrem-1024x576.jpg',
+  ]) {
+    assert.match(html, new RegExp(`src="[^"]*${src.replace('.', '\\.')}`))
   }
 
-  // Check WebM video tags
-  assert.match(html, /Header-Super-Pano-2400-1080-H265\.webm/)
-  assert.match(html, /Header-Infinity-2400-1080-h265\.webm/)
-  assert.match(html, /Header-Panoramic-2400-1080-H265\.webm/)
-  assert.match(html, /xtrem-header\.webm/)
+  // Ensure no redundant CTA button inside tabs
+  assert.equal(html.includes('Запросить расчёт модели'), false)
+
+  // Verify all 6 models have the exact same 6 standardized spec rows in identical order
+  const expectedLabels = ['Остекление', 'Силовой каркас', 'Антикоррозия', 'Сетка', 'Крепёж', 'Ветростойкость']
+  for (const model of models) {
+    const labels = model.specs.map((s) => s.label)
+    assert.deepEqual(labels, expectedLabels, `Model ${model.name} must have standardized spec rows`)
+  }
 })
 
 test('specifications and data arrays contain all turnkey stages and technologies', () => {
@@ -50,4 +69,9 @@ test('specifications and data arrays contain all turnkey stages and technologies
     'Infinity Tournament',
     'Infinity Xtrem',
   ])
+})
+
+test('typograph helper binds prepositions and short words with non-breaking spaces', () => {
+  const result = typograph('Падел корт под ключ в Москве и по всей России')
+  assert.equal(result, 'Падел корт под\u00A0ключ в\u00A0Москве и\u00A0по\u00A0всей России')
 })

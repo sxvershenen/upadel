@@ -1,4 +1,4 @@
-import { useRef, type ReactNode } from "react";
+import React, { useRef, type ReactNode } from "react";
 import { motion, type HTMLMotionProps } from "framer-motion";
 import { cn } from "../../utils/cn";
 import { springSoft } from "../../lib/motion";
