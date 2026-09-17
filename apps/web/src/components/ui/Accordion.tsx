@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useId, useState, type CSSProperties } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Plus } from "lucide-react";
 import { springSoft } from "../../lib/motion";
@@ -15,12 +15,10 @@ export function Accordion({ items }: { items: { q: string; a: string }[] }) {
         const triggerId = `${instanceId}-trigger-${i}`;
         const panelId = `${instanceId}-panel-${i}`;
         return (
-          <motion.div
+          <div
             key={`${item.q}-${i}`}
-            initial={false}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ ...springSoft, delay: i * 0.05 }}
+            data-reveal
+            style={{ "--reveal-delay": `${i * 0.05}s`, "--reveal-y": "14px" } as CSSProperties}
             className="border-b border-ink/10 first:border-t"
           >
             <button
@@ -59,7 +57,7 @@ export function Accordion({ items }: { items: { q: string; a: string }[] }) {
                 </motion.div>
               )}
             </AnimatePresence>
-          </motion.div>
+          </div>
         );
       })}
     </div>

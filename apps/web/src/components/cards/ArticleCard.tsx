@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, type CSSProperties } from "react";
 import { motion } from "framer-motion";
 import type { ArticleCatalogItem, HomepageDTO } from "@unlim/content-contract";
 import { springSoft } from "../../lib/motion";
@@ -23,7 +23,8 @@ export function ArticleCard({ post, mobilePlain = false }: { post: Article; mobi
 }
 
 export function ArticleRow({ post, delay = 0 }: { post: ArticleSummary; delay?: number }) {
-  return <motion.a href={`/blog/${post.slug}`} initial={false} whileInView="visible" whileHover="hover" viewport={{ once: true, margin: "-50px" }} variants={{ hidden: { opacity: 0, y: 14 }, visible: { opacity: 1, y: 0 }, hover: { x: 4 } }} transition={{ ...springSoft, delay }} className="card-spring group group/card flex cursor-pointer items-center justify-between gap-4 border-b border-ink/10 py-5 first:pt-0">
+  const style = { "--reveal-delay": `${delay}s`, "--reveal-y": "14px" } as CSSProperties;
+  return <motion.a href={`/blog/${post.slug}`} data-reveal style={style} initial={false} whileHover="hover" variants={{ hover: { x: 4 } }} transition={springSoft} className="card-spring group group/card flex cursor-pointer items-center justify-between gap-4 border-b border-ink/10 py-5 first:pt-0">
     <div><h4 className="type-body text-ink">{post.title}</h4><p className="type-body-sm mt-1 text-ink-soft">{post.excerpt}</p></div>
     <ArrowAction tone="light" size="sm" cardHover className="shrink-0 !bg-control !text-ink transition-colors group-hover/card:!bg-lime group-hover/card:!text-ink" />
   </motion.a>;

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, type CSSProperties } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import type { Swiper as SwiperType } from "swiper";
 import "swiper/css";
@@ -7,8 +7,6 @@ import { useContent } from "../content/ContentContext";
 import { IconButton } from "../components/ui/Button";
 import { SectionHeader } from "../components/ui/SectionHeader";
 import { Reveal } from "../components/ui/Reveal";
-import { motion } from "framer-motion";
-import { springSoft } from "../lib/motion";
 import { useMobileSwipeHint } from "../lib/useMobileSwipeHint";
 import { horizontalSwiperProps } from "../lib/swiper";
 import { CoachCard } from "../components/cards/CoachCard";
@@ -72,14 +70,9 @@ export function Coaches() {
           >
             {entities.coaches.map((coach, index) => (
               <SwiperSlide key={coach.id} className="!h-auto">
-                <motion.div
-                  initial={false}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-60px" }}
-                  transition={{ ...springSoft, delay: index * 0.06 }}
-                >
+                <div data-reveal style={{ "--reveal-delay": `${index * 0.06}s`, "--reveal-y": "18px" } as CSSProperties}>
                   <CoachCard coach={coach} />
-                </motion.div>
+                </div>
               </SwiperSlide>
             ))}
           </Swiper>

@@ -68,6 +68,10 @@ html[data-reveal-ready] [data-reveal]:not([data-reveal-visible="true"]) {
   opacity: 0;
   transform: translate3d(0, var(--reveal-y, 26px), 0);
 }
+html[data-reveal-ready] [data-reveal-fade="false"]:not([data-reveal-visible="true"]) {
+  opacity: 1;
+  transform: translate3d(0, var(--reveal-y, 26px), 0);
+}
 [data-reveal-text] [data-reveal-word] {
   display: inline-block;
   opacity: 1;
