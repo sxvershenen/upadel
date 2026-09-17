@@ -1,27 +1,31 @@
 import React, { type ReactNode } from "react";
-import { motion, type MotionProps } from "framer-motion";
+import { motion } from "framer-motion";
 import { springSoft } from "../../lib/motion";
+import { useSsrReveal } from "./useSsrReveal";
 
 export function Reveal({
   children,
   delay = 0,
   y = 26,
   className,
-  ...rest
+  fade = true,
 }: {
   children: ReactNode;
   delay?: number;
   y?: number;
   className?: string;
-} & MotionProps) {
+  fade?: boolean;
+}) {
+  const { ref, controls } = useSsrReveal<HTMLDivElement>("-80px", false);
+
   return (
     <motion.div
-      initial={{ opacity: 0, y }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
+      ref={ref}
+      initial="visible"
+      animate={controls}
+      variants={{ hidden: { opacity: fade ? 0 : 1, y }, show: { opacity: 1, y: 0 } }}
       transition={{ ...springSoft, delay }}
       className={className}
-      {...rest}
     >
       {children}
     </motion.div>

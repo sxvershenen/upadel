@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
-import React, { type CSSProperties } from "react";
+import React from "react";
 import { cn } from "../../utils/cn";
 import { springSoft } from "../../lib/motion";
+import { useSsrReveal } from "./useSsrReveal";
 
 const shortWord = /^(в|во|и|к|ко|с|со|у|о|об|от|до|за|на|по|из|без|для|при|под|над|через|после|между)$/i;
 
@@ -32,11 +33,7 @@ export function SplitTextReveal({
   animateOnMount?: boolean;
   delay?: number;
 }) {
-  const words = joinWords(text);
-  const container = {
-    hidden: {},
-    show: { transition: { staggerChildren: 0.045, delayChildren: delay } },
-  };
+  const { ref, controls } = useSsrReveal<HTMLSpanElement>("-80px", animateOnMount);
   const word = {
     hidden: { opacity: 0, y: "0.7em", filter: "blur(5px)" },
     show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { ...springSoft, duration: 0.7 } },
@@ -44,12 +41,14 @@ export function SplitTextReveal({
 
   return (
     <motion.span
+      ref={ref}
       className={cn("inline", className)}
-      variants={container}
-      {...(animateOnMount ? {} : { initial: "hidden", whileInView: "show", viewport: { once: true, margin: "-80px" } })}
+      initial="show"
+      animate={controls}
+      variants={{ hidden: {}, show: { transition: { staggerChildren: 0.045, delayChildren: delay } } }}
     >
-      {words.map((item, index) => (
-        <motion.span key={`${item}-${index}`} data-hero-word={animateOnMount ? "" : undefined} style={animateOnMount ? { "--hero-word-index": index } as CSSProperties : undefined} className="mr-[0.25em] inline-block last:mr-0" variants={word}>
+      {joinWords(text).map((item, index) => (
+        <motion.span key={`${item}-${index}`} className="mr-[0.25em] inline-block last:mr-0" variants={word}>
           {item}
         </motion.span>
       ))}

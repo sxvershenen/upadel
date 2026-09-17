@@ -19,6 +19,7 @@ import type { HomeSectionKey, HomepageDTO } from "@unlim/content-contract";
 import { visibleHomepageSections } from "./content/sections";
 import { AnalyticsTracker } from './analytics/AnalyticsTracker'
 import { ExternalAnalytics } from './analytics/ExternalAnalytics'
+import { MainContentReady } from './components/MainContentReady'
 
 type AppProps = {
   content: HomepageDTO;
@@ -73,6 +74,7 @@ export default function App({ content, view = "home" }: AppProps) {
           const Section = sectionComponents[key];
           return key === "pricing" ? <div key={key}><div id="training" /><Section /></div> : <Section key={key} />;
         })}
+        <MainContentReady />
       </main>
 
       <Footer />

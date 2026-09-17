@@ -1,112 +1,100 @@
-import gsap from 'gsap'
-import Swup from 'swup'
-import SwupScriptsPlugin from '@swup/scripts-plugin'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState, type ComponentType } from 'react'
 
-import { ReferenceBallScene, type ReferenceBallSceneHandle } from './ReferenceBallScene'
-import { computeReferenceTrajectory } from './referenceTrajectories'
-import { transitionAudio } from './transitionAudio'
+type TransitionRuntime = ComponentType
 
-const duration = 1000
+function isInternalNavigableLink(target: EventTarget | null): boolean {
+  if (!(target instanceof Element)) return false
+  const link = target.closest<HTMLAnchorElement>('a[href]')
+  if (!link || link.hasAttribute('data-no-swup') || link.target === '_blank' || link.hasAttribute('download')) return false
 
-function getSurface() {
-  const surface = document.querySelector<HTMLElement>('#swup')
-  if (!surface) throw new Error('Global Swup surface is missing')
-  return surface
+  try {
+    const url = new URL(link.href, window.location.href)
+    return url.origin === window.location.origin && !url.pathname.startsWith('/transitions/')
+  } catch {
+    return false
+  }
 }
 
-function resetTransitionStyles() {
-  const surface = document.querySelector<HTMLElement>('#swup')
-  if (!surface) return
+function scheduleAfterMainReady(run: () => void) {
+  let stopped = false
+  let scheduled = false
+  let firstFrame = 0
+  let secondFrame = 0
+  let idle: number | undefined
+  let timer: number | undefined
 
-  gsap.killTweensOf(surface)
-  surface.style.removeProperty('opacity')
-  surface.style.removeProperty('transform')
-}
+  const eligible = () => document.readyState === 'complete' && document.visibilityState === 'visible' && document.querySelector('#swup')?.getAttribute('data-main-ready') === 'true'
+  const attempt = () => {
+    if (stopped || scheduled || !eligible()) return
+    scheduled = true
+    firstFrame = window.requestAnimationFrame(() => {
+      secondFrame = window.requestAnimationFrame(() => {
+        const finish = () => {
+          if (stopped) return
+          if (!eligible()) { scheduled = false; return }
+          stop()
+          run()
+        }
+        if (typeof window.requestIdleCallback === 'function') idle = window.requestIdleCallback(finish, { timeout: 2000 })
+        else timer = window.setTimeout(finish, 100)
+      })
+    })
+  }
+  function stop() {
+    stopped = true
+    window.removeEventListener('load', attempt)
+    document.removeEventListener('unlim:main-ready', attempt)
+    document.removeEventListener('visibilitychange', attempt)
+    window.cancelAnimationFrame(firstFrame)
+    window.cancelAnimationFrame(secondFrame)
+    if (idle !== undefined && typeof window.cancelIdleCallback === 'function') window.cancelIdleCallback(idle)
+    if (timer !== undefined) window.clearTimeout(timer)
+  }
 
-function updateMetadata(nextDocument: Document) {
-  document.title = nextDocument.title
-  const description = nextDocument.querySelector('meta[name="description"]')?.getAttribute('content')
-  document.querySelector('meta[name="description"]')?.setAttribute('content', description ?? '')
-  const canonical = nextDocument.querySelector('link[rel="canonical"]')?.getAttribute('href')
-  document.querySelector('link[rel="canonical"]')?.setAttribute('href', canonical ?? '')
-}
-
-function waitFor(animation: gsap.core.Animation) {
-  if (animation.progress() >= 1) return Promise.resolve()
-  return new Promise<void>((resolve) => animation.eventCallback('onComplete', resolve))
-}
-
-function animateOut() {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return Promise.resolve()
-  const surface = getSurface()
-  return waitFor(gsap.to(surface, {
-    opacity: 0.2,
-    y: -25,
-    scale: 1.03,
-    duration: 0.45,
-    ease: 'power2.in',
-  }))
-}
-
-function animateIn() {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return Promise.resolve()
-  const surface = getSurface()
-  gsap.set(surface, { opacity: 0, y: 35, scale: 0.95 })
-  return waitFor(gsap.to(surface, {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    duration: 0.6,
-    ease: 'power4.out',
-    onComplete: () => gsap.set(surface, { clearProps: 'transform,opacity' }),
-  }))
+  window.addEventListener('load', attempt)
+  document.addEventListener('unlim:main-ready', attempt)
+  document.addEventListener('visibilitychange', attempt)
+  attempt()
+  return stop
 }
 
 export function GlobalPageTransition() {
-  const ballRef = useRef<ReferenceBallSceneHandle | null>(null)
+  const [Runtime, setRuntime] = useState<TransitionRuntime | null>(null)
+  const importRef = useRef<Promise<void> | null>(null)
 
   useEffect(() => {
-    const swup = new Swup({
-      containers: ['#swup'],
-      linkSelector: 'a[href]:not([data-transition-link])',
-      animationSelector: false,
-      plugins: [new SwupScriptsPlugin({ head: false, body: true })],
-      ignoreVisit: (url, { el } = {}) => {
-        if (el?.closest('[data-no-swup]')) return true
-        return new URL(url, window.location.href).pathname.startsWith('/transitions/')
-      },
-      hooks: {
-        'visit:start': () => {
-          const trajectory = computeReferenceTrajectory()
-          ballRef.current?.startFlight(trajectory, duration)
-          transitionAudio.playWhoosh(duration / 1000)
-        },
-        'page:view': (visit) => {
-          if (visit.to.document) updateMetadata(visit.to.document)
-          // Astro islands removed by Swup otherwise never receive their unmount event.
-          document.dispatchEvent(new Event('astro:after-swap'))
-        },
-        'visit:abort': () => {
-          ballRef.current?.cancel()
-          resetTransitionStyles()
-        },
-        'visit:fail': () => {
-          ballRef.current?.cancel()
-          resetTransitionStyles()
-        },
-      },
-    })
+    let disposed = false
 
-    swup.hooks.replace('animation:out:await', () => animateOut())
-    swup.hooks.replace('animation:in:await', () => animateIn())
+    const loadRuntime = () => {
+      if (!importRef.current) {
+        importRef.current = import('./GlobalPageTransitionRuntime')
+          .then(({ GlobalPageTransitionRuntime: runtime }) => {
+            if (!disposed) setRuntime(() => runtime)
+          })
+          .catch(() => {
+            // Native navigation remains available when the optional transition runtime fails to load.
+          })
+      }
+      return importRef.current
+    }
+
+    const primeOnIntent = (event: Event) => {
+      if (isInternalNavigableLink(event.target)) void loadRuntime()
+    }
+
+    const cancel = scheduleAfterMainReady(() => { void loadRuntime() })
+    document.addEventListener('pointerover', primeOnIntent, { passive: true })
+    document.addEventListener('focusin', primeOnIntent)
+    document.addEventListener('touchstart', primeOnIntent, { passive: true })
 
     return () => {
-      ballRef.current?.cancel()
-      resetTransitionStyles()
-      void swup.destroy()
+      disposed = true
+      cancel()
+      document.removeEventListener('pointerover', primeOnIntent)
+      document.removeEventListener('focusin', primeOnIntent)
+      document.removeEventListener('touchstart', primeOnIntent)
     }
   }, [])
 
-  return <ReferenceBallScene ref={ballRef} />
+  return Runtime ? <Runtime /> : <div className="transition-demo-reference-ball" aria-hidden="true" />
 }

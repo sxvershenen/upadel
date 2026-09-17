@@ -25,16 +25,23 @@ export const ReferenceBallScene = forwardRef<ReferenceBallSceneHandle>(function 
   const trailRef = useRef<THREE.Points | null>(null)
   const activeFlightRef = useRef<ActiveFlight | null>(null)
   const historyRef = useRef<THREE.Vector3[]>([])
+  const animationFrameRef = useRef<number | null>(null)
+  const renderRef = useRef<(() => void) | null>(null)
+  const tickRef = useRef<(() => void) | null>(null)
 
   useImperativeHandle(ref, () => ({
     startFlight: (trajectory, duration) => {
       activeFlightRef.current = { trajectory, duration, startedAt: performance.now() }
+      if (animationFrameRef.current === null) animationFrameRef.current = window.requestAnimationFrame(() => tickRef.current?.())
     },
     cancel: () => {
       activeFlightRef.current = null
       historyRef.current = []
       if (ballGroupRef.current) ballGroupRef.current.visible = false
       if (trailRef.current) trailRef.current.visible = false
+      if (animationFrameRef.current !== null) window.cancelAnimationFrame(animationFrameRef.current)
+      animationFrameRef.current = null
+      renderRef.current?.()
     },
   }), [])
 
@@ -151,8 +158,10 @@ export const ReferenceBallScene = forwardRef<ReferenceBallSceneHandle>(function 
     scene.add(trailPoints)
     trailRef.current = trailPoints
 
-    let animationFrame = 0
+    const render = () => renderer.render(scene, camera)
+    renderRef.current = render
     const animate = () => {
+      animationFrameRef.current = null
       const now = performance.now()
       const activeFlight = activeFlightRef.current
 
@@ -190,10 +199,11 @@ export const ReferenceBallScene = forwardRef<ReferenceBallSceneHandle>(function 
         }
       }
 
-      renderer.render(scene, camera)
-      animationFrame = window.requestAnimationFrame(animate)
+      render()
+      if (activeFlightRef.current) animationFrameRef.current = window.requestAnimationFrame(animate)
     }
-    animationFrame = window.requestAnimationFrame(animate)
+    tickRef.current = animate
+    if (activeFlightRef.current && animationFrameRef.current === null) animationFrameRef.current = window.requestAnimationFrame(animate)
 
     const handleResize = () => {
       const nextWidth = Math.max(1, container.clientWidth)
@@ -206,7 +216,11 @@ export const ReferenceBallScene = forwardRef<ReferenceBallSceneHandle>(function 
 
     return () => {
       window.removeEventListener('resize', handleResize)
-      window.cancelAnimationFrame(animationFrame)
+      if (animationFrameRef.current !== null) window.cancelAnimationFrame(animationFrameRef.current)
+      animationFrameRef.current = null
+      tickRef.current = null
+      renderRef.current = null
+      activeFlightRef.current = null
       ballGroupRef.current = null
       ballMeshRef.current = null
       fuzzShellRef.current = null
