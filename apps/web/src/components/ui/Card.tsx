@@ -3,6 +3,7 @@ import { motion, type HTMLMotionProps } from "framer-motion";
 import { cn } from "../../utils/cn";
 import { springSoft } from "../../lib/motion";
 import { useImageParallax } from "../../lib/useImageParallax";
+import { revealAttributes, type RevealConfig } from "./revealAttributes";
 
 const cardVariants = { rest: { y: 0, scale: 1 }, hover: { y: -5, scale: 1.012 } };
 const imageVariants = { rest: { scale: 1.04 }, hover: { scale: 1.095 } };
@@ -19,19 +20,8 @@ const meshTextTone: Record<MeshTone, string> = {
 type SurfaceCardProps = HTMLMotionProps<"div"> & {
   tone?: "white" | "glass" | MeshTone;
   interactive?: boolean;
-  reveal?: boolean | { delay?: number; y?: number; fade?: boolean };
+  reveal?: RevealConfig;
 };
-
-function revealAttributes(reveal: SurfaceCardProps["reveal"], style: HTMLMotionProps<"div">["style"]) {
-  if (reveal === false) return { style };
-  const settings = typeof reveal === "object" ? reveal : {};
-  return {
-    "data-gsap-reveal": "true",
-    "data-gsap-reveal-fade": settings.fade === false ? "false" : undefined,
-    "data-gsap-reveal-y": settings.y ?? 24,
-    style: { ...style, "--gsap-reveal-delay": `${settings.delay ?? 0}s`, "--gsap-reveal-y": `${settings.y ?? 24}px` } as HTMLMotionProps<"div">["style"],
-  };
-}
 
 export function SurfaceCard({ tone = "white", interactive = true, reveal = true, className, children, style, ...props }: SurfaceCardProps) {
   const isMesh = tone in meshMap;
@@ -76,7 +66,7 @@ export interface ImageCardProps extends Omit<HTMLMotionProps<"div">, "children">
 }
 
 /** Full-bleed image card with a mandatory colorized overlay. */
-export function ImageCard({ src, alt, overlay, className, children, imgClassName, interactive = true, reveal = true, style, ...props }: ImageCardProps & { reveal?: boolean | { delay?: number; y?: number; fade?: boolean } }) {
+export function ImageCard({ src, alt, overlay, className, children, imgClassName, interactive = true, reveal = true, style, ...props }: ImageCardProps & { reveal?: RevealConfig }) {
   const imageRef = useRef<HTMLDivElement>(null);
   const imageY = useImageParallax(imageRef);
   const revealProps = revealAttributes(reveal, style);

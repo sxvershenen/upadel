@@ -1,5 +1,6 @@
 import React, { createElement, type ElementType, type HTMLAttributes, type ReactNode } from "react";
 import { cn } from "../../utils/cn";
+import { revealAttributes, type RevealConfig } from "./revealAttributes";
 
 export type TypeRole = "micro" | "caption" | "ui" | "body-small" | "body" | "editorial" | "hero-lead" | "title-compact" | "title-dense" | "title-card" | "title-large" | "price" | "section" | "hero" | "eyebrow";
 export type TypeTone = "default" | "muted" | "subtle" | "inverse" | "inverse-strong" | "inverse-muted" | "inverse-subtle" | "accent" | "danger";
@@ -39,10 +40,11 @@ export interface TypographyProps extends HTMLAttributes<HTMLElement> {
   role?: TypeRole;
   tone?: TypeTone;
   children: ReactNode;
+  reveal?: RevealConfig;
 }
 
-export function Typography({ as: Component = "p", role = "body", tone, className, children, ...props }: TypographyProps) {
-  return createElement(Component, { className: cn(roleClasses[role], tone && toneClasses[tone], className), ...props }, children);
+export function Typography({ as: Component = "p", role = "body", tone, className, children, reveal = false, style, ...props }: TypographyProps) {
+  return createElement(Component, { className: cn(roleClasses[role], tone && toneClasses[tone], className), ...props, ...revealAttributes(reveal, style) }, children);
 }
 
 export function CardTitle({ as = "h3", className, ...props }: Omit<TypographyProps, "role">) {

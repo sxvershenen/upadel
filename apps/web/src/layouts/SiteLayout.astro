@@ -235,13 +235,20 @@ const enableGlobalTransitions = !Astro.url.pathname.startsWith('/transitions/') 
     import { startGsapReveals, stopGsapReveals } from '../lib/gsapReveals'
 
     let revealIdle: ReturnType<typeof setTimeout> | 0 = 0
+    let revealIdleCallback = 0
+    const cancelScheduledGsapReveal = () => {
+      if (revealIdle) clearTimeout(revealIdle)
+      revealIdle = 0
+      if (revealIdleCallback && 'cancelIdleCallback' in window) window.cancelIdleCallback(revealIdleCallback)
+      revealIdleCallback = 0
+    }
     const scheduleGsapReveals = () => {
       if (document.readyState !== 'complete' || document.querySelector('#swup')?.getAttribute('data-main-ready') !== 'true') return
-      if (revealIdle) clearTimeout(revealIdle)
-      const start = () => { void startGsapReveals() }
+      cancelScheduledGsapReveal()
+      const start = () => { revealIdleCallback = 0; void startGsapReveals() }
       const eager = document.querySelector('[data-gsap-reveal-eager="true"]')
-      if (eager) window.setTimeout(start, 0)
-      else if ('requestIdleCallback' in window) window.requestIdleCallback(start, { timeout: 1200 })
+      if (eager) revealIdle = setTimeout(start, 0)
+      else if ('requestIdleCallback' in window) revealIdleCallback = window.requestIdleCallback(start, { timeout: 1200 })
       else revealIdle = setTimeout(start, 700)
     }
     const scheduleAfterMainReady = () => {
@@ -251,7 +258,7 @@ const enableGlobalTransitions = !Astro.url.pathname.startsWith('/transitions/') 
       }
       scheduleGsapReveals()
     }
-    document.addEventListener('astro:before-swap', stopGsapReveals)
+    document.addEventListener('astro:before-swap', () => { cancelScheduledGsapReveal(); stopGsapReveals() })
     document.addEventListener('astro:after-swap', scheduleAfterMainReady)
     document.addEventListener('unlim:main-ready', scheduleAfterMainReady)
     window.addEventListener('load', scheduleAfterMainReady)

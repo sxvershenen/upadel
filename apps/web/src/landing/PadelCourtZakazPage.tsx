@@ -794,6 +794,7 @@ function DirectContactButtons() {
   return (
     <div className="mt-8 flex flex-wrap items-center gap-2.5 overflow-clip">
       <ButtonLink
+        reveal={{ delay: 0.12 }}
         href="https://t.me/unlim_padel"
         target="_blank"
         rel="noreferrer"
@@ -807,6 +808,7 @@ function DirectContactButtons() {
       >Telegram</ButtonLink>
 
       <ButtonLink
+        reveal={{ delay: 0.16 }}
         href="https://vk.com/unlim_padel"
         target="_blank"
         rel="noreferrer"
@@ -820,6 +822,7 @@ function DirectContactButtons() {
       >ВКонтакте</ButtonLink>
 
       <Button
+        reveal={{ delay: 0.2 }}
         variant="neutral"
         size="md"
         icon={<PhoneIcon size={15} />}
@@ -984,10 +987,10 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
           <div className="grid gap-12 lg:grid-cols-[.85fr_1.15fr] lg:items-start">
             <Reveal>
               <div>
-              <Typography as="h2" id="distributor-title" role="section" className="text-ink">
+              <Typography reveal={{ delay: 0.02 }} as="h2" id="distributor-title" role="section" className="text-ink">
                 {typograph('Прямые поставки JUBO в Россию без посредников')}
               </Typography>
-              <Typography role="body" tone="subtle" className="mt-5 leading-relaxed">
+              <Typography reveal={{ delay: 0.08 }} role="body" tone="subtle" className="mt-5 leading-relaxed">
                 {typograph(
                   'UNLIM является официальным авторизованным дистрибьютором испанского бренда JUBO Padel на территории РФ. Мы не просто продаём металлоконструкции — мы берем на себя полный цикл инженерной реализации падел-клуба: от адаптации проекта под российские снеговые и ветровые нагрузки до шеф-монтажа и сервисного обслуживания.'
                 )}
@@ -1016,10 +1019,10 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
         {/* 3. ЧТО ВХОДИТ В УСЛУГИ ПОД КЛЮЧ: 5 ЭТАПОВ (БЕЗ EYEBROWS И БЕЗ 01-05) */}
         <section className="container-page py-16 md:py-24" aria-labelledby="turnkey-title">
           <Reveal className="mb-12 max-w-[760px]">
-            <Typography as="h2" id="turnkey-title" role="section" className="text-ink">
+            <Typography reveal={{ delay: 0.02 }} as="h2" id="turnkey-title" role="section" className="text-ink">
               {typograph('Что входит в строительство и монтаж корта под ключ')}
             </Typography>
-            <Typography role="body" tone="subtle" className="mt-4">
+            <Typography reveal={{ delay: 0.08 }} role="body" tone="subtle" className="mt-4">
               {typograph(
                 'Мы фиксируем состав работ и техническую спецификацию в договоре до начала поставки. Вы получаете готовый к игре объект без непредвиденных доплат и скрытых этапов.'
               )}
@@ -1052,16 +1055,16 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
             <div className="grid gap-10 lg:grid-cols-[.9fr_1.1fr] lg:items-center">
               <Reveal>
                 <div>
-                <Typography as="h2" id="price-factors-title" role="section" className="text-ink">
+                <Typography reveal={{ delay: 0.02 }} as="h2" id="price-factors-title" role="section" className="text-ink">
                   {typograph('Из чего складывается реальная стоимость падел-корта')}
                 </Typography>
-                <Typography role="body" tone="subtle" className="mt-5 leading-relaxed">
+                <Typography reveal={{ delay: 0.08 }} role="body" tone="subtle" className="mt-5 leading-relaxed">
                   {typograph(
                     'Универсальная цена «корт от 2 млн рублей» не отражает реальную стоимость запуска площадки. Мы формируем прозрачную смету под конкретный объект: тип площадки (indoor или outdoor), класс ветровой нагрузки, состояние фундамента, комплектацию света и логистику до вашего города.'
                   )}
                 </Typography>
                 <div className="mt-8">
-                  <ButtonLink href="#cta-section" variant="dark" size="md" icon={<ArrowRight size={16} />}>
+                  <ButtonLink reveal={{ delay: 0.16 }} href="#cta-section" variant="dark" size="md" icon={<ArrowRight size={16} />}>
                     {typograph('Рассчитать стоимость')}
                   </ButtonLink>
                 </div>
@@ -1104,11 +1107,11 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
           <div className="container-page relative z-10">
             <Reveal className="grid gap-6 lg:grid-cols-[1fr_.8fr] lg:items-end">
               <div>
-                <Typography as="h2" id="tech-title" role="section" tone="inverse">
+                <Typography reveal={{ delay: 0.02 }} as="h2" id="tech-title" role="section" tone="inverse">
                   {typograph('Технологии и стандарты JUBO')}
                 </Typography>
               </div>
-              <Typography role="body" tone="inverse-subtle" className="lg:justify-self-end">
+              <Typography reveal={{ delay: 0.08 }} role="body" tone="inverse-subtle" className="lg:justify-self-end">
                 {typograph(
                   'Европейский стандарт безопасности и долговечности. Каждая деталь спроектирована с расчётом на многолетнюю клубную эксплуатацию без коррозии, деформаций и люфтов.'
                 )}
@@ -1125,14 +1128,14 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
                         <span className="se-2 flex h-11 w-11 items-center justify-center bg-white/10 text-white">
                           <tech.icon size={22} />
                         </span>
-                        <Badge tone="glass" className="text-white/70">
+                        <Badge reveal={{ delay: 0.04 }} tone="glass" className="text-white/70">
                           {tech.tag}
                         </Badge>
                       </div>
-                      <Typography as="h3" role="title-card" tone="inverse" className="mt-6 font-semibold">
+                      <Typography reveal={{ delay: 0.09 }} as="h3" role="title-card" tone="inverse" className="mt-6 font-semibold">
                         {typograph(tech.title)}
                       </Typography>
-                      <Typography role="body-small" tone="inverse-subtle" className="mt-3 leading-relaxed">
+                      <Typography reveal={{ delay: 0.14 }} role="body-small" tone="inverse-subtle" className="mt-3 leading-relaxed">
                         {typograph(tech.text)}
                       </Typography>
                     </div>
@@ -1146,10 +1149,10 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
         {/* ГАЛЕРЕЯ КЛУБНЫХ РЕАЛИЗАЦИЙ JUBO (БЕЗ EYEBROWS) */}
         <section className="container-page py-16 md:py-24" aria-labelledby="gallery-title">
           <Reveal className="mb-10 max-w-[760px]">
-            <Typography as="h2" id="gallery-title" role="section" className="text-ink">
+            <Typography reveal={{ delay: 0.02 }} as="h2" id="gallery-title" role="section" className="text-ink">
               {typograph('Как корты JUBO выглядят в реальных клубных проектах')}
             </Typography>
-            <Typography role="body" tone="subtle" className="mt-4">
+            <Typography reveal={{ delay: 0.08 }} role="body" tone="subtle" className="mt-4">
               {typograph(
                 'Панорамные светопрозрачные конструкции без лишних стоек визуально расширяют клубное пространство и обеспечивают высокую зрелищность матчей для гостей и зрителей.'
               )}
@@ -1192,11 +1195,11 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
           <div className="container-page">
             <Reveal className="grid gap-6 lg:grid-cols-[1fr_.7fr] lg:items-end">
               <div>
-                <Typography as="h2" id="models-title" role="section" className="max-w-[720px] text-ink">
+                <Typography reveal={{ delay: 0.02 }} as="h2" id="models-title" role="section" className="max-w-[720px] text-ink">
                   {typograph('Выберите модель корта под условия вашей площадки')}
                 </Typography>
               </div>
-              <Typography role="body" tone="subtle" className="max-w-[620px] lg:justify-self-end">
+              <Typography reveal={{ delay: 0.08 }} role="body" tone="subtle" className="max-w-[620px] lg:justify-self-end">
                 {typograph(
                   'Сравните технические параметры, тип остекления, ветровую стойкость и конструктивные особенности каждой модели в единой таблице характеристик.'
                 )}
@@ -1216,10 +1219,10 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
               {/* Левая колонка: швейцарская типографика, лаконичные кнопки, гарантии */}
               <Reveal>
                 <div>
-                <Typography as="h2" id="cta-heading" role="section" className="text-ink">
+                <Typography reveal={{ delay: 0.02 }} as="h2" id="cta-heading" role="section" className="text-ink">
                   {typograph('Рассчитать проект падел-корта под ключ')}
                 </Typography>
-                <Typography role="body" tone="subtle" className="mt-4 leading-relaxed">
+                <Typography reveal={{ delay: 0.08 }} role="body" tone="subtle" className="mt-4 leading-relaxed">
                   {typograph(
                     'Напишите нам напрямую в удобный мессенджер для быстрой консультации или отправьте параметры площадки через форму — инженер UNLIM подготовит подробную заводскую смету JUBO.'
                   )}
@@ -1234,7 +1237,7 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
                     <span className="se-1 flex h-6 w-6 shrink-0 items-center justify-center bg-lime text-lime-ink">
                       <Check size={14} strokeWidth={2.8} />
                     </span>
-                    <Typography role="body-small" tone="subtle">
+                    <Typography reveal={{ delay: 0.1 }} role="body-small" tone="subtle">
                       {typograph('Прямой контракт с роботизированным заводом JUBO в Валенсии')}
                     </Typography>
                   </div>
@@ -1242,7 +1245,7 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
                     <span className="se-1 flex h-6 w-6 shrink-0 items-center justify-center bg-lime text-lime-ink">
                       <Check size={14} strokeWidth={2.8} />
                     </span>
-                    <Typography role="body-small" tone="subtle">
+                    <Typography reveal={{ delay: 0.15 }} role="body-small" tone="subtle">
                       {typograph('Прозрачная смета с фиксированной стоимостью оборудования и шеф-монтажа')}
                     </Typography>
                   </div>
@@ -1250,7 +1253,7 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
                     <span className="se-1 flex h-6 w-6 shrink-0 items-center justify-center bg-lime text-lime-ink">
                       <Check size={14} strokeWidth={2.8} />
                     </span>
-                    <Typography role="body-small" tone="subtle">
+                    <Typography reveal={{ delay: 0.2 }} role="body-small" tone="subtle">
                       {typograph('Сертифицированный монтаж с гарантией производителя по всей территории РФ')}
                     </Typography>
                   </div>

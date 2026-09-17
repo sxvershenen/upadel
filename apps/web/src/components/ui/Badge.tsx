@@ -1,5 +1,6 @@
 import React, { type HTMLAttributes, type ReactNode } from "react";
 import { cn } from "../../utils/cn";
+import { revealAttributes, type RevealConfig } from "./revealAttributes";
 
 export type BadgeTone = "dark" | "light" | "lime" | "lime-soft" | "sunset" | "gold" | "muted" | "glass" | "outline-light" | "outline-dark";
 
@@ -19,6 +20,7 @@ const toneClasses: Record<BadgeTone, string> = {
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   tone?: BadgeTone;
   icon?: ReactNode;
+  reveal?: RevealConfig;
 }
 
 export function Badge({
@@ -26,6 +28,8 @@ export function Badge({
   tone = "light",
   icon,
   className,
+  reveal = false,
+  style,
   ...nativeProps
 }: BadgeProps) {
   return (
@@ -36,6 +40,7 @@ export function Badge({
         className,
       )}
       {...nativeProps}
+      {...revealAttributes(reveal, style)}
     >
       {icon}
       {children}

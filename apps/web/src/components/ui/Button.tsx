@@ -3,6 +3,7 @@ import { motion, type HTMLMotionProps } from "framer-motion";
 import { LoaderCircle } from "lucide-react";
 import { cn } from "../../utils/cn";
 import { springSnappy, tapScale } from "../../lib/motion";
+import { revealAttributes, type RevealConfig } from "./revealAttributes";
 
 export type ButtonVariant = "primary" | "secondary" | "neutral" | "glass" | "dark";
 export type ButtonSize = "sm" | "md" | "lg";
@@ -32,6 +33,7 @@ type SharedButtonProps = {
   fullWidth?: boolean;
   loading?: boolean;
   iconOnly?: boolean;
+  reveal?: RevealConfig;
 };
 
 export interface ButtonProps extends Omit<HTMLMotionProps<"button">, "children">, SharedButtonProps { children?: ReactNode; }
@@ -47,9 +49,9 @@ function ButtonContents({ children, icon, iconPosition = "right", iconDivider = 
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ variant = "primary", size = "md", icon, iconPosition, iconDivider, fullWidth, loading = false, iconOnly, className, children, disabled, type = "button", ...nativeProps }, ref) => {
+  ({ variant = "primary", size = "md", icon, iconPosition, iconDivider, fullWidth, loading = false, iconOnly, reveal = false, className, children, disabled, type = "button", style, ...nativeProps }, ref) => {
     const unavailable = disabled || loading;
-    return <motion.button ref={ref} type={type} disabled={unavailable} aria-busy={loading || undefined} whileHover={unavailable ? undefined : { scale: 1.025 }} whileTap={unavailable ? undefined : tapScale} transition={springSnappy} className={cn(baseClasses, variantClasses[variant], sizeClasses[size], fullWidth && "w-full", className)} {...nativeProps}>
+    return <motion.button ref={ref} type={type} disabled={unavailable} aria-busy={loading || undefined} whileHover={unavailable ? undefined : { scale: 1.025 }} whileTap={unavailable ? undefined : tapScale} transition={springSnappy} className={cn(baseClasses, variantClasses[variant], sizeClasses[size], fullWidth && "w-full", className)} {...nativeProps} {...revealAttributes(reveal, style)}>
       <ButtonContents icon={icon} iconPosition={iconPosition} iconDivider={iconDivider} loading={loading} iconOnly={iconOnly}>{children}</ButtonContents>
     </motion.button>;
   },
@@ -59,7 +61,7 @@ Button.displayName = "Button";
 export interface ButtonLinkProps extends Omit<HTMLMotionProps<"a">, "children">, Omit<SharedButtonProps, "loading"> { children?: ReactNode; }
 
 export const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(
-  ({ variant = "primary", size = "md", icon, iconPosition, iconDivider, fullWidth, iconOnly, className, children, ...nativeProps }, ref) => <motion.a ref={ref} data-button-link="true" whileHover={{ scale: 1.025 }} whileTap={tapScale} transition={springSnappy} className={cn(baseClasses, variantClasses[variant], sizeClasses[size], fullWidth && "w-full", className)} {...nativeProps}>
+  ({ variant = "primary", size = "md", icon, iconPosition, iconDivider, fullWidth, iconOnly, reveal = false, className, children, style, ...nativeProps }, ref) => <motion.a ref={ref} data-button-link="true" whileHover={{ scale: 1.025 }} whileTap={tapScale} transition={springSnappy} className={cn(baseClasses, variantClasses[variant], sizeClasses[size], fullWidth && "w-full", className)} {...nativeProps} {...revealAttributes(reveal, style)}>
     <ButtonContents icon={icon} iconPosition={iconPosition} iconDivider={iconDivider} iconOnly={iconOnly}>{children}</ButtonContents>
   </motion.a>,
 );

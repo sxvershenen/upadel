@@ -78,6 +78,7 @@ export function GlobalPageTransitionRuntime() {
       },
       hooks: {
         'visit:start': () => {
+          document.dispatchEvent(new Event('astro:before-swap'))
           const trajectory = computeReferenceTrajectory()
           ballRef.current?.startFlight(trajectory, duration)
           transitionAudio.playWhoosh(duration / 1000)

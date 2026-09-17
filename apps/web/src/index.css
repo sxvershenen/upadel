@@ -84,15 +84,15 @@ html[data-reveal-ready] [data-reveal-fade="false"]:not([data-reveal-visible="tru
 }
 html[data-gsap-reveal-ready] [data-gsap-reveal-owner="true"]:not([data-gsap-reveal-visible="true"]) {
   opacity: 0;
-  transform: translate3d(0, var(--gsap-reveal-y, 24px), 0);
+  translate: 0 var(--gsap-reveal-offset, var(--gsap-reveal-y, 24px));
 }
 html[data-gsap-reveal-ready] [data-gsap-reveal-owner="true"][data-gsap-reveal-fade="false"]:not([data-gsap-reveal-visible="true"]) {
   opacity: 1;
-  transform: translate3d(0, var(--gsap-reveal-y, 24px), 0);
+  translate: 0 var(--gsap-reveal-offset, var(--gsap-reveal-y, 24px));
 }
 html[data-unlim-enhancements] [data-gsap-reveal-eager="true"]:not([data-gsap-reveal-visible="true"]) {
   opacity: 0;
-  transform: translate3d(0, var(--gsap-reveal-y, 24px), 0);
+  translate: 0 var(--gsap-reveal-offset, var(--gsap-reveal-y, 24px));
 }
 [data-reveal-text] [data-reveal-word] {
   display: inline-block;
