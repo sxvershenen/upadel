@@ -91,6 +91,10 @@ html[data-gsap-reveal-ready] [data-gsap-reveal-owner="true"]:not([data-gsap-reve
 html[data-gsap-reveal-ready] [data-gsap-reveal-owner="true"][data-gsap-reveal-fade="false"]:not([data-gsap-reveal-visible="true"]) {
   opacity: 1;
 }
+html[data-gsap-reveal-ready] [data-gsap-reveal-eager="true"]:not([data-gsap-reveal-owner="true"]):not([data-gsap-reveal-visible="true"]) {
+  opacity: 1;
+  translate: none;
+}
 html[data-unlim-enhancements] [data-gsap-reveal-eager="true"]:not([data-gsap-reveal-visible="true"]) {
   opacity: 0;
   translate: 0 var(--gsap-reveal-offset, var(--gsap-reveal-y, 24px));

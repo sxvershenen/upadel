@@ -28,7 +28,7 @@ export function Badge({
   tone = "light",
   icon,
   className,
-  reveal = false,
+  reveal = true,
   style,
   ...nativeProps
 }: BadgeProps) {
