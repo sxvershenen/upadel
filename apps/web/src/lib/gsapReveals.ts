@@ -9,7 +9,10 @@ let activeTweens: Array<{ kill: () => void }> = []
 
 export async function startGsapReveals() {
   if (typeof window === 'undefined' || typeof document === 'undefined') return
-  const targets = Array.from(document.querySelectorAll<RevealTarget>('[data-gsap-reveal]'))
+  // Animate only the deepest target in a nested tree. A section-level Reveal
+  // and a component-level SurfaceCard must never both own the same entrance.
+  const allTargets = Array.from(document.querySelectorAll<RevealTarget>('[data-gsap-reveal]'))
+  const targets = allTargets.filter((target) => !target.querySelector('[data-gsap-reveal]'))
   if (!targets.length) return
 
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -22,6 +25,9 @@ export async function startGsapReveals() {
   observer?.disconnect()
   activeTweens.forEach((tween) => tween.kill())
   activeTweens = []
+  allTargets.forEach((target) => {
+    target.dataset.gsapRevealOwner = targets.includes(target) ? 'true' : 'false'
+  })
   document.documentElement.setAttribute('data-gsap-reveal-ready', 'true')
 
   const show = (target: RevealTarget) => {
@@ -53,5 +59,7 @@ export function stopGsapReveals() {
   observer = null
   activeTweens.forEach((tween) => tween.kill())
   activeTweens = []
+  document.querySelectorAll<RevealTarget>('[data-gsap-reveal-owner]').forEach((target) => delete target.dataset.gsapRevealOwner)
   document.documentElement.removeAttribute('data-gsap-reveal-ready')
+  document.querySelector('#swup')?.setAttribute('data-main-ready', 'false')
 }

@@ -105,22 +105,22 @@ export const distributorAdvantages = [
   {
     index: '01',
     title: 'Прямой заводской контракт',
-    text: 'Прямые поставки с роботизированного завода JUBO в Валенсии (Испания). Фиксированные заводские цены, официальный контракт и отсутствие наценок посредников.',
+    text: 'Прямые поставки с завода JUBO в Валенсии без посредников и лишних наценок.',
   },
   {
     index: '02',
     title: 'Климатическая адаптация для РФ',
-    text: 'Инженерный расчёт ветровых и снеговых нагрузок под климатические зоны России. Высокопрочная сталь с защитным антикоррозийным покрытием Magnelis® C4/C5.',
+    text: 'Считаем снеговые и ветровые нагрузки под климатическую зону и подбираем защиту Magnelis® C4/C5.',
   },
   {
     index: '03',
     title: 'Сертифицированный шеф-монтаж',
-    text: 'Штатные сертифицированные монтажные бригады UNLIM. Специализированный вакуумный монтаж 12 мм остекления, лазерная юстировка и бесшовное примыкание к сетке.',
+    text: 'Сертифицированная бригада: вакуумная установка стекла, лазерная юстировка и точная стыковка сетки.',
   },
   {
     index: '04',
     title: 'Склад комплектующих и гарантия',
-    text: 'Официальная гарантия производителя и собственный оперативный склад запасных стеклопакетов, крепежа AISI 316 и расходников в РФ для непрерывной работы кортов.',
+    text: 'Запчасти и расходники в РФ, гарантия производителя и сервис без простоев.',
   },
 ] as const
 
@@ -129,7 +129,7 @@ export const turnkeySteps = [
     icon: Ruler,
     number: '01',
     title: 'Аудит локации и основания',
-    text: 'Выезд инженера или детальный аудит площадки: геометрия зала, качество бетонного основания, снеговые и ветровые нагрузки, высоты потолков и коммуникации.',
+    text: 'Проверяем геометрию зала, основание, нагрузки, высоты и коммуникации.',
     image: '/turnkey/site-audit.webp',
     overlay: 'overlay-blue',
   },
@@ -137,7 +137,7 @@ export const turnkeySteps = [
     icon: Settings2,
     number: '02',
     title: 'Подбор модели и кастомизация',
-    text: 'Выбор конструкции под задачи клуба, подбор цвета металлокаркаса по шкале RAL, освещения (4×200W или 8×200W), спортивного газона FIP и брендинга.',
+    text: 'Подбираем модель, цвет RAL, свет, покрытие FIP и брендинг.',
     image: '/turnkey/logistics.webp',
     overlay: 'overlay-violet',
   },
@@ -145,7 +145,7 @@ export const turnkeySteps = [
     icon: Truck,
     number: '03',
     title: 'Поставка и таможенная логистика',
-    text: 'Прямая транспортировка еврофурами с фабрики в Испании, полное таможенное оформление, страхование 100% груза и ответственное хранение до монтажа.',
+    text: 'Организуем доставку из Испании, таможню, страховку и хранение.',
     image: '/turnkey/handover.webp',
     overlay: 'overlay-emerald',
   },
@@ -153,7 +153,7 @@ export const turnkeySteps = [
     icon: Wrench,
     number: '04',
     title: 'Профессиональный монтаж',
-    text: 'Сборка силового металлокаркаса, вакуумная посадка закалённого стекла 12 мм, бесшовная стыковка сетки заподлицо, укладка газона и засыпка кварцевым песком.',
+    text: 'Собираем каркас, ставим стекло 12 мм, сетку, газон и песок.',
     image: '/turnkey/assembly.webp',
     overlay: 'overlay-lime',
   },
@@ -161,7 +161,7 @@ export const turnkeySteps = [
     icon: ClipboardCheck,
     number: '05',
     title: 'Сдача в эксплуатацию и сервис',
-    text: 'Инструментальная проверка плоскостности, замер освещенности по стандарту FIP, передача исполнительной документации, гарантийный талон и регламентное ТО.',
+    text: 'Проверяем плоскостность и свет, передаём документы, гарантию и регламент ТО.',
     image: '/turnkey/glass-installation.webp',
     overlay: 'overlay-dark',
   },
@@ -923,7 +923,7 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,5,8,.52)_0%,rgba(3,5,8,.82)_65%,rgba(3,5,8,.98)_100%)]" />
 
         <div className="container-page relative z-10 flex flex-col justify-between flex-1">
-          <div className="pt-2 sm:pt-4">
+          <Reveal className="pt-2 sm:pt-4">
             <Badge tone="glass" className="mb-4">
               <span className="mr-1.5 h-2 w-2 rounded-full bg-lime animate-pulse" />
               {typograph('Официальный дистрибьютор JUBO Padel в РФ')}
@@ -960,10 +960,10 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
                 {typograph('Выбрать модель корта')}
               </ButtonLink>
             </div>
-          </div>
+          </Reveal>
 
           {/* 4 пункта в хиро: лаконично, без 01-04 и без eyebrows */}
-          <div className="mt-8 grid grid-cols-2 gap-4 border-t border-white/15 pt-6 md:grid-cols-4 md:gap-6">
+          <Reveal delay={0.12} className="mt-8 grid grid-cols-2 gap-4 border-t border-white/15 pt-6 md:grid-cols-4 md:gap-6">
             {heroMetrics.map((metric) => (
               <div key={metric.title} className="space-y-0.5">
                 <Typography role="body-small" className="font-semibold text-white">
@@ -974,7 +974,7 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
                 </Typography>
               </div>
             ))}
-          </div>
+          </Reveal>
         </div>
       </header>
 
@@ -982,7 +982,8 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
         {/* 2. СТАТУС ДИСТРИБЬЮТОРА И ГАРАНТИИ (БЕЗ EYEBROWS И БЕЗ 01-04) */}
         <section className="container-page py-16 md:py-24 border-b border-ink/10" aria-labelledby="distributor-title">
           <div className="grid gap-12 lg:grid-cols-[.85fr_1.15fr] lg:items-start">
-            <div>
+            <Reveal>
+              <div>
               <Typography as="h2" id="distributor-title" role="section" className="text-ink">
                 {typograph('Прямые поставки JUBO в Россию без посредников')}
               </Typography>
@@ -992,13 +993,8 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
                 )}
               </Typography>
 
-              <div className="mt-7 flex flex-wrap gap-2">
-                <Badge tone="muted">FIP Compliant (Международная федерация)</Badge>
-                <Badge tone="muted">Eurocodes 1 & 3</Badge>
-                <Badge tone="muted">UNE 147201:2024</Badge>
-                <Badge tone="muted">ISO 12944 (C4/C5)</Badge>
               </div>
-            </div>
+            </Reveal>
 
             <div className="grid gap-4 sm:grid-cols-2">
               {distributorAdvantages.map((adv, idx) => (
@@ -1019,7 +1015,7 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
 
         {/* 3. ЧТО ВХОДИТ В УСЛУГИ ПОД КЛЮЧ: 5 ЭТАПОВ (БЕЗ EYEBROWS И БЕЗ 01-05) */}
         <section className="container-page py-16 md:py-24" aria-labelledby="turnkey-title">
-          <div className="mb-12 max-w-[760px]">
+          <Reveal className="mb-12 max-w-[760px]">
             <Typography as="h2" id="turnkey-title" role="section" className="text-ink">
               {typograph('Что входит в строительство и монтаж корта под ключ')}
             </Typography>
@@ -1028,7 +1024,7 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
                 'Мы фиксируем состав работ и техническую спецификацию в договоре до начала поставки. Вы получаете готовый к игре объект без непредвиденных доплат и скрытых этапов.'
               )}
             </Typography>
-          </div>
+          </Reveal>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
             {turnkeySteps.map((step, idx) => (
@@ -1054,7 +1050,8 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
         <section className="container-page pb-16 md:pb-24" aria-labelledby="price-factors-title">
           <SurfaceCard tone="white" interactive={false} className="p-6 md:p-12 lg:p-14">
             <div className="grid gap-10 lg:grid-cols-[.9fr_1.1fr] lg:items-center">
-              <div>
+              <Reveal>
+                <div>
                 <Typography as="h2" id="price-factors-title" role="section" className="text-ink">
                   {typograph('Из чего складывается реальная стоимость падел-корта')}
                 </Typography>
@@ -1068,9 +1065,11 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
                     {typograph('Рассчитать стоимость')}
                   </ButtonLink>
                 </div>
-              </div>
+                </div>
+              </Reveal>
 
-              <ul className="grid gap-2.5 sm:grid-cols-2" aria-label="Факторы стоимости падел-корта">
+              <Reveal>
+                <ul className="grid gap-2.5 sm:grid-cols-2" aria-label="Факторы стоимости падел-корта">
                 {priceFactors.map((factor) => (
                   <li
                     key={factor.label}
@@ -1084,7 +1083,8 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
                     </Typography>
                   </li>
                 ))}
-              </ul>
+                </ul>
+              </Reveal>
             </div>
           </SurfaceCard>
         </section>
@@ -1102,7 +1102,7 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
           <div className="absolute inset-0 bg-ink/80" />
 
           <div className="container-page relative z-10">
-            <div className="grid gap-6 lg:grid-cols-[1fr_.8fr] lg:items-end">
+            <Reveal className="grid gap-6 lg:grid-cols-[1fr_.8fr] lg:items-end">
               <div>
                 <Typography as="h2" id="tech-title" role="section" tone="inverse">
                   {typograph('Технологии и стандарты JUBO')}
@@ -1113,7 +1113,7 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
                   'Европейский стандарт безопасности и долговечности. Каждая деталь спроектирована с расчётом на многолетнюю клубную эксплуатацию без коррозии, деформаций и люфтов.'
                 )}
               </Typography>
-            </div>
+            </Reveal>
 
             <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {technologies.map((tech, idx) => (
@@ -1145,7 +1145,7 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
 
         {/* ГАЛЕРЕЯ КЛУБНЫХ РЕАЛИЗАЦИЙ JUBO (БЕЗ EYEBROWS) */}
         <section className="container-page py-16 md:py-24" aria-labelledby="gallery-title">
-          <div className="mb-10 max-w-[760px]">
+          <Reveal className="mb-10 max-w-[760px]">
             <Typography as="h2" id="gallery-title" role="section" className="text-ink">
               {typograph('Как корты JUBO выглядят в реальных клубных проектах')}
             </Typography>
@@ -1154,7 +1154,7 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
                 'Панорамные светопрозрачные конструкции без лишних стоек визуально расширяют клубное пространство и обеспечивают высокую зрелищность матчей для гостей и зрителей.'
               )}
             </Typography>
-          </div>
+          </Reveal>
 
           <div className="grid gap-6 lg:grid-cols-2">
             {galleryImages.map((image, idx) => (
@@ -1190,7 +1190,7 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
         {/* 6. МОДЕЛЬНЫЙ РЯД КОРТОВ JUBO (БЕЗ EYEBROWS) */}
         <section id="models-section" className="bg-page py-16 md:py-24 border-t border-ink/10" aria-labelledby="models-title">
           <div className="container-page">
-            <div className="grid gap-6 lg:grid-cols-[1fr_.7fr] lg:items-end">
+            <Reveal className="grid gap-6 lg:grid-cols-[1fr_.7fr] lg:items-end">
               <div>
                 <Typography as="h2" id="models-title" role="section" className="max-w-[720px] text-ink">
                   {typograph('Выберите модель корта под условия вашей площадки')}
@@ -1201,7 +1201,7 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
                   'Сравните технические параметры, тип остекления, ветровую стойкость и конструктивные особенности каждой модели в единой таблице характеристик.'
                 )}
               </Typography>
-            </div>
+            </Reveal>
 
             <div className="mt-10">
               <CourtModelTabs onSelectModel={(modelId) => setActiveModelForForm(modelId)} />
@@ -1214,7 +1214,8 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
           <div className="container-page">
             <div className="grid gap-12 lg:grid-cols-[.9fr_1.1fr] lg:items-start">
               {/* Левая колонка: швейцарская типографика, лаконичные кнопки, гарантии */}
-              <div>
+              <Reveal>
+                <div>
                 <Typography as="h2" id="cta-heading" role="section" className="text-ink">
                   {typograph('Рассчитать проект падел-корта под ключ')}
                 </Typography>
@@ -1254,7 +1255,8 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
                     </Typography>
                   </div>
                 </div>
-              </div>
+                </div>
+              </Reveal>
 
               {/* Правая колонка: форма расчёта */}
               <div>

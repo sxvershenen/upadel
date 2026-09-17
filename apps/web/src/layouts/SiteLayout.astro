@@ -66,7 +66,7 @@ const enableGlobalTransitions = !Astro.url.pathname.startsWith('/transitions/') 
       const headerTopThreshold = 32
       const headerDirectionThreshold = 14
       const applyHeaderState = () => {
-        document.querySelectorAll('[data-header-scroll]:not([data-header-hydrated="true"])').forEach((header) => {
+        document.querySelectorAll('[data-header-scroll][data-header-hydrated="true"]').forEach((header) => {
           header.setAttribute('data-header-compact', headerCompact ? 'true' : 'false')
         })
       }
@@ -131,11 +131,28 @@ const enableGlobalTransitions = !Astro.url.pathname.startsWith('/transitions/') 
         })
       }
       const scheduleScrollReveals = () => {
+        if (document.readyState !== 'complete' || document.querySelector('#swup')?.getAttribute('data-main-ready') !== 'true') return
         if (revealTimer) window.clearTimeout(revealTimer)
         revealTimer = window.setTimeout(setupScrollReveals, 180)
       }
-      scheduleScrollReveals()
-      document.addEventListener('astro:after-swap', scheduleScrollReveals)
+      const scheduleAfterMainReady = () => {
+        if (document.readyState !== 'complete') {
+          window.addEventListener('load', scheduleScrollReveals, { once: true })
+          return
+        }
+        scheduleScrollReveals()
+      }
+      const resetScrollReveals = () => {
+        if (revealTimer) window.clearTimeout(revealTimer)
+        revealTimer = 0
+        revealObserver?.disconnect()
+        revealObserver = null
+        document.documentElement.removeAttribute('data-reveal-ready')
+      }
+      scheduleAfterMainReady()
+      document.addEventListener('unlim:main-ready', scheduleAfterMainReady)
+      document.addEventListener('astro:after-swap', scheduleAfterMainReady)
+      document.addEventListener('astro:before-swap', resetScrollReveals)
 
       const prefetches = new Set()
       const getIntentTarget = (target) => {
@@ -218,13 +235,23 @@ const enableGlobalTransitions = !Astro.url.pathname.startsWith('/transitions/') 
 
     let revealIdle: ReturnType<typeof setTimeout> | 0 = 0
     const scheduleGsapReveals = () => {
+      if (document.readyState !== 'complete' || document.querySelector('#swup')?.getAttribute('data-main-ready') !== 'true') return
       if (revealIdle) clearTimeout(revealIdle)
       const start = () => { void startGsapReveals() }
       if ('requestIdleCallback' in window) window.requestIdleCallback(start, { timeout: 1200 })
       else revealIdle = setTimeout(start, 700)
     }
+    const scheduleAfterMainReady = () => {
+      if (document.readyState !== 'complete') {
+        window.addEventListener('load', scheduleGsapReveals, { once: true })
+        return
+      }
+      scheduleGsapReveals()
+    }
     document.addEventListener('astro:before-swap', stopGsapReveals)
-    document.addEventListener('astro:after-swap', scheduleGsapReveals)
-    scheduleGsapReveals()
+    document.addEventListener('astro:after-swap', scheduleAfterMainReady)
+    document.addEventListener('unlim:main-ready', scheduleAfterMainReady)
+    window.addEventListener('load', scheduleAfterMainReady)
+    scheduleAfterMainReady()
   </script>
 </html>
