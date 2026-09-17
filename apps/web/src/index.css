@@ -82,13 +82,14 @@ html[data-reveal-ready] [data-reveal-fade="false"]:not([data-reveal-visible="tru
   opacity: 1;
   transform: translate3d(0, var(--reveal-y, 26px), 0);
 }
-html[data-gsap-reveal-ready] [data-gsap-reveal-owner="true"]:not([data-gsap-reveal-visible="true"]) {
-  opacity: 0;
+html[data-gsap-reveal-ready] [data-gsap-reveal-owner="true"] {
   translate: 0 var(--gsap-reveal-offset, var(--gsap-reveal-y, 24px));
+}
+html[data-gsap-reveal-ready] [data-gsap-reveal-owner="true"]:not([data-gsap-reveal-visible="true"]):not([data-gsap-reveal-fade="false"]) {
+  opacity: 0;
 }
 html[data-gsap-reveal-ready] [data-gsap-reveal-owner="true"][data-gsap-reveal-fade="false"]:not([data-gsap-reveal-visible="true"]) {
   opacity: 1;
-  translate: 0 var(--gsap-reveal-offset, var(--gsap-reveal-y, 24px));
 }
 html[data-unlim-enhancements] [data-gsap-reveal-eager="true"]:not([data-gsap-reveal-visible="true"]) {
   opacity: 0;
