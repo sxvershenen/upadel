@@ -26,12 +26,12 @@ Migration stage: the CMS-backed homepage prerenders visible HTML plus one `clien
 ## Content model
 
 - Globals: site identity, navigation, contacts, footer, integrations, booking provider and homepage composition.
-- Pages: code-defined page templates with parent/child relationships, CMS-managed content/SEO and per-page hero image/grayscale settings; `/gift` is a typed certificate landing page, not a free-form page builder.
+- Pages: code-defined page templates with parent/child relationships, CMS-managed content/SEO and per-page hero image/grayscale settings; `/gift` and `/padel-court-zakaz` are typed landings, not free-form page builders.
 - Collections: articles/categories, coaches, courts, training types, prices/memberships, tournaments/leagues, reviews, FAQ, partners and leads.
 - Media: raster uploads are normalized to WebP quality 80 before storage; desktop-navigation rows and their optional typed submenu children may reference SVG icons as Media relations rendered through safe image URLs. Alt/focal point/rights, schema-aware reverse usage links and referenced-file deletion safeguards remain in Payload.
 - Shared SEO group: title, description, canonical, robots, social image and optional structured-data inputs.
 
-Editing model: typed fields for core pages and repeatable entities. Homepage sections can be hidden or reordered, but their markup and animations remain code-defined. New landing layouts are implemented in code from the shared design system/UI kit, then exposed as typed CMS fields.
+Editing model: typed fields for core pages and repeatable entities. Homepage sections can be hidden or reordered, but their markup and animations remain code-defined. New landing layouts are implemented in code from the shared design system/UI kit, then exposed as typed CMS fields. `/padel-court-zakaz` uses the typed `padel-court-zakaz-page` global for copy, media, cards, CTA/form labels and SEO while preserving its stable code-defined route.
 
 ## Single source of truth
 

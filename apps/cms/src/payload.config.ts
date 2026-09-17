@@ -32,7 +32,7 @@ import { SiteSettings } from './globals/SiteSettings'
 import { BlogPage } from './globals/BlogPage'
 import { CoachesPage } from './globals/CoachesPage'
 import { TournamentsPage } from './globals/TournamentsPage'
-import { AboutPage, ContactsPage, CourtsPage, GalleryPage, GiftPage, OfertaPage, PolicyPage, PricesPage, TrainingPage } from './globals/ThematicPages'
+import { AboutPage, ContactsPage, CourtsPage, GalleryPage, GiftPage, OfertaPage, PadelCourtZakazPage, PolicyPage, PricesPage, TrainingPage } from './globals/ThematicPages'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -92,7 +92,7 @@ export default buildConfig({
   editor: lexicalEditor(),
   globals: [
     SiteSettings,
-    ...[HomePage, BlogPage, CoachesPage, TournamentsPage, PricesPage, TrainingPage, GiftPage, CourtsPage, GalleryPage, AboutPage, ContactsPage, PolicyPage, OfertaPage]
+    ...[HomePage, BlogPage, CoachesPage, TournamentsPage, PricesPage, TrainingPage, GiftPage, CourtsPage, PadelCourtZakazPage, GalleryPage, AboutPage, ContactsPage, PolicyPage, OfertaPage]
       .map((global) => ({ ...global, admin: { ...global.admin, group: 'Контент' } })),
   ],
   secret: process.env.PAYLOAD_SECRET ?? '',

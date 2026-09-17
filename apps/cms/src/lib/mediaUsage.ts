@@ -136,6 +136,23 @@ function scanSiteSettings(target: Map<string, MediaUsage>, doc: Record<string, u
   }
 }
 
+function scanPadelCourtZakazPage(target: Map<string, MediaUsage>, doc: Record<string, unknown>, state: MediaUsage['state']) {
+  for (const [path, location] of [
+    ['seo.socialImage', 'Падел-корты JUBO → SEO → изображение для соцсетей'],
+    ['heroImage', 'Падел-корты JUBO → Шапка страницы → poster'],
+    ['heroVideo', 'Падел-корты JUBO → Шапка страницы → видео'],
+    ['technology.background', 'Падел-корты JUBO → Технологии → фон'],
+    ['turnkey.steps.image', 'Падел-корты JUBO → Строительство под ключ → изображение этапа'],
+    ['gallery.items.media', 'Падел-корты JUBO → Галерея → изображение'],
+    ['models.items.image', 'Падел-корты JUBO → Модельный ряд → изображение модели'],
+  ] as const) {
+    for (const value of valuesAtPath(doc, path)) {
+      const mediaID = relationID(value)
+      if (mediaID) addUsage(target, { mediaID, href: '/admin/globals/padel-court-zakaz-page', location }, state)
+    }
+  }
+}
+
 function scanCatalogPage(target: Map<string, MediaUsage>, doc: Record<string, unknown>, state: MediaUsage['state'], label: string, slug: string) {
   for (const [path, fieldLabel] of [['seo.socialImage', 'SEO → изображение для соцсетей'], ['heroImage', 'Шапка страницы → фоновое изображение']] as const) {
     for (const value of valuesAtPath(doc, path)) {
@@ -179,15 +196,19 @@ export async function getMediaUsage(payload: Payload, mediaIDs: Array<number | s
     () => payload.findGlobal({ slug: 'homepage', depth: 0, draft: true, overrideAccess: true, req }),
     () => payload.findGlobal({ slug: 'site-settings', depth: 0, draft: false, overrideAccess: true, req }),
     () => payload.findGlobal({ slug: 'site-settings', depth: 0, draft: true, overrideAccess: true, req }),
+    () => payload.findGlobal({ slug: 'padel-court-zakaz-page', depth: 0, draft: false, overrideAccess: true, req } as never),
+    () => payload.findGlobal({ slug: 'padel-court-zakaz-page', depth: 0, draft: true, overrideAccess: true, req } as never),
   ] as const
   const globalResults = req
     ? [await globalTasks[0](), await globalTasks[1](), await globalTasks[2](), await globalTasks[3]()]
     : await Promise.all(globalTasks.map((task) => task()))
-  const [publishedHome, draftHome, publishedSite, draftSite] = globalResults
+  const [publishedHome, draftHome, publishedSite, draftSite, publishedPadel, draftPadel] = globalResults
   if (publishedHome._status === 'published') scanHomepage(usage, publishedHome as unknown as Record<string, unknown>, 'live')
   scanHomepage(usage, draftHome as unknown as Record<string, unknown>, 'draft-only')
   if (publishedSite._status === 'published') scanSiteSettings(usage, publishedSite as unknown as Record<string, unknown>, 'live')
   scanSiteSettings(usage, draftSite as unknown as Record<string, unknown>, 'draft-only')
+  if (publishedPadel._status === 'published') scanPadelCourtZakazPage(usage, publishedPadel as unknown as Record<string, unknown>, 'live')
+  scanPadelCourtZakazPage(usage, draftPadel as unknown as Record<string, unknown>, 'draft-only')
 
   for (const [slug, label] of [
     ['blog-page', 'Блог'], ['coaches-page', 'Страница тренеров'], ['tournaments-page', 'Страница турниров'],

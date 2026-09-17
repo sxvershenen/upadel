@@ -1,4 +1,4 @@
-import type { SiteDTO } from '@unlim/content-contract'
+import type { PadelCourtZakazPageDTO, PadelCourtZakazPageIcon } from '@unlim/content-contract'
 import {
   ArrowRight,
   Check,
@@ -58,340 +58,25 @@ export function typograph(text: string): string {
   return parts.join('').replace(/(?<=\S)-(?=\S)/g, '‑')
 }
 
-export const heroImage = {
-  src: 'https://jubopadel.com/wp-content/uploads/2025/01/JGC06036-2048x1365.jpg',
-  alt: 'Панорамные падел-корты JUBO в спортивном клубе мирового уровня',
-  width: 2048,
-  height: 1365,
+const iconMap: Record<PadelCourtZakazPageIcon, typeof Ruler> = {
+  Ruler,
+  Settings2,
+  Truck,
+  Wrench,
+  ClipboardCheck,
+  Layers3,
+  ShieldCheck,
+  Factory,
+  Sparkles,
+  Wind,
+  CheckCircle2,
 }
 
-export const heroMetrics = [
-  {
-    title: 'Прямой импорт из Испании',
-    caption: 'Завод JUBO в Валенсии',
-  },
-  {
-    title: '6 моделей в линейке',
-    caption: 'От клубов до Premier Padel',
-  },
-  {
-    title: 'Монтаж под ключ по РФ',
-    caption: 'Сертифицированная бригада',
-  },
-  {
-    title: 'Склад запчастей и сервис',
-    caption: 'Стекла, сетки и ТО в наличии',
-  },
-] as const
+type PadelModel = PadelCourtZakazPageDTO['models']['items'][number]
+type ModelId = PadelModel['id']
 
-export const galleryImages = [
-  {
-    src: 'https://jubopadel.com/wp-content/uploads/2026/05/showroom-aereal-1536x848.jpg',
-    alt: 'Комплекс падел-кортов JUBO — открытые и крытые площадки, вид сверху',
-    width: 1536,
-    height: 848,
-    caption: 'Комплексный объект JUBO: открытые и крытые корты',
-  },
-  {
-    src: 'https://jubopadel.com/wp-content/uploads/2023/09/header-18-1024x569.png',
-    alt: 'Панорамные корты JUBO в интерьере премиального крытого клуба',
-    width: 1024,
-    height: 569,
-    caption: 'Крытый клуб с непрерывной линией остекления',
-  },
-] as const
-
-export const distributorAdvantages = [
-  {
-    index: '01',
-    title: 'Прямой заводской контракт',
-    text: 'Прямые поставки с завода JUBO в Валенсии без посредников и лишних наценок.',
-  },
-  {
-    index: '02',
-    title: 'Климатическая адаптация для РФ',
-    text: 'Считаем снеговые и ветровые нагрузки под климатическую зону и подбираем защиту Magnelis® C4/C5.',
-  },
-  {
-    index: '03',
-    title: 'Сертифицированный шеф-монтаж',
-    text: 'Сертифицированная бригада: вакуумная установка стекла, лазерная юстировка и точная стыковка сетки.',
-  },
-  {
-    index: '04',
-    title: 'Склад комплектующих и гарантия',
-    text: 'Запчасти и расходники в РФ, гарантия производителя и сервис без простоев.',
-  },
-] as const
-
-export const turnkeySteps = [
-  {
-    icon: Ruler,
-    number: '01',
-    title: 'Аудит локации и основания',
-    text: 'Проверяем геометрию зала, основание, нагрузки, высоты и коммуникации.',
-    image: '/turnkey/site-audit.webp',
-    overlay: 'overlay-blue',
-  },
-  {
-    icon: Settings2,
-    number: '02',
-    title: 'Подбор модели и кастомизация',
-    text: 'Подбираем модель, цвет RAL, свет, покрытие FIP и брендинг.',
-    image: '/turnkey/logistics.webp',
-    overlay: 'overlay-violet',
-  },
-  {
-    icon: Truck,
-    number: '03',
-    title: 'Поставка и таможенная логистика',
-    text: 'Организуем доставку из Испании, таможню, страховку и хранение.',
-    image: '/turnkey/handover.webp',
-    overlay: 'overlay-emerald',
-  },
-  {
-    icon: Wrench,
-    number: '04',
-    title: 'Профессиональный монтаж',
-    text: 'Собираем каркас, ставим стекло 12 мм, сетку, газон и песок.',
-    image: '/turnkey/assembly.webp',
-    overlay: 'overlay-lime',
-  },
-  {
-    icon: ClipboardCheck,
-    number: '05',
-    title: 'Сдача в эксплуатацию и сервис',
-    text: 'Проверяем плоскостность и свет, передаём документы, гарантию и регламент ТО.',
-    image: '/turnkey/glass-installation.webp',
-    overlay: 'overlay-dark',
-  },
-] as const
-
-export const priceFactors = [
-  { label: 'Модель и класс корта', detail: 'от клубного Vision Pro до ураганного Infinity Xtrem' },
-  { label: 'Тип размещения', detail: 'indoor (в помещении) или outdoor (открытый грунт с C4/C5)' },
-  { label: 'Готовность основания', detail: 'ровная плита, обустройство подушек или анкерование' },
-  { label: 'Комплектация остекления', detail: '12 мм монолитное закалённое стекло с полированной еврокромкой' },
-  { label: 'Спортивное покрытие', detail: 'профессиональный монофиламентный или текстурированный газон FIP' },
-  { label: 'Осветительная система', detail: 'мачты 6–8 м, 4 или 8 LED прожекторов 200–300W без бликов' },
-  { label: 'Персонализация', detail: 'индивидуальный цвет RAL, амбилайт, защитные протекторы стоек' },
-  { label: 'Логистика до объекта', detail: 'расстояние, схема разгрузки и сроки монтажного окна' },
-] as const
-
-export const technologies = [
-  {
-    icon: Layers3,
-    title: 'Закалённое стекло 12 мм',
-    tag: 'FIP Standard',
-    text: '18 стеклопакетов формата 2995×1995 мм (108 м²). Шлифованные плоские еврокромки, зенкованные отверстия с полиамидными втулками против УФ-деградации и неопреновые демпферы.',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Антикоррозия Magnelis® C4/C5',
-    tag: 'ISO 12944',
-    text: 'Инновационный стальной сплав с цинково-алюминиево-магниевым слоем. Стойкость к коррозии в 10 раз выше обычной оцинковки, выдерживает агрессивный климат и дорожные реагенты.',
-  },
-  {
-    icon: Factory,
-    title: 'Роботизированное производство',
-    tag: 'Laser Cut',
-    text: 'Прецизионная лазерная резка деталей, автоматизированная сварка и сборка на нержавеющих метизах класса А4 (AISI 316) со скруглёнными травмобезопасными головками.',
-  },
-  {
-    icon: Sparkles,
-    title: 'Система Total Visibility',
-    tag: 'Patented',
-    text: 'Запатентованный треугольный силовой профиль 150×70×3 мм по периметру 60 м. Полное отсутствие угловых металлических стоек обеспечивает идеальный угол обзора для зрителей и ТВ.',
-  },
-  {
-    icon: Wind,
-    title: 'Ветростойкость до 260 км/ч',
-    tag: 'Eurocodes 1 & 3',
-    text: 'Динамическое распределение ветровых нагрузок. Корты сертифицированы по европейским нормам Eurocode и испанскому стандарту UNE 147201:2024 с подтверждённым запасом прочности.',
-  },
-  {
-    icon: CheckCircle2,
-    title: 'Flush стыковка сетки и стекла',
-    tag: 'Safety First',
-    text: 'Сварная сетка 50×50×4 мм с загнутыми кромками монтируется заподлицо со стеклом без выступающих углов. Регламентные проёмы 220×200 см сертифицированы для игроков на колясках.',
-  },
-] as const
-
-export const models = [
-  {
-    id: 'infinity',
-    name: 'Infinity',
-    eyebrow: 'Премиальный флагман',
-    title: 'Патентованная панорамная система без угловых стоек',
-    tagline: 'Идеальный выбор для главных ТВ-кортов и премиальных клубов',
-    description:
-      'Флагман линейки JUBO без угловых металлических стоек для безупречного обзора. Разработан для турниров высшего ранга и флагманских клубов с повышенными требованиями к эстетике.',
-    image: {
-      src: 'https://jubopadel.com/wp-content/uploads/2026/05/3c.png',
-      alt: 'Панорамный падел-корт JUBO Infinity без угловых стоек',
-      width: 1920,
-      height: 1080,
-    },
-    specs: [
-      { label: 'Остекление', value: '12 мм закалённое FIP (18 панелей, 108 м²)' },
-      { label: 'Силовой каркас', value: '4 колонны 160×80×3 мм + 8 опорных ласт 3 м' },
-      { label: 'Антикоррозия', value: 'Сталь Magnelis® C4 / C5 по ISO 12944' },
-      { label: 'Сетка', value: 'Электросварная 50×50×4 мм, заподлицо со стеклом' },
-      { label: 'Крепёж', value: 'Нержавеющая сталь AISI 316, втулки с УФ-защитой' },
-      { label: 'Ветростойкость', value: 'Сертифицирована по Eurocode 1 (до 140 км/ч)' },
-    ],
-    highlights: [
-      'Полная панорама 360° без угловых стоек для безупречной телетрансляции',
-      'Запатентованный треугольный силовой профиль 150×70×3 мм по периметру',
-      'Опциональная интеграция скрытой контурной амбилайт-подсветки',
-    ],
-  },
-  {
-    id: 'super-panoramic',
-    name: 'Super Panoramic',
-    eyebrow: 'Чемпионский обзор',
-    title: 'Открытая панорама и максимальная жёсткость каркаса',
-    tagline: 'Турнирный стандарт для престижных международных соревнований',
-    description:
-      'Турнирный корт со сплошным остеклением задней и боковых линий и усиленным силовым периметром. Исключает нежелательные вибрации и гарантирует правильный и предсказуемый отскок мяча.',
-    image: {
-      src: 'https://jubopadel.com/wp-content/uploads/2026/05/3a.png',
-      alt: 'Падел-корт JUBO Super Panoramic для профессиональных турниров',
-      width: 1920,
-      height: 1080,
-    },
-    specs: [
-      { label: 'Остекление', value: '12 мм закалённое с полированной еврофаской' },
-      { label: 'Силовой каркас', value: 'Усиленный периметр без центральных колонн' },
-      { label: 'Антикоррозия', value: 'Защитное покрытие Magnelis® C4 / C5' },
-      { label: 'Сетка', value: 'Трёхслойная 50×50×4 мм, заподлицо со стеклом' },
-      { label: 'Крепёж', value: 'Нержавеющая сталь AISI 316, скруглённые головки' },
-      { label: 'Ветростойкость', value: 'Сертифицирована по UNE 147201:2024 и Eurocodes' },
-    ],
-    highlights: [
-      'Отсутствие металлических стоек в зонах активного зрительского обзора',
-      'Стекло и сетка в одной плоскости (Flush Transition) для безопасности',
-      'Подтверждённая устойчивость к динамическим ударам и вибрациям',
-    ],
-  },
-  {
-    id: 'panoramic',
-    name: 'Panoramic',
-    eyebrow: 'Клубный стандарт',
-    title: 'Широкий обзор и оптимальный клубный бюджет проекта',
-    tagline: 'Баланс открытой панорамы и проверенной клубной надёжности',
-    description:
-      'Классическая панорамная модель без промежуточных стоек на торцах для коммерческих центров. Обеспечивает эстетику открытого корта при минимальных начальных капиталовложениях.',
-    image: {
-      src: 'https://jubopadel.com/wp-content/uploads/2026/05/3.png',
-      alt: 'Панорамный падел-корт JUBO Panoramic для спортивных клубов',
-      width: 1920,
-      height: 1080,
-    },
-    specs: [
-      { label: 'Остекление', value: '10 мм или 12 мм закалённое безопасное стекло' },
-      { label: 'Силовой каркас', value: 'Колонны 100×50×3 мм без вертикальных перемычек на торцах' },
-      { label: 'Антикоррозия', value: 'Антикоррозийный грунт + Qualisteelcoat®' },
-      { label: 'Сетка', value: '50×50×4 мм со сглаженными кромками' },
-      { label: 'Крепёж', value: 'Оцинкованные метизы 8.8 / AISI 304' },
-      { label: 'Ветростойкость', value: 'Стандарт Eurocode (indoor / outdoor)' },
-    ],
-    highlights: [
-      'Открытый панорамный вид на игровую зону с торцевых трибун',
-      'Доступность в стационарном и быстроразборном переносном исполнении',
-      'Быстрая окупаемость в коммерческих падел-центрах',
-    ],
-  },
-  {
-    id: 'vision-pro',
-    name: 'Vision Pro',
-    eyebrow: 'Интенсивная эксплуатация',
-    title: 'Сверхжёсткая металлоконструкция для непрерывной игры',
-    tagline: 'Максимальная прочность и долговечность для коммерческих кортов 24/7',
-    description:
-      'Усиленная модификация с утолщённым профилем стоек и защитой кромок закалённого остекления. Рассчитана на непрерывную эксплуатацию 24/7 в центрах с максимальным трафиком игроков.',
-    image: {
-      src: 'https://jubopadel.com/wp-content/uploads/2026/05/visiopro-side.png',
-      alt: 'Падел-корт JUBO Vision Pro с усиленным каркасом',
-      width: 1920,
-      height: 1080,
-    },
-    specs: [
-      { label: 'Остекление', value: '10 мм или 12 мм закалённое монолитное стекло' },
-      { label: 'Силовой каркас', value: 'Усиленные стойки 120×60×3 мм с рёбрами жесткости' },
-      { label: 'Антикоррозия', value: 'Qualisteelcoat® C4 / C5 против износа' },
-      { label: 'Сетка', value: 'Антивандальная электросварная 50×50×4 мм' },
-      { label: 'Крепёж', value: 'Нержавеющие метизы AISI 316' },
-      { label: 'Ветростойкость', value: 'Высокая конструктивная жёсткость для 24/7' },
-    ],
-    highlights: [
-      'Максимальная геометрическая стабильность при интенсивной клубной игре',
-      'Стекло установлено заподлицо со стальной рамой для защиты кромок',
-      'Минимальные требования к обслуживанию на протяжении 10+ лет',
-    ],
-  },
-  {
-    id: 'infinity-tournament',
-    name: 'Infinity Tournament',
-    eyebrow: 'Мобильный Pop-up корт',
-    title: 'Мобильный турнирный корт без анкерования в основание',
-    tagline: 'Быстрый монтаж и демонтаж на площадях, стадионах и выставочных центрах',
-    description:
-      'Переносная соревновательная конфигурация с автономной балансировочной рамой по периметру. Позволяет быстро развернуть площадку на стадионах и выставках без повреждения чистового пола.',
-    image: {
-      src: 'https://jubopadel.com/wp-content/uploads/2026/05/infinity_ParaWbTournament.107.png',
-      alt: 'Мобильный переносной падел-корт JUBO Infinity Tournament',
-      width: 1920,
-      height: 1080,
-    },
-    specs: [
-      { label: 'Остекление', value: '12 мм закалённое соревновательное стекло FIP' },
-      { label: 'Силовой каркас', value: 'Самонесущая автономная рама без постоянных анкеров' },
-      { label: 'Антикоррозия', value: 'Порошковое термопокрытие по ISO 12944' },
-      { label: 'Сетка', value: 'Электросварная турнирная 50×50×4 мм заподлицо' },
-      { label: 'Крепёж', value: 'Быстросъёмные узлы AISI 316 для оперативной сборки' },
-      { label: 'Ветростойкость', value: '— (мобильный pop-up корт для закрытых арен и залов)' },
-    ],
-    highlights: [
-      'Монтаж на ледовых аренах, паркете, асфальте и временных помостах',
-      'Сохраняет 100% соревновательные игровые характеристики постоянного корта',
-      'Полная совместимость с телетрансляционными регламентами FIP / Premier Padel',
-    ],
-  },
-  {
-    id: 'infinity-xtrem',
-    name: 'Infinity Xtrem',
-    eyebrow: 'Ураганная ветростойкость',
-    title: 'Инженерная защита от ветровых порывов до 260 км/ч (160 mph)',
-    tagline: 'Создан для морских побережий, крыш зданий и открытых ветровых зон',
-    description:
-      'Высокопрочная модификация с усиленным треугольным контуром 150×70×3 мм для экстремального климата. Разработана для открытых локаций на морских побережьях и эксплуатируемых крышах зданий.',
-    image: {
-      src: 'https://jubopadel.com/wp-content/uploads/2026/05/3-1.png',
-      alt: 'Ветростойкий падел-корт JUBO Infinity Xtrem для побережий и крыш',
-      width: 1920,
-      height: 1080,
-    },
-    specs: [
-      { label: 'Остекление', value: '12 мм закалённое с усиленными эластичными прокладками' },
-      { label: 'Силовой каркас', value: 'Утолщённый треугольный контур 150×70×3 мм + усиленные узлы' },
-      { label: 'Антикоррозия', value: 'Qualisteelcoat® C5VH для морского воздуха и соли' },
-      { label: 'Сетка', value: '50×50×4 мм с усиленным узлом натяжения' },
-      { label: 'Крепёж', value: 'Нержавеющая сталь AISI 316 (морской класс)' },
-      { label: 'Ветростойкость', value: 'До 260 км/ч (160 mph) — ураганная категория' },
-    ],
-    highlights: [
-      'Непрерывный панорамный обзор даже при предельных ветровых нагрузках',
-      'Сертифицированный расчёт сопротивления конструкций по Eurocode 1',
-      'Специальная морская защита от коррозии и солевого тумана',
-    ],
-  },
-] as const
-
-type ModelId = (typeof models)[number]['id']
-
-export function CourtModelTabs({ onSelectModel }: { onSelectModel?: (modelId: ModelId) => void }) {
-  const [activeModel, setActiveModel] = useState<ModelId>(models[0].id)
+export function CourtModelTabs({ badge, models, onSelectModel }: { badge: string; models: PadelModel[]; onSelectModel?: (modelId: ModelId) => void }) {
+  const [activeModel, setActiveModel] = useState<ModelId>(models[0]?.id ?? 'consultation')
   const panelRef = useRef<HTMLDivElement>(null)
 
   const handleTabChange = (val: string) => {
@@ -441,10 +126,10 @@ export function CourtModelTabs({ onSelectModel }: { onSelectModel?: (modelId: Mo
                 <div className="grid gap-8 lg:grid-cols-[1.15fr_.85fr] lg:gap-12 lg:items-start">
                   <div className="relative aspect-[16/9] w-full overflow-hidden bg-white flex items-center justify-center">
                     <img
-                      src={model.image.src}
+                      src={model.image.url}
                       alt={model.image.alt}
-                      width={model.image.width}
-                      height={model.image.height}
+                      width={model.image.width ?? undefined}
+                      height={model.image.height ?? undefined}
                       loading="lazy"
                       decoding="async"
                       className="h-full w-full object-contain"
@@ -453,7 +138,7 @@ export function CourtModelTabs({ onSelectModel }: { onSelectModel?: (modelId: Mo
 
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <Badge tone="dark">JUBO · Испания</Badge>
+                      <Badge tone="dark">{badge}</Badge>
                     </div>
 
                     <Typography as="h3" role="title-large" className="mt-3 font-semibold text-ink min-h-[3.25rem] flex items-center">
@@ -511,11 +196,15 @@ export function CourtModelTabs({ onSelectModel }: { onSelectModel?: (modelId: Mo
 
 function InlineLeadCalculatorForm({
   site,
+  page,
   initialModel = 'infinity',
 }: {
-  site: SiteDTO
+  site: PadelCourtZakazPageDTO['site']
+  page: PadelCourtZakazPageDTO
   initialModel?: ModelId
 }) {
+  const formCopy = page.cta.form
+  const modelItems = page.models.items
   const [preferredChannel, setPreferredChannel] = useState<'phone' | 'telegram' | 'vk'>('phone')
   const [selectedModel, setSelectedModel] = useState<string>(initialModel)
   const [courtCount, setCourtCount] = useState<string>('1')
@@ -554,8 +243,8 @@ function InlineLeadCalculatorForm({
     const userComment = String(data.comment ?? '').trim()
 
     const errors: string[] = []
-    if (name.length < 2) errors.push('Укажите имя (минимум 2 символа).')
-    if (!contactValue) errors.push('Укажите контактные данные для связи.')
+    if (name.length < 2) errors.push(formCopy.nameError)
+    if (!contactValue) errors.push(formCopy.contactError)
 
     let phone = ''
     let telegram = ''
@@ -563,21 +252,21 @@ function InlineLeadCalculatorForm({
 
     if (preferredChannel === 'phone') {
       phone = contactValue
-      if (!/^[+\d\s()-]{6,40}$/.test(phone)) errors.push('Проверьте корректность номера телефона.')
+      if (!/^[+\d\s()-]{6,40}$/.test(phone)) errors.push(formCopy.contactError)
     } else if (preferredChannel === 'telegram') {
       telegram = contactValue
       if (!/^@?[\p{L}\p{N}_.-]{3,80}$/u.test(telegram)) {
-        errors.push('Укажите корректный Telegram-логин (например, @username).')
+        errors.push(formCopy.contactError)
       }
     } else if (preferredChannel === 'vk') {
       vk = contactValue
       if (!/^@?[\p{L}\p{N}_.-]{3,80}$/u.test(vk)) {
-        errors.push('Укажите логин или ID ВКонтакте.')
+        errors.push(formCopy.contactError)
       }
     }
 
     if (data.consent !== 'on') {
-      errors.push('Необходимо подтвердить согласие на обработку персональных данных.')
+      errors.push(formCopy.consentError)
     }
 
     if (errors.length > 0) {
@@ -638,7 +327,7 @@ function InlineLeadCalculatorForm({
         })
       } else {
         setState('form')
-        setError(result.error ?? 'Не удалось отправить заявку. Попробуйте ещё раз.')
+        setError(result.error ?? formCopy.submitError)
         trackAnalytics({
           name: 'form_error',
           formType: 'consultation',
@@ -648,7 +337,7 @@ function InlineLeadCalculatorForm({
       }
     } catch {
       setState('form')
-      setError('Связь прервалась. Проверьте интернет и повторите отправку — дубликат не создастся.')
+      setError(formCopy.connectionError)
       trackAnalytics({
         name: 'form_error',
         formType: 'consultation',
@@ -667,18 +356,14 @@ function InlineLeadCalculatorForm({
           <Check size={28} strokeWidth={2.8} />
         </div>
         <Typography as="h3" role="title-large" className="mt-6 text-ink">
-          {typograph('Заявка на расчёт корта принята')}
+          {typograph(formCopy.successTitle)}
         </Typography>
         <Typography role="body" tone="subtle" className="mt-3 max-w-[540px]">
-          {typograph(
-            `Инженер UNLIM свяжется с вами по указанному каналу (${
-              preferredChannel === 'telegram' ? 'Telegram' : preferredChannel === 'vk' ? 'VK' : 'телефону'
-            }), уточнит параметры площадки и подготовит детальную заводскую спецификацию JUBO.`
-          )}
+          {typograph(formCopy.successText.replace('{{channel}}', preferredChannel === 'telegram' ? 'Telegram' : preferredChannel === 'vk' ? 'VK' : 'телефону'))}
         </Typography>
         <div className="mt-8">
           <Button variant="neutral" size="md" onClick={() => setState('form')}>
-            {typograph('Отправить ещё одну заявку')}
+            {typograph(formCopy.resubmitLabel)}
           </Button>
         </div>
       </SurfaceCard>
@@ -690,19 +375,19 @@ function InlineLeadCalculatorForm({
       <form onSubmit={handleSubmit} onFocusCapture={handleFocus} noValidate>
         <div className="mb-6">
           <Typography as="h3" role="title-card" className="font-semibold text-ink">
-            {typograph('Заполните данные для расчёта')}
+            {typograph(formCopy.title)}
           </Typography>
         </div>
 
         <div className="grid gap-5">
           <div>
             <span className="type-caption text-ink-muted mb-2 block font-medium">
-              {typograph('Куда направить?')}
+              {typograph(formCopy.channelLabel)}
             </span>
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
-                aria-label="Связаться по телефону"
+                aria-label={formCopy.phoneLabel}
                 onClick={() => setPreferredChannel('phone')}
                 className={cn(
                   'se-2 flex h-[var(--control-md)] w-[var(--control-md)] items-center justify-center type-ui font-medium transition-colors cursor-pointer',
@@ -715,7 +400,7 @@ function InlineLeadCalculatorForm({
               </button>
               <button
                 type="button"
-                aria-label="Связаться в Telegram"
+                aria-label={formCopy.telegramLabel}
                 onClick={() => setPreferredChannel('telegram')}
                 className={cn(
                   'se-2 flex h-[var(--control-md)] w-[var(--control-md)] items-center justify-center type-ui font-medium transition-colors cursor-pointer',
@@ -728,7 +413,7 @@ function InlineLeadCalculatorForm({
               </button>
               <button
                 type="button"
-                aria-label="Связаться во ВКонтакте"
+                aria-label={formCopy.vkLabel}
                 onClick={() => setPreferredChannel('vk')}
                 className={cn(
                   'se-2 flex h-[var(--control-md)] w-[var(--control-md)] items-center justify-center type-ui font-medium transition-colors cursor-pointer',
@@ -743,33 +428,33 @@ function InlineLeadCalculatorForm({
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Имя" labelVisibility="sr-only" name="name" autoComplete="name" required minLength={2} maxLength={120} placeholder="Ваше имя" />
+            <Field label={formCopy.nameLabel} labelVisibility="sr-only" name="name" autoComplete="name" required minLength={2} maxLength={120} placeholder={formCopy.namePlaceholder} />
             <Field
-              label={preferredChannel === 'phone' ? 'Номер телефона' : preferredChannel === 'telegram' ? 'Telegram логин' : 'ВКонтакте'}
+              label={preferredChannel === 'phone' ? formCopy.phoneLabel : preferredChannel === 'telegram' ? formCopy.telegramLabel : formCopy.vkLabel}
               labelVisibility="sr-only"
               name="contactValue"
               type={preferredChannel === 'phone' ? 'tel' : 'text'}
               autoComplete={preferredChannel === 'phone' ? 'tel' : 'off'}
               required
               maxLength={80}
-              placeholder={preferredChannel === 'phone' ? 'Номер телефона: +7 (999) 000-00-00' : preferredChannel === 'telegram' ? 'Telegram: @username' : 'ВКонтакте: vk.com/id'}
+              placeholder={preferredChannel === 'phone' ? formCopy.phonePlaceholder : preferredChannel === 'telegram' ? formCopy.telegramPlaceholder : formCopy.vkPlaceholder}
             />
           </div>
 
           <div className="grid gap-4 sm:grid-cols-3">
-            <SelectField label="Модель корта" labelVisibility="sr-only" value={selectedModel} onChange={(e) => setSelectedModel(e.target.value)} options={[...models.map((m) => ({ value: m.id, label: `Модель: ${m.name}` })), { value: 'consultation', label: 'Помочь с выбором модели' }]} />
-            <SelectField label="Количество кортов" labelVisibility="sr-only" value={courtCount} onChange={(e) => setCourtCount(e.target.value)} options={[{ value: '1', label: 'Количество: 1 корт' }, { value: '2-3', label: 'Количество: 2–3 корта' }, { value: '4-6', label: 'Количество: 4–6 кортов' }, { value: '7+', label: 'Количество: 7+ кортов' }]} />
-            <Field label="Город или локация" labelVisibility="sr-only" name="city" placeholder="Город / локация (напр. Москва)" maxLength={100} />
+            <SelectField label={formCopy.modelLabel} labelVisibility="sr-only" value={selectedModel} onChange={(e) => setSelectedModel(e.target.value)} options={[...modelItems.map((model) => ({ value: model.id, label: `${formCopy.modelOptionPrefix}: ${model.name}` })), { value: 'consultation', label: formCopy.consultationOptionLabel }]} />
+            <SelectField label={formCopy.courtCountLabel} labelVisibility="sr-only" value={courtCount} onChange={(e) => setCourtCount(e.target.value)} options={[{ value: '1', label: formCopy.courtCountOneLabel }, { value: '2-3', label: formCopy.courtCountTwoThreeLabel }, { value: '4-6', label: formCopy.courtCountFourSixLabel }, { value: '7+', label: formCopy.courtCountSevenPlusLabel }]} />
+            <Field label={formCopy.cityLabel} labelVisibility="sr-only" name="city" placeholder={formCopy.cityPlaceholder} maxLength={100} />
           </div>
 
-          <TextareaField label="Комментарий к объекту" labelVisibility="sr-only" name="comment" maxLength={1000} placeholder="Тип объекта (indoor/outdoor), готовность фундамента, сроки..." />
+          <TextareaField label={formCopy.commentLabel} labelVisibility="sr-only" name="comment" maxLength={1000} placeholder={formCopy.commentPlaceholder} />
 
           <label className="absolute -left-[10000px]" aria-hidden="true">
             Компания
             <input name="company" tabIndex={-1} autoComplete="off" />
           </label>
 
-          <CheckboxField name="consent" required defaultChecked label={<>{site.contactConfirmation.consentLabel} ·{' '}<a href={site.contactConfirmation.policyHref} target="_blank" rel="noreferrer" className="underline hover:text-ink">политика конфиденциальности</a></>} />
+          <CheckboxField name="consent" required defaultChecked label={<>{formCopy.consentLabel} ·{' '}<a href={site.contactConfirmation.policyHref} target="_blank" rel="noreferrer" className="underline hover:text-ink">{formCopy.policyLabel}</a></>} />
 
           {error && (
             <p role="alert" className="type-body-sm font-semibold text-danger">
@@ -779,7 +464,7 @@ function InlineLeadCalculatorForm({
 
           <div>
             <Button type="submit" variant="primary" size="lg" loading={state === 'sending'} fullWidth>
-              {typograph('Получить смету')}
+              {typograph(formCopy.submitLabel)}
             </Button>
           </div>
         </div>
@@ -788,14 +473,14 @@ function InlineLeadCalculatorForm({
   )
 }
 
-function DirectContactButtons() {
+function DirectContactButtons({ contacts }: { contacts: PadelCourtZakazPageDTO['cta']['contacts'] }) {
   const { requestContact } = useActionLayer()
 
   return (
     <div className="mt-8 flex flex-wrap items-center gap-2.5 overflow-clip">
       <ButtonLink
         reveal={{ delay: 0.12 }}
-        href="https://t.me/unlim_padel"
+        href={contacts.telegramURL}
         target="_blank"
         rel="noreferrer"
         variant="neutral"
@@ -805,11 +490,11 @@ function DirectContactButtons() {
         onClick={() => {
           trackAnalytics({ name: 'direct_messenger_click', actionKind: 'telegram', objectType: 'lead' })
         }}
-      >Telegram</ButtonLink>
+      >{contacts.telegramLabel}</ButtonLink>
 
       <ButtonLink
         reveal={{ delay: 0.16 }}
-        href="https://vk.com/unlim_padel"
+        href={contacts.vkURL}
         target="_blank"
         rel="noreferrer"
         variant="neutral"
@@ -819,7 +504,7 @@ function DirectContactButtons() {
         onClick={() => {
           trackAnalytics({ name: 'direct_messenger_click', actionKind: 'vk', objectType: 'lead' })
         }}
-      >ВКонтакте</ButtonLink>
+      >{contacts.vkLabel}</ButtonLink>
 
       <Button
         reveal={{ delay: 0.2 }}
@@ -831,13 +516,14 @@ function DirectContactButtons() {
           trackAnalytics({ name: 'direct_call_click', actionKind: 'phone', objectType: 'lead' })
           requestContact('phone')
         }}
-      >По телефону</Button>
+      >{contacts.phoneLabel}</Button>
     </div>
   )
 }
 
-export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
-  const [activeModelForForm, setActiveModelForForm] = useState<ModelId>('infinity')
+export function PadelCourtZakazPage({ dto }: { dto: PadelCourtZakazPageDTO }) {
+  const { site } = dto
+  const [activeModelForForm, setActiveModelForForm] = useState<ModelId>(dto.models.items[0]?.id ?? 'consultation')
   const heroRef = useRef<HTMLElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
 
@@ -877,14 +563,13 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
                 '@type': 'Organization',
                 name: site.brandName,
                 url: 'https://unlimpadel.ru',
-                description: 'Официальный дистрибьютор падел-кортов JUBO в России.',
+                description: dto.page.intro,
               },
               {
                 '@type': 'Product',
-                name: 'Падел-корты JUBO под ключ',
-                image: heroImage.src,
-                description:
-                  'Продажа, прямые поставки с завода в Валенсии и сертифицированный монтаж падел-кортов JUBO в РФ под ключ: Infinity, Super Panoramic, Xtrem.',
+                name: dto.page.title,
+                image: dto.page.hero.media.url,
+                description: dto.page.intro,
                 brand: { '@type': 'Brand', name: 'JUBO Padel' },
                 offers: {
                   '@type': 'AggregateOffer',
@@ -900,7 +585,7 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
                 '@type': 'BreadcrumbList',
                 itemListElement: [
                   { '@type': 'ListItem', position: 1, name: 'Главная', item: 'https://unlimpadel.ru/' },
-                  { '@type': 'ListItem', position: 2, name: 'Корты JUBO под ключ', item: 'https://unlimpadel.ru/padel-court-zakaz' },
+                  { '@type': 'ListItem', position: 2, name: dto.page.title, item: 'https://unlimpadel.ru/padel-court-zakaz' },
                 ],
               },
             ],
@@ -915,8 +600,8 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
       >
         <video
           ref={videoRef}
-          src="https://jubopadel.com/wp-content/uploads/2026/05/Header-Super-Pano-2400-1080-H265.webm"
-          poster={heroImage.src}
+          src={dto.heroVideo?.url ?? 'https://jubopadel.com/wp-content/uploads/2026/05/Header-Super-Pano-2400-1080-H265.webm'}
+          poster={dto.page.hero.media.url}
           autoPlay
           loop
           muted
@@ -929,20 +614,18 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
           <Reveal eager className="pt-2 sm:pt-4">
             <Badge tone="glass" className="mb-4">
               <span className="mr-1.5 h-2 w-2 rounded-full bg-lime animate-pulse" />
-              {typograph('Официальный дистрибьютор JUBO Padel в РФ')}
+              {typograph(dto.page.eyebrow)}
             </Badge>
 
             <Typography as="h1" role="hero" className="max-w-[960px] text-white font-semibold leading-[1.08]">
               <SplitTextReveal
-                text="Падел корт купить под ключ — цена, строительство, монтаж"
+                text={dto.page.title}
                 reveal={false}
               />
             </Typography>
 
             <Typography role="editorial" className="mt-4 max-w-[800px] text-white/80 text-base md:text-lg">
-              {typograph(
-                'UNLIM — официальный представитель испанского производителя JUBO Padel в России. Прямая поставка с завода в Валенсии и сертифицированный монтаж под ключ с гарантией.'
-              )}
+              {typograph(dto.page.intro)}
             </Typography>
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -952,7 +635,7 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
                 size="md"
                 icon={<ArrowRight size={16} />}
               >
-                {typograph('Получить расчёт сметы')}
+                {typograph(dto.hero.primaryLabel)}
               </ButtonLink>
 
               <ButtonLink
@@ -960,14 +643,14 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
                 variant="glass"
                 size="md"
               >
-                {typograph('Выбрать модель корта')}
+                {typograph(dto.hero.secondaryLabel)}
               </ButtonLink>
             </div>
           </Reveal>
 
           {/* 4 пункта в хиро: лаконично, без 01-04 и без eyebrows */}
           <Reveal eager delay={0.12} className="mt-8 grid grid-cols-2 gap-4 border-t border-white/15 pt-6 md:grid-cols-4 md:gap-6">
-            {heroMetrics.map((metric) => (
+            {dto.hero.metrics.map((metric) => (
               <div key={metric.title} className="space-y-0.5">
                 <Typography role="body-small" className="font-semibold text-white">
                   {typograph(metric.title)}
@@ -988,19 +671,17 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
             <Reveal>
               <div>
               <Typography reveal={{ delay: 0.02 }} as="h2" id="distributor-title" role="section" className="text-ink">
-                {typograph('Прямые поставки JUBO в Россию без посредников')}
+                {typograph(dto.distributor.title)}
               </Typography>
               <Typography reveal={{ delay: 0.08 }} role="body" tone="subtle" className="mt-5 leading-relaxed">
-                {typograph(
-                  'UNLIM является официальным авторизованным дистрибьютором испанского бренда JUBO Padel на территории РФ. Мы не просто продаём металлоконструкции — мы берем на себя полный цикл инженерной реализации падел-клуба: от адаптации проекта под российские снеговые и ветровые нагрузки до шеф-монтажа и сервисного обслуживания.'
-                )}
+                {typograph(dto.distributor.text)}
               </Typography>
 
               </div>
             </Reveal>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              {distributorAdvantages.map((adv, idx) => (
+              {dto.distributor.advantages.map((adv, idx) => (
                 <Reveal key={adv.title} delay={idx * 0.08} className="h-full">
                   <SurfaceCard tone="white" interactive={false} className="p-6 h-full">
                     <Typography as="h3" role="title-card" className="font-semibold text-ink">
@@ -1020,22 +701,22 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
         <section className="container-page py-16 md:py-24" aria-labelledby="turnkey-title">
           <Reveal className="mb-12 max-w-[760px]">
             <Typography reveal={{ delay: 0.02 }} as="h2" id="turnkey-title" role="section" className="text-ink">
-              {typograph('Что входит в строительство и монтаж корта под ключ')}
+            {typograph(dto.turnkey.title)}
             </Typography>
             <Typography reveal={{ delay: 0.08 }} role="body" tone="subtle" className="mt-4">
-              {typograph(
-                'Мы фиксируем состав работ и техническую спецификацию в договоре до начала поставки. Вы получаете готовый к игре объект без непредвиденных доплат и скрытых этапов.'
-              )}
+              {typograph(dto.turnkey.intro)}
             </Typography>
           </Reveal>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-            {turnkeySteps.map((step, idx) => (
+            {dto.turnkey.steps.map((step, idx) => {
+              const Icon = iconMap[step.icon]
+              return (
               <Reveal key={step.title} delay={idx * 0.08} className="h-full">
-                <ImageCard src={step.image} alt={step.title} overlay={step.overlay as ImageOverlay} className="min-h-[360px] h-full" imgClassName="object-center">
+                <ImageCard src={step.image.url} alt={step.title} overlay={step.overlay as ImageOverlay} className="min-h-[360px] h-full" imgClassName="object-center">
                   <div className="flex h-full flex-col justify-between p-6">
                     <div className="flex items-start justify-between gap-3">
-                      <span className="se-2 flex h-10 w-10 items-center justify-center bg-white/15 text-white backdrop-blur-sm"><step.icon size={20} /></span>
+                      <span className="se-2 flex h-10 w-10 items-center justify-center bg-white/15 text-white backdrop-blur-sm"><Icon size={20} /></span>
                       <span className="type-eyebrow text-white/75">{step.number}</span>
                     </div>
                     <div>
@@ -1045,7 +726,8 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
                   </div>
                 </ImageCard>
               </Reveal>
-            ))}
+              )
+            })}
           </div>
         </section>
 
@@ -1056,24 +738,22 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
               <Reveal>
                 <div>
                 <Typography reveal={{ delay: 0.02 }} as="h2" id="price-factors-title" role="section" className="text-ink">
-                  {typograph('Из чего складывается реальная стоимость падел-корта')}
+                  {typograph(dto.price.title)}
                 </Typography>
                 <Typography reveal={{ delay: 0.08 }} role="body" tone="subtle" className="mt-5 leading-relaxed">
-                  {typograph(
-                    'Универсальная цена «корт от 2 млн рублей» не отражает реальную стоимость запуска площадки. Мы формируем прозрачную смету под конкретный объект: тип площадки (indoor или outdoor), класс ветровой нагрузки, состояние фундамента, комплектацию света и логистику до вашего города.'
-                  )}
+                  {typograph(dto.price.text)}
                 </Typography>
                 <div className="mt-8">
                   <ButtonLink reveal={{ delay: 0.16 }} href="#cta-section" variant="dark" size="md" icon={<ArrowRight size={16} />}>
-                    {typograph('Рассчитать стоимость')}
+                    {typograph(dto.price.actionLabel)}
                   </ButtonLink>
                 </div>
                 </div>
               </Reveal>
 
               <Reveal>
-                <ul className="grid gap-2.5 sm:grid-cols-2" aria-label="Факторы стоимости падел-корта">
-                {priceFactors.map((factor) => (
+                <ul className="grid gap-2.5 sm:grid-cols-2" aria-label={dto.price.title}>
+                {dto.price.factors.map((factor) => (
                   <li
                     key={factor.label}
                     className="se-2 bg-surface-subtle p-4 flex flex-col justify-start"
@@ -1098,7 +778,7 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
             className="absolute inset-0 bg-cover bg-center"
             style={{
               backgroundImage:
-                "url('https://jubopadel.com/wp-content/uploads/2026/05/showroom-aereal-1536x848.jpg')",
+                `url('${dto.technology.background.url}')`,
             }}
           />
           {/* Чистое затемнение без размытия/блюра фонового изображения */}
@@ -1108,25 +788,25 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
             <Reveal className="grid gap-6 lg:grid-cols-[1fr_.8fr] lg:items-end">
               <div>
                 <Typography reveal={{ delay: 0.02 }} as="h2" id="tech-title" role="section" tone="inverse">
-                  {typograph('Технологии и стандарты JUBO')}
+                  {typograph(dto.technology.title)}
                 </Typography>
               </div>
               <Typography reveal={{ delay: 0.08 }} role="body" tone="inverse-subtle" className="lg:justify-self-end">
-                {typograph(
-                  'Европейский стандарт безопасности и долговечности. Каждая деталь спроектирована с расчётом на многолетнюю клубную эксплуатацию без коррозии, деформаций и люфтов.'
-                )}
+                {typograph(dto.technology.text)}
               </Typography>
             </Reveal>
 
             <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {technologies.map((tech, idx) => (
+              {dto.technology.items.map((tech, idx) => {
+                const Icon = iconMap[tech.icon]
+                return (
                 <Reveal key={tech.title} fade={false} y={20} delay={idx * 0.06} className="h-full">
                   {/* Плашки без обводки border, backdrop-blur не ломается так как fade={false} держит opacity 1 */}
                   <div className="se-3 bg-white/[0.08] p-6 backdrop-blur-md h-full flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between">
                         <span className="se-2 flex h-11 w-11 items-center justify-center bg-white/10 text-white">
-                          <tech.icon size={22} />
+                          <Icon size={22} />
                         </span>
                         <Badge reveal={{ delay: 0.04 }} tone="glass" className="text-white/70">
                           {tech.tag}
@@ -1141,7 +821,8 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
                     </div>
                   </div>
                 </Reveal>
-              ))}
+                )
+              })}
             </div>
           </div>
         </section>
@@ -1150,26 +831,24 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
         <section className="container-page py-16 md:py-24" aria-labelledby="gallery-title">
           <Reveal className="mb-10 max-w-[760px]">
             <Typography reveal={{ delay: 0.02 }} as="h2" id="gallery-title" role="section" className="text-ink">
-              {typograph('Как корты JUBO выглядят в реальных клубных проектах')}
+              {typograph(dto.gallery.title)}
             </Typography>
             <Typography reveal={{ delay: 0.08 }} role="body" tone="subtle" className="mt-4">
-              {typograph(
-                'Панорамные светопрозрачные конструкции без лишних стоек визуально расширяют клубное пространство и обеспечивают высокую зрелищность матчей для гостей и зрителей.'
-              )}
+              {typograph(dto.gallery.text)}
             </Typography>
           </Reveal>
 
           <div className="grid gap-6 lg:grid-cols-2">
-            {galleryImages.map((image, idx) => (
-              <Reveal key={image.src} delay={idx * 0.1}>
+            {dto.gallery.items.map((image, idx) => (
+              <Reveal key={image.media.url} delay={idx * 0.1}>
                 <SurfaceCard tone="white" interactive={false} className="p-3 overflow-hidden">
                   <figure className="group">
                     <div className="se-3 aspect-[16/9] overflow-hidden bg-control">
                       <img
-                        src={image.src}
-                        alt={image.alt}
-                        width={image.width}
-                        height={image.height}
+                        src={image.media.url}
+                        alt={image.media.alt}
+                        width={image.media.width ?? undefined}
+                        height={image.media.height ?? undefined}
                         loading="lazy"
                         decoding="async"
                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
@@ -1180,7 +859,7 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
                         {typograph(image.caption)}
                       </Typography>
                       <Typography role="micro" tone="subtle">
-                        Фото: JUBO Padel
+                        {dto.gallery.creditLabel}
                       </Typography>
                     </figcaption>
                   </figure>
@@ -1196,18 +875,16 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
             <Reveal className="grid gap-6 lg:grid-cols-[1fr_.7fr] lg:items-end">
               <div>
                 <Typography reveal={{ delay: 0.02 }} as="h2" id="models-title" role="section" className="max-w-[720px] text-ink">
-                  {typograph('Выберите модель корта под условия вашей площадки')}
+                  {typograph(dto.models.title)}
                 </Typography>
               </div>
               <Typography reveal={{ delay: 0.08 }} role="body" tone="subtle" className="max-w-[620px] lg:justify-self-end">
-                {typograph(
-                  'Сравните технические параметры, тип остекления, ветровую стойкость и конструктивные особенности каждой модели в единой таблице характеристик.'
-                )}
+                {typograph(dto.models.text)}
               </Typography>
             </Reveal>
 
             <div className="mt-10">
-              <CourtModelTabs onSelectModel={(modelId) => setActiveModelForForm(modelId)} />
+              <CourtModelTabs badge={dto.models.badge} models={dto.models.items} onSelectModel={(modelId) => setActiveModelForForm(modelId)} />
             </div>
           </div>
         </section>
@@ -1220,50 +897,34 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
               <Reveal>
                 <div>
                 <Typography reveal={{ delay: 0.02 }} as="h2" id="cta-heading" role="section" className="text-ink">
-                  {typograph('Рассчитать проект падел-корта под ключ')}
+                  {typograph(dto.cta.title)}
                 </Typography>
                 <Typography reveal={{ delay: 0.08 }} role="body" tone="subtle" className="mt-4 leading-relaxed">
-                  {typograph(
-                    'Напишите нам напрямую в удобный мессенджер для быстрой консультации или отправьте параметры площадки через форму — инженер UNLIM подготовит подробную заводскую смету JUBO.'
-                  )}
+                  {typograph(dto.cta.text)}
                 </Typography>
 
                 {/* Лаконичные швейцарские кнопки мессенджеров */}
-                <DirectContactButtons />
+                <DirectContactButtons contacts={dto.cta.contacts} />
 
                 {/* Гарантии и факты */}
                 <div className="mt-10 space-y-3.5 border-t border-ink/10 pt-8">
-                  <div className="flex items-center gap-3">
-                    <span className="se-1 flex h-6 w-6 shrink-0 items-center justify-center bg-lime text-lime-ink">
-                      <Check size={14} strokeWidth={2.8} />
-                    </span>
-                    <Typography reveal={{ delay: 0.1 }} role="body-small" tone="subtle">
-                      {typograph('Прямой контракт с роботизированным заводом JUBO в Валенсии')}
-                    </Typography>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="se-1 flex h-6 w-6 shrink-0 items-center justify-center bg-lime text-lime-ink">
-                      <Check size={14} strokeWidth={2.8} />
-                    </span>
-                    <Typography reveal={{ delay: 0.15 }} role="body-small" tone="subtle">
-                      {typograph('Прозрачная смета с фиксированной стоимостью оборудования и шеф-монтажа')}
-                    </Typography>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="se-1 flex h-6 w-6 shrink-0 items-center justify-center bg-lime text-lime-ink">
-                      <Check size={14} strokeWidth={2.8} />
-                    </span>
-                    <Typography reveal={{ delay: 0.2 }} role="body-small" tone="subtle">
-                      {typograph('Сертифицированный монтаж с гарантией производителя по всей территории РФ')}
-                    </Typography>
-                  </div>
+                  {dto.cta.guarantees.map((guarantee, index) => (
+                    <div key={guarantee} className="flex items-center gap-3">
+                      <span className="se-1 flex h-6 w-6 shrink-0 items-center justify-center bg-lime text-lime-ink">
+                        <Check size={14} strokeWidth={2.8} />
+                      </span>
+                      <Typography reveal={{ delay: 0.1 + index * 0.05 }} role="body-small" tone="subtle">
+                        {typograph(guarantee)}
+                      </Typography>
+                    </div>
+                  ))}
                 </div>
                 </div>
               </Reveal>
 
               {/* Правая колонка: форма расчёта */}
               <div>
-                <InlineLeadCalculatorForm site={site} initialModel={activeModelForForm} />
+                <InlineLeadCalculatorForm page={dto} site={site} initialModel={activeModelForForm} />
               </div>
             </div>
           </div>

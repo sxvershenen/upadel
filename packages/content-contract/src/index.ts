@@ -20,6 +20,7 @@ export const codeDefinedRouteRegistry = [
     path: '/padel-court-zakaz',
     parent: '/',
     template: 'padel-court-zakaz',
+    globalSlug: 'padel-court-zakaz-page',
     title: 'Падел корт купить под ключ — цена, строительство, монтаж',
     description: 'Официальный дистрибьютор падел-кортов JUBO в России: продажа, поставка с завода и монтаж под ключ. Модели Infinity, Super Panoramic, Xtrem. Расчёт стоимости под объект.',
     robots: 'index-follow',
@@ -39,7 +40,7 @@ export const codeDefinedRouteRegistry = [
 ] as const
 
 export const padelCourtZakazRoute = codeDefinedRouteRegistry[0]
-export const padelCourtsRoute = codeDefinedRouteRegistry[0]
+export const padelCourtsRoute = codeDefinedRouteRegistry[1]
 
 export const dynamicRouteRegistry = [
   { parent: '/blog', template: 'article-detail', collection: 'articles' },
@@ -187,6 +188,103 @@ export type GiftPageDTO = ThematicPageBase & {
   faq: Array<{ question: string; answer: string }>
   action: ActionDTO
 }
+
+export type PadelCourtZakazPageIcon = 'Ruler' | 'Settings2' | 'Truck' | 'Wrench' | 'ClipboardCheck' | 'Layers3' | 'ShieldCheck' | 'Factory' | 'Sparkles' | 'Wind' | 'CheckCircle2'
+export type PadelCourtZakazPageOverlay = 'overlay-blue' | 'overlay-violet' | 'overlay-emerald' | 'overlay-lime' | 'overlay-dark'
+export type PadelCourtZakazPageDTO = ThematicPageBase & {
+  kind: 'padel-court-zakaz'
+  heroVideo?: MediaDTO | null
+  hero: {
+    primaryLabel: string
+    secondaryLabel: string
+    metrics: Array<{ title: string; caption: string }>
+  }
+  distributor: {
+    title: string
+    text: string
+    advantages: Array<{ index: string; title: string; text: string }>
+  }
+  turnkey: {
+    title: string
+    intro: string
+    steps: Array<{ number: string; title: string; text: string; image: MediaDTO; icon: PadelCourtZakazPageIcon; overlay: PadelCourtZakazPageOverlay }>
+  }
+  price: {
+    title: string
+    text: string
+    actionLabel: string
+    factors: Array<{ label: string; detail: string }>
+  }
+  technology: {
+    title: string
+    text: string
+    background: MediaDTO
+    items: Array<{ title: string; tag: string; text: string; icon: PadelCourtZakazPageIcon }>
+  }
+  gallery: {
+    title: string
+    text: string
+    creditLabel: string
+    items: Array<{ media: MediaDTO; caption: string }>
+  }
+  models: {
+    title: string
+    text: string
+    badge: string
+    items: Array<{
+      id: string
+      name: string
+      eyebrow: string
+      title: string
+      tagline: string
+      description: string
+      image: MediaDTO
+      specs: Array<{ label: string; value: string }>
+      highlights: string[]
+    }>
+  }
+  cta: {
+    title: string
+    text: string
+    guarantees: string[]
+    contacts: { telegramLabel: string; telegramURL: string; vkLabel: string; vkURL: string; phoneLabel: string }
+    form: {
+      title: string
+      channelLabel: string
+      nameLabel: string
+      namePlaceholder: string
+      phoneLabel: string
+      phonePlaceholder: string
+      telegramLabel: string
+      telegramPlaceholder: string
+      vkLabel: string
+      vkPlaceholder: string
+      modelLabel: string
+      modelOptionPrefix: string
+      consultationOptionLabel: string
+      courtCountLabel: string
+      courtCountOneLabel: string
+      courtCountTwoThreeLabel: string
+      courtCountFourSixLabel: string
+      courtCountSevenPlusLabel: string
+      cityLabel: string
+      cityPlaceholder: string
+      commentLabel: string
+      commentPlaceholder: string
+      consentLabel: string
+      policyLabel: string
+      submitLabel: string
+      successTitle: string
+      successText: string
+      resubmitLabel: string
+      nameError: string
+      contactError: string
+      consentError: string
+      submitError: string
+      connectionError: string
+    }
+  }
+}
 export type CourtsPageDTO = ThematicPageBase & {
   kind: 'courts'
   infographicTitle: string
@@ -204,6 +302,8 @@ export type ThematicPageDTO = PricesPageDTO | TrainingPageDTO | GiftPageDTO | Co
 const sectionKeys = new Set<HomeSectionKey>(['hero', 'benefits', 'offers', 'courts', 'pricing', 'coaches', 'methodist-banner', 'tournaments', 'gallery', 'blog', 'reviews-faq'])
 const overlays = new Set(['overlay-lime', 'overlay-blue', 'overlay-cyan', 'overlay-violet', 'overlay-sunset', 'overlay-emerald', 'overlay-dark'])
 const meshes = new Set(['indigo', 'deep-blue', 'dark', 'lime', 'lime-soft', 'sky', 'lavender', 'sunset', 'navy-gold'])
+const padelOverlays = new Set<PadelCourtZakazPageOverlay>(['overlay-blue', 'overlay-violet', 'overlay-emerald', 'overlay-lime', 'overlay-dark'])
+const padelIcons = new Set<PadelCourtZakazPageIcon>(['Ruler', 'Settings2', 'Truck', 'Wrench', 'ClipboardCheck', 'Layers3', 'ShieldCheck', 'Factory', 'Sparkles', 'Wind', 'CheckCircle2'])
 
 function assertNavigationIcon(icon: unknown) {
   if (icon == null) return
@@ -288,4 +388,15 @@ export function parseThematicPageDTO(value: unknown): ThematicPageDTO {
   if (!['prices', 'training', 'gift', 'courts', 'gallery', 'about', 'contacts', 'policy', 'oferta'].includes(String(dto.kind))) throw new Error('Page DTO kind is invalid.')
   assertDesktopNavigation(dto.site)
   return dto as ThematicPageDTO
+}
+
+export function parsePadelCourtZakazPageDTO(value: unknown): PadelCourtZakazPageDTO {
+  if (!value || typeof value !== 'object') throw new Error('Padel court page DTO must be an object.')
+  const dto = value as Partial<PadelCourtZakazPageDTO>
+  if (dto.version !== homepageDTOversion || !dto.site || !dto.page || dto.kind !== 'padel-court-zakaz') throw new Error('Padel court page DTO is incomplete.')
+  if (!dto.hero || !dto.distributor || !dto.turnkey || !dto.price || !dto.technology || !dto.gallery || !dto.models || !dto.cta) throw new Error('Padel court page DTO content is incomplete.')
+  if (!Array.isArray(dto.hero.metrics) || !Array.isArray(dto.distributor.advantages) || !Array.isArray(dto.turnkey.steps) || !Array.isArray(dto.price.factors) || !Array.isArray(dto.technology.items) || !Array.isArray(dto.gallery.items) || !Array.isArray(dto.models.items) || !Array.isArray(dto.cta.guarantees)) throw new Error('Padel court page DTO contains an invalid list.')
+  if (dto.turnkey.steps.some((step) => !padelIcons.has(step.icon) || !padelOverlays.has(step.overlay)) || dto.technology.items.some((item) => !padelIcons.has(item.icon))) throw new Error('Padel court page DTO contains an invalid visual token.')
+  assertDesktopNavigation(dto.site)
+  return dto as PadelCourtZakazPageDTO
 }

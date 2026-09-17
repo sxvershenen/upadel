@@ -7,6 +7,7 @@ import { getPayload, type CollectionSlug, type Payload } from 'payload'
 
 import config from './payload.config'
 import { mergeRequiredNavigation, navigationChanged, normalizeDesktopNavigation, priceNavigationChildren, requiredPageLinks } from './content/requiredNavigation'
+import { padelCourtZakazSeed } from './content/padelCourtZakazSeed'
 
 const seedVersion = 'prototype-v2'
 const dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -288,16 +289,16 @@ async function ensureRemoteMedia(payload: Payload, sourceURL: string, alt: strin
   if (!response.ok) throw new Error(`Failed to download demo media ${sourceURL}: HTTP ${response.status}`)
 
   const mimetype = response.headers.get('content-type')?.split(';')[0] ?? ''
-  if (!mimetype.startsWith('image/')) throw new Error(`Demo media ${sourceURL} returned unexpected type ${mimetype || 'unknown'}.`)
+  if (!mimetype.startsWith('image/') && mimetype !== 'video/mp4' && mimetype !== 'video/webm') throw new Error(`Demo media ${sourceURL} returned unexpected type ${mimetype || 'unknown'}.`)
   const data = Buffer.from(await response.arrayBuffer())
   if (data.byteLength === 0) throw new Error(`Demo media ${sourceURL} returned an empty file.`)
 
   return createMedia(
     payload,
     sourceURL,
-    { data, mimetype, name: `pexels-${hash(sourceURL)}.${mimetype === 'image/png' ? 'png' : 'jpg'}` },
+    { data, mimetype, name: `remote-${hash(sourceURL)}.${mimetype === 'image/png' ? 'png' : mimetype === 'video/webm' ? 'webm' : mimetype === 'video/mp4' ? 'mp4' : 'jpg'}` },
     alt,
-    'Pexels demo source from the prototype; author attribution is not available in the snapshot.',
+    'Remote source from the approved prototype content.',
     'Demo asset. Verify attribution and production usage rights before launch.',
   )
 }
@@ -343,6 +344,11 @@ async function seed() {
       ...images.gallery.map((source, index) => [source, `Жизнь клуба Unlim Riga Padel ${index + 1}`] as const),
       ...images.blog.map((source, index) => [source, `Статья блога Unlim Riga Padel ${index + 1}`] as const),
       ...images.reviewAvatars.map((source, index) => [source, `Автор отзыва ${index + 1}`] as const),
+      [padelCourtZakazSeed.heroImage.source, padelCourtZakazSeed.heroImage.alt],
+      [padelCourtZakazSeed.heroVideo.source, padelCourtZakazSeed.heroVideo.alt],
+      [padelCourtZakazSeed.technology.background.source, padelCourtZakazSeed.technology.background.alt],
+      ...padelCourtZakazSeed.gallery.items.map(({ source, alt }) => [source, alt] as const),
+      ...padelCourtZakazSeed.models.items.map(({ image }) => [image.source, image.alt] as const),
     ])
 
     const remoteMedia = new Map<string, { id: number | string }>()
@@ -368,6 +374,15 @@ async function seed() {
       const media = remoteMedia.get(source)
       if (!media) throw new Error(`Media was not prepared for ${source}`)
       return media.id
+    }
+
+    const padelCourtZakazMedia = {
+      heroImage: mediaID(padelCourtZakazSeed.heroImage.source),
+      heroVideo: mediaID(padelCourtZakazSeed.heroVideo.source),
+      technologyBackground: mediaID(padelCourtZakazSeed.technology.background.source),
+      gallery: padelCourtZakazSeed.gallery.items.map(({ source }) => mediaID(source)),
+      models: padelCourtZakazSeed.models.items.map(({ image }) => mediaID(image.source)),
+      turnkey: await Promise.all(padelCourtZakazSeed.turnkey.steps.map(({ image, title }) => ensureLocalMedia(payload, image, title))),
     }
 
     const coachData = [
@@ -875,6 +890,69 @@ async function seed() {
         await payload.updateGlobal({ slug: page.slug, draft: false, overrideAccess: true, data: { heroImage: heroMediaFor(page.slug)?.id } as never })
         stats.globalsPublished += 1
       }
+    }
+
+    const padelCourtZakazPage = {
+      seedVersion,
+      _status: 'published',
+      eyebrow: padelCourtZakazSeed.eyebrow,
+      title: padelCourtZakazSeed.title,
+      intro: padelCourtZakazSeed.intro,
+      heroImage: padelCourtZakazMedia.heroImage,
+      heroGrayscale: false,
+      heroVideo: padelCourtZakazMedia.heroVideo,
+      heroPrimaryLabel: padelCourtZakazSeed.heroPrimaryLabel,
+      heroSecondaryLabel: padelCourtZakazSeed.heroSecondaryLabel,
+      heroMetrics: padelCourtZakazSeed.heroMetrics,
+      distributor: padelCourtZakazSeed.distributor,
+      turnkey: {
+        title: padelCourtZakazSeed.turnkey.title,
+        intro: padelCourtZakazSeed.turnkey.intro,
+        steps: padelCourtZakazSeed.turnkey.steps.map((step, index) => ({ ...step, image: padelCourtZakazMedia.turnkey[index].id })),
+      },
+      price: padelCourtZakazSeed.price,
+      technology: {
+        title: padelCourtZakazSeed.technology.title,
+        text: padelCourtZakazSeed.technology.text,
+        background: padelCourtZakazMedia.technologyBackground,
+        items: padelCourtZakazSeed.technology.items,
+      },
+      gallery: {
+        title: padelCourtZakazSeed.gallery.title,
+        text: padelCourtZakazSeed.gallery.text,
+        creditLabel: padelCourtZakazSeed.gallery.creditLabel,
+        items: padelCourtZakazSeed.gallery.items.map((item, index) => ({ caption: item.caption, media: padelCourtZakazMedia.gallery[index] })),
+      },
+      models: {
+        title: padelCourtZakazSeed.models.title,
+        text: padelCourtZakazSeed.models.text,
+        badge: padelCourtZakazSeed.models.badge,
+        items: padelCourtZakazSeed.models.items.map((model, index) => ({
+          ...model,
+          image: padelCourtZakazMedia.models[index],
+          highlights: model.highlights.map((text) => ({ text })),
+        })),
+      },
+      cta: {
+        ...padelCourtZakazSeed.cta,
+        guarantees: padelCourtZakazSeed.cta.guarantees.map((text) => ({ text })),
+      },
+      seo: { ...padelCourtZakazSeed.seo, socialImage: padelCourtZakazMedia.heroImage },
+    }
+    const draftPadelCourtZakaz = await payload.findGlobal({ slug: 'padel-court-zakaz-page', draft: true, depth: 0, overrideAccess: true, showHiddenFields: true } as never) as unknown as Record<string, any>
+    const currentPadelCourtZakaz = draftPadelCourtZakaz.seedVersion === seedVersion
+      ? await payload.findGlobal({ slug: 'padel-court-zakaz-page', draft: false, depth: 0, overrideAccess: true, showHiddenFields: true } as never) as unknown as typeof draftPadelCourtZakaz
+      : draftPadelCourtZakaz
+    if (currentPadelCourtZakaz.seedVersion === seedVersion) {
+      stats.skipped += 1
+      if (!currentPadelCourtZakaz.seo?.socialImage) {
+        await payload.updateGlobal({ slug: 'padel-court-zakaz-page', draft: false, overrideAccess: true, data: { seo: { ...currentPadelCourtZakaz.seo, socialImage: padelCourtZakazMedia.heroImage }, _status: 'published' } as never } as never)
+        stats.globalsPublished += 1
+      }
+    } else {
+      assertGlobalCanBeSeeded('padel-court-zakaz-page', currentPadelCourtZakaz)
+      await payload.updateGlobal({ slug: 'padel-court-zakaz-page', draft: false, overrideAccess: true, data: padelCourtZakazPage as never } as never)
+      stats.globalsPublished += 1
     }
 
     const draftCurrentHome = await payload.findGlobal({ slug: 'homepage', draft: true, depth: 0, overrideAccess: true, showHiddenFields: true })

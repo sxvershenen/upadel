@@ -79,9 +79,21 @@ export async function GET() {
         }),
       )
     ).flat();
-    const codeDefined = codeDefinedRouteRegistry
-      .filter((route) => route.robots === "index-follow" && !excluded.has(route.path))
-      .map((route) => ({ path: route.path, canonical: route.canonical }));
+    const codeDefined = (
+      await Promise.all(
+        codeDefinedRouteRegistry.map(async (route) => {
+          if (excluded.has(route.path)) return null;
+          const routePath = route.path;
+          const routeCanonical = route.canonical;
+          const routeRobots = String(route.robots);
+          if (!("globalSlug" in route)) return routeRobots === "index-follow" ? { path: routePath, canonical: routeCanonical } : null;
+          const page = (await payload.findGlobal({ slug: route.globalSlug, draft: false, depth: 0, overrideAccess: true } as never)) as unknown as IndexDocument;
+          return page._status === "published" && page.seo?.robots === "index-follow"
+            ? { path: route.path, lastmod: page.updatedAt, canonical: page.seo.canonical }
+            : null;
+        }),
+      )
+    ).filter(Boolean);
     return Response.json(
       { urls: [...fixed, ...codeDefined, ...dynamic] },
       { headers: { "Cache-Control": "public, max-age=0, s-maxage=300" } },

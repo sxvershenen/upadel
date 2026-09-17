@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { homepageDTOversion, parseCatalogDTO } from './index'
+import { homepageDTOversion, parseCatalogDTO, parsePadelCourtZakazPageDTO } from './index'
 
 const page = { eyebrow: 'Блог', title: 'Блог', intro: 'Статьи', hero: { media: { alt: 'Фон', mimeType: 'image/webp', url: '/hero.webp' }, grayscale: false }, seo: {} }
 
@@ -51,4 +51,30 @@ test('catalog contract rejects malformed desktop navigation children', () => {
     site: { desktopNavigation: [{ label: 'Цены', href: '/prices', children: { label: 'Аренда', href: '/prices' } }] },
     items: [],
   }), /invalid children/)
+})
+
+const padelPage = {
+  version: homepageDTOversion,
+  preview: false,
+  generatedAt: new Date().toISOString(),
+  kind: 'padel-court-zakaz',
+  page,
+  site: { desktopNavigation: [] },
+  hero: { metrics: [] },
+  distributor: { advantages: [] },
+  turnkey: { steps: [] },
+  price: { factors: [] },
+  technology: { background: { alt: '', mimeType: 'image/webp', url: '/tech.webp' }, items: [] },
+  gallery: { items: [] },
+  models: { items: [] },
+  cta: { guarantees: [] },
+}
+
+test('padel court page contract accepts typed content and rejects unapproved visual tokens', () => {
+  const dto = parsePadelCourtZakazPageDTO(padelPage)
+  assert.equal(dto.kind, 'padel-court-zakaz')
+  assert.throws(() => parsePadelCourtZakazPageDTO({
+    ...padelPage,
+    turnkey: { steps: [{ icon: 'UnknownIcon', overlay: 'overlay-blue' }] },
+  }), /visual token/)
 })

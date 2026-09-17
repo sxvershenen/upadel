@@ -25,7 +25,7 @@ export function requiredMedia(value: unknown, origin: string, variant: MediaVari
 export function pageHeroDTO(value: unknown, kind: string, origin: string): PageHeroDTO {
   const page = value && typeof value === 'object' ? value as { heroImage?: unknown; heroGrayscale?: boolean } : {}
   const uploaded = mediaDTO(page.heroImage, origin, 'hero')
-  const assetKind = kind === 'policy' || kind === 'oferta' || kind === 'gift' ? 'about' : kind
+  const assetKind = kind === 'policy' || kind === 'oferta' || kind === 'gift' || kind === 'padel-court-zakaz' ? 'about' : kind
   const media = uploaded ?? { alt: `Фон страницы ${kind}`, height: 745, mimeType: 'image/webp', url: new URL(`/page-heroes/${assetKind}.webp`, process.env.PUBLIC_WEB_URL ?? origin).toString(), width: 2110 }
   return { media, grayscale: page.heroGrayscale !== false }
 }
