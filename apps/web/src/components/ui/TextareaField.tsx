@@ -1,5 +1,6 @@
 import { forwardRef, useId, type ReactNode, type TextareaHTMLAttributes } from "react";
 import { cn } from "../../utils/cn";
+import { revealAttributes, type RevealConfig } from "./revealAttributes";
 
 export interface TextareaFieldProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   label: string;
@@ -8,10 +9,11 @@ export interface TextareaFieldProps extends TextareaHTMLAttributes<HTMLTextAreaE
   tone?: "light" | "dark";
   labelVisibility?: "visible" | "sr-only";
   containerClassName?: string;
+  reveal?: RevealConfig;
 }
 
 export const TextareaField = forwardRef<HTMLTextAreaElement, TextareaFieldProps>(
-  ({ id: suppliedId, label, description, error, tone = "light", labelVisibility = "visible", className, containerClassName, disabled, "aria-describedby": suppliedDescribedBy, "aria-invalid": suppliedInvalid, ...nativeProps }, ref) => {
+  ({ id: suppliedId, label, description, error, tone = "light", labelVisibility = "visible", reveal = true, className, containerClassName, disabled, "aria-describedby": suppliedDescribedBy, "aria-invalid": suppliedInvalid, ...nativeProps }, ref) => {
     const generatedId = useId();
     const id = suppliedId ?? `textarea-${generatedId}`;
     const descriptionId = description ? `${id}-description` : undefined;
@@ -19,7 +21,7 @@ export const TextareaField = forwardRef<HTMLTextAreaElement, TextareaFieldProps>
     const describedBy = [suppliedDescribedBy, descriptionId, errorId].filter(Boolean).join(" ") || undefined;
     const dark = tone === "dark";
 
-    return <div className={cn("flex flex-col", containerClassName)}>
+    return <div {...revealAttributes(reveal)} className={cn("flex flex-col", containerClassName)}>
       <label htmlFor={id} className={cn("type-caption mb-2 font-medium", labelVisibility === "sr-only" && "sr-only", dark ? "text-white/70" : "text-ink-soft")}>{label}</label>
       <textarea
         ref={ref}

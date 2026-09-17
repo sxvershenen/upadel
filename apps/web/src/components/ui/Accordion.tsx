@@ -1,8 +1,9 @@
-import { useId, useState, type CSSProperties } from "react";
+import { useId, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Plus } from "lucide-react";
 import { springSoft } from "../../lib/motion";
 import { cn } from "../../utils/cn";
+import { revealAttributes } from "./revealAttributes";
 
 export function Accordion({ items }: { items: { q: string; a: string }[] }) {
   const [open, setOpen] = useState<number | null>(0);
@@ -17,8 +18,7 @@ export function Accordion({ items }: { items: { q: string; a: string }[] }) {
         return (
           <div
             key={`${item.q}-${i}`}
-            data-reveal
-            style={{ "--reveal-delay": `${i * 0.05}s`, "--reveal-y": "14px" } as CSSProperties}
+            {...revealAttributes({ delay: i * 0.05, y: 14 })}
             className="border-b border-ink/10 first:border-t"
           >
             <button

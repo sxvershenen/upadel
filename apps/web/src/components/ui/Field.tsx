@@ -1,5 +1,6 @@
 import { forwardRef, useId, type InputHTMLAttributes, type ReactNode } from "react";
 import { cn } from "../../utils/cn";
+import { revealAttributes, type RevealConfig } from "./revealAttributes";
 
 export interface FieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "size"> {
   label: string;
@@ -10,10 +11,11 @@ export interface FieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
   labelVisibility?: "visible" | "sr-only";
   fieldClassName?: string;
   containerClassName?: string;
+  reveal?: RevealConfig;
 }
 
 export const Field = forwardRef<HTMLInputElement, FieldProps>(
-  ({ id: suppliedId, label, description, error, suffix, tone = "light", labelVisibility = "visible", className, fieldClassName, containerClassName, disabled, "aria-describedby": suppliedDescribedBy, "aria-invalid": suppliedInvalid, ...nativeProps }, ref) => {
+  ({ id: suppliedId, label, description, error, suffix, tone = "light", labelVisibility = "visible", reveal = true, className, fieldClassName, containerClassName, disabled, "aria-describedby": suppliedDescribedBy, "aria-invalid": suppliedInvalid, ...nativeProps }, ref) => {
     const generatedId = useId();
     const id = suppliedId ?? `field-${generatedId}`;
     const descriptionId = description ? `${id}-description` : undefined;
@@ -21,7 +23,7 @@ export const Field = forwardRef<HTMLInputElement, FieldProps>(
     const describedBy = [suppliedDescribedBy, descriptionId, errorId].filter(Boolean).join(" ") || undefined;
     const dark = tone === "dark";
 
-    return <div className={cn("flex flex-col", containerClassName)}>
+    return <div {...revealAttributes(reveal)} className={cn("flex flex-col", containerClassName)}>
       <label htmlFor={id} className={cn("type-caption mb-2 font-medium", labelVisibility === "sr-only" && "sr-only", dark ? "text-white/70" : "text-ink-soft")}>{label}</label>
       <div className={cn(
         "se-2 flex h-[var(--control-md)] items-center gap-2 px-4 transition-colors focus-within:outline-2 focus-within:outline-[var(--color-focus)] focus-within:outline-offset-2",
