@@ -18,7 +18,7 @@ test('page header renders one heading without an extra back-link wrapper or spac
   assert.doesNotMatch(html, /Назад/)
   assert.doesNotMatch(html, /h-\[60px\]/)
   assert.doesNotMatch(html, /min-h-\[760px\]/)
-  assert.match(html, /data-page-enter="eyebrow"/)
+  assert.doesNotMatch(html, /data-page-enter="eyebrow"/)
   assert.match(html, /data-page-enter="title"/)
   assert.match(html, /data-page-enter="intro"/)
 })

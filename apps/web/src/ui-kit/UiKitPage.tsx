@@ -24,6 +24,8 @@ import {
   OfferCard,
   RentalRateCard,
   ReviewCard,
+  Select,
+  SelectField,
   SurfaceCard,
   Tabs,
   TournamentCard,
@@ -112,6 +114,7 @@ export function UiKitPage() {
   const { home, entities } = useContent();
   const [tab, setTab] = useState<"rent" | "training" | "membership">("rent");
   const [email, setEmail] = useState("hello@");
+  const [selectValue, setSelectValue] = useState("newest");
   const [sheetOpen, setSheetOpen] = useState(false);
   const [notice, setNotice] = useState("Компоненты готовы к проверке мышью и клавиатурой");
   const emailError = email && !/^\S+@\S+\.\S+$/.test(email) ? "Введите полный адрес электронной почты" : undefined;
@@ -152,7 +155,7 @@ export function UiKitPage() {
         </div>
       </KitSection>
 
-      <KitSection id="controls" eyebrow="Controls" title="Кнопки, ссылки и поля" note="Native props, refs, focus-visible, disabled и busy проходят через production API. Высота задаётся размером компонента.">
+      <KitSection id="controls" eyebrow="Controls" title="Кнопки, ссылки и поля" note="Select использует тот же плавный dropdown-shell, что и меню; между пунктами только 2 px, а внутренние отступы компактные.">
         <div className="grid gap-4 xl:grid-cols-2">
           <Demo title="Variants"><div className="flex flex-wrap gap-3">{designSystemCatalog.buttonVariants.filter((v) => v !== "glass").map((variant) => <Button key={variant} variant={variant} onClick={() => setNotice(`Нажата кнопка ${variant}`)}>{variant}</Button>)}</div></Demo>
           <Demo title="Glass" dark><div className="flex flex-wrap gap-3"><Button variant="glass">Glass action</Button><ButtonLink href="#patterns" variant="glass" icon={<ChevronRight size={16} />}>Glass link</ButtonLink></div></Demo>
@@ -161,6 +164,7 @@ export function UiKitPage() {
           <Demo title="Icon buttons"><div className="flex items-center gap-3"><IconButton size="sm" aria-label="Добавить в избранное"><Heart size={17} /></IconButton><IconButton aria-label="Отправить письмо" variant="dark"><Mail size={18} /></IconButton><IconButton aria-label="Недоступное действие" disabled><ChevronRight size={18} /></IconButton></div></Demo>
           <Demo title="Badge tones"><div className="flex flex-wrap gap-2">{designSystemCatalog.badgeTones.filter((tone) => tone !== "glass" && tone !== "outline-light").map((tone) => <Badge key={tone} tone={tone}>{tone}</Badge>)}</div><div className="se-2 mesh-dark mt-4 flex flex-wrap gap-2 p-4">{(["glass", "outline-light"] as const).map((tone) => <Badge key={tone} tone={tone}>{tone}</Badge>)}</div></Demo>
           <Demo title="Fields"><div className="grid gap-5"><Field label="Электронная почта" value={email} onChange={(event) => setEmail(event.target.value)} description="Пришлём подтверждение брони" error={emailError} placeholder="name@example.com" /><Field label="Номер карты" value="Недоступно" disabled /></div></Demo>
+          <Demo title="Select / dropdown"><div className="grid gap-5 md:grid-cols-2"><Select aria-label="Сортировка" value={selectValue} onChange={setSelectValue} options={[{ value: "newest", label: "Сначала новые" }, { value: "popular", label: "Популярные" }, { value: "recommended", label: "Рекомендованные" }]} /><SelectField label="Формат тренировки" name="kit-format" value={selectValue} onChange={(event) => setSelectValue(event.target.value)} options={[{ value: "newest", label: "Индивидуальная" }, { value: "popular", label: "Групповая" }, { value: "recommended", label: "Детская" }]} /></div></Demo>
         </div>
       </KitSection>
 
