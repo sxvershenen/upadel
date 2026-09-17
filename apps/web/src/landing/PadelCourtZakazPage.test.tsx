@@ -4,18 +4,27 @@ import test from 'node:test'
 import React from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 
-import {
-  CourtModelTabs,
-  models,
-  turnkeySteps,
-  technologies,
-  distributorAdvantages,
-  priceFactors,
-  typograph,
-} from './PadelCourtZakazPage'
+import type { PadelCourtZakazPageDTO } from '@unlim/content-contract'
+import { CourtModelTabs, typograph } from './PadelCourtZakazPage'
+
+type PadelModel = PadelCourtZakazPageDTO['models']['items'][number]
+const media = (file: string) => ({ alt: `Модель ${file}`, mimeType: 'image/webp', url: `https://cms.test/${file}`, width: 1920, height: 1080 })
+const specLabels = ['Остекление', 'Силовой каркас', 'Антикоррозия', 'Сетка', 'Крепёж', 'Ветростойкость']
+const models: PadelModel[] = [
+  ['infinity', 'Infinity', '3c.png'],
+  ['super-panoramic', 'Super Panoramic', '3a.png'],
+  ['panoramic', 'Panoramic', '3.png'],
+  ['vision-pro', 'Vision Pro', 'visiopro-side.png'],
+  ['infinity-tournament', 'Infinity Tournament', 'infinity_ParaWbTournament.107.png'],
+  ['infinity-xtrem', 'Infinity Xtrem', '3-1.png'],
+].map(([id, name, file]) => ({
+  id, name, eyebrow: 'JUBO', title: `${name} title`, tagline: `${name} tagline`, description: `${name} description`, image: media(file),
+  specs: specLabels.map((label) => ({ label, value: `${name} ${label}` })),
+  highlights: [`${name} highlight`],
+}))
 
 test('court model tabs expose all 6 JUBO models, crisp photos, and standardized specs in server HTML', () => {
-  const html = renderToStaticMarkup(<CourtModelTabs />)
+  const html = renderToStaticMarkup(<CourtModelTabs badge="JUBO · Испания" models={models} />)
 
   assert.equal((html.match(/role="tab"/g) ?? []).length, 6)
   assert.equal((html.match(/role="tabpanel"/g) ?? []).length, 6)
@@ -43,23 +52,14 @@ test('court model tabs expose all 6 JUBO models, crisp photos, and standardized 
   assert.equal(html.includes('Запросить расчёт модели'), false)
 
   // Verify all 6 models have the exact same 6 standardized spec rows in identical order
-  const expectedLabels = ['Остекление', 'Силовой каркас', 'Антикоррозия', 'Сетка', 'Крепёж', 'Ветростойкость']
+  const expectedLabels = specLabels
   for (const model of models) {
     const labels = model.specs.map((s) => s.label)
     assert.deepEqual(labels, expectedLabels, `Model ${model.name} must have standardized spec rows`)
   }
 })
 
-test('specifications and data arrays contain all turnkey stages and technologies', () => {
-  assert.equal(models.length, 6)
-  assert.equal(turnkeySteps.length, 5)
-  assert.equal(technologies.length, 6)
-  assert.equal(distributorAdvantages.length, 4)
-  assert.equal(priceFactors.length, 8)
-
-  assert.equal(turnkeySteps[0].number, '01')
-  assert.equal(turnkeySteps[4].number, '05')
-
+test('model cards remain driven by the typed CMS DTO shape', () => {
   const modelNames = models.map((m) => m.name)
   assert.deepEqual(modelNames, [
     'Infinity',

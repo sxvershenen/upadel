@@ -1,18 +1,26 @@
 ---
-import type { ThematicPageDTO } from '@unlim/content-contract'
+import type { PadelCourtZakazPageDTO, ThematicPageDTO } from '@unlim/content-contract'
 import { ThematicPage } from '../../thematic/ThematicPage'
-import { loadPage, PageLoadError, type ThematicPageKind } from '../../content/loadPage'
+import { loadPadelCourtZakazPage, loadPage, PageLoadError, type ThematicPageKind } from '../../content/loadPage'
+import { PadelCourtZakazPage } from '../../landing/PadelCourtZakazPage'
 import SiteLayout from '../../layouts/SiteLayout.astro'
 export const prerender = false
 const type = Astro.url.searchParams.get('type')
 const secret = Astro.url.searchParams.get('secret')
 const kinds: ThematicPageKind[] = ['prices', 'training', 'gift', 'courts', 'gallery', 'about', 'contacts', 'policy', 'oferta']
-const allowed = kinds.includes(type as ThematicPageKind)
+const padelCourtZakaz = type === 'padel-court-zakaz'
+const allowed = padelCourtZakaz || kinds.includes(type as ThematicPageKind)
 let dto: ThematicPageDTO | null = null
+let padelDTO: PadelCourtZakazPageDTO | null = null
 let denied = !allowed || !secret
-if (allowed && secret) { try { dto = await loadPage(import.meta.env.CMS_URL, type as ThematicPageKind, secret) } catch (error) { if (error instanceof PageLoadError && error.status === 403) denied = true; else throw error } }
+if (allowed && secret) {
+  try {
+    if (padelCourtZakaz) padelDTO = await loadPadelCourtZakazPage(import.meta.env.CMS_URL, secret)
+    else dto = await loadPage(import.meta.env.CMS_URL, type as ThematicPageKind, secret)
+  } catch (error) { if (error instanceof PageLoadError && error.status === 403) denied = true; else throw error }
+}
 if (denied) Astro.response.status = 403
 Astro.response.headers.set('Cache-Control', 'no-store')
 Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow')
 ---
-{dto ? <SiteLayout site={dto.site} title={dto.page.title} description={dto.page.intro} robots="noindex,nofollow"><ThematicPage client:load dto={dto} /></SiteLayout> : <html lang="ru"><head><meta charset="utf-8" /><meta name="robots" content="noindex,nofollow" /><title>Preview access denied</title></head><body><main><h1>Доступ к предпросмотру запрещён</h1></main></body></html>}
+{padelDTO ? <SiteLayout site={padelDTO.site} title={padelDTO.page.seo.title ?? padelDTO.page.title} description={padelDTO.page.seo.description ?? padelDTO.page.intro} robots="noindex,nofollow" socialImage={padelDTO.page.seo.socialImage?.url ?? padelDTO.page.hero.media.url}><PadelCourtZakazPage client:load dto={padelDTO} /></SiteLayout> : dto ? <SiteLayout site={dto.site} title={dto.page.title} description={dto.page.intro} robots="noindex,nofollow"><ThematicPage client:load dto={dto} /></SiteLayout> : <html lang="ru"><head><meta charset="utf-8" /><meta name="robots" content="noindex,nofollow" /><title>Preview access denied</title></head><body><main><h1>Доступ к предпросмотру запрещён</h1></main></body></html>}

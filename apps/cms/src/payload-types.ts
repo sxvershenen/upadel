@@ -137,6 +137,7 @@ export interface Config {
     'training-page': TrainingPage;
     'gift-page': GiftPage;
     'courts-page': CourtsPage;
+    'padel-court-zakaz-page': PadelCourtZakazPage;
     'gallery-page': GalleryPage;
     'about-page': AboutPage;
     'contacts-page': ContactsPage;
@@ -153,6 +154,7 @@ export interface Config {
     'training-page': TrainingPageSelect<false> | TrainingPageSelect<true>;
     'gift-page': GiftPageSelect<false> | GiftPageSelect<true>;
     'courts-page': CourtsPageSelect<false> | CourtsPageSelect<true>;
+    'padel-court-zakaz-page': PadelCourtZakazPageSelect<false> | PadelCourtZakazPageSelect<true>;
     'gallery-page': GalleryPageSelect<false> | GalleryPageSelect<true>;
     'about-page': AboutPageSelect<false> | AboutPageSelect<true>;
     'contacts-page': ContactsPageSelect<false> | ContactsPageSelect<true>;
@@ -2802,6 +2804,222 @@ export interface CourtsPage {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "padel-court-zakaz-page".
+ */
+export interface PadelCourtZakazPage {
+  id: number;
+  seedVersion?: string | null;
+  eyebrow: string;
+  title: string;
+  intro: string;
+  /**
+   * MP4 или WebM. Если поле пустое, используется текущий fallback-видеофон.
+   */
+  heroVideo?: (number | null) | Media;
+  heroPrimaryLabel: string;
+  heroSecondaryLabel: string;
+  heroMetrics?:
+    | {
+        title: string;
+        caption: string;
+        id?: string | null;
+      }[]
+    | null;
+  distributor: {
+    title: string;
+    text: string;
+    advantages?:
+      | {
+          index: string;
+          title: string;
+          text: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  turnkey: {
+    title: string;
+    intro: string;
+    steps?:
+      | {
+          number: string;
+          title: string;
+          text: string;
+          image: number | Media;
+          icon:
+            | 'Ruler'
+            | 'Settings2'
+            | 'Truck'
+            | 'Wrench'
+            | 'ClipboardCheck'
+            | 'Layers3'
+            | 'ShieldCheck'
+            | 'Factory'
+            | 'Sparkles'
+            | 'Wind'
+            | 'CheckCircle2';
+          overlay: 'overlay-blue' | 'overlay-violet' | 'overlay-emerald' | 'overlay-lime' | 'overlay-dark';
+          id?: string | null;
+        }[]
+      | null;
+  };
+  price: {
+    title: string;
+    text: string;
+    actionLabel: string;
+    factors?:
+      | {
+          label: string;
+          detail: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  technology: {
+    title: string;
+    text: string;
+    background: number | Media;
+    items?:
+      | {
+          title: string;
+          tag: string;
+          text: string;
+          icon:
+            | 'Ruler'
+            | 'Settings2'
+            | 'Truck'
+            | 'Wrench'
+            | 'ClipboardCheck'
+            | 'Layers3'
+            | 'ShieldCheck'
+            | 'Factory'
+            | 'Sparkles'
+            | 'Wind'
+            | 'CheckCircle2';
+          id?: string | null;
+        }[]
+      | null;
+  };
+  gallery: {
+    title: string;
+    text: string;
+    creditLabel: string;
+    items?:
+      | {
+          media: number | Media;
+          caption: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  models: {
+    title: string;
+    text: string;
+    badge: string;
+    items?:
+      | {
+          id: string;
+          name: string;
+          eyebrow: string;
+          title: string;
+          tagline: string;
+          description: string;
+          image: number | Media;
+          specs?:
+            | {
+                label: string;
+                value: string;
+                id?: string | null;
+              }[]
+            | null;
+          highlights?:
+            | {
+                text: string;
+                id?: string | null;
+              }[]
+            | null;
+        }[]
+      | null;
+  };
+  cta: {
+    title: string;
+    text: string;
+    guarantees?:
+      | {
+          text: string;
+          id?: string | null;
+        }[]
+      | null;
+    contacts: {
+      telegramLabel: string;
+      telegramURL: string;
+      vkLabel: string;
+      vkURL: string;
+      phoneLabel: string;
+    };
+    form: {
+      title: string;
+      channelLabel: string;
+      nameLabel: string;
+      namePlaceholder: string;
+      phoneLabel: string;
+      phonePlaceholder: string;
+      telegramLabel: string;
+      telegramPlaceholder: string;
+      vkLabel: string;
+      vkPlaceholder: string;
+      modelLabel: string;
+      modelOptionPrefix: string;
+      consultationOptionLabel: string;
+      courtCountLabel: string;
+      courtCountOneLabel: string;
+      courtCountTwoThreeLabel: string;
+      courtCountFourSixLabel: string;
+      courtCountSevenPlusLabel: string;
+      cityLabel: string;
+      cityPlaceholder: string;
+      commentLabel: string;
+      commentPlaceholder: string;
+      consentLabel: string;
+      policyLabel: string;
+      submitLabel: string;
+      successTitle: string;
+      successText: string;
+      resubmitLabel: string;
+      nameError: string;
+      contactError: string;
+      consentError: string;
+      submitError: string;
+      connectionError: string;
+    };
+  };
+  /**
+   * Если поле пустое, используется подготовленный фон страницы.
+   */
+  heroImage?: (number | null) | Media;
+  /**
+   * Картинка страницы получает спокойный grayscale-режим.
+   */
+  heroGrayscale?: boolean | null;
+  seo: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Оставьте пустым, чтобы использовать основной публичный URL записи.
+     */
+    canonical?: string | null;
+    robots: 'index-follow' | 'noindex-follow' | 'noindex-nofollow';
+    /**
+     * Не заменяет фотографию карточки или preview image самой сущности.
+     */
+    socialImage?: (number | null) | Media;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "gallery-page".
  */
 export interface GalleryPage {
@@ -3677,6 +3895,205 @@ export interface CourtsPageSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "padel-court-zakaz-page_select".
+ */
+export interface PadelCourtZakazPageSelect<T extends boolean = true> {
+  seedVersion?: T;
+  eyebrow?: T;
+  title?: T;
+  intro?: T;
+  heroVideo?: T;
+  heroPrimaryLabel?: T;
+  heroSecondaryLabel?: T;
+  heroMetrics?:
+    | T
+    | {
+        title?: T;
+        caption?: T;
+        id?: T;
+      };
+  distributor?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        advantages?:
+          | T
+          | {
+              index?: T;
+              title?: T;
+              text?: T;
+              id?: T;
+            };
+      };
+  turnkey?:
+    | T
+    | {
+        title?: T;
+        intro?: T;
+        steps?:
+          | T
+          | {
+              number?: T;
+              title?: T;
+              text?: T;
+              image?: T;
+              icon?: T;
+              overlay?: T;
+              id?: T;
+            };
+      };
+  price?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        actionLabel?: T;
+        factors?:
+          | T
+          | {
+              label?: T;
+              detail?: T;
+              id?: T;
+            };
+      };
+  technology?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        background?: T;
+        items?:
+          | T
+          | {
+              title?: T;
+              tag?: T;
+              text?: T;
+              icon?: T;
+              id?: T;
+            };
+      };
+  gallery?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        creditLabel?: T;
+        items?:
+          | T
+          | {
+              media?: T;
+              caption?: T;
+              id?: T;
+            };
+      };
+  models?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        badge?: T;
+        items?:
+          | T
+          | {
+              id?: T;
+              name?: T;
+              eyebrow?: T;
+              title?: T;
+              tagline?: T;
+              description?: T;
+              image?: T;
+              specs?:
+                | T
+                | {
+                    label?: T;
+                    value?: T;
+                    id?: T;
+                  };
+              highlights?:
+                | T
+                | {
+                    text?: T;
+                    id?: T;
+                  };
+            };
+      };
+  cta?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        guarantees?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        contacts?:
+          | T
+          | {
+              telegramLabel?: T;
+              telegramURL?: T;
+              vkLabel?: T;
+              vkURL?: T;
+              phoneLabel?: T;
+            };
+        form?:
+          | T
+          | {
+              title?: T;
+              channelLabel?: T;
+              nameLabel?: T;
+              namePlaceholder?: T;
+              phoneLabel?: T;
+              phonePlaceholder?: T;
+              telegramLabel?: T;
+              telegramPlaceholder?: T;
+              vkLabel?: T;
+              vkPlaceholder?: T;
+              modelLabel?: T;
+              modelOptionPrefix?: T;
+              consultationOptionLabel?: T;
+              courtCountLabel?: T;
+              courtCountOneLabel?: T;
+              courtCountTwoThreeLabel?: T;
+              courtCountFourSixLabel?: T;
+              courtCountSevenPlusLabel?: T;
+              cityLabel?: T;
+              cityPlaceholder?: T;
+              commentLabel?: T;
+              commentPlaceholder?: T;
+              consentLabel?: T;
+              policyLabel?: T;
+              submitLabel?: T;
+              successTitle?: T;
+              successText?: T;
+              resubmitLabel?: T;
+              nameError?: T;
+              contactError?: T;
+              consentError?: T;
+              submitError?: T;
+              connectionError?: T;
+            };
+      };
+  heroImage?: T;
+  heroGrayscale?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        canonical?: T;
+        robots?: T;
+        socialImage?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "gallery-page_select".
  */
 export interface GalleryPageSelect<T extends boolean = true> {
@@ -3906,6 +4323,7 @@ export interface TaskSchedulePublish {
           | 'training-page'
           | 'gift-page'
           | 'courts-page'
+          | 'padel-court-zakaz-page'
           | 'gallery-page'
           | 'about-page'
           | 'contacts-page'

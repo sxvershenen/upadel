@@ -105,21 +105,46 @@ export async function GET(request: Request): Promise<Response> {
         };
       }),
     );
-    const codeDefined = codeDefinedRouteRegistry.map((route) => ({
-      path: route.path,
-      parent: route.parent,
-      template: route.template,
-      title: route.title,
-      status: "published",
-      robots: route.robots,
-      issues: [
-        !route.title && "Нет SEO title",
-        !route.description && "Нет description",
-        !route.socialImage && "Нет social image",
-      ].filter(Boolean),
-      edit: "",
-      public: publicBase ? new URL(route.path, publicBase).toString() : null,
-      preview: null,
+    const codeDefined = await Promise.all(codeDefinedRouteRegistry.map(async (route) => {
+      const globalSlug = "globalSlug" in route ? route.globalSlug : null;
+      const [draftDoc, publishedDoc] = globalSlug
+        ? (await Promise.all([
+            payload.findGlobal({ slug: globalSlug, draft: true, depth: 0, overrideAccess: true, showHiddenFields: false } as never),
+            payload.findGlobal({ slug: globalSlug, draft: false, depth: 0, overrideAccess: true, showHiddenFields: false } as never),
+          ])) as unknown as [PublicDocument, PublicDocument]
+        : [null, null];
+      const hasPublished = globalSlug ? publishedDoc?._status === "published" : true;
+      const seo = draftDoc?.seo ?? {};
+      let preview: string | null = null;
+      if (globalSlug && process.env.PUBLIC_WEB_URL && process.env.PREVIEW_SECRET) {
+        const url = new URL("/preview/page", process.env.PUBLIC_WEB_URL);
+        url.searchParams.set("type", route.template);
+        url.searchParams.set("secret", process.env.PREVIEW_SECRET);
+        preview = url.toString();
+      }
+      return {
+        path: route.path,
+        parent: route.parent,
+        template: route.template,
+        title: draftDoc?.title ?? route.title,
+        status: globalSlug ? resolvePageMapStatus(draftDoc?._status, hasPublished) : "published",
+        robots: seo.robots ?? route.robots,
+        issues: globalSlug
+          ? [
+              !draftDoc?.title && "Нет названия CMS-страницы",
+              !seo.title && "Нет SEO title",
+              !seo.description && "Нет description",
+              !seo.socialImage && "Нет social image",
+            ].filter(Boolean)
+          : [
+              !route.title && "Нет SEO title",
+              !route.description && "Нет description",
+              !route.socialImage && "Нет social image",
+            ].filter(Boolean),
+        edit: globalSlug ? formatAdminURL({ adminRoute, path: `/globals/${globalSlug}` }) : "",
+        public: publicBase && hasPublished ? new URL(route.path, publicBase).toString() : null,
+        preview,
+      };
     }));
     const dynamicRows = (
       await Promise.all(

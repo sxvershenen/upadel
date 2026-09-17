@@ -3,15 +3,18 @@ import type { Field, GlobalConfig } from 'payload'
 import { authenticated } from '../fields/access'
 import { createActionField } from '../fields/action'
 import { pageHeroFields } from '../fields/pageHero'
+import { padelCourtZakazFields } from '../fields/padelCourtZakaz'
 import { seoField } from '../fields/seo'
 import { requirePublishedGlobal } from '../hooks/requirePublishedGlobal'
 
 export type ThematicPageKind = 'prices' | 'training' | 'gift' | 'courts' | 'gallery' | 'about' | 'contacts' | 'policy' | 'oferta'
-export type ThematicPageSlug = `${ThematicPageKind}-page`
+export type CodeDefinedPageKind = 'padel-court-zakaz'
+export type ThematicPageSlug = `${ThematicPageKind | CodeDefinedPageKind}-page`
 
-function createThematicPage(args: { slug: ThematicPageSlug; label: string; kind: ThematicPageKind; fields?: Field[]; hidden?: boolean }): GlobalConfig {
+function createThematicPage(args: { slug: ThematicPageSlug; label: string; kind: ThematicPageKind | CodeDefinedPageKind; fields?: Field[]; hidden?: boolean; dbName?: string }): GlobalConfig {
   return {
     slug: args.slug,
+    ...(args.dbName ? { dbName: args.dbName } : {}),
     label: args.label,
     access: { read: () => true, readVersions: authenticated, update: authenticated },
     admin: {
@@ -142,6 +145,14 @@ export const CourtsPage = createThematicPage({
       ],
     },
   ],
+})
+
+export const PadelCourtZakazPage = createThematicPage({
+  slug: 'padel-court-zakaz-page',
+  label: 'Падел-корты JUBO под ключ',
+  kind: 'padel-court-zakaz',
+  dbName: 'padel_court_page',
+  fields: padelCourtZakazFields,
 })
 
 export const GalleryPage = createThematicPage({ slug: 'gallery-page', label: 'Галерея', kind: 'gallery' })

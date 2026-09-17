@@ -1,21 +1,20 @@
 ---
-import { padelCourtZakazRoute } from '@unlim/content-contract'
-import { loadHomepage } from '../content/loadHomepage'
+import { loadPadelCourtZakazPage } from '../content/loadPage'
 import { PadelCourtZakazPage } from '../landing/PadelCourtZakazPage'
 import SiteLayout from '../layouts/SiteLayout.astro'
 
-const content = await loadHomepage({ cmsURL: import.meta.env.CMS_URL })
-const canonical = new URL(padelCourtZakazRoute.path, import.meta.env.PUBLIC_SITE_URL ?? Astro.url.origin).toString()
+const content = await loadPadelCourtZakazPage(import.meta.env.CMS_URL)
+const canonical = content.page.seo.canonical ?? new URL('/padel-court-zakaz', import.meta.env.PUBLIC_SITE_URL ?? Astro.url.origin).toString()
 ---
 
 <SiteLayout
-  site={content.site}
-  title={padelCourtZakazRoute.title}
-  description={padelCourtZakazRoute.description}
-  canonical={canonical}
-  robots={padelCourtZakazRoute.robots}
-  socialImage={padelCourtZakazRoute.socialImage}
-  webmasterVerification={content.site.analytics.vendors.webmasterVerification}
+	site={content.site}
+	title={content.page.seo.title ?? content.page.title}
+	description={content.page.seo.description ?? content.page.intro}
+	canonical={canonical}
+	robots={content.page.seo.robots}
+	socialImage={content.page.seo.socialImage?.url ?? content.page.hero.media.url}
+	webmasterVerification={content.site.analytics.vendors.webmasterVerification}
 >
-  <PadelCourtZakazPage client:load site={content.site} />
+	<PadelCourtZakazPage client:load dto={content} />
 </SiteLayout>

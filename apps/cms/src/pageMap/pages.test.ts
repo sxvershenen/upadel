@@ -34,6 +34,8 @@ test('typed registries include CMS thematic routes and the code-defined padel la
   assert.equal(fixedPaths.has('/training'), true)
   assert.equal(fixedPaths.has('/gift'), true)
   assert.deepEqual(codeDefinedRouteRegistry.map(({ path }) => path), ['/padel-court-zakaz', '/padel-courts'])
+  assert.equal('globalSlug' in codeDefinedRouteRegistry[0] ? codeDefinedRouteRegistry[0].globalSlug : null, 'padel-court-zakaz-page')
+  assert.equal('globalSlug' in codeDefinedRouteRegistry[1], false)
 
   const payload = { find: async () => { throw new Error('registry path must not query the database') } } as unknown as Payload
   assert.equal(await pagePathExists(payload, '/padel-court-zakaz'), true)
