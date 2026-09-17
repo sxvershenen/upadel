@@ -1,5 +1,5 @@
 import type { PricesPageDTO, ThematicPageDTO, TrainingPageDTO } from '@unlim/content-contract'
-import { BadgeCheck, Calendar, CalendarCheck, Car, Clock, Gift, Layers3, Lightbulb, MapPin, PanelTop, RefreshCw, Sparkles, Target, Thermometer, Train, TrendingUp, Users } from 'lucide-react'
+import { Calendar, CalendarCheck, Car, Clock, Layers3, Lightbulb, MapPin, PanelTop, RefreshCw, Target, Thermometer, Train, TrendingUp, Users } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useRef, useState, type CSSProperties, type KeyboardEvent } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
@@ -12,7 +12,6 @@ import { TrainingCard } from '../components/cards/TrainingCard'
 import { CourtCard } from '../components/cards/CourtCards'
 import { ContentAction } from '../components/ContentAction'
 import { SiteFrame } from '../components/SiteFrame'
-import { Accordion } from '../components/ui/Accordion'
 import { MobileSwiperNav } from '../components/ui/MobileSwiperNav'
 import { horizontalSwiperProps } from '../lib/swiper'
 import { springLayout } from '../lib/motion'
@@ -50,7 +49,6 @@ function Prices({ dto }: { dto: PricesPageDTO }) {
 }
 
 const trainingIcons = { Target, Calendar, TrendingUp, Users }
-const giftIcons = { Gift, BadgeCheck, CalendarCheck, Sparkles }
 const metricIcons = { Layers3, PanelTop, Lightbulb, Thermometer }
 const arrivalIcons = { Car, Train, Clock, MapPin }
 
@@ -98,21 +96,11 @@ function TrainingPage({ dto }: { dto: TrainingPageDTO }) {
   </article>
 }
 
-function GiftPage({ dto }: { dto: Extract<ThematicPageDTO, { kind: 'gift' }> }) {
-  return <article className="container-page pb-12 pt-10 md:pb-16 md:pt-14">
-    <section className="grid gap-8 lg:grid-cols-[.72fr_1.28fr] lg:items-start" aria-labelledby="gift-offer-title">
-      <div className="se-4 bg-white p-6 md:p-8"><span className="type-eyebrow text-ink-muted">{dto.offerEyebrow}</span><h2 id="gift-offer-title" className="type-section mt-3 text-ink">{dto.offerTitle}</h2><p className="type-body mt-4 max-w-[560px] text-ink-soft">{dto.offerCopy}</p><div className="mt-7"><ContentAction action={dto.action} sourcePage="/gift" sourceEntity={dto.offerTitle} /></div></div>
-      <ul className="grid gap-3 sm:grid-cols-2">{dto.benefits.map((benefit) => { const Icon = giftIcons[benefit.icon]; return <li key={benefit.title} className="se-3 bg-white p-5 md:p-6"><span className="se-2 flex h-10 w-10 items-center justify-center bg-surface-muted text-ink-soft"><Icon aria-hidden="true" size={19} /></span><h3 className="type-title-card mt-5 text-ink">{benefit.title}</h3><p className="type-body-sm mt-2 text-ink-soft">{benefit.body}</p></li> })}</ul>
-    </section>
-    <section className="mt-14 grid gap-8 lg:grid-cols-[.7fr_1.3fr]" aria-labelledby="gift-steps-title"><div><span className="type-eyebrow text-ink-muted">{dto.stepsEyebrow}</span><h2 id="gift-steps-title" className="type-section mt-3 text-ink">{dto.stepsTitle}</h2></div><ol className="grid gap-3 sm:grid-cols-2">{dto.steps.map((step, index) => <li key={step.title} className="se-3 bg-white p-5"><span className="type-caption text-ink-muted">0{index + 1}</span><h3 className="type-title-card mt-5 text-ink">{step.title}</h3><p className="type-body-sm mt-2 text-ink-soft">{step.body}</p></li>)}</ol></section>
-    <EditorialArticle html={dto.articleHTML} eyebrow="Условия" title="Всё о сертификате" label="gift" />
-    <section className="mx-auto mt-16 max-w-[960px]" aria-labelledby="gift-faq-title"><div className="grid gap-8 lg:grid-cols-[.55fr_1.45fr]"><div><p className="type-eyebrow text-ink-muted">Вопросы и ответы</p><h2 id="gift-faq-title" className="type-section mt-3 text-ink">{dto.faqTitle}</h2><div className="mt-7"><ContentAction action={dto.action} sourcePage="/gift" sourceEntity="FAQ подарочного сертификата" /></div></div><div className="se-4 bg-white px-5 md:px-7"><Accordion items={dto.faq.map(({ question, answer }) => ({ q: question, a: answer }))} /></div></div></section>
-  </article>
-}
+import { GiftLandingPage } from '../landing/GiftLandingPage'
 
 function PageBody({ dto }: { dto: Exclude<ThematicPageDTO, PricesPageDTO> }) {
   if (dto.kind === 'training') return <TrainingPage dto={dto} />
-  if (dto.kind === 'gift') return <GiftPage dto={dto} />
+  if (dto.kind === 'gift') return <GiftLandingPage dto={dto} />
   if (dto.kind === 'courts') return <><section className="mesh-dark text-white"><div className="container-page pb-8 pt-8 md:pb-12 md:pt-8"><div className="grid gap-10 lg:grid-cols-[.8fr_1.2fr]"><div><h2 className="type-section text-white">{dto.infographicTitle}</h2><p className="type-body mt-5 max-w-[520px] text-white/60">{dto.infographicCopy}</p></div><dl className="grid grid-cols-2 gap-3">{dto.metrics.map((metric) => { const Icon = metricIcons[metric.icon]; return <div key={metric.label} className="se-3 bg-white/8 p-5"><Icon size={20} className="text-lime" /><dt className="type-price mt-5 text-white">{metric.value}</dt><dd className="type-caption mt-1 text-white/55">{metric.label}</dd></div> })}</dl></div><div className="mt-12 grid gap-4 md:grid-cols-2">{dto.courts.map((item) => <CourtCard key={item.id} court={item} />)}</div></div></section><section className="container-page overflow-hidden pb-8 pt-8 md:pb-12 md:pt-8"><h2 className="type-section mb-8 text-ink">Корты и пространство клуба</h2><GalleryExperience items={dto.gallery} /></section></>
   if (dto.kind === 'gallery') return <section className="container-page overflow-hidden pb-8 pt-8 md:pb-12 md:pt-8"><GalleryExperience items={dto.gallery} /></section>
   if (dto.kind === 'about') return <div className="container-page pb-8 pt-8 md:pb-12 md:pt-8"><section className="grid gap-10 lg:grid-cols-[1.2fr_.8fr]"><div className="article-content text-ink" dangerouslySetInnerHTML={{ __html: dto.storyHTML }} /><dl className="grid grid-cols-2 gap-3">{dto.stats.map((stat) => <div key={stat.label} className="se-3 bg-white p-5"><dt className="type-price text-ink">{stat.value}</dt><dd className="type-caption mt-1 text-ink-soft">{stat.label}</dd></div>)}</dl></section><section className="mt-12 overflow-hidden"><h2 className="type-section mb-8 text-ink">Инфраструктура клуба</h2><GalleryExperience items={dto.gallery} /></section></div>
@@ -121,5 +109,12 @@ function PageBody({ dto }: { dto: Exclude<ThematicPageDTO, PricesPageDTO> }) {
 }
 
 export function ThematicPage({ dto }: { dto: ThematicPageDTO }) {
+  if (dto.kind === 'gift') {
+    return (
+      <SiteFrame site={dto.site}>
+        <GiftLandingPage dto={dto} />
+      </SiteFrame>
+    )
+  }
   return <SiteFrame site={dto.site}><PageHeader page={dto.page} /><div data-page-enter="content" style={{ '--page-enter-delay': '160ms' } as CSSProperties}>{dto.kind === 'prices' ? <Prices dto={dto} /> : <PageBody dto={dto} />}</div></SiteFrame>
 }
