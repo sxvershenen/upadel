@@ -923,7 +923,7 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,5,8,.52)_0%,rgba(3,5,8,.82)_65%,rgba(3,5,8,.98)_100%)]" />
 
         <div className="container-page relative z-10 flex flex-col justify-between flex-1">
-          <Reveal className="pt-2 sm:pt-4">
+          <Reveal eager className="pt-2 sm:pt-4">
             <Badge tone="glass" className="mb-4">
               <span className="mr-1.5 h-2 w-2 rounded-full bg-lime animate-pulse" />
               {typograph('Официальный дистрибьютор JUBO Padel в РФ')}
@@ -963,7 +963,7 @@ export function PadelCourtZakazPage({ site }: { site: SiteDTO }) {
           </Reveal>
 
           {/* 4 пункта в хиро: лаконично, без 01-04 и без eyebrows */}
-          <Reveal delay={0.12} className="mt-8 grid grid-cols-2 gap-4 border-t border-white/15 pt-6 md:grid-cols-4 md:gap-6">
+          <Reveal eager delay={0.12} className="mt-8 grid grid-cols-2 gap-4 border-t border-white/15 pt-6 md:grid-cols-4 md:gap-6">
             {heroMetrics.map((metric) => (
               <div key={metric.title} className="space-y-0.5">
                 <Typography role="body-small" className="font-semibold text-white">
