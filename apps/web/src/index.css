@@ -4,11 +4,6 @@
 @import "./styles/surfaces.css";
 
 html { scroll-behavior: smooth; }
-html { scrollbar-width: thin; scrollbar-color: #2c2c34 transparent; }
-html::-webkit-scrollbar { width: 7px; height: 7px; }
-html::-webkit-scrollbar-track { background: transparent; }
-html::-webkit-scrollbar-thumb { background: #2c2c34; border-radius: 999px; border: 2px solid transparent; background-clip: content-box; }
-html::-webkit-scrollbar-thumb:hover { background: #14141a; background-clip: content-box; }
 [id] { scroll-margin-top: 96px; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 
