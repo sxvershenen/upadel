@@ -476,19 +476,17 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
           </Badge>
         )}
 
-        {/* Прогресс-бар в правом верхнем углу Hero: белый фон, аккуратная тонкая лаймовая полоска */}
+        {/* Прогресс-бар в правом верхнем углу Hero: полупрозрачная полоска 10% с блюром без паддингов */}
         {!completed && (
           <div
-            className="se-1 inline-flex items-center bg-white px-2.5 py-1.5 shadow-xs w-20 sm:w-24 shrink-0"
+            className="h-1.5 w-20 sm:w-24 bg-white/10 backdrop-blur-sm rounded-full overflow-hidden shrink-0"
             title={`Заполнено ${participants.length} из ${totalSlots} мест`}
             aria-label={`Заполнено ${participants.length} из ${totalSlots} мест`}
           >
-            <div className="h-1.5 w-full bg-surface-muted rounded-full overflow-hidden">
-              <div
-                className="h-full bg-lime transition-all duration-500 rounded-full"
-                style={{ width: `${(participants.length / totalSlots) * 100}%` }}
-              />
-            </div>
+            <div
+              className="h-full bg-lime transition-all duration-500 rounded-full"
+              style={{ width: `${(participants.length / totalSlots) * 100}%` }}
+            />
           </div>
         )}
       </div>
@@ -805,18 +803,18 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
 
                   // 1: Золото / dark mesh / белое золото подложка
                   // 2: Серебро / silver mesh / серебряная подложка
-                  // 3: Бронза / sunset mesh / бронзовая подложка
-                  const cardBg = isTop1 ? 'mesh-dark shadow-xs' : isTop2 ? 'mesh-silver shadow-xs' : 'mesh-sunset shadow-xs'
+                  // 3: Бронза / bronze mesh / бронзовая подложка
+                  const cardBg = isTop1 ? 'mesh-dark shadow-xs' : isTop2 ? 'mesh-silver shadow-xs' : 'mesh-bronze shadow-xs'
                   const podlozhka = isTop1
                     ? 'bg-gold text-gold-ink shadow-2xs'
                     : isTop2
                       ? 'bg-white/80 text-[#334155] shadow-2xs'
                       : 'bg-[#fed7aa] text-[#7c2d12] shadow-2xs'
-                  const labelColor = isTop1 ? 'text-white' : isTop2 ? 'text-[#1e293b]' : 'text-[#7c2d12]'
-                  const nameColor = isTop1 ? 'text-white' : isTop2 ? 'text-[#0f172a]' : 'text-[#7c2d12]'
-                  const pointsColor = isTop1 ? 'text-gold' : isTop2 ? 'text-[#0f172a]' : 'text-[#7c2d12]'
-                  const subtextColor = isTop1 ? 'text-white/60' : isTop2 ? 'text-[#64748b]' : 'text-[#9a3412]/80'
-                  const borderColor = isTop1 ? 'border-white/10' : isTop2 ? 'border-[#94a3b8]/35' : 'border-[#fdba74]/40'
+                  const labelColor = isTop1 ? 'text-white' : isTop2 ? 'text-[#1e293b]' : 'text-[#431407]'
+                  const nameColor = isTop1 ? 'text-white' : isTop2 ? 'text-[#0f172a]' : 'text-[#431407]'
+                  const pointsColor = isTop1 ? 'text-gold' : isTop2 ? 'text-[#0f172a]' : 'text-[#431407]'
+                  const subtextColor = isTop1 ? 'text-white/60' : isTop2 ? 'text-[#64748b]' : 'text-[#7c2d12]'
+                  const borderColor = isTop1 ? 'border-white/10' : isTop2 ? 'border-[#94a3b8]/35' : 'border-[#ea580c]/25'
                   const labelText = isTop1 ? 'Золото' : isTop2 ? 'Серебро' : 'Бронза'
 
                   return (
@@ -827,8 +825,8 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                         cardBg
                       )}
                     >
-                      {/* Верхний ряд: Медаль с подложкой + статус слева, Очки справа */}
-                      <div className="flex items-center justify-between gap-2">
+                      {/* Верхний ряд: Медаль с подложкой + статус слева, Очки справа (выровнены по верхней границе) */}
+                      <div className="flex items-start justify-between gap-2">
                         <div className={cn('flex items-center gap-2 type-ui font-semibold', labelColor)}>
                           <span className={cn('se-1 flex h-7 w-7 items-center justify-center shrink-0', podlozhka)}>
                             <Medal size={15} />
@@ -1013,74 +1011,50 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                   const isSecond = idx === 1
                   const IconComp = isFirst ? Trophy : Medal
 
+                  const cardBg = isFirst ? 'mesh-dark shadow-xs' : isSecond ? 'mesh-silver shadow-xs' : 'mesh-bronze shadow-xs'
+                  const podlozhka = isFirst
+                    ? 'bg-gold text-gold-ink shadow-2xs'
+                    : isSecond
+                      ? 'bg-white/80 text-[#334155] shadow-2xs'
+                      : 'bg-[#fed7aa] text-[#7c2d12] shadow-2xs'
+                  const labelColor = isFirst ? 'text-white' : isSecond ? 'text-[#1e293b]' : 'text-[#431407]'
+                  const titleColor = isFirst ? 'text-white/60' : isSecond ? 'text-[#64748b]' : 'text-[#7c2d12]'
+                  const rewardColor = isFirst ? 'text-gold' : isSecond ? 'text-[#0f172a]' : 'text-[#431407]'
+                  const descColor = isFirst ? 'text-white/70' : isSecond ? 'text-[#475569]' : 'text-[#7c2d12]'
+                  const borderColor = isFirst ? 'border-white/10' : isSecond ? 'border-[#94a3b8]/35' : 'border-[#ea580c]/25'
+
                   return (
                     <div
                       key={prize.place}
                       className={cn(
                         'se-3 p-5 sm:p-6 border-0 flex flex-col justify-between gap-5 transition-all',
-                        isFirst
-                          ? 'mesh-lime-soft shadow-xs text-lime-ink'
-                          : 'bg-white shadow-2xs text-ink'
+                        cardBg
                       )}
                     >
                       <div className="space-y-3">
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="flex items-center gap-2">
-                            <span
-                              className={cn(
-                                'se-1 flex h-7 w-7 items-center justify-center shrink-0',
-                                isFirst
-                                  ? 'bg-white text-ink shadow-2xs'
-                                  : isSecond
-                                    ? 'bg-ink text-white'
-                                    : 'bg-control text-ink'
-                              )}
-                            >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className={cn('flex items-center gap-2 type-ui font-semibold', labelColor)}>
+                            <span className={cn('se-1 flex h-7 w-7 items-center justify-center shrink-0', podlozhka)}>
                               <IconComp size={15} />
                             </span>
-                            <span
-                              className={cn(
-                                'text-xs font-bold uppercase tracking-wider',
-                                isFirst ? 'text-lime-ink' : 'text-ink'
-                              )}
-                            >
+                            <span className="text-xs font-bold uppercase tracking-wider">
                               {prize.place}
                             </span>
                           </div>
-                          <span
-                            className={cn(
-                              'type-micro font-medium',
-                              isFirst ? 'text-lime-soft-ink' : 'text-ink-muted'
-                            )}
-                          >
+                          <span className={cn('type-micro font-medium uppercase tracking-wider pt-1 text-right', titleColor)}>
                             {typograph(prize.title)}
                           </span>
                         </div>
 
                         <div className="pt-1">
-                          <p
-                            className={cn(
-                              'type-title-card font-bold tracking-tight',
-                              isFirst ? 'text-lime-ink' : 'text-ink'
-                            )}
-                          >
+                          <p className={cn('type-title-card font-bold tracking-tight', rewardColor)}>
                             {typograph(prize.reward)}
                           </p>
                         </div>
                       </div>
 
-                      <div
-                        className={cn(
-                          'pt-3.5 border-t',
-                          isFirst ? 'border-lime-soft-ink/15' : 'border-ink/10'
-                        )}
-                      >
-                        <p
-                          className={cn(
-                            'type-body-sm leading-relaxed',
-                            isFirst ? 'text-lime-soft-ink font-medium' : 'text-ink-soft'
-                          )}
-                        >
+                      <div className={cn('pt-3.5 border-t', borderColor)}>
+                        <p className={cn('type-body-sm leading-relaxed', descColor)}>
                           {typograph(prize.desc)}
                         </p>
                       </div>
