@@ -132,7 +132,7 @@ const enableGlobalTransitions = !Astro.url.pathname.startsWith('/transitions/') 
         })
       }
       const scheduleScrollReveals = () => {
-        if (document.readyState !== 'complete' || document.querySelector('#swup')?.getAttribute('data-main-ready') !== 'true') return
+        if (document.readyState !== 'complete') return
         if (revealTimer) window.clearTimeout(revealTimer)
         revealTimer = window.setTimeout(setupScrollReveals, 180)
       }
@@ -243,7 +243,7 @@ const enableGlobalTransitions = !Astro.url.pathname.startsWith('/transitions/') 
       revealIdleCallback = 0
     }
     const scheduleGsapReveals = () => {
-      if (document.readyState !== 'complete' || document.querySelector('#swup')?.getAttribute('data-main-ready') !== 'true') return
+      if (document.readyState !== 'complete') return
       cancelScheduledGsapReveal()
       const start = () => { revealIdleCallback = 0; void startGsapReveals() }
       const eager = document.querySelector('[data-gsap-reveal-eager="true"]')

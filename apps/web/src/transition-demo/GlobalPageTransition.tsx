@@ -23,7 +23,7 @@ function scheduleAfterMainReady(run: () => void) {
   let idle: number | undefined
   let timer: number | undefined
 
-  const eligible = () => document.readyState === 'complete' && document.visibilityState === 'visible' && document.querySelector('#swup')?.getAttribute('data-main-ready') === 'true'
+  const eligible = () => document.readyState === 'complete' && document.visibilityState === 'visible' && Boolean(document.querySelector('#swup'))
   const attempt = () => {
     if (stopped || scheduled || !eligible()) return
     scheduled = true
