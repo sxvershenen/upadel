@@ -152,21 +152,21 @@ test('TournamentDetailPage renders Swiss layout with hero, passport, prizes, par
 
   // 3. Prize distribution by places
   assert.match(html, /aria-label="Распределение призов"/)
-  assert.match(html, /Распределение призов по\u00A0местам/)
+  assert.match(html, /Распределение[\s\S]*?призов[\s\S]*?по[\s\S]*?местам/)
   assert.match(html, /1 МЕСТО/)
   assert.match(html, /2 МЕСТО/)
   assert.match(html, /3 МЕСТО/)
 
   // 4. Participants & Standings section with tab switcher
   assert.match(html, /aria-label="Участники и результаты"/)
-  assert.match(html, /Сетка и\u00A0участники/)
+  assert.match(html, /Сетка[\s\S]*?и[\s\S]*?участники/)
   assert.match(html, /Список участников/)
   assert.match(html, /Итоги турнира/)
   assert.match(html, /Максим Воронов/)
 
   // 5. Regulations (collapsed by default, expandable)
   assert.match(html, /aria-label="Регламент турнира"/)
-  assert.match(html, /Регламент турнира/)
+  assert.match(html, /Регламент[\s\S]*?турнира/)
   assert.match(html, /Развернуть регламент/)
 
   // 6. Checklist and Perks
@@ -183,9 +183,9 @@ test('TournamentDetailPage renders Swiss layout with hero, passport, prizes, par
   assert.match(html, /Частые[\s\S]*?вопросы/)
   assert.match(html, /Нужен ли постоянный напарник для\u00A0участия\?/)
 
-  // 8. Registration CTA block
-  assert.match(html, /aria-label="Запись на турнир"/)
-  assert.match(html, /Готовы выйти на\u00A0корт\?/)
+  // 8. Single CTA button inside Hero
+  assert.match(html, /Записаться/)
+  assert.match(html, /Осталось/)
 
   // 9. Related Tournaments
   assert.match(html, /aria-label="Другие турниры"/)
