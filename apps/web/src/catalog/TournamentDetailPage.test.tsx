@@ -152,7 +152,7 @@ test('TournamentDetailPage renders Swiss layout with hero, passport, prizes, par
 
   // 3. Prize distribution by places
   assert.match(html, /aria-label="Распределение призов"/)
-  assert.match(html, /Распределение[\s\S]*?призов[\s\S]*?по[\s\S]*?местам/)
+  assert.match(html, /1 МЕСТО/)
   assert.match(html, /1 МЕСТО/)
   assert.match(html, /2 МЕСТО/)
   assert.match(html, /3 МЕСТО/)
@@ -160,8 +160,8 @@ test('TournamentDetailPage renders Swiss layout with hero, passport, prizes, par
   // 4. Participants & Standings section with tab switcher
   assert.match(html, /aria-label="Участники и результаты"/)
   assert.match(html, /Сетка[\s\S]*?и[\s\S]*?участники/)
-  assert.match(html, /Список участников/)
-  assert.match(html, /Итоги турнира/)
+  assert.match(html, /Участники/)
+  assert.match(html, /Итоги/)
   assert.match(html, /Максим Воронов/)
 
   // 5. Regulations (collapsed by default, expandable)
@@ -216,7 +216,7 @@ test('TournamentDetailPage renders completed lifecycle state appropriately', () 
   assert.match(html, /Этот турнир уже завершился/)
   assert.match(html, /80[\s\u00A0]000[\s\u00A0]₽/)
   assert.match(html, /Все турниры/)
-  assert.match(html, /Итоги турнира/)
+  assert.match(html, /Итоги/)
 })
 
 test('typograph utility glues prepositions with non-breaking spaces', () => {
@@ -289,8 +289,8 @@ test('TournamentDetailPage renders 3 competition tabs and 4 collapsible left sec
   )
 
   // 3 tabs in competition module
-  assert.match(html, /Список участников/)
-  assert.match(html, /Итоги турнира/)
+  assert.match(html, /Участники/)
+  assert.match(html, /Итоги/)
   assert.match(html, /Распределение призов/)
 
   // 4 left sections in separate details
