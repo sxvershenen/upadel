@@ -77,6 +77,21 @@ const localMedia = {
   padelRacket: 'padel-racket.png',
   parkingSign: 'parking-sign.png',
   varlionEquipment: 'images/benefits/varlion-equipment.png',
+  articleTechniqueReady: 'images/articles/technique-ready.png',
+  articleTechniqueGlass: 'images/articles/technique-glass.png',
+  articleTechniqueOverhead: 'images/articles/technique-overhead.png',
+  articleVarlionShapes: 'images/articles/varlion-shapes.png',
+  articleVarlionSummum: 'images/articles/varlion-summum.png',
+  articleVarlionBalance: 'images/articles/varlion-balance.png',
+  articleBeginnerCourt: 'images/articles/beginner-court.png',
+  articleBeginnerKit: 'images/articles/beginner-kit.png',
+  articleBeginnerDrill: 'images/articles/beginner-drill.png',
+  articlePadelTennisSplit: 'images/articles/padel-tennis-split.png',
+  articleJuboGlass: 'images/articles/jubo-glass.png',
+  articlePadelTennisTactics: 'images/articles/padel-tennis-tactics.png',
+  articleLevelsMatch: 'images/articles/levels-match.png',
+  articleLevelsCoach: 'images/articles/levels-coach.png',
+  articleLevelsScale: 'images/articles/levels-scale.png',
   giftBox: 'images/gift/box.jpg',
   giftCard: 'images/gift/card.jpg',
 } as const
@@ -124,19 +139,56 @@ function richText(text: string) {
   }
 }
 
-function richTextArticle(blocks: Array<{ type: 'heading' | 'paragraph'; text: string }>) {
+type ArticleInline = string | { text: string; url: string }
+type ArticleBlock =
+  | { type: 'heading'; text: string; tag?: 'h2' | 'h3' | 'h4' }
+  | { type: 'paragraph'; text?: string; children?: ArticleInline[] }
+  | { type: 'list'; items: string[] }
+  | { type: 'image'; media: number | string; alt: string; caption?: string }
+
+function richTextArticle(blocks: ArticleBlock[]) {
+  const inlineNodes = (children: ArticleInline[] = []): Array<Record<string, unknown>> => children.flatMap((child): Array<Record<string, unknown>> => {
+    if (typeof child === 'string') return [{ type: 'text', detail: 0, format: 0, mode: 'normal', style: '', text: child, version: 1 }]
+    return [{
+      type: 'link',
+      fields: { linkType: 'custom', newTab: true, url: child.url },
+      children: [{ type: 'text', detail: 0, format: 0, mode: 'normal', style: '', text: child.text, version: 1 }],
+      direction: 'ltr',
+      format: '',
+      indent: 0,
+      version: 1,
+    }]
+  })
+
   return {
     root: {
       type: 'root',
-      children: blocks.map((block) => ({
-        type: block.type,
-        ...(block.type === 'heading' ? { tag: 'h2' } : {}),
-        children: [{ type: 'text', detail: 0, format: 0, mode: 'normal', style: '', text: block.text, version: 1 }],
-        direction: 'ltr',
-        format: '',
-        indent: 0,
-        version: 1,
-      })),
+      children: blocks.map((block) => {
+        if (block.type === 'image') return {
+          type: 'upload', relationTo: 'media', value: block.media,
+          fields: { alt: block.alt, caption: block.caption ?? '' },
+          version: 1,
+        }
+        if (block.type === 'list') return {
+          type: 'list', listType: 'bullet', tag: 'ul', start: 1,
+          children: block.items.map((item) => ({
+            type: 'listitem', children: inlineNodes([item]), direction: 'ltr', format: '', indent: 0, version: 1,
+          })),
+          direction: 'ltr', format: '', indent: 0, version: 1,
+        }
+        const children = block.type === 'paragraph'
+          ? inlineNodes(block.children ?? [block.text ?? ''])
+          : inlineNodes([block.text])
+        return {
+          type: block.type,
+          ...(block.type === 'heading' ? { tag: block.tag ?? 'h2' } : {}),
+          children,
+          direction: 'ltr',
+          format: '',
+          indent: 0,
+          version: 1,
+        }
+      }),
       direction: 'ltr',
       format: '',
       indent: 0,
@@ -400,6 +452,23 @@ async function seed() {
       parkingSign: await ensureLocalMedia(payload, localMedia.parkingSign, 'Знак парковки'),
       varlionEquipment: await ensureLocalMedia(payload, localMedia.varlionEquipment, 'Игрок с ракеткой Varlion в падел-клубе'),
     }
+    const articleMedia = {
+      techniqueReady: await ensureLocalMedia(payload, localMedia.articleTechniqueReady, 'Игрок в падел в стойке готовности перед ударом'),
+      techniqueGlass: await ensureLocalMedia(payload, localMedia.articleTechniqueGlass, 'Игрок выполняет удар после отскока мяча от стекла'),
+      techniqueOverhead: await ensureLocalMedia(payload, localMedia.articleTechniqueOverhead, 'Игрок выполняет удар над головой в паделе'),
+      varlionShapes: await ensureLocalMedia(payload, localMedia.articleVarlionShapes, 'Три формы ракеток Varlion: круглая, каплевидная и ромбовидная'),
+      varlionSummum: await ensureLocalMedia(payload, localMedia.articleVarlionSummum, 'Детали конструкции ракетки Varlion с длинной ручкой и диффузором'),
+      varlionBalance: await ensureLocalMedia(payload, localMedia.articleVarlionBalance, 'Схема распределения баланса ракетки для падела'),
+      beginnerCourt: await ensureLocalMedia(payload, localMedia.articleBeginnerCourt, 'Новички на первой тренировке по паделу с тренером'),
+      beginnerKit: await ensureLocalMedia(payload, localMedia.articleBeginnerKit, 'Базовый комплект экипировки для первой игры в падел'),
+      beginnerDrill: await ensureLocalMedia(payload, localMedia.articleBeginnerDrill, 'Тренер показывает новичку базовый удар в паделе'),
+      padelTennisSplit: await ensureLocalMedia(payload, localMedia.articlePadelTennisSplit, 'Сравнение площадки для падела и теннисного корта'),
+      juboGlass: await ensureLocalMedia(payload, localMedia.articleJuboGlass, 'Панорамный корт JUBO Padel со стеклянными стенами'),
+      padelTennisTactics: await ensureLocalMedia(payload, localMedia.articlePadelTennisTactics, 'Схема движения игроков в паделе и большом теннисе'),
+      levelsMatch: await ensureLocalMedia(payload, localMedia.articleLevelsMatch, 'Парная игра в падел на любительском уровне'),
+      levelsCoach: await ensureLocalMedia(payload, localMedia.articleLevelsCoach, 'Тренер и игрок обсуждают уровень игры в падел'),
+      levelsScale: await ensureLocalMedia(payload, localMedia.articleLevelsScale, 'Абстрактная шкала прогресса уровня игрока в паделе'),
+    }
     const giftMedia = {
       box: await ensureLocalMedia(payload, localMedia.giftBox, 'Подарочный бокс UNLIM PADEL'),
       card: await ensureLocalMedia(payload, localMedia.giftCard, 'Электронный сертификат UNLIM PADEL'),
@@ -518,6 +587,173 @@ async function seed() {
         publishedAt: new Date(Date.UTC(2026, 0, index + 1, 9)).toISOString(),
         content: richText(excerpt),
         seo: { robots: 'index-follow' },
+      })
+    }
+
+    const articleAuthor = (): ArticleBlock => ({
+      type: 'paragraph',
+      children: ['Автор статьи: ', { text: 'Константин Кузнецов', url: 'https://t.me/sovershenen' }],
+    })
+    const editorialArticles = [
+      {
+        seedKey: 'editorial:article:padel-strikes-v1',
+        slug: 'padel-udary-tehnika-ot-stekla',
+        title: 'Удары в паделе: техника, виды и удар от стекла',
+        excerpt: 'Разбираю базовые удары в паделе, работу ног и понятную механику удара после отскока мяча от стекла.',
+        category: 'technique',
+        readingTimeMinutes: 8,
+        previewImage: articleMedia.techniqueReady.id,
+        seo: {
+          title: 'Удары в паделе: техника, виды и удар от стекла',
+          description: 'Какие бывают удары в паделе, как подготовиться к контакту и научиться спокойно играть после стекла.',
+          robots: 'index-follow',
+        },
+        content: richTextArticle([
+          { type: 'paragraph', text: 'Я долго считал, что в паделе решает сила. Потом понял обратное: хороший удар начинается с ног, ранней подготовки и спокойного контакта с мячом. Когда тело успевает занять позицию, ракетка делает работу почти сама, а розыгрыш перестаёт быть лотереей.' },
+          { type: 'heading', text: 'Какие удары нужны в первую очередь' },
+          { type: 'paragraph', text: 'На старте не нужно собирать энциклопедию из двадцати названий. Я бы поставил в такой порядок:' },
+          { type: 'list', items: ['форхенд и бэкхенд с комфортной высотой контакта;', 'подача снизу и надёжный приём;', 'воллей у сетки без замаха через плечо;', 'свеча, чтобы вернуть себе время и позицию;', 'бандеха, вибора и смэш — когда база уже держится.'] },
+          { type: 'image', media: articleMedia.techniqueReady.id, alt: 'Игрок в падел в стойке готовности перед ударом', caption: 'Любой удар начинается с устойчивой стойки и готовой ракетки.' },
+          { type: 'heading', text: 'Механика удара: сначала ноги, потом рука' },
+          { type: 'paragraph', text: 'Перед контактом я разворачиваю корпус боком, делаю короткий приставной шаг и держу ракетку перед собой. Рука не убегает далеко назад: чем короче замах, тем проще поймать высоту и направление. В момент удара вес переходит вперёд, а завершение остаётся компактным. Это особенно важно у сетки, где времени мало.' },
+          { type: 'paragraph', text: 'Отдельно слежу за расстоянием до мяча. Если он забрался под корпус, приходится спасать кистью. Если улетел далеко, появляется большой замах и теряется контроль. Лучше остановиться на полшага раньше и встретить мяч перед собой.' },
+          { type: 'heading', text: 'Удар от стекла: не бейте раньше времени' },
+          { type: 'paragraph', text: 'Главная ошибка новичка — броситься к мячу до отскока от стены. Я сначала разворачиваюсь, смотрю на траекторию и даю мячу пройти мимо корпуса. После стекла он замедляется и поднимается: этого короткого окна хватает, чтобы спокойно подставить ракетку.' },
+          { type: 'image', media: articleMedia.techniqueGlass.id, alt: 'Игрок выполняет удар после отскока мяча от стекла', caption: 'После стекла важнее время и положение корпуса, чем резкость замаха.' },
+          { type: 'list', items: ['развернитесь боком и не стойте лицом к стеклу;', 'не теряйте мяч из поля зрения в момент отскока;', 'встречайте его перед собой, а не за спиной;', 'направляйте мяч глубоко и высоко, если нужно вернуться в розыгрыш.'] },
+          { type: 'paragraph', text: 'Когда отскок стал понятным, добавляйте скорость постепенно. Сначала цель — вернуть мяч в корт десять раз подряд. Потом — менять направление. Сила появится сама, когда перестанете догонять мяч руками.' },
+          { type: 'image', media: articleMedia.techniqueOverhead.id, alt: 'Игрок выполняет удар над головой в паделе', caption: 'Удар над головой работает только вместе с правильной позицией ног.' },
+          { type: 'paragraph', text: 'Для тренировки я беру короткие серии по пять минут: форхенд, бэкхенд, игра от стекла и одна игровая задача. Такой формат лучше бесконечных сильных ударов без цели: прогресс видно сразу, а техника не рассыпается от усталости.' },
+          articleAuthor(),
+        ]),
+      },
+      {
+        seedKey: 'editorial:article:varlion-racket-choice-v1',
+        slug: 'kak-vybrat-raketku-dlya-padela',
+        title: 'Как выбрать ракетку для падела: баланс, форма и жёсткость',
+        excerpt: 'Объясняю, как форма, баланс и жёсткость ракетки меняют ощущения в игре, и разбираю технологии Varlion без маркетинговой шелухи.',
+        category: 'guide',
+        readingTimeMinutes: 9,
+        previewImage: articleMedia.varlionShapes.id,
+        seo: {
+          title: 'Как выбрать ракетку для падела: баланс, форма и жёсткость',
+          description: 'Круглая, каплевидная или ромбовидная ракетка Varlion: что выбрать новичку, как читать баланс и зачем нужны технологии Summum и Prisma.',
+          robots: 'index-follow',
+        },
+        content: richTextArticle([
+          { type: 'paragraph', children: ['Я не люблю совет выбирать ракетку по цвету или цене. У Varlion одна и та же логика работает стабильнее: сначала понять свою игру, потом посмотреть на форму, баланс и жёсткость, а уже после разбираться с технологиями. Официальный ', { text: 'гид Varlion по выбору ракетки', url: 'https://varlion.com/en/complete-guide-to-choosing-padel-racket/' }, ' как раз раскладывает выбор по этим базовым параметрам.'] },
+          { type: 'heading', text: 'Форма: где будет центр комфортного удара' },
+          { type: 'paragraph', text: 'Круглая форма обычно даёт большой и понятный sweet spot ближе к центру. Я бы смотрел на неё новичку или игроку, который ценит контроль и часто отбивает сложные мячи после стекла. Каплевидная форма даёт компромисс между контролем и мощностью. Ромбовидная смещает рабочую зону выше и раскрывается у игрока, который уже стабильно попадает в мяч и хочет больше веса в атаке.' },
+          { type: 'image', media: articleMedia.varlionShapes.id, alt: 'Три формы ракеток Varlion: круглая, каплевидная и ромбовидная', caption: 'Форма помогает заранее понять, где будет комфортнее всего встречать мяч.' },
+          { type: 'heading', text: 'Баланс: что чувствует кисть в конце матча' },
+          { type: 'paragraph', text: 'Низкий баланс ближе к ручке даёт больше манёвренности и проще прощает опоздания. Средний баланс ощущается универсально. Высокий баланс переносит массу к голове и добавляет мощности, но требует точнее работать ногами и не зажимать предплечье. Если после игры устаёт локоть, я сначала проверяю не вес как цифру, а баланс и качество контакта.' },
+          { type: 'image', media: articleMedia.varlionBalance.id, alt: 'Схема распределения баланса ракетки для падела', caption: 'Чем выше точка баланса, тем сильнее ощущается вес головы ракетки.' },
+          { type: 'heading', text: 'Жёсткость и технологии Varlion' },
+          { type: 'paragraph', children: ['Мягкий сердечник помогает получить более лёгкий выход мяча и приятное ощущение на спокойной скорости. Жёсткий даёт точный отклик и больше контроля при активном замахе, но требует чистого попадания. В актуальных линейках Varlion рядом с этим выбором встречаются ', { text: 'Summum', url: 'https://varlion.com/en/technologies-summum/' }, ', ', { text: 'Prisma', url: 'https://varlion.com/en/technologies/' }, ', Wings Diffuser, ErgoSlice и Ergoholes. Это не замена технике, а настройка поведения ракетки: аэродинамика, контакт с мячом, рабочая площадь и ощущение в руке.'] },
+          { type: 'image', media: articleMedia.varlionSummum.id, alt: 'Детали конструкции ракетки Varlion с длинной ручкой и диффузором', caption: 'Summum у Varlion объединяет длинную ручку, увеличенную рабочую поверхность и диффузор Wings.' },
+          { type: 'paragraph', text: 'Мой практический порядок такой: новичку — круглая форма и комфортная мягкость, продолжающему — капля и средний баланс, атакующему игроку — ромб и более жёсткий отклик. Но примеряйте ракетку в руке и тестируйте её на корте: паспорт модели не расскажет, как она поведёт себя именно в вашем замахе.' },
+          articleAuthor(),
+        ]),
+      },
+      {
+        seedKey: 'editorial:article:padel-for-beginners-v1',
+        slug: 'padel-dlya-nachinayushchikh-s-nulya',
+        title: 'Падел для начинающих: как начать играть с нуля',
+        excerpt: 'Понятный маршрут для первого визита: что взять, как проходит тренировка и что делать, чтобы не перегореть после первой игры.',
+        category: 'guide',
+        readingTimeMinutes: 7,
+        previewImage: articleMedia.beginnerCourt.id,
+        seo: {
+          title: 'Падел для начинающих: как начать играть с нуля',
+          description: 'Падел с нуля: экипировка, первая тренировка, ракетка для начинающих и план первых занятий без лишнего стресса.',
+          robots: 'index-follow',
+        },
+        content: richTextArticle([
+          { type: 'paragraph', text: 'Если вы ни разу не держали ракетку, это нормальная точка старта. Я сам видел, как люди приходят на корт с ощущением, что их сейчас будут оценивать. Через десять минут они уже смеются над первыми промахами и понимают: падел хорош тем, что в него можно войти через игру, а не через идеальную физическую форму.' },
+          { type: 'heading', text: 'Что взять на первую тренировку' },
+          { type: 'paragraph', text: 'Нужны удобная спортивная одежда, чистые кроссовки с устойчивой подошвой и вода. Ракетку и мячи обычно можно взять в клубе, поэтому покупать дорогую модель до первого занятия не стоит. Если хочется своей, выбирайте лёгкую и управляемую ракетку с большим центром попадания, а не самую мощную.' },
+          { type: 'image', media: articleMedia.beginnerKit.id, alt: 'Базовый комплект экипировки для первой игры в падел', caption: 'На первую игру достаточно удобной формы, воды и подходящей обуви.' },
+          { type: 'heading', text: 'Как проходит первый час' },
+          { type: 'paragraph', text: 'Хорошая вводная тренировка начинается с движения, хвата и простой подачи снизу. Затем тренер показывает форхенд, бэкхенд и короткие игровые задания. Стекло не нужно осваивать сразу: сначала важно научиться оценивать скорость мяча и возвращать его в корт. В конце обычно играют короткими розыгрышами, чтобы правила закрепились не в теории, а в руках.' },
+          { type: 'image', media: articleMedia.beginnerCourt.id, alt: 'Новички на первой тренировке по паделу с тренером', caption: 'Первые упражнения лучше выполнять в спокойном темпе и сразу с понятной задачей.' },
+          { type: 'heading', text: 'План первых четырёх занятий' },
+          { type: 'list', items: ['первое занятие — хват, стойка, подача и базовый форхенд;', 'второе — бэкхенд, приём и перемещение вдвоём;', 'третье — стекло, свеча и выход к сетке;', 'четвёртое — полноценные розыгрыши с одной тактической задачей.'] },
+          { type: 'paragraph', text: 'Между занятиями полезнее один спокойный матч, чем попытка за вечер выучить все удары из видео. В паделе быстро растёт тот, кто понимает, зачем двигается, а не тот, кто сильнее всех замахивается.' },
+          { type: 'image', media: articleMedia.beginnerDrill.id, alt: 'Тренер показывает новичку базовый удар в паделе', caption: 'Тренер помогает почувствовать момент контакта, а не просто повторить движение.' },
+          { type: 'heading', text: 'Типичные ошибки новичка' },
+          { type: 'paragraph', text: 'Не бегите за каждым мячом в одиночку, не стойте всё время у задней стены и не пытайтесь выиграть каждый розыгрыш одним ударом. Сначала держите позицию рядом с партнёром, говорите вслух и возвращайте мяч с запасом по высоте. Уверенность приходит именно из этих простых повторений.' },
+          articleAuthor(),
+        ]),
+      },
+      {
+        seedKey: 'editorial:article:padel-vs-tennis-v1',
+        slug: 'padel-i-bolshoy-tennis-otlichiya',
+        title: 'Падел и большой теннис: отличие правил, корта и техники',
+        excerpt: 'Сравниваю падел и большой теннис по корту, подаче, стенам, движению и ощущениям для игрока, который переходит из одного спорта в другой.',
+        category: 'guide',
+        readingTimeMinutes: 8,
+        previewImage: articleMedia.padelTennisSplit.id,
+        seo: {
+          title: 'Падел и большой теннис: отличие правил, корта и техники',
+          description: 'Отличие падела от тенниса: правила, размеры и устройство корта, подача, стекло и техника розыгрыша.',
+          robots: 'index-follow',
+        },
+        content: richTextArticle([
+          { type: 'paragraph', text: 'Я пришёл в падел после большого тенниса и сначала пытался играть по-старому: уходил далеко назад, замахивался широко и искал победу в скорости. Это работает ровно до первого мяча от стекла. Падел похож на теннис по счёту и сетке, но логика розыгрыша у него другая.' },
+          { type: 'heading', text: 'Главное отличие — корт становится частью игры' },
+          { type: 'paragraph', text: 'Падельный корт меньше и закрыт стеклом с металлической сеткой. После отскока от пола мяч может продолжить движение через стену, а игрок возвращает его уже с новой траекторией. В большом теннисе задняя линия заканчивает площадку: мяч после неё не возвращается в розыгрыш.' },
+          { type: 'image', media: articleMedia.padelTennisSplit.id, alt: 'Сравнение площадки для падела и теннисного корта', caption: 'В паделе стены не фон, а полноценный элемент тактики.' },
+          { type: 'heading', text: 'Правила и подача' },
+          { type: 'list', items: ['в падел играют парами на компактном корте, в теннисе возможен одиночный формат;', 'счёт и логика геймов похожи, но в паделе подача выполняется снизу после отскока мяча;', 'подача направляется по диагонали и не должна попадать в сетку или стекло на стороне подающего;', 'мяч в паделе может быть возвращён после отскока от стекла, если он сначала коснулся пола.'] },
+          { type: 'image', media: articleMedia.juboGlass.id, alt: 'Панорамный корт JUBO Padel со стеклянными стенами', caption: 'Панорамная конструкция JUBO хорошо показывает, как стекло расширяет пространство розыгрыша.' },
+          { type: 'heading', text: 'Техника переезжает не целиком' },
+          { type: 'paragraph', text: 'Из тенниса отлично переходят чувство мяча, координация и понимание счёта. Но замах в паделе компактнее, а позиция пары важнее индивидуального удара. У сетки нужно двигаться синхронно, после подачи не оставлять партнёра одного и заранее договариваться, кто забирает мяч по центру.' },
+          { type: 'image', media: articleMedia.padelTennisTactics.id, alt: 'Схема движения игроков в паделе и большом теннисе', caption: 'В паделе пара двигается как единый блок и постоянно закрывает центр.' },
+          { type: 'paragraph', text: 'Теннисисту я советую начать с контроля силы и отдельной тренировки стекла. Новичку без теннисного опыта, наоборот, проще: он не успевает закрепить привычку всё решать одним мощным ударом. В обоих случаях выигрывает тот, кто раньше читает траекторию и лучше держит позицию.' },
+          articleAuthor(),
+        ]),
+      },
+      {
+        seedKey: 'editorial:article:padel-levels-v1',
+        slug: 'urovni-v-padela-kak-opredelit-svoy',
+        title: 'Падел уровни: как определить свой уровень игры',
+        excerpt: 'Разбираю, как не завышать уровень по ощущениям, чем отличаются PadelApp и Lunda и какие признаки действительно видны на корте.',
+        category: 'technique',
+        readingTimeMinutes: 9,
+        previewImage: articleMedia.levelsMatch.id,
+        seo: {
+          title: 'Падел уровни: как определить свой уровень игры',
+          description: 'Уровни игры в паделе: шкала Lunda 1.0–7.0, уровень PadelApp, признаки техники, стабильности и тактики.',
+          robots: 'index-follow',
+        },
+        content: richTextArticle([
+          { type: 'paragraph', children: ['Уровень в паделе — это не ощущение после удачного матча. Я смотрю на то, что игрок повторяет под давлением: как принимает подачу, что делает со стеклом, умеет ли держать позицию и насколько часто ошибается без причины. Для ориентира удобно сравнивать описание своей игры с ', { text: 'шкалой Lunda', url: 'https://lundapadel.app/rating/' }, ', а результаты не смешивать механически с рейтингом ', { text: 'PadelApp', url: 'https://www.padelapp.com.ar/ranking/como-funciona' }, '.'] },
+          { type: 'heading', text: 'Что показывает PadelApp' },
+          { type: 'paragraph', text: 'У PadelApp есть отдельные очки сезона и уровень PadelApp. Очки приходят из турниров и подтверждённых свободных игр, а сам уровень описан как независимая Elo-оценка, которая меняется после валидированных результатов. Поэтому место в таблице и реальная игровая категория — не одно и то же. Для честной самооценки важнее смотреть на серию матчей, а не на один красивый финал.' },
+          { type: 'heading', text: 'Шкала Lunda от первого занятия до 7.0' },
+          { type: 'paragraph', text: 'Lunda использует одну шкалу от 1.0 до 7.0 и девять ступеней. Рейтинг считается по результатам и может подтверждаться тренером:' },
+          { type: 'list', items: ['1.0–1.49 — абсолютный новичок: осваивает правила и стены;', '1.5–1.99 — новичок: понимает счёт, но нестабилен по направлению;', '2.0–2.49 — развивающийся игрок: начинает выходить к сетке;', '2.5–2.99 — любитель: держит около 60% ударов и использует свечу;', '3.0–3.49 — средний любитель: стабилен с задней линии и наращивает тактику;', '3.5–3.99 — опытный любитель: уверенно играет у сетки и знает бандеху;', '4.0–4.74 — продвинутый: контролирует глубину, направление и вращение;', '4.75–5.49 — полупрофессионал: играет сильные локальные турниры;', '5.5–7.0 — профессионал: полный арсенал и игра на уровне FIP или Premier Padel.'] },
+          { type: 'image', media: articleMedia.levelsScale.id, alt: 'Абстрактная шкала прогресса уровня игрока в паделе', caption: 'Шкала полезна как общий ориентир, но важнее повторяемые навыки в реальной игре.' },
+          { type: 'heading', text: 'Как определить свой уровень без самообмана' },
+          { type: 'paragraph', text: 'Запишите три последних матча и ответьте на пять вопросов: сколько подач вы принимаете в корт, можете ли вернуть мяч после стекла, как часто ошибаетесь в простой ситуации, двигаетесь ли вместе с партнёром и умеете ли закончить розыгрыш у сетки. Если между двумя уровнями, я выбираю нижний. Так честнее для подбора игры и понятнее для прогресса.' },
+          { type: 'image', media: articleMedia.levelsMatch.id, alt: 'Парная игра в падел на любительском уровне', caption: 'Рейтинг имеет смысл только тогда, когда соперники действительно близки по уровню.' },
+          { type: 'paragraph', text: 'Самый точный способ — сыграть несколько рейтинговых матчей и попросить тренера подтвердить наблюдения. В Lunda расчётный рейтинг и тренерская верификация дополняют друг друга. В PadelApp клуб валидирует результаты, поэтому не стоит записывать себе очки за матч, который никто не подтвердил.' },
+          { type: 'image', media: articleMedia.levelsCoach.id, alt: 'Тренер и игрок обсуждают уровень игры в падел', caption: 'Хорошая оценка объясняет не только число, но и следующий конкретный шаг.' },
+          articleAuthor(),
+        ]),
+      },
+    ] as const
+    for (const [index, article] of editorialArticles.entries()) {
+      await ensureSeeded(payload, 'articles', article.seedKey, {
+        slug: article.slug,
+        title: article.title,
+        excerpt: article.excerpt,
+        category: categories.get(article.category)?.id,
+        previewImage: article.previewImage,
+        readingTimeMinutes: article.readingTimeMinutes,
+        publishedAt: new Date(Date.UTC(2026, 8, 18, 12, index)).toISOString(),
+        content: article.content,
+        seo: article.seo,
       })
     }
 
