@@ -167,7 +167,7 @@ test('TournamentDetailPage renders Swiss layout with hero, passport, prizes, par
   // 5. Regulations (collapsed by default, expandable)
   assert.match(html, /aria-label="Регламент турнира"/)
   assert.match(html, /Регламент[\s\S]*?турнира/)
-  assert.match(html, /Регламент и\u00A0правила/)
+  assert.match(html, /Регламент[\s\S]*?и[\s\S]*?правила/)
 
   // 6. Checklist and Perks
   assert.match(html, /Перед выходом на\u00A0корт/)

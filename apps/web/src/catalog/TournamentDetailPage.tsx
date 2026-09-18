@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import type { TournamentCatalogItem, TournamentDetailDTO } from '@unlim/content-contract'
 import {
   Award,
-  BookOpen,
   CalendarDays,
   Camera,
   Check,
@@ -12,7 +11,6 @@ import {
   Droplets,
   FileText,
   Gauge,
-  HelpCircle,
   Medal,
   PartyPopper,
   Phone,
@@ -29,7 +27,7 @@ import { SiteFrame } from '../components/SiteFrame'
 import { TournamentCard } from '../components/cards/TournamentCard'
 import { Badge } from '../components/ui/Badge'
 import { ButtonLink } from '../components/ui/Button'
-import { ImageCard, MeshCard, SurfaceCard, type ImageOverlay, type MeshTone } from '../components/ui/Card'
+import { ImageCard, MeshCard, type ImageOverlay, type MeshTone } from '../components/ui/Card'
 import { SectionHeader } from '../components/ui/SectionHeader'
 import { cn } from '../utils/cn'
 
@@ -354,7 +352,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
 
   // Внутренний контент Hero Left визитки
   const heroCardContent = (
-    <div className="relative z-10 flex min-h-[360px] sm:min-h-[380px] md:min-h-[400px] flex-col justify-between p-6 sm:p-7 md:p-8 h-full">
+    <div className="relative z-10 flex min-h-[360px] sm:min-h-[400px] md:min-h-[440px] flex-col justify-between p-6 sm:p-7 md:p-8 h-full">
       {/* Верхний ряд: статус */}
       <div className="flex items-center justify-between gap-2.5">
         {completed ? (
@@ -374,28 +372,26 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
         )}
       </div>
 
-      {/* Заголовок */}
-      <div className="my-auto py-4">
-        <h1 className="type-section font-semibold text-white tracking-tight leading-tight">
-          {typograph(dto.item.title)}
-        </h1>
-      </div>
-
-      {/* Нижняя часть Hero: кнопка справа над уровнем игроков, шкала уровня по нижнему краю */}
-      <div className="space-y-3 pt-1">
-        <div className="flex items-center justify-end">
-          {completed ? (
-            <ButtonLink href="/tournaments" variant="secondary" size="md">
-              Все турниры
-            </ButtonLink>
-          ) : (
-            <ContentAction
-              action={dto.item.action}
-              sourcePage={sourcePage}
-              sourceEntity={dto.item.title}
-              size="lg"
-            />
-          )}
+      {/* Нижняя часть Hero: Название турнира, прижатое к уровню игроков, кнопка справа и шкала уровня */}
+      <div className="mt-auto pt-6 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <h1 className="type-section font-semibold text-white tracking-tight leading-tight flex-1">
+            {typograph(dto.item.title)}
+          </h1>
+          <div className="shrink-0">
+            {completed ? (
+              <ButtonLink href="/tournaments" variant="secondary" size="md">
+                Все турниры
+              </ButtonLink>
+            ) : (
+              <ContentAction
+                action={dto.item.action}
+                sourcePage={sourcePage}
+                sourceEntity={dto.item.title}
+                size="lg"
+              />
+            )}
+          </div>
         </div>
 
         <div className="se-2 bg-black/35 backdrop-blur-sm p-3 border-0">
@@ -407,13 +403,13 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
 
   return (
     <SiteFrame site={dto.site} backLink={{ href: '/tournaments' }}>
-      {/* pt-24 md:pt-32 гарантирует, что фиксированный header не перекрывает hero */}
-      <article data-page-enter="content" className="container-page pb-16 pt-24 sm:pt-28 md:pt-32 space-y-8 sm:space-y-10 md:space-y-12">
-        {/* 1. Первый экран: Компактный сплит Hero Left (визитка) + Hero Right (паспорт) */}
+      {/* pt-24 md:pt-32 гарантирует, что фиксированный header не перекрывает hero, а space-y-16..28 дает чистое швейцарское пространство */}
+      <article data-page-enter="content" className="container-page pb-24 pt-24 sm:pt-28 md:pt-32 space-y-16 sm:space-y-20 md:space-y-28">
+        {/* 1. Первый экран: Равнозначный сплит 50/50: Hero Left (визитка) + Hero Right (инфо без карточки) */}
         <section aria-label="Визитка и паспорт турнира">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-stretch">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-12 items-stretch">
             {/* Hero Left: визитка турнира с мешем/фото, уровнем и кнопкой */}
-            <div aria-label="Визитка турнира" className="lg:col-span-7 flex flex-col">
+            <div aria-label="Визитка турнира" className="flex flex-col">
               {dto.item.visualStyle === 'image' && dto.item.image ? (
                 <ImageCard
                   src={dto.item.image.url}
@@ -435,93 +431,92 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
               )}
             </div>
 
-            {/* Hero Right: Паспорт турнира (Main Info) в компактной швейцарской сетке */}
-            <div aria-label="Паспорт турнира" className="lg:col-span-5 flex flex-col">
-              <SurfaceCard tone="white" interactive={false} className="p-6 sm:p-7 flex flex-col justify-between h-full border-0">
-                <div>
-                  <span className="type-eyebrow text-ink-muted">Паспорт события</span>
-                  <h2 className="type-title-dense font-semibold text-ink mt-1">
-                    {typograph('Информация о турнире')}
-                  </h2>
+            {/* Hero Right: Информация о турнире в швейцарском стиле без карточки-контейнера */}
+            <div aria-label="Паспорт турнира" className="flex flex-col justify-between h-full py-1">
+              <div>
+                <h2 className="type-title-dense font-semibold text-ink">
+                  {typograph('Информация о турнире')}
+                </h2>
+                {dto.item.description || dto.page?.intro ? (
                   <p className="type-body-sm text-ink-soft leading-relaxed mt-2.5">
                     {typograph(dto.item.description || dto.page?.intro || '')}
                   </p>
+                ) : null}
 
-                  {/* Компактная 2x2 матрица ключевых параметров */}
-                  <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
-                    <div className="p-3.5 bg-surface-muted/60 se-2 flex flex-col justify-between">
-                      <dt className="type-micro font-medium uppercase tracking-wider text-ink-muted flex items-center gap-1.5">
-                        <CalendarDays size={13} />
-                        {typograph('Расписание')}
-                      </dt>
-                      <dd className="mt-1.5">
-                        <span className="type-body-sm font-semibold text-ink block leading-snug">
-                          {typograph(dto.item.scheduleLabel)}
-                        </span>
-                      </dd>
-                    </div>
+                {/* 2x2 параметры турнира в швейцарском стиле: чистая сетка с тонкими линиями без серых плашек */}
+                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5 pt-5 mt-5 border-t border-ink/10">
+                  <div className="flex flex-col">
+                    <dt className="type-micro font-medium uppercase tracking-wider text-ink-muted flex items-center gap-1.5">
+                      <CalendarDays size={14} className="text-ink-muted" />
+                      {typograph('Расписание')}
+                    </dt>
+                    <dd className="mt-1">
+                      <span className="type-body-sm font-semibold text-ink block leading-snug">
+                        {typograph(dto.item.scheduleLabel)}
+                      </span>
+                    </dd>
+                  </div>
 
-                    <div className="p-3.5 bg-surface-muted/60 se-2 flex flex-col justify-between">
-                      <dt className="type-micro font-medium uppercase tracking-wider text-ink-muted flex items-center gap-1.5">
-                        <Icon size={13} />
-                        {typograph('Формат')}
-                      </dt>
-                      <dd className="mt-1.5">
-                        <span className="type-body-sm font-semibold text-ink block leading-snug">
-                          {typograph(dto.item.format)}
-                        </span>
-                      </dd>
-                    </div>
+                  <div className="flex flex-col">
+                    <dt className="type-micro font-medium uppercase tracking-wider text-ink-muted flex items-center gap-1.5">
+                      <Icon size={14} className="text-ink-muted" />
+                      {typograph('Формат')}
+                    </dt>
+                    <dd className="mt-1">
+                      <span className="type-body-sm font-semibold text-ink block leading-snug">
+                        {typograph(dto.item.format)}
+                      </span>
+                    </dd>
+                  </div>
 
-                    <div className="p-3.5 bg-surface-muted/60 se-2 flex flex-col justify-between">
-                      <dt className="type-micro font-medium uppercase tracking-wider text-ink-muted flex items-center gap-1.5">
-                        <Wallet size={13} />
-                        {typograph('Взнос')}
-                      </dt>
-                      <dd className="mt-1.5">
-                        <span className="type-body-sm font-semibold text-ink block leading-snug">
-                          {typograph(dto.item.entryFee)}
-                        </span>
-                      </dd>
-                    </div>
+                  <div className="flex flex-col">
+                    <dt className="type-micro font-medium uppercase tracking-wider text-ink-muted flex items-center gap-1.5">
+                      <Wallet size={14} className="text-ink-muted" />
+                      {typograph('Взнос')}
+                    </dt>
+                    <dd className="mt-1">
+                      <span className="type-body-sm font-semibold text-ink block leading-snug">
+                        {typograph(dto.item.entryFee)}
+                      </span>
+                    </dd>
+                  </div>
 
-                    <div className="p-3.5 bg-surface-muted/60 se-2 flex flex-col justify-between">
-                      <dt className="type-micro font-medium uppercase tracking-wider text-ink-muted flex items-center gap-1.5">
-                        <Award size={13} />
-                        {typograph(hasDistinctPrize ? dto.item.prizeLabel : 'Призовой фонд')}
-                      </dt>
-                      <dd className="mt-1.5">
-                        <span className="type-body-sm font-semibold text-ink block leading-snug">
-                          {typograph(hasDistinctPrize ? dto.item.prize : 'Кубки и клубные призы')}
-                        </span>
-                      </dd>
-                    </div>
-                  </dl>
-                </div>
+                  <div className="flex flex-col">
+                    <dt className="type-micro font-medium uppercase tracking-wider text-ink-muted flex items-center gap-1.5">
+                      <Award size={14} className="text-ink-muted" />
+                      {typograph(hasDistinctPrize ? dto.item.prizeLabel : 'Призовой фонд')}
+                    </dt>
+                    <dd className="mt-1">
+                      <span className="type-body-sm font-semibold text-ink block leading-snug">
+                        {typograph(hasDistinctPrize ? dto.item.prize : 'Кубки и клубные призы')}
+                      </span>
+                    </dd>
+                  </div>
+                </dl>
+              </div>
 
-                {/* Быстрые контакты координатора */}
-                <div className="pt-5 border-t border-ink/10 flex flex-wrap items-center justify-between gap-3 text-ink-soft type-caption mt-6">
-                  <span className="text-ink-muted">Вопросы координатору:</span>
-                  <div className="flex items-center gap-4">
+              {/* Быстрые контакты координатора */}
+              <div className="pt-5 border-t border-ink/10 flex flex-wrap items-center justify-between gap-3 text-ink-soft type-caption mt-6">
+                <span className="text-ink-muted font-medium">Вопросы координатору:</span>
+                <div className="flex items-center gap-4">
+                  <a
+                    href="https://t.me/unlimpadel"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 font-medium text-ink hover:text-ink/70 transition-colors"
+                  >
+                    <Send size={13} /> Telegram
+                  </a>
+                  {dto.site.contacts?.phoneDisplay && (
                     <a
-                      href="https://t.me/unlimpadel"
-                      target="_blank"
-                      rel="noreferrer"
+                      href={`tel:${dto.site.contacts.phoneValue}`}
                       className="inline-flex items-center gap-1.5 font-medium text-ink hover:text-ink/70 transition-colors"
                     >
-                      <Send size={13} /> Telegram
+                      <Phone size={13} /> {dto.site.contacts.phoneDisplay}
                     </a>
-                    {dto.site.contacts?.phoneDisplay && (
-                      <a
-                        href={`tel:${dto.site.contacts.phoneValue}`}
-                        className="inline-flex items-center gap-1.5 font-medium text-ink hover:text-ink/70 transition-colors"
-                      >
-                        <Phone size={13} /> {dto.site.contacts.phoneDisplay}
-                      </a>
-                    )}
-                  </div>
+                  )}
                 </div>
-              </SurfaceCard>
+              </div>
             </div>
           </div>
         </section>
@@ -570,92 +565,91 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                 </button>
               </div>
             }
-            className="mb-4"
+            className="mb-6"
           />
 
-          <div className="bg-white se-3 p-5 sm:p-7 border-0">
-            {/* ТАБ 1: Участники */}
-            <div className={activeTab === 'participants' ? 'block' : 'hidden'} role="tabpanel">
-              <div className="h-1.5 w-full bg-surface-muted rounded-full overflow-hidden mb-5">
-                <div
-                  className="h-full bg-lime transition-all duration-300"
-                  style={{ width: `${(participants.length / totalSlots) * 100}%` }}
-                />
-              </div>
+          {/* ТАБ 1: Участники */}
+          <div className={activeTab === 'participants' ? 'block' : 'hidden'} role="tabpanel">
+            <div className="h-1.5 w-full bg-ink/10 rounded-full overflow-hidden mb-6">
+              <div
+                className="h-full bg-lime transition-all duration-300"
+                style={{ width: `${(participants.length / totalSlots) * 100}%` }}
+              />
+            </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {participants.map((player, idx) => (
-                  <div
-                    key={player.id}
-                    className={cn(
-                      'se-2 p-3.5 flex items-center justify-between gap-3 bg-surface-muted/60',
-                      !participantsExpanded && idx >= 4 && 'hidden sm:flex'
-                    )}
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <span className="font-mono text-xs font-bold text-ink-muted w-5 text-center shrink-0">
-                        {(idx + 1).toString().padStart(2, '0')}
-                      </span>
-                      <div className="min-w-0">
-                        {player.isPair ? (
-                          <div>
-                            <div className="type-body-sm font-semibold text-ink leading-snug truncate">
-                              {player.player1}
-                            </div>
-                            <div className="type-body-sm font-semibold text-ink leading-snug truncate">
-                              {player.player2}
-                            </div>
-                            <p className="type-micro text-ink-soft mt-0.5">
-                              Пара · Уровень {player.level}
-                            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-1">
+              {participants.map((player, idx) => (
+                <div
+                  key={player.id}
+                  className={cn(
+                    'py-3 border-b border-ink/10 flex items-center justify-between gap-3',
+                    !participantsExpanded && idx >= 4 && 'hidden sm:flex'
+                  )}
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="font-mono text-xs font-bold text-ink-muted w-5 shrink-0">
+                      {(idx + 1).toString().padStart(2, '0')}
+                    </span>
+                    <div className="min-w-0">
+                      {player.isPair ? (
+                        <div>
+                          <div className="type-body-sm font-semibold text-ink leading-snug truncate">
+                            {player.player1}
                           </div>
-                        ) : (
-                          <div>
-                            <p className="type-body-sm font-semibold text-ink truncate leading-snug">
-                              {typograph(player.name)}
-                            </p>
-                            <p className="type-micro text-ink-soft mt-0.5">
-                              Игрок · Уровень {player.level}
-                            </p>
+                          <div className="type-body-sm font-semibold text-ink leading-snug truncate">
+                            {player.player2}
                           </div>
-                        )}
-                      </div>
+                          <p className="type-micro text-ink-soft mt-0.5">
+                            Пара · Уровень {player.level}
+                          </p>
+                        </div>
+                      ) : (
+                        <div>
+                          <p className="type-body-sm font-semibold text-ink truncate leading-snug">
+                            {typograph(player.name)}
+                          </p>
+                          <p className="type-micro text-ink-soft mt-0.5">
+                            Игрок · Уровень {player.level}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
-                ))}
+                </div>
+              ))}
 
-                {/* Свободные слоты */}
-                {!completed &&
-                  Array.from({ length: availableSlots }).map((_, i) => {
-                    const slotIndex = participants.length + i
-                    return (
-                      <div
-                        key={`empty-${i}`}
-                        className={cn(
-                          'se-2 border border-dashed border-ink/20 p-3.5 flex items-center justify-between gap-3 text-ink-muted',
-                          !participantsExpanded && slotIndex >= 4 && 'hidden sm:flex'
-                        )}
-                      >
-                        <div className="flex items-center gap-3 min-w-0">
-                          <span className="font-mono text-xs font-medium text-ink-muted/50 w-5 text-center shrink-0">
-                            {(slotIndex + 1).toString().padStart(2, '0')}
-                          </span>
-                          <span className="type-body-sm text-ink-soft">Свободный слот</span>
-                        </div>
-                        <ContentAction
-                          action={dto.item.action}
-                          sourcePage={sourcePage}
-                          sourceEntity={dto.item.title}
-                          variant="neutral"
-                          size="sm"
-                          className="shrink-0 text-xs px-3 h-8 font-normal"
-                        >
-                          Занять
-                        </ContentAction>
+              {/* Свободные слоты */}
+              {!completed &&
+                Array.from({ length: availableSlots }).map((_, i) => {
+                  const slotIndex = participants.length + i
+                  return (
+                    <div
+                      key={`empty-${i}`}
+                      className={cn(
+                        'py-3 border-b border-ink/10 flex items-center justify-between gap-3 text-ink-muted',
+                        !participantsExpanded && slotIndex >= 4 && 'hidden sm:flex'
+                      )}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className="font-mono text-xs font-medium text-ink-muted/50 w-5 shrink-0">
+                          {(slotIndex + 1).toString().padStart(2, '0')}
+                        </span>
+                        <span className="type-body-sm text-ink-soft">Свободный слот</span>
                       </div>
-                    )
-                  })}
-              </div>
+                      <ContentAction
+                        action={dto.item.action}
+                        sourcePage={sourcePage}
+                        sourceEntity={dto.item.title}
+                        variant="neutral"
+                        size="sm"
+                        className="shrink-0 text-xs px-3 h-8 font-normal"
+                      >
+                        Занять
+                      </ContentAction>
+                    </div>
+                  )
+                })}
+            </div>
 
               {!participantsExpanded && (participants.length + (!completed ? availableSlots : 0)) > 4 && (
                 <div className="sm:hidden pt-4 flex justify-center">
@@ -803,28 +797,26 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
 
             {/* ТАБ 3: Призы */}
             <div className={activeTab === 'prizes' ? 'block' : 'hidden'} role="tabpanel" aria-label="Распределение призов">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-2">
                 {prizes.map((prize, idx) => {
                   const icon =
                     idx === 0 ? (
-                      <Trophy size={16} className="text-[#eab308]" />
+                      <Trophy size={18} className="text-ink" />
                     ) : idx === 1 ? (
-                      <Medal size={16} className="text-[#94a3b8]" />
+                      <Medal size={18} className="text-ink" />
                     ) : (
-                      <Award size={16} className="text-[#b45309]" />
+                      <Award size={18} className="text-ink" />
                     )
 
                   return (
                     <div
                       key={prize.place}
-                      className="se-2 bg-surface-muted/60 p-4 sm:p-5 flex flex-col justify-between gap-3"
+                      className="border-t-2 border-ink pt-4 flex flex-col justify-between gap-3"
                     >
                       <div>
                         <div className="flex items-center gap-2 mb-2">
-                          <span className="se-1 flex h-6 w-6 items-center justify-center bg-white shadow-2xs shrink-0">
-                            {icon}
-                          </span>
-                          <span className="type-micro font-semibold text-ink uppercase tracking-wider">
+                          {icon}
+                          <span className="type-micro font-mono font-bold text-ink uppercase tracking-wider">
                             {prize.place}
                           </span>
                           <span className="text-ink-muted text-xs">·</span>
@@ -844,23 +836,19 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                 })}
               </div>
             </div>
-          </div>
         </section>
 
-        {/* 3. Нижний 2-колоночный блок: Инфо (слева, свёрнуты по дефолту) + Частые вопросы (справа) */}
+        {/* 3. Нижний 2-колоночный блок: Регламент и правила (слева) + Частые вопросы (справа) с двумя отдельными заголовками */}
         <section aria-label="Игровой день и вопросы">
-          <SectionHeader title={typograph('Правила и частые вопросы')} className="mb-4 sm:mb-5" />
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
             {/* Левая колонка: 4 нативных аккордеона, свёрнутые по дефолту */}
-            <div aria-label="Инфо перед игрой" className="bg-white se-3 p-5 sm:p-7 border-0">
-              <h3 className="type-title-card font-semibold text-ink mb-4 flex items-center gap-2">
-                <BookOpen size={20} className="text-ink-muted" />
-                <span>{typograph('Регламент и правила')}</span>
-              </h3>
-              <div className="divide-y divide-ink/10">
+            <div aria-label="Инфо перед игрой" className="space-y-6">
+              <SectionHeader
+                title={typograph('Регламент и правила')}
+              />
+              <div className="divide-y divide-ink/10 border-y border-ink/10">
                 {/* 1. Регламент турнира */}
-                <details aria-label="Регламент турнира" className="group/acc py-3.5 first:pt-0 last:pb-0">
+                <details aria-label="Регламент турнира" className="group/acc py-4 first:pt-0 last:pb-0">
                   <summary className="flex items-center justify-between gap-3 cursor-pointer list-none type-body font-medium text-ink hover:text-ink/80 transition-colors">
                     <span className="flex items-center gap-2.5">
                       <FileText size={16} className="text-ink-muted shrink-0" />
@@ -887,7 +875,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                 </details>
 
                 {/* 2. Перед выходом на корт */}
-                <details className="group/acc py-3.5 first:pt-0 last:pb-0">
+                <details className="group/acc py-4 first:pt-0 last:pb-0">
                   <summary className="flex items-center justify-between gap-3 cursor-pointer list-none type-body font-medium text-ink hover:text-ink/80 transition-colors">
                     <span className="flex items-center gap-2.5">
                       <CheckCircle2 size={16} className="text-ink-muted shrink-0" />
@@ -912,7 +900,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                 </details>
 
                 {/* 3. Что включено для каждого игрока */}
-                <details className="group/acc py-3.5 first:pt-0 last:pb-0">
+                <details className="group/acc py-4 first:pt-0 last:pb-0">
                   <summary className="flex items-center justify-between gap-3 cursor-pointer list-none type-body font-medium text-ink hover:text-ink/80 transition-colors">
                     <span className="flex items-center gap-2.5">
                       <Sparkles size={16} className="text-ink-muted shrink-0" />
@@ -947,7 +935,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                 </details>
 
                 {/* 4. Как проходит игровой день */}
-                <details className="group/acc py-3.5 first:pt-0 last:pb-0">
+                <details className="group/acc py-4 first:pt-0 last:pb-0">
                   <summary className="flex items-center justify-between gap-3 cursor-pointer list-none type-body font-medium text-ink hover:text-ink/80 transition-colors">
                     <span className="flex items-center gap-2.5">
                       <Timer size={16} className="text-ink-muted shrink-0" />
@@ -977,14 +965,13 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
             </div>
 
             {/* Правая колонка: Частые вопросы — нативные чистые аккордеоны без задержек раскрытия */}
-            <div aria-label="Частые вопросы" className="bg-white se-3 p-5 sm:p-7 border-0">
-              <h3 className="type-title-card font-semibold text-ink mb-4 flex items-center gap-2">
-                <HelpCircle size={20} className="text-ink-muted" />
-                <span>{typograph('Частые вопросы')}</span>
-              </h3>
-              <div className="divide-y divide-ink/10">
+            <div aria-label="Частые вопросы" className="space-y-6">
+              <SectionHeader
+                title={typograph('Частые вопросы')}
+              />
+              <div className="divide-y divide-ink/10 border-y border-ink/10">
                 {faqItems.map((item, idx) => (
-                  <details key={item.q} open={idx === 0} className="group/faq py-3.5 first:pt-0 last:pb-0">
+                  <details key={item.q} open={idx === 0} className="group/faq py-4 first:pt-0 last:pb-0">
                     <summary className="flex items-center justify-between gap-3 cursor-pointer list-none type-body font-medium text-ink hover:text-ink/80 transition-colors">
                       <span>{typograph(item.q)}</span>
                       <span className="se-1 flex h-7 w-7 shrink-0 items-center justify-center bg-control text-ink transition-transform duration-200 group-open/faq:rotate-180">
