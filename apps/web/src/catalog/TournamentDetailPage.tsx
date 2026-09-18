@@ -498,7 +498,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                 size="md"
                 icon={<UserPlus size={18} />}
                 aria-label="Записаться на турнир"
-                className="px-2.5 sm:px-4 py-2"
+                className="px-2.5 sm:px-4 py-2 max-sm:[&_span.w-px]:hidden max-sm:[&_span.bg-current\/25]:hidden"
               >
                 <span className="hidden sm:inline">Записаться</span>
               </ContentAction>
@@ -515,8 +515,8 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
 
   return (
     <SiteFrame site={dto.site} backLink={{ href: '/tournaments' }}>
-      {/* pt-24 md:pt-32 гарантирует, что фиксированный header не перекрывает hero, а space-y-16..28 дает чистое швейцарское пространство */}
-      <article data-page-enter="content" className="container-page pb-24 pt-24 sm:pt-28 md:pt-32 space-y-16 sm:space-y-20 md:space-y-28">
+      {/* На мобилке нет верхнего navbar, поэтому отступ сверху pt-4 (равен боковому --page-gutter), на десктопе pt-28 md:pt-32 */}
+      <article data-page-enter="content" className="container-page pb-24 pt-4 sm:pt-28 md:pt-32 space-y-16 sm:space-y-20 md:space-y-28">
         {/* 1. Первый экран: Равнозначный сплит 50/50: Hero Left (визитка) + Hero Right (инфо без карточки) */}
         <section aria-label="Визитка и паспорт турнира">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-12 items-stretch">
@@ -694,7 +694,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                     )}
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <span className="font-mono text-xs font-bold text-ink-muted w-5 shrink-0">
+                      <span className="text-xs font-bold text-ink-muted w-5 shrink-0 tabular-nums">
                         {(idx + 1).toString().padStart(2, '0')}
                       </span>
                       <div className="min-w-0">
@@ -738,7 +738,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                         )}
                       >
                         <div className="flex items-center gap-3 min-w-0">
-                          <span className="font-mono text-xs font-medium text-ink-muted/50 w-5 shrink-0">
+                          <span className="text-xs font-medium text-ink-muted/50 w-5 shrink-0 tabular-nums">
                             {(slotIndex + 1).toString().padStart(2, '0')}
                           </span>
                           <span className="type-body-sm text-ink-soft">Свободный слот</span>
@@ -792,20 +792,18 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                     <div
                       key={`podium-${st.rank}`}
                       className={cn(
-                        'p-5 border flex flex-col justify-between gap-4 transition-colors',
+                        'se-3 p-5 flex flex-col justify-between gap-4 transition-all border-0',
                         isTop1
-                          ? 'border-lime bg-lime/10 shadow-xs'
-                          : isTop2
-                            ? 'border-ink/20 bg-surface-muted/40'
-                            : 'border-ink/10 bg-surface-muted/20'
+                          ? 'mesh-lime-soft shadow-xs text-lime-ink'
+                          : 'bg-white shadow-2xs text-ink'
                       )}
                     >
                       <div className="flex items-center justify-between gap-2">
                         <span
                           className={cn(
-                            'se-1 flex h-8 w-8 items-center justify-center font-mono text-sm font-bold',
+                            'se-1 flex h-8 w-8 items-center justify-center text-sm font-bold tabular-nums',
                             isTop1
-                              ? 'bg-lime text-lime-ink'
+                              ? 'bg-lime text-lime-ink shadow-2xs'
                               : isTop2
                                 ? 'bg-ink text-white'
                                 : 'bg-control text-ink'
@@ -813,9 +811,14 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                         >
                           {st.rank.toString().padStart(2, '0')}
                         </span>
-                        <div className="flex items-center gap-1.5 text-xs font-semibold text-ink-soft">
-                          {isTop1 && <Trophy size={16} className="text-[#eab308]" />}
-                          {isTop2 && <Medal size={16} className="text-[#94a3b8]" />}
+                        <div
+                          className={cn(
+                            'flex items-center gap-1.5 text-xs font-semibold',
+                            isTop1 ? 'text-lime-soft-ink' : 'text-ink-soft'
+                          )}
+                        >
+                          {isTop1 && <Trophy size={16} className="text-[#854d0e]" />}
+                          {isTop2 && <Medal size={16} className="text-[#64748b]" />}
                           {isTop3 && <Medal size={16} className="text-[#b45309]" />}
                           <span>{st.award ?? (isTop1 ? '1 место' : isTop2 ? '2 место' : '3 место')}</span>
                         </div>
@@ -824,35 +827,69 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                       <div className="min-w-0">
                         {st.isPair ? (
                           <div className="space-y-0.5">
-                            <p className="type-body font-semibold text-ink truncate">{st.player1}</p>
-                            <p className="type-body font-semibold text-ink truncate">{st.player2}</p>
+                            <p className={cn('type-body font-semibold truncate', isTop1 ? 'text-lime-ink' : 'text-ink')}>
+                              {st.player1}
+                            </p>
+                            <p className={cn('type-body font-semibold truncate', isTop1 ? 'text-lime-ink' : 'text-ink')}>
+                              {st.player2}
+                            </p>
                           </div>
                         ) : (
-                          <p className="type-body font-semibold text-ink truncate">{typograph(st.name)}</p>
+                          <p className={cn('type-body font-semibold truncate', isTop1 ? 'text-lime-ink' : 'text-ink')}>
+                            {typograph(st.name)}
+                          </p>
                         )}
                       </div>
 
-                      <div className="pt-3 border-t border-ink/10 flex items-center justify-between text-ink-soft type-caption">
+                      <div
+                        className={cn(
+                          'pt-3 border-t flex items-center justify-between type-caption',
+                          isTop1 ? 'border-lime-soft-ink/15 text-lime-soft-ink' : 'border-ink/10 text-ink-soft'
+                        )}
+                      >
                         <div>
-                          <span className="type-micro text-ink-muted block uppercase tracking-wider">Матчей</span>
-                          <span className="font-mono font-medium text-ink">{st.matches}</span>
-                        </div>
-                        <div>
-                          <span className="type-micro text-ink-muted block uppercase tracking-wider">Разница</span>
                           <span
                             className={cn(
-                              'font-mono font-semibold',
-                              st.diff.startsWith('+') ? 'text-green-600' : 'text-ink-soft'
+                              'type-micro block uppercase tracking-wider',
+                              isTop1 ? 'text-lime-soft-ink/80' : 'text-ink-muted'
+                            )}
+                          >
+                            Матчей
+                          </span>
+                          <span className={cn('font-medium tabular-nums', isTop1 ? 'text-lime-ink' : 'text-ink')}>
+                            {st.matches}
+                          </span>
+                        </div>
+                        <div>
+                          <span
+                            className={cn(
+                              'type-micro block uppercase tracking-wider',
+                              isTop1 ? 'text-lime-soft-ink/80' : 'text-ink-muted'
+                            )}
+                          >
+                            Разница
+                          </span>
+                          <span
+                            className={cn(
+                              'font-semibold tabular-nums',
+                              isTop1
+                                ? (st.diff.startsWith('+') ? 'text-[#15803d]' : 'text-lime-soft-ink')
+                                : (st.diff.startsWith('+') ? 'text-green-600' : 'text-ink-soft')
                             )}
                           >
                             {st.diff}
                           </span>
                         </div>
                         <div className="text-right">
-                          <span className="type-micro text-ink-muted block uppercase tracking-wider">
+                          <span
+                            className={cn(
+                              'type-micro block uppercase tracking-wider',
+                              isTop1 ? 'text-lime-soft-ink/80' : 'text-ink-muted'
+                            )}
+                          >
                             Очки
                           </span>
-                          <span className="type-title-card font-mono font-bold text-ink">
+                          <span className={cn('type-title-card font-bold tabular-nums', isTop1 ? 'text-lime-ink' : 'text-ink')}>
                             {st.points}
                           </span>
                         </div>
@@ -885,7 +922,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                       <div className="flex items-center gap-3 min-w-0 pr-2">
                         <span
                           className={cn(
-                            'se-1 flex h-7 w-7 shrink-0 items-center justify-center font-mono text-xs font-bold',
+                            'se-1 flex h-7 w-7 shrink-0 items-center justify-center text-xs font-bold tabular-nums',
                             isTop1
                               ? 'bg-lime text-lime-ink'
                               : isTop2 || isTop3
@@ -903,11 +940,11 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                                 <span className="type-body-sm font-semibold text-ink leading-tight">
                                   {st.player1}
                                 </span>
-                                <span className="text-ink-muted text-xs font-mono">/</span>
+                                <span className="text-ink-muted text-xs">/</span>
                                 <span className="type-body-sm font-semibold text-ink leading-tight">
                                   {st.player2}
                                 </span>
-                                {isTop1 && <Trophy size={14} className="text-[#eab308] shrink-0" />}
+                                {isTop1 && <Trophy size={14} className="text-[#854d0e] shrink-0" />}
                               </div>
                               {st.award && (
                                 <span className="type-micro font-medium text-ink-muted block mt-0.5">
@@ -921,7 +958,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                                 <span className="type-body-sm font-semibold text-ink truncate">
                                   {typograph(st.name)}
                                 </span>
-                                {isTop1 && <Trophy size={14} className="text-[#eab308] shrink-0 ml-0.5" />}
+                                {isTop1 && <Trophy size={14} className="text-[#854d0e] shrink-0 ml-0.5" />}
                               </div>
                               {st.award && (
                                 <span className="type-micro font-medium text-ink-muted block mt-0.5">
@@ -939,7 +976,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                           <span className="type-micro text-ink-muted block uppercase tracking-wider">
                             Матчей
                           </span>
-                          <span className="type-body-sm font-mono text-ink-soft">{st.matches}</span>
+                          <span className="type-body-sm text-ink-soft tabular-nums">{st.matches}</span>
                         </div>
 
                         <div className="hidden sm:block">
@@ -948,7 +985,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                           </span>
                           <span
                             className={cn(
-                              'type-body-sm font-mono font-semibold',
+                              'type-body-sm font-semibold tabular-nums',
                               st.diff.startsWith('+') ? 'text-green-600' : 'text-ink-soft'
                             )}
                           >
@@ -957,13 +994,13 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                         </div>
 
                         <div className="text-right min-w-[56px] sm:min-w-[68px]">
-                          <div className="sm:hidden type-micro text-ink-muted font-mono leading-none mb-1">
+                          <div className="sm:hidden type-micro text-ink-muted leading-none mb-1 tabular-nums">
                             {st.matches}м · {st.diff}
                           </div>
                           <span className="type-micro text-ink-muted hidden sm:block uppercase tracking-wider">
                             Очки
                           </span>
-                          <span className="type-title-dense font-bold font-mono text-ink leading-none">
+                          <span className="type-title-dense font-bold text-ink leading-none tabular-nums">
                             {st.points}
                           </span>
                         </div>
@@ -987,21 +1024,22 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
               )}
             </div>
 
-            {/* ТАБ 3: Призы (Логичная иерархия без грубого черного дивайдера) */}
+            {/* ТАБ 3: Призы (Суперэллипс, mesh-lime-soft для 1 места, белые подложки без обводок для 2 и 3 мест) */}
             <div id="tab-prizes" className={activeTab === 'prizes' ? 'block' : 'hidden'} role="tabpanel" aria-label="Распределение призов">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-2">
                 {prizes.map((prize, idx) => {
                   const isFirst = idx === 0
-                  const IconComp = idx === 0 ? Trophy : idx === 1 ? Medal : Award
+                  const isSecond = idx === 1
+                  const IconComp = isFirst ? Trophy : Medal
 
                   return (
                     <div
                       key={prize.place}
                       className={cn(
-                        'p-5 sm:p-6 border flex flex-col justify-between gap-5 transition-all',
+                        'se-3 p-5 sm:p-6 border-0 flex flex-col justify-between gap-5 transition-all',
                         isFirst
-                          ? 'border-lime/80 bg-lime/10'
-                          : 'border-ink/10 bg-surface-muted/30'
+                          ? 'mesh-lime-soft shadow-xs text-lime-ink'
+                          : 'bg-white shadow-2xs text-ink'
                       )}
                     >
                       <div className="space-y-3">
@@ -1010,29 +1048,58 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                             <span
                               className={cn(
                                 'se-1 flex h-7 w-7 items-center justify-center shrink-0',
-                                isFirst ? 'bg-lime text-lime-ink' : 'bg-control text-ink'
+                                isFirst
+                                  ? 'bg-lime text-lime-ink shadow-2xs'
+                                  : isSecond
+                                    ? 'bg-ink text-white'
+                                    : 'bg-control text-ink'
                               )}
                             >
                               <IconComp size={15} />
                             </span>
-                            <span className="font-mono text-xs font-bold uppercase tracking-wider text-ink">
+                            <span
+                              className={cn(
+                                'text-xs font-bold uppercase tracking-wider',
+                                isFirst ? 'text-lime-ink' : 'text-ink'
+                              )}
+                            >
                               {prize.place}
                             </span>
                           </div>
-                          <span className="type-micro font-medium text-ink-muted">
+                          <span
+                            className={cn(
+                              'type-micro font-medium',
+                              isFirst ? 'text-lime-soft-ink' : 'text-ink-muted'
+                            )}
+                          >
                             {typograph(prize.title)}
                           </span>
                         </div>
 
                         <div className="pt-1">
-                          <p className="type-title-card font-bold text-ink tracking-tight">
+                          <p
+                            className={cn(
+                              'type-title-card font-bold tracking-tight',
+                              isFirst ? 'text-lime-ink' : 'text-ink'
+                            )}
+                          >
                             {typograph(prize.reward)}
                           </p>
                         </div>
                       </div>
 
-                      <div className="pt-3.5 border-t border-ink/10">
-                        <p className="type-body-sm text-ink-soft leading-relaxed">
+                      <div
+                        className={cn(
+                          'pt-3.5 border-t',
+                          isFirst ? 'border-lime-soft-ink/15' : 'border-ink/10'
+                        )}
+                      >
+                        <p
+                          className={cn(
+                            'type-body-sm leading-relaxed',
+                            isFirst ? 'text-lime-soft-ink font-medium' : 'text-ink-soft'
+                          )}
+                        >
                           {typograph(prize.desc)}
                         </p>
                       </div>
