@@ -1,11 +1,14 @@
 import React, { useRef, useState } from 'react'
 import type { ThematicPageDTO } from '@unlim/content-contract'
 import {
+  CalendarCheck,
   Check,
+  ClipboardCheck,
   Layers,
   PackageCheck,
   Phone as PhoneIcon,
   Send as TelegramIcon,
+  ShieldCheck,
   Sparkles,
   Target,
   Users,
@@ -103,36 +106,32 @@ export const giftFormats = [
 // 3. Условия и правила
 export const termsList = [
   {
-    number: '01',
     title: 'Срок действия 365 дней',
     text: 'Сертификат действует целый год с момента оформления для свободного выбора удобного времени.',
   },
   {
-    number: '02',
     title: 'Несгораемый баланс',
     text: 'Остаток средств не сгорает после игры, а сохраняется на личном счёте для следующих визитов.',
   },
   {
-    number: '03',
     title: 'Любые услуги клуба',
     text: 'Номинал можно потратить на аренду кортов, персональные или групповые занятия и участие в турнирах.',
   },
   {
-    number: '04',
     title: 'Экипировка Varlion включена',
     text: 'Профессиональные ракетки Varlion и турнирные мячи бесплатно предоставляются на каждую игру.',
   },
   {
-    number: '05',
     title: 'На предъявителя',
     text: 'Сертификат можно свободно передавать друзьям, коллегам или членам семьи без переоформления.',
   },
   {
-    number: '06',
     title: 'Предварительное бронирование',
     text: 'Дата и время корта или тренера согласуются заранее с администратором клуба под ваше расписание.',
   },
 ]
+
+const termsIcons = [CalendarCheck, ShieldCheck, Layers, PackageCheck, Users, ClipboardCheck]
 
 // 4. Частые вопросы
 export const faqItems = [
@@ -263,7 +262,6 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
         interactive={false}
         className={cn(
           'flex h-full flex-col overflow-hidden p-6 transition-all duration-300 md:p-8',
-          isChosen ? 'ring-2 ring-ink' : ''
         )}
       >
         <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-control">
@@ -371,7 +369,7 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
       />
 
       {/* 1. HERO ШАПКА ВИДОМ КАК У PAGE-VIEW (БЕЗ БЕЙДЖЕЙ, БЕЗ КНОПОК И МЕТРИК) */}
-      <header className="page-hero relative isolate overflow-hidden bg-ink py-16 text-white md:py-24">
+      <header className="page-hero relative isolate overflow-hidden bg-ink py-12 text-white md:pb-12 md:pt-24">
         <div
           className="absolute inset-0 -z-20 bg-cover bg-center grayscale"
           style={{ backgroundImage: `url(/images/gift/card.jpg)` }}
@@ -379,25 +377,15 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
         <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(3,5,8,.95)_0%,rgba(3,5,8,.84)_52%,rgba(3,5,8,.62)_100%)]" />
 
         <div className="container-page relative z-10">
-          <Reveal eager>
-            <Typography
-              as="h1"
-              role="hero"
-              className="max-w-[920px] font-semibold leading-[1.06] text-white"
-            >
-              {typograph('Подарочный сертификат на\u00A0падел в\u00A0Москве')}
-            </Typography>
+          <Typography as="h1" role="section" className="max-w-[920px] text-white" data-page-enter="title">
+            {typograph('Подарочный сертификат на\u00A0падел в\u00A0Москве')}
+          </Typography>
 
-            <Typography
-              role="editorial"
-              tone="inverse-subtle"
-              className="mt-4 max-w-[760px] text-lg leading-relaxed text-white/75 md:text-xl"
-            >
-              {typograph(
-                'Подарите динамичную игру и\u00A0эмоции в\u00A0UNLIM RIGA PADEL: аренда кортов Jubo, тренировки с\u00A0тренером и\u00A0ракетки Varlion.'
-              )}
-            </Typography>
-          </Reveal>
+          <Typography role="editorial" className="mt-4 max-w-[820px] text-white/65" data-page-enter="intro">
+            {typograph(
+              'Подарите динамичную игру и\u00A0эмоции в\u00A0UNLIM RIGA PADEL: аренда кортов Jubo, тренировки с\u00A0тренером и\u00A0ракетки Varlion.'
+            )}
+          </Typography>
         </div>
       </header>
 
@@ -520,11 +508,15 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
             </Reveal>
 
             <div className="mt-8 space-y-3.5">
-              {termsList.map((term, idx) => (
+              {termsList.map((term, idx) => {
+                const Icon = termsIcons[idx] ?? Check
+                return (
                 <Reveal key={term.title} delay={idx * 0.05}>
                   <SurfaceCard tone="white" interactive={false} className="p-5">
-                    <div className="flex items-baseline gap-3">
-                      <span className="type-caption font-semibold text-ink-muted">{term.number}</span>
+                    <div className="flex items-start gap-3">
+                      <span className="se-1 flex h-10 w-10 shrink-0 items-center justify-center bg-surface-muted text-ink" aria-hidden="true">
+                        <Icon size={18} strokeWidth={1.8} />
+                      </span>
                       <Typography as="h3" role="title-compact" className="font-semibold text-ink">
                         {typograph(term.title)}
                       </Typography>
@@ -534,7 +526,8 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
                     </Typography>
                   </SurfaceCard>
                 </Reveal>
-              ))}
+                )
+              })}
             </div>
           </div>
 

@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import { readFile } from 'node:fs/promises'
+import { readFile, stat } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -12,10 +12,12 @@ import { padelCourtZakazSeed } from './content/padelCourtZakazSeed'
 const seedVersion = 'prototype-v2'
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const webPublicDir = path.resolve(dirname, '../../web/public')
+const mediaDir = path.resolve(dirname, '../media')
 
 const stats = {
   created: 0,
   mediaReused: 0,
+  mediaRehydrated: 0,
   skipped: 0,
   globalsPublished: 0,
 }
@@ -77,6 +79,7 @@ const localMedia = {
   varlionEquipment: 'images/benefits/varlion-equipment.png',
 } as const
 const pageHeroKinds = ['blog', 'coaches', 'tournaments', 'prices', 'training', 'courts', 'gallery', 'about'] as const
+type SeededRecord = { id: number | string; [key: string]: unknown }
 
 function hash(value: string): string {
   return createHash('sha256').update(value).digest('hex').slice(0, 24)
@@ -140,7 +143,7 @@ function richTextArticle(blocks: Array<{ type: 'heading' | 'paragraph'; text: st
   }
 }
 
-async function findBySeedKey(payload: Payload, collection: CollectionSlug, seedKey: string) {
+async function findBySeedKey(payload: Payload, collection: CollectionSlug, seedKey: string): Promise<SeededRecord | undefined> {
   const result = (await payload.find({
     collection,
     depth: 0,
@@ -148,8 +151,24 @@ async function findBySeedKey(payload: Payload, collection: CollectionSlug, seedK
     overrideAccess: true,
     showHiddenFields: true,
     where: { seedKey: { equals: seedKey } },
-  } as never)) as { docs: Array<{ id: number | string }> }
+  } as never)) as unknown as { docs: SeededRecord[] }
   return result.docs[0]
+}
+
+async function storedMediaFilesExist(media: Record<string, unknown>) {
+  const sizes = media.sizes && typeof media.sizes === 'object' ? media.sizes as Record<string, unknown> : {}
+  const filenames = [
+    media.filename,
+    ...Object.values(sizes).map((size) => size && typeof size === 'object' ? (size as Record<string, unknown>).filename : undefined),
+  ].filter((filename): filename is string => typeof filename === 'string' && filename.length > 0)
+  if (filenames.length === 0) return false
+
+  try {
+    await Promise.all(filenames.map((filename) => stat(path.join(mediaDir, filename))))
+    return true
+  } catch {
+    return false
+  }
 }
 
 async function ensureSeeded(
@@ -157,7 +176,7 @@ async function ensureSeeded(
   collection: CollectionSlug,
   seedKey: string,
   data: Record<string, unknown>,
-) {
+): Promise<SeededRecord> {
   const existing = await findBySeedKey(payload, collection, seedKey)
   if (existing) {
     stats.skipped += 1
@@ -241,12 +260,25 @@ async function createMedia(
   alt: string,
   credit: string,
   usageRights: string,
-) {
+): Promise<SeededRecord> {
   const seedKey = `prototype-media:${hash(source)}`
   const existing = await findBySeedKey(payload, 'media', seedKey)
   if (existing) {
-    stats.skipped += 1
-    return existing
+    if (await storedMediaFilesExist(existing)) {
+      stats.skipped += 1
+      return existing
+    }
+
+    const restored = await payload.update({
+      collection: 'media',
+      id: existing.id,
+      data: {},
+      file: { ...file, size: file.data.byteLength },
+      depth: 0,
+      overrideAccess: true,
+    } as never) as unknown as SeededRecord
+    stats.mediaRehydrated += 1
+    return restored
   }
 
   const sameSource = (await payload.find({
@@ -255,7 +287,7 @@ async function createMedia(
     limit: 1,
     overrideAccess: true,
     where: { sourceURL: { equals: source } },
-  })) as { docs: Array<{ id: number | string }> }
+  })) as unknown as { docs: SeededRecord[] }
   if (sameSource.docs[0]) {
     stats.mediaReused += 1
     return sameSource.docs[0]
@@ -267,15 +299,15 @@ async function createMedia(
     file: { ...file, size: file.data.byteLength },
     depth: 0,
     overrideAccess: true,
-  })
+  }) as unknown as SeededRecord
   stats.created += 1
   return created
 }
 
-async function ensureRemoteMedia(payload: Payload, sourceURL: string, alt: string) {
+async function ensureRemoteMedia(payload: Payload, sourceURL: string, alt: string): Promise<SeededRecord> {
   const seedKey = `prototype-media:${hash(sourceURL)}`
   const existing = await findBySeedKey(payload, 'media', seedKey)
-  if (existing) {
+  if (existing && await storedMediaFilesExist(existing)) {
     stats.skipped += 1
     return existing
   }
@@ -303,11 +335,11 @@ async function ensureRemoteMedia(payload: Payload, sourceURL: string, alt: strin
   )
 }
 
-async function ensureLocalMedia(payload: Payload, filename: string, alt: string) {
+async function ensureLocalMedia(payload: Payload, filename: string, alt: string): Promise<SeededRecord> {
   const source = `apps/web/public/${filename}`
   const seedKey = `prototype-media:${hash(source)}`
   const existing = await findBySeedKey(payload, 'media', seedKey)
-  if (existing) {
+  if (existing && await storedMediaFilesExist(existing)) {
     stats.skipped += 1
     return existing
   }

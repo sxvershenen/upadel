@@ -11,6 +11,8 @@ export * from "../components/ui/MobileSwiperNav";
 export * from "../components/ui/Price";
 export * from "../components/ui/Reveal";
 export * from "../components/ui/SectionHeader";
+export * from "../components/ui/Select";
+export * from "../components/ui/SelectField";
 export * from "../components/ui/SplitTextReveal";
 export * from "../components/ui/Tabs";
 export * from "../components/ui/Typography";
@@ -30,6 +32,7 @@ export * from "../components/cards/TrainingCard";
 export const designSystemCatalog = {
   buttonVariants: ["primary", "secondary", "neutral", "glass", "dark"],
   buttonSizes: ["sm", "md", "lg"],
+  controls: ["select", "select-field"],
   badgeTones: ["dark", "light", "lime", "lime-soft", "sunset", "gold", "muted", "glass", "outline-light", "outline-dark"],
   meshTones: ["indigo", "deep-blue", "dark", "lime", "lime-soft", "sky", "lavender", "sunset", "navy-gold"],
   typeRoles: ["micro", "caption", "ui", "body-small", "body", "editorial", "hero-lead", "title-compact", "title-dense", "title-card", "title-large", "price", "section", "hero", "eyebrow"],

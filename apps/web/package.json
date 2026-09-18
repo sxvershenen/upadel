@@ -8,7 +8,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "typecheck": "astro check",
-    "test:integrations": "node --import tsx --test src/analytics/ExternalAnalytics.test.ts src/seo/sitemap.test.ts src/thematic/PageHeader.test.tsx src/components/navigation/desktopHeaderState.test.ts src/components/navigation/siteChromeState.test.ts src/components/navigation/headerPlaygroundState.test.ts src/landing/PadelCourtZakazPage.test.tsx src/landing/GiftLandingPage.test.tsx src/catalog/TournamentDetailPage.test.tsx"
+    "test:integrations": "node --import tsx --test src/analytics/ExternalAnalytics.test.ts src/seo/sitemap.test.ts src/thematic/PageHeader.test.tsx src/components/ui/Select.test.tsx src/components/navigation/desktopHeaderState.test.ts src/components/navigation/siteChromeState.test.ts src/components/navigation/headerPlaygroundState.test.ts src/landing/PadelCourtZakazPage.test.tsx src/landing/GiftLandingPage.test.tsx src/catalog/TournamentDetailPage.test.tsx"
   },
   "dependencies": {
     "@astrojs/react": "6.0.5",

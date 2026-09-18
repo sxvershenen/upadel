@@ -73,6 +73,7 @@ test('GiftLandingPage renders server HTML with SEO content, schema.org metadata 
   assert.equal(giftFormats[1].id, 'digital')
   assert.match(html, /Физический бокс/)
   assert.match(html, /Электронный PDF/)
+  assert.doesNotMatch(html, /ring-ink/)
 
   // Use cases, terms, and FAQs counts
   assert.equal(useCases.length, 4)
