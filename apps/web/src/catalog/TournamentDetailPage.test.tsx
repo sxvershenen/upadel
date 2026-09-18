@@ -6,7 +6,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import type { TournamentDetailDTO } from '@unlim/content-contract'
 
 import { ActionLayerProvider } from '../actions/ActionLayer'
-import { TournamentDetailPage, typograph } from './TournamentDetailPage'
+import { TournamentDetailPage, parseLevelRange, typograph } from './TournamentDetailPage'
 
 const mockSite = {
   title: 'UNLIM RIGA PADEL',
@@ -224,3 +224,86 @@ test('typograph utility glues prepositions with non-breaking spaces', () => {
   const expected = 'Матч в\u00A0субботу и\u00A0в\u00A0воскресенье для\u00A0игроков на\u00A0кортах'
   assert.equal(typograph(input), expected)
 })
+
+test('parseLevelRange correctly extracts single levels and ranges', () => {
+  assert.deepEqual(parseLevelRange('2.0'), { min: 2.0, max: 2.0, isRange: false })
+  assert.deepEqual(parseLevelRange('2.5 – 4.5'), { min: 2.5, max: 4.5, isRange: true })
+  assert.deepEqual(parseLevelRange('3.0-4.0'), { min: 3.0, max: 4.0, isRange: true })
+  assert.deepEqual(parseLevelRange('уровень 1.5'), { min: 1.5, max: 1.5, isRange: false })
+})
+
+test('TournamentDetailPage renders level range and omits club address', () => {
+  const rangeDTO = {
+    ...mockTournamentDTO,
+    item: {
+      ...mockTournamentDTO.item,
+      level: '2.5 – 4.5',
+    },
+  } as unknown as TournamentDetailDTO
+
+  const html = renderToStaticMarkup(
+    <ActionLayerProvider site={mockSite as any}>
+      <TournamentDetailPage dto={rangeDTO} />
+    </ActionLayerProvider>
+  )
+
+  // 1. Level range is displayed in gauge
+  assert.match(html, /2\.5\s*[–-]\s*4\.5/)
+
+  // 2. Club address is NOT displayed in passport
+  const passportHtml = html.match(/<div aria-label="Паспорт турнира"[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/)?.[0] ?? ''
+  assert.doesNotMatch(passportHtml, /Новорижское шоссе/)
+  assert.doesNotMatch(passportHtml, /Адрес/)
+
+  // 3. No horizontal scroll wrapper
+  assert.doesNotMatch(html, /overflow-x-auto/)
+})
+
+test('TournamentDetailPage renders pairs cleanly in participants and standings', () => {
+  const pairsDTO = {
+    ...mockTournamentDTO,
+    item: {
+      ...mockTournamentDTO.item,
+      format: 'Парный кубок (фиксированные пары)',
+      level: '3.0 - 4.5',
+    },
+  } as unknown as TournamentDetailDTO
+
+  const html = renderToStaticMarkup(
+    <ActionLayerProvider site={mockSite as any}>
+      <TournamentDetailPage dto={pairsDTO} />
+    </ActionLayerProvider>
+  )
+
+  // Participants pair visualization
+  assert.match(html, /Воронов/)
+  assert.match(html, /Кузнецов/)
+  assert.match(html, /Пара/)
+})
+
+test('TournamentDetailPage renders 3 competition tabs and 4 collapsible left sections with FAQ on right', () => {
+  const html = renderToStaticMarkup(
+    <ActionLayerProvider site={mockSite as any}>
+      <TournamentDetailPage dto={mockTournamentDTO as unknown as TournamentDetailDTO} />
+    </ActionLayerProvider>
+  )
+
+  // 3 tabs in competition module
+  assert.match(html, /Список участников/)
+  assert.match(html, /Итоги турнира/)
+  assert.match(html, /Распределение призов/)
+
+  // 4 left sections in separate details
+  assert.match(html, /Регламент турнира/)
+  assert.match(html, /Перед выходом на\u00A0корт/)
+  assert.match(html, /Включено для\u00A0каждого игрока/)
+  assert.match(html, /Как[\s\S]*?проходит[\s\S]*?игровой[\s\S]*?день/)
+
+  // Right section: FAQ
+  assert.match(html, /aria-label="Частые вопросы"/)
+
+  // Exactly one booking button on the entire page
+  const bookingButtons = html.match(/data-analytics-action="booking"/g)
+  assert.equal(bookingButtons?.length, 1)
+})
+
