@@ -498,9 +498,9 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                 size="md"
                 icon={<UserPlus size={18} />}
                 aria-label="Записаться на турнир"
-                className="px-2.5 sm:px-4 py-2 max-sm:[&_span.w-px]:hidden max-sm:[&_span.bg-current\/25]:hidden"
+                className="max-sm:h-[var(--control-md)] max-sm:w-[var(--control-md)] max-sm:!p-0 max-sm:!gap-0 max-sm:justify-center max-sm:[&>span:first-child]:hidden max-sm:[&_span.h-5]:hidden sm:gap-2.5 sm:px-5"
               >
-                <span className="hidden sm:inline">Записаться</span>
+                Записаться
               </ContentAction>
             )}
           </div>
@@ -637,23 +637,22 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
         <section aria-label="Участники и результаты">
           <SectionHeader
             title={typograph('Сетка и участники')}
+            actionClassName="max-sm:w-full max-sm:ml-0"
             action={
-              <div className="flex items-center gap-[6px]">
-                {/* Прогресс-бар заполняемости слотов турнира: слева от табов */}
+              <div className="w-full flex items-center justify-between sm:w-auto sm:justify-end sm:gap-[6px]">
+                {/* Прогресс-бар заполняемости слотов турнира: на мобилке по левому краю, на ПК рядом с табами с гэпом 6px, высота как у таб-бара */}
                 <div
-                  className="p-1 bg-white rounded-full shadow-2xs flex items-center w-20 sm:w-28 shrink-0 h-[38px] sm:h-[40px] px-2.5"
+                  className="h-[38px] sm:h-[40px] w-20 sm:w-28 rounded-full bg-surface-muted overflow-hidden flex items-center shrink-0"
                   title={`Заполнено ${participants.length} из ${totalSlots} мест`}
                   aria-label={`Заполнено ${participants.length} из ${totalSlots} мест`}
                 >
-                  <div className="h-2 w-full bg-surface-muted rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-ink transition-all duration-500 rounded-full"
-                      style={{ width: `${(participants.length / totalSlots) * 100}%` }}
-                    />
-                  </div>
+                  <div
+                    className="h-full bg-ink transition-all duration-500 rounded-full"
+                    style={{ width: `${(participants.length / totalSlots) * 100}%` }}
+                  />
                 </div>
 
-                <div role="tablist" aria-label="Вкладки соревнования" className="se-2 inline-flex bg-control p-1 gap-1">
+                <div role="tablist" aria-label="Вкладки соревнования" className="se-2 inline-flex h-[38px] sm:h-[40px] items-center bg-control p-1 gap-1">
                   {(
                     [
                       { id: 'participants', label: 'Участники' },
@@ -700,7 +699,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                     )}
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <span className="text-xs font-bold text-ink-muted w-5 shrink-0 tabular-nums">
+                      <span className="se-1 flex h-7 w-7 shrink-0 items-center justify-center text-xs font-bold text-ink bg-surface-muted tabular-nums">
                         {(idx + 1).toString().padStart(2, '0')}
                       </span>
                       <div className="min-w-0">
@@ -744,7 +743,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                         )}
                       >
                         <div className="flex items-center gap-3 min-w-0">
-                          <span className="text-xs font-medium text-ink-muted/50 w-5 shrink-0 tabular-nums">
+                          <span className="se-1 flex h-7 w-7 shrink-0 items-center justify-center text-xs font-medium text-ink-muted/60 bg-surface-muted/60 tabular-nums">
                             {(slotIndex + 1).toString().padStart(2, '0')}
                           </span>
                           <span className="type-body-sm text-ink-soft">Свободный слот</span>
@@ -793,7 +792,6 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                 {standings.slice(0, 3).map((st) => {
                   const isTop1 = st.rank === 1
                   const isTop2 = st.rank === 2
-                  const isTop3 = st.rank === 3
                   return (
                     <div
                       key={`podium-${st.rank}`}
@@ -805,28 +803,20 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                       )}
                     >
                       <div className="flex items-center justify-between gap-2">
-                        <span
-                          className={cn(
-                            'se-1 flex h-8 w-8 items-center justify-center text-sm font-bold tabular-nums',
-                            isTop1
-                              ? 'bg-lime text-lime-ink shadow-2xs'
-                              : isTop2
-                                ? 'bg-ink text-white'
-                                : 'bg-control text-ink'
-                          )}
-                        >
-                          {st.rank.toString().padStart(2, '0')}
-                        </span>
                         <div
                           className={cn(
-                            'flex items-center gap-1.5 text-xs font-semibold',
-                            isTop1 ? 'text-lime-soft-ink' : 'text-ink-soft'
+                            'flex items-center gap-1.5 text-xs sm:text-sm font-semibold',
+                            isTop1 ? 'text-ink' : 'text-ink'
                           )}
                         >
-                          {isTop1 && <Trophy size={16} className="text-[#854d0e]" />}
-                          {isTop2 && <Medal size={16} className="text-[#64748b]" />}
-                          {isTop3 && <Medal size={16} className="text-[#b45309]" />}
-                          <span>{st.award ?? (isTop1 ? '1 место' : isTop2 ? '2 место' : '3 место')}</span>
+                          <Medal
+                            size={16}
+                            className={cn(
+                              'shrink-0',
+                              isTop1 ? 'text-ink' : isTop2 ? 'text-[#64748b]' : 'text-[#b45309]'
+                            )}
+                          />
+                          <span>{isTop1 ? 'Золото' : isTop2 ? 'Серебро' : 'Бронза'}</span>
                         </div>
                       </div>
 
@@ -875,14 +865,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                           >
                             Разница
                           </span>
-                          <span
-                            className={cn(
-                              'font-semibold tabular-nums',
-                              isTop1
-                                ? (st.diff.startsWith('+') ? 'text-[#15803d]' : 'text-lime-soft-ink')
-                                : (st.diff.startsWith('+') ? 'text-green-600' : 'text-ink-soft')
-                            )}
-                          >
+                          <span className={cn('font-medium tabular-nums', isTop1 ? 'text-lime-ink' : 'text-ink')}>
                             {st.diff}
                           </span>
                         </div>
@@ -989,14 +972,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                           <span className="type-micro text-ink-muted block uppercase tracking-wider">
                             Разница
                           </span>
-                          <span
-                            className={cn(
-                              'type-body-sm font-semibold tabular-nums',
-                              st.diff.startsWith('+') ? 'text-green-600' : 'text-ink-soft'
-                            )}
-                          >
-                            {st.diff}
-                          </span>
+                          <span className="type-body-sm text-ink-soft tabular-nums">{st.diff}</span>
                         </div>
 
                         <div className="text-right min-w-[56px] sm:min-w-[68px]">
@@ -1055,7 +1031,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                               className={cn(
                                 'se-1 flex h-7 w-7 items-center justify-center shrink-0',
                                 isFirst
-                                  ? 'bg-lime text-lime-ink shadow-2xs'
+                                  ? 'bg-white text-ink shadow-2xs'
                                   : isSecond
                                     ? 'bg-ink text-white'
                                     : 'bg-control text-ink'

@@ -9,6 +9,7 @@ export function SectionHeader({
   className,
   titleClassName,
   light,
+  actionClassName,
 }: {
   eyebrow?: string;
   title: ReactNode;
@@ -16,6 +17,7 @@ export function SectionHeader({
   className?: string;
   titleClassName?: string;
   light?: boolean;
+  actionClassName?: string;
 }) {
   return (
     <div className={cn("flex flex-wrap items-end justify-between gap-6", className)}>
@@ -40,7 +42,7 @@ export function SectionHeader({
           {typeof title === "string" ? <SplitTextReveal text={title} /> : title}
         </h2>
       </div>
-      {action && <div className="ml-auto flex shrink-0 items-center gap-3">{action}</div>}
+      {action && <div className={cn("ml-auto flex shrink-0 items-center gap-3", actionClassName)}>{action}</div>}
     </div>
   );
 }
