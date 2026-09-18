@@ -86,7 +86,7 @@ const mockTournamentDTO = {
     slug: 'americano',
     title: 'Game Party / Americano',
     level: '2.0',
-    lifecycle: 'active',
+    lifecycle: 'upcoming',
     scheduleLabel: 'Каждую пятницу · 19:30–22:30',
     format: 'Americano (смена напарников каждый сет)',
     entryFee: '2 500 ₽ / участник',
@@ -107,7 +107,7 @@ const mockTournamentDTO = {
       id: 't-open',
       slug: 'open-league',
       title: 'Unlim Riga Masters Cup',
-    level: '4.0',
+      level: '4.0',
       lifecycle: 'finished',
       scheduleLabel: 'Суббота, 14 марта · 11:00–17:00',
       format: 'Групповой этап + Олимпийская сетка',
@@ -119,54 +119,63 @@ const mockTournamentDTO = {
       meshStyle: 'deep-blue',
       icon: 'Trophy',
       regulationHTML: '<p>Олимпийская сетка.</p>',
-    levelKey: '4.0',
+      levelKey: '4.0',
       formatKey: 'groups-knockout',
       action: { label: 'Турнир завершён', mode: 'none' },
     },
   ],
 }
 
-test('TournamentDetailPage renders hero without buttons/badge/eyebrows and Swiss structure with passport, regulations, side-by-side timeline and FAQ', () => {
+test('TournamentDetailPage renders Swiss layout with hero, passport, prizes, participants, regulations, checklist and FAQ', () => {
   const html = renderToStaticMarkup(
     <ActionLayerProvider site={mockSite as any}>
       <TournamentDetailPage dto={mockTournamentDTO as unknown as TournamentDetailDTO} />
     </ActionLayerProvider>
   )
 
-  // 1. Hero block checks: unchanged H1, intro; no actions, no badge, no eyebrow
-  assert.match(html, /<header[^>]*class="page-hero[^>]*>/)
+  // 1. Hero block: visual card with status, title, format and 1.0-7.0 level gauge
+  assert.match(html, /aria-label="Визитка турнира"/)
   assert.match(html, /<h1[^>]*>[\s\S]*?Game Party \/ Americano[\s\S]*?<\/h1>/)
-  assert.doesNotMatch(html, /data-page-enter="eyebrow"/)
-  assert.doesNotMatch(html, /data-page-enter="actions"/)
+  assert.match(html, /Регистрация открыта/)
+  assert.match(html, /Americano/)
+  assert.match(html, /Шкала 1\.0–7\.0/)
+  assert.match(html, /Уровень игроков:/)
 
-  // 2. Breadcrumbs removed
-  assert.doesNotMatch(html, /aria-label="Хлебные крошки"/)
-
-  // 3. Tournament passport metrics (unified Swiss dl without card borders or 01-04 numbers)
+  // 2. Tournament passport metrics (Swiss grid with schedule, format, fee, prize)
   assert.match(html, /aria-label="Паспорт турнира"/)
   assert.match(html, /Расписание/)
-  assert.doesNotMatch(html, /01\s*·/)
   assert.match(html, /19:30–22:30/)
   assert.match(html, /Формат/)
-  assert.doesNotMatch(html, /02\s*·/)
   assert.match(html, /Americano/)
   assert.match(html, /Взнос/)
-  assert.doesNotMatch(html, /03\s*·/)
   assert.match(html, /2[\s\u00A0]500[\s\u00A0]₽ \/ участник/)
-  assert.doesNotMatch(html, /border border-ink\/5/)
-  assert.doesNotMatch(html, /border border-ink\/10/)
 
-  // 4. Regulations and Checklist
+  // 3. Prize distribution by places
+  assert.match(html, /aria-label="Распределение призов"/)
+  assert.match(html, /Распределение призов по\u00A0местам/)
+  assert.match(html, /1 МЕСТО/)
+  assert.match(html, /2 МЕСТО/)
+  assert.match(html, /3 МЕСТО/)
+
+  // 4. Participants & Standings section with tab switcher
+  assert.match(html, /aria-label="Участники и результаты"/)
+  assert.match(html, /Сетка и\u00A0участники/)
+  assert.match(html, /Список участников/)
+  assert.match(html, /Итоги турнира/)
+  assert.match(html, /Максим Воронов/)
+
+  // 5. Regulations (collapsed by default, expandable)
+  assert.match(html, /aria-label="Регламент турнира"/)
   assert.match(html, /Регламент турнира/)
+  assert.match(html, /Развернуть регламент/)
+
+  // 6. Checklist and Perks
   assert.match(html, /Перед выходом на\u00A0корт/)
   assert.match(html, /Включено для\u00A0каждого игрока/)
-  assert.doesNotMatch(html, /Особенности формата/)
-  assert.match(html, /type-body/)
   assert.match(html, /Питьевая вода/)
-  assert.doesNotMatch(html, /фруктовый бар/)
-  assert.doesNotMatch(html, /без ограничений/)
+  assert.match(html, /Турнирные мячи/)
 
-  // 5. Side-by-side Matchday Timeline and FAQ on PC with SectionHeader
+  // 7. Matchday Timeline and FAQ
   assert.match(html, /aria-label="Игровой день и вопросы"/)
   assert.match(html, /Как[\s\S]*?проходит[\s\S]*?игровой[\s\S]*?день/)
   assert.match(html, /Сбор и\u00A0разминка/)
@@ -174,18 +183,17 @@ test('TournamentDetailPage renders hero without buttons/badge/eyebrows and Swiss
   assert.match(html, /Частые[\s\S]*?вопросы/)
   assert.match(html, /Нужен ли постоянный напарник для\u00A0участия\?/)
 
-  // 6. Registration CTA block (no badges, no borders)
+  // 8. Registration CTA block
   assert.match(html, /aria-label="Запись на турнир"/)
   assert.match(html, /Готовы выйти на\u00A0корт\?/)
-  assert.doesNotMatch(html, /Регистрация открыта/)
 
-  // 7. Related Tournaments
+  // 9. Related Tournaments
   assert.match(html, /aria-label="Другие турниры"/)
   assert.match(html, /Другие[\s\S]*?турниры[\s\S]*?и[\s\S]*?лиги/)
   assert.match(html, /Unlim Riga Masters Cup/)
 })
 
-test('TournamentDetailPage renders completed lifecycle state appropriately without badges', () => {
+test('TournamentDetailPage renders completed lifecycle state appropriately', () => {
   const completedDTO = {
     ...mockTournamentDTO,
     item: {
@@ -204,10 +212,11 @@ test('TournamentDetailPage renders completed lifecycle state appropriately witho
     </ActionLayerProvider>
   )
 
-  assert.doesNotMatch(html, /Завершённый турнир/)
+  assert.match(html, /Турнир завершён/)
   assert.match(html, /Этот турнир уже завершился/)
   assert.match(html, /80[\s\u00A0]000[\s\u00A0]₽/)
   assert.match(html, /Все турниры/)
+  assert.match(html, /Итоги турнира/)
 })
 
 test('typograph utility glues prepositions with non-breaking spaces', () => {

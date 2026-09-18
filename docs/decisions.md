@@ -64,7 +64,7 @@ CMS users and SEO redirects are also managed from dedicated tabs inside `Нас�
 ## D11 — Catalog and detail routes — accepted
 
 - `/coaches`: filtered catalog, quick profile, then `/coaches/[slug]` detail.
-- `/tournaments`: filtered catalog and `/tournaments/[slug]` detail rendered with modern Swiss-style layout (original PageHeader hero preserved intact, 4-metric tournament passport, split regulations and pre-match checklist with club perks, 4-step matchday timeline, unwrapped Accordion FAQ, registration CTA conversion block, and related tournaments grid with glued Russian prepositions). Tournament filtering uses player levels `1.0–7.0`; cards foreground the tournament format and keep the player level in metadata.
+- `/tournaments`: filtered catalog and `/tournaments/[slug]` detail rendered with a compact Swiss-style layout (non-fullscreen branded hero on image or mesh gradient, live status badge, 1.0–7.0 level visual gauge, 4-metric tournament passport dl, prize breakdown by places with medals/cups, interactive tabs for participants grid and standings table with Americano points, expandable tournament regulations, pre-court checklist and included perks, matchday timeline, FAQ accordion, mobile accordions for secondary sections, registration CTA, and related tournaments). Tournament filtering uses player levels `1.0–7.0`; cards foreground the tournament format and keep the player level in metadata.
 - `/blog`: catalog and `/blog/[slug]` article.
 - Courts, prices, training and about remain single thematic pages; `/contacts` redirects to `/about`, while shared contact details stay in the footer and site settings.
 
