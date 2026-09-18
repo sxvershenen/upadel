@@ -28,6 +28,7 @@
 .mesh-lavender { background: radial-gradient(circle at 50% 40%, #3b0764 0%, #6b21a8 45%, #a855f7 80%, #e9d5ff 100%); }
 .mesh-sunset { background: radial-gradient(circle at 75% 20%, #fdba74 0%, #fed7aa 45%, #fff 90%); }
 .mesh-navy-gold { background: radial-gradient(circle at 75% 15%, rgb(250 204 21 / 35%) 0%, transparent 45%), radial-gradient(circle at 20% 85%, rgb(56 189 248 / 35%) 0%, transparent 55%), linear-gradient(150deg, #0b1327 0%, #020509 100%); }
+.mesh-silver { background: radial-gradient(circle at 75% 20%, #cbd5e1 0%, #e2e8f0 45%, #f8fafc 90%); }
 
 .overlay-lime::after, .overlay-blue::after, .overlay-cyan::after, .overlay-violet::after, .overlay-sunset::after, .overlay-emerald::after, .overlay-dark::after { content: ""; position: absolute; inset: 0; }
 .overlay-lime::after { background: radial-gradient(circle at 75% 75%, rgb(163 230 53 / 75%) 0%, transparent 45%), radial-gradient(circle at 20% 100%, rgb(101 163 13 / 80%) 0%, transparent 55%), linear-gradient(to bottom, transparent 0%, rgb(45 75 12 / 8%) 28%, rgb(58 95 15 / 64%) 64%, #203808 100%); }
