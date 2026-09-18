@@ -390,7 +390,7 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
       </header>
 
       {/* 2. НА ЧТО МОЖНО ПОТРАТИТЬ (USE CASES) — БЕЗ EYEBROW */}
-      <section className="container-page py-20 md:py-28" aria-labelledby="usecases-title">
+      <section className="container-page py-12 md:py-20" aria-labelledby="usecases-title">
         <Reveal className="mb-10 max-w-[760px]">
           <Typography as="h2" id="usecases-title" role="section" className="font-semibold text-ink">
             {typograph('На\u00A0что можно потратить сертификат')}
@@ -432,7 +432,7 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
       </section>
 
       {/* 3. ФОРМАТЫ ВРУЧЕНИЯ: СЛЕВА ФИЗИЧЕСКИЙ, СПРАВА ЭЛЕКТРОННЫЙ (СВАЙПЕР НА МОБИЛКЕ) — БЕЗ EYEBROW */}
-      <section className="bg-surface-subtle py-20 md:py-28" aria-labelledby="formats-title">
+      <section className="bg-surface-subtle py-12 md:py-20" aria-labelledby="formats-title">
         <div className="container-page">
           <Reveal className="mb-10 flex items-end justify-between gap-4 md:mb-12">
             <div>
@@ -492,8 +492,8 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
       </section>
 
       {/* 4. ОБЪЕДИНЁННЫЙ БЛОК: УСЛОВИЯ СЛЕВА, FAQ СПРАВА (БЕЗ ОБЁРТКИ КАРТОЧКИ) — БЕЗ EYEBROW */}
-      <section id="terms" className="container-page py-20 md:py-28" aria-labelledby="terms-title">
-        <div className="grid gap-12 lg:grid-cols-2 lg:gap-0 lg:divide-x lg:divide-ink/10">
+      <section id="terms" className="container-page py-12 md:py-20" aria-labelledby="terms-title">
+        <div className="grid gap-8 lg:grid-cols-2 lg:gap-0 lg:divide-x lg:divide-ink/10">
           {/* Слева: Условия */}
           <div className="lg:pr-16">
             <Reveal>
@@ -548,7 +548,7 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
       </section>
 
       {/* 5. CTA БЛОК И ФОРМА ЗАКАЗА (ПОЛЯ БЕЗ ВЕРХНИХ ПОДПИСЕЙ, С GHOST-ТЕКСТОМ) — БЕЗ EYEBROW */}
-      <section id="order-section" className="bg-surface-subtle py-20 md:py-28" aria-labelledby="order-title">
+      <section id="order-section" className="bg-surface-subtle py-12 md:py-20" aria-labelledby="order-title">
         <div className="container-page">
           <div className="grid gap-12 lg:grid-cols-[.9fr_1.1fr] lg:items-start">
             {/* Левая колонка: мессенджеры и детали */}
