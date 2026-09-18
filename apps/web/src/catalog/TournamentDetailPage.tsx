@@ -638,34 +638,50 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
           <SectionHeader
             title={typograph('Сетка и участники')}
             action={
-              <div role="tablist" aria-label="Вкладки соревнования" className="se-2 inline-flex bg-control p-1 gap-1">
-                {(
-                  [
-                    { id: 'participants', label: 'Участники' },
-                    { id: 'standings', label: 'Итоги' },
-                    { id: 'prizes', label: 'Призы' },
-                  ] as const
-                ).map((tab) => {
-                  const active = activeTab === tab.id
-                  return (
-                    <button
-                      key={tab.id}
-                      role="tab"
-                      type="button"
-                      aria-selected={active}
-                      aria-controls={`tab-${tab.id}`}
-                      onClick={() => setActiveTab(tab.id)}
-                      className={cn(
-                        'se-1 px-4 py-2 type-ui font-medium transition-colors cursor-pointer whitespace-nowrap',
-                        active
-                          ? 'bg-ink text-white shadow-xs font-semibold'
-                          : 'text-ink-soft hover:text-ink'
-                      )}
-                    >
-                      {tab.label}
-                    </button>
-                  )
-                })}
+              <div className="flex items-center gap-[6px]">
+                {/* Прогресс-бар заполняемости слотов турнира: слева от табов */}
+                <div
+                  className="p-1 bg-white rounded-full shadow-2xs flex items-center w-20 sm:w-28 shrink-0 h-[38px] sm:h-[40px] px-2.5"
+                  title={`Заполнено ${participants.length} из ${totalSlots} мест`}
+                  aria-label={`Заполнено ${participants.length} из ${totalSlots} мест`}
+                >
+                  <div className="h-2 w-full bg-surface-muted rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-ink transition-all duration-500 rounded-full"
+                      style={{ width: `${(participants.length / totalSlots) * 100}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div role="tablist" aria-label="Вкладки соревнования" className="se-2 inline-flex bg-control p-1 gap-1">
+                  {(
+                    [
+                      { id: 'participants', label: 'Участники' },
+                      { id: 'standings', label: 'Итоги' },
+                      { id: 'prizes', label: 'Призы' },
+                    ] as const
+                  ).map((tab) => {
+                    const active = activeTab === tab.id
+                    return (
+                      <button
+                        key={tab.id}
+                        role="tab"
+                        type="button"
+                        aria-selected={active}
+                        aria-controls={`tab-${tab.id}`}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={cn(
+                          'se-1 px-3 sm:px-4 py-1.5 sm:py-2 type-ui font-medium transition-colors cursor-pointer whitespace-nowrap',
+                          active
+                            ? 'bg-ink text-white shadow-xs font-semibold'
+                            : 'text-ink-soft hover:text-ink'
+                        )}
+                      >
+                        {tab.label}
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
             }
             className="mb-6"
@@ -674,16 +690,6 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
           <div ref={tabPanelsRef}>
             {/* ТАБ 1: Участники */}
             <div id="tab-participants" className={activeTab === 'participants' ? 'block' : 'hidden'} role="tabpanel">
-              {/* Прогресс-бар с белой подложкой 4px */}
-              <div className="p-1 bg-white rounded-full shadow-2xs mb-6 max-w-full">
-                <div className="h-2 w-full bg-surface-muted rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-lime transition-all duration-500 rounded-full"
-                    style={{ width: `${(participants.length / totalSlots) * 100}%` }}
-                  />
-                </div>
-              </div>
-
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-1">
                 {participants.map((player, idx) => (
                   <div
