@@ -80,7 +80,7 @@ export const SelectField = forwardRef<HTMLButtonElement, SelectFieldProps>(
           aria-describedby={describedBy}
           aria-invalid={error ? true : suppliedInvalid}
           aria-required={suppliedRequired ?? required}
-          className={cn('h-full bg-transparent px-4 pr-3 type-ui font-medium outline-none disabled:cursor-not-allowed', className)}
+          className={cn('ui-select-field-trigger h-full bg-control px-4 pr-3 type-ui font-medium outline-none disabled:cursor-not-allowed', className)}
           aria-label={labelVisibility === 'sr-only' ? label : undefined}
         />
         {name && <input type="hidden" name={name} value={currentValue} disabled={disabled} />}

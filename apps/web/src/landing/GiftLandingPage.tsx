@@ -12,6 +12,7 @@ import {
   Sparkles,
   Target,
   Users,
+  type LucideIcon,
 } from 'lucide-react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import type { Swiper as SwiperType } from 'swiper'
@@ -133,6 +134,31 @@ export const termsList = [
 
 const termsIcons = [CalendarCheck, ShieldCheck, Layers, PackageCheck, Users, ClipboardCheck]
 
+const giftBenefitIcons: Record<string, LucideIcon> = { Gift: Layers, BadgeCheck: Target, CalendarCheck, Sparkles }
+const giftTermIcons: Record<string, LucideIcon> = { CalendarCheck, ShieldCheck, Layers, PackageCheck, Users, ClipboardCheck }
+
+type GiftFormatView = {
+  id: string
+  badge: string
+  title: string
+  image: string
+  features: string[]
+  buttonText: string
+  buttonSelectedText: string
+}
+
+const giftFormDefaults = {
+  sectionTitle: 'Оформить подарочный сертификат',
+  sectionCopy: 'Оставьте контакты — менеджер клуба свяжется с вами в течение 5 минут для согласования деталей, проведения оплаты и отправки сертификата.',
+  channelLabel: 'Связаться в', telegramLabel: 'Telegram', phoneLabel: 'Телефон', vkLabel: 'ВКонтакте',
+  formatLabel: 'Формат сертификата', purposeLabel: 'Направление или номинал', namePlaceholder: 'Ваше имя',
+  contactPhonePlaceholder: '+7 (___) ___-__-__', contactTelegramPlaceholder: 'Telegram @username', contactVKPlaceholder: 'Профиль VK (vk.com/id)',
+  recipientPlaceholder: 'Кому подарок (для именного сертификата)', commentPlaceholder: 'Пожелание или комментарий к заказу...',
+  consentLabel: 'Согласие на обработку персональных данных (текст требует юридического согласования)', policyLabel: 'политика конфиденциальности',
+  submitLabel: 'Получить сертификат', successTitle: 'Заявка успешно отправлена!',
+  successText: 'Менеджер клуба свяжется с вами в течение 5 минут для согласования и проведения оплаты.', resubmitLabel: 'Оформить ещё один сертификат',
+}
+
 // 4. Частые вопросы
 export const faqItems = [
   {
@@ -163,6 +189,20 @@ export const faqItems = [
 
 export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
   const site = dto.site
+  const giftPage = dto.kind === 'gift' ? dto : null
+  const pageUseCases = giftPage?.benefits?.length
+    ? giftPage.benefits.map((item) => ({ icon: giftBenefitIcons[item.icon] ?? Layers, badge: item.badge, title: item.title, text: item.body }))
+    : useCases
+  const pageFormats: GiftFormatView[] = giftPage?.formats?.length
+    ? giftPage.formats.map((format) => ({ ...format, image: format.image.url }))
+    : giftFormats
+  const pageTerms = giftPage?.terms?.length
+    ? giftPage.terms.map((term) => ({ ...term, icon: giftTermIcons[term.icon] ?? Check }))
+    : termsList.map((term, index) => ({ ...term, icon: termsIcons[index] ?? Check }))
+  const pageFaqItems = giftPage?.faq?.length
+    ? giftPage.faq.map((item) => ({ q: item.question, a: item.answer }))
+    : faqItems
+  const pageForm = giftPage?.form ?? giftFormDefaults
   const [selectedFormat, setSelectedFormat] = useState<'box' | 'digital'>('box')
   const [selectedPurpose, setSelectedPurpose] = useState<string>('match')
   const [preferredChannel, setPreferredChannel] = useState<'telegram' | 'phone' | 'vk'>('telegram')
@@ -254,7 +294,7 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
     }
   }
 
-  const renderFormatCard = (format: typeof giftFormats[number]) => {
+  const renderFormatCard = (format: GiftFormatView) => {
     const isChosen = selectedFormat === format.id
     return (
       <SurfaceCard
@@ -332,10 +372,9 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
               },
               {
                 '@type': 'Product',
-                name: 'Подарочный сертификат на падел в Москве',
-                image: 'https://unlimpadel.ru/images/gift/card.jpg',
-                description:
-                  'Подарочный сертификат на аренду панорамных кортов Jubo, тренировки с тренером и экипировку Varlion в клубе UNLIM RIGA PADEL.',
+                name: giftPage?.page.title ?? 'Подарочный сертификат на падел в Москве',
+                image: giftPage?.formats?.[0]?.image.url ?? 'https://unlimpadel.ru/images/gift/card.jpg',
+                description: giftPage?.page.intro ?? 'Подарочный сертификат на аренду панорамных кортов Jubo, тренировки с тренером и экипировку Varlion в клубе UNLIM RIGA PADEL.',
                 brand: { '@type': 'Brand', name: 'UNLIM PADEL' },
                 offers: {
                   '@type': 'AggregateOffer',
@@ -354,7 +393,7 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
               },
               {
                 '@type': 'FAQPage',
-                mainEntity: faqItems.map((item) => ({
+                mainEntity: pageFaqItems.map((item) => ({
                   '@type': 'Question',
                   name: item.q,
                   acceptedAnswer: {
@@ -372,18 +411,18 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
       <header className="page-hero relative isolate overflow-hidden bg-ink py-12 text-white md:pb-12 md:pt-24">
         <div
           className="absolute inset-0 -z-20 bg-cover bg-center grayscale"
-          style={{ backgroundImage: `url(/images/gift/card.jpg)` }}
+          style={{ backgroundImage: `url(${giftPage?.page.hero.media.url ?? '/images/gift/card.jpg'})` }}
         />
         <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(3,5,8,.95)_0%,rgba(3,5,8,.84)_52%,rgba(3,5,8,.62)_100%)]" />
 
         <div className="container-page relative z-10">
           <Typography as="h1" role="section" className="max-w-[920px] text-white" data-page-enter="title">
-            {typograph('Подарочный сертификат на\u00A0падел в\u00A0Москве')}
+            {typograph(giftPage?.page.title ?? 'Подарочный сертификат на\u00A0падел в\u00A0Москве')}
           </Typography>
 
           <Typography role="editorial" className="mt-4 max-w-[820px] text-white/65" data-page-enter="intro">
             {typograph(
-              'Подарите динамичную игру и\u00A0эмоции в\u00A0UNLIM RIGA PADEL: аренда кортов Jubo, тренировки с\u00A0тренером и\u00A0ракетки Varlion.'
+              giftPage?.page.intro ?? 'Подарите динамичную игру и\u00A0эмоции в\u00A0UNLIM RIGA PADEL: аренда кортов Jubo, тренировки с\u00A0тренером и\u00A0ракетки Varlion.'
             )}
           </Typography>
         </div>
@@ -393,17 +432,17 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
       <section className="container-page py-12 md:py-20" aria-labelledby="usecases-title">
         <Reveal className="mb-10 max-w-[760px]">
           <Typography as="h2" id="usecases-title" role="section" className="font-semibold text-ink">
-            {typograph('На\u00A0что можно потратить сертификат')}
+            {typograph(giftPage?.offerTitle ?? 'На\u00A0что можно потратить сертификат')}
           </Typography>
           <Typography role="body" tone="subtle" className="mt-2.5">
             {typograph(
-              'Получатель сам выбирает формат: игра с\u00A0друзьями, урок с\u00A0тренером или тест-драйв ракеток Varlion.'
+              giftPage?.offerCopy ?? 'Получатель сам выбирает формат: игра с\u00A0друзьями, урок с\u00A0тренером или тест-драйв ракеток Varlion.'
             )}
           </Typography>
         </Reveal>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {useCases.map((item, idx) => {
+          {pageUseCases.map((item, idx) => {
             const Icon = item.icon
             return (
               <Reveal key={item.title} delay={idx * 0.08} className="h-full">
@@ -437,11 +476,11 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
           <Reveal className="mb-10 flex items-end justify-between gap-4 md:mb-12">
             <div>
               <Typography as="h2" id="formats-title" role="section" className="font-semibold text-ink">
-                {typograph('Форматы вручения')}
+                {typograph(giftPage?.formatsTitle ?? 'Форматы вручения')}
               </Typography>
               <Typography role="body" tone="subtle" className="mt-2 max-w-[620px]">
                 {typograph(
-                  'Премиальный бокс для личного вручения или электронный PDF с\u00A0доставкой в\u00A0мессенджер.'
+                  giftPage?.formatsCopy ?? 'Премиальный бокс для личного вручения или электронный PDF с\u00A0доставкой в\u00A0мессенджер.'
                 )}
               </Typography>
             </div>
@@ -457,7 +496,7 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
 
           {/* Desktop: 2 колонки */}
           <div className="hidden gap-8 lg:grid lg:grid-cols-2">
-            {giftFormats.map((format, idx) => (
+            {pageFormats.map((format, idx) => (
               <Reveal key={format.id} delay={idx * 0.1} className="h-full">
                 {renderFormatCard(format)}
               </Reveal>
@@ -481,7 +520,7 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
               spaceBetween={16}
               className="swiper-breathe !px-5"
             >
-              {giftFormats.map((format) => (
+              {pageFormats.map((format) => (
                 <SwiperSlide key={format.id} className="!h-auto">
                   <div className="h-full">{renderFormatCard(format)}</div>
                 </SwiperSlide>
@@ -498,16 +537,16 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
           <div className="lg:pr-16">
             <Reveal>
               <Typography as="h2" id="terms-title" role="section" className="font-semibold text-ink">
-                {typograph('Условия и правила')}
+                {typograph(giftPage?.termsTitle ?? 'Условия и правила')}
               </Typography>
               <Typography role="body" tone="subtle" className="mt-2.5 max-w-none lg:whitespace-nowrap">
-                {typograph('Понятные правила действия сертификата без скрытых условий.')}
+                {typograph(giftPage?.termsCopy ?? 'Понятные правила действия сертификата без скрытых условий.')}
               </Typography>
             </Reveal>
 
             <div className="mt-8 border-y border-ink/10" data-gift-terms-list>
-              {termsList.map((term, idx) => {
-                const Icon = termsIcons[idx] ?? Check
+              {pageTerms.map((term, idx) => {
+                const Icon = term.icon
                 return (
                 <Reveal key={term.title} delay={idx * 0.05} className="border-b border-ink/10 last:border-b-0">
                   <div className="flex items-start gap-3 py-5">
@@ -533,7 +572,7 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
           <div className="lg:pl-16">
             <Reveal>
               <Typography as="h2" id="faq-title" role="section" className="font-semibold text-ink">
-                {typograph('Частые вопросы')}
+                {typograph(giftPage?.faqTitle ?? 'Частые вопросы')}
               </Typography>
               <Typography role="body" tone="subtle" className="mt-2.5 max-w-[520px]">
                 {typograph('Ответы на\u00A0главные вопросы перед заказом и\u00A0первым визитом в\u00A0клуб.')}
@@ -541,7 +580,7 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
             </Reveal>
 
             <div className="mt-8">
-              <Accordion items={faqItems.map((item) => ({ q: typograph(item.q), a: typograph(item.a) }))} />
+              <Accordion items={pageFaqItems.map((item) => ({ q: typograph(item.q), a: typograph(item.a) }))} />
             </div>
           </div>
         </div>
@@ -555,11 +594,11 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
             <Reveal>
               <div>
                 <Typography as="h2" id="order-title" role="section" className="font-semibold text-ink">
-                  {typograph('Оформить подарочный сертификат')}
+                  {typograph(pageForm.sectionTitle)}
                 </Typography>
                 <Typography role="body" tone="subtle" className="mt-3 leading-relaxed">
                   {typograph(
-                    'Оставьте контакты\u00A0— менеджер клуба свяжется с\u00A0вами в\u00A0течение 5\u00A0минут для согласования деталей, проведения оплаты и\u00A0отправки сертификата.'
+                    pageForm.sectionCopy
                   )}
                 </Typography>
 
@@ -648,11 +687,11 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
                       <PackageCheck size={28} />
                     </div>
                     <Typography as="h3" role="title-large" className="mt-5 font-semibold text-ink">
-                      {typograph('Заявка успешно отправлена!')}
+                      {typograph(pageForm.successTitle)}
                     </Typography>
                     <Typography role="body" tone="subtle" className="mt-2">
                       {typograph(
-                        'Менеджер клуба свяжется с\u00A0вами в\u00A0течение 5\u00A0минут для согласования и\u00A0проведения оплаты.'
+                        pageForm.successText
                       )}
                     </Typography>
                     <Button
@@ -661,7 +700,7 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
                       className="mt-6"
                       onClick={() => setFormState('idle')}
                     >
-                      {typograph('Оформить ещё один сертификат')}
+                      {typograph(pageForm.resubmitLabel)}
                     </Button>
                   </div>
                 ) : (
@@ -673,11 +712,8 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
                     <div className="mt-6 grid gap-4">
                       {/* Канал связи */}
                       <div>
-                        <span className="sr-only">Предпочтительный канал связи</span>
+                        <span className="type-caption mb-2 block text-ink-muted">{typograph(pageForm.channelLabel)}</span>
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="type-caption text-ink-muted mr-1">
-                            {typograph('Связаться в:')}
-                          </span>
                           <button
                             type="button"
                             aria-label="В Telegram"
@@ -690,7 +726,7 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
                             )}
                           >
                             <TelegramIcon size={15} />
-                            <span>Telegram</span>
+                            <span>{pageForm.telegramLabel}</span>
                           </button>
                           <button
                             type="button"
@@ -704,7 +740,7 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
                             )}
                           >
                             <PhoneIcon size={14} />
-                            <span>Телефон</span>
+                            <span>{pageForm.phoneLabel}</span>
                           </button>
                           <button
                             type="button"
@@ -718,7 +754,7 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
                             )}
                           >
                             <VkIcon size={15} />
-                            <span>ВКонтакте</span>
+                            <span>{pageForm.vkLabel}</span>
                           </button>
                         </div>
                       </div>
@@ -726,7 +762,7 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
                       {/* Формат и номинал — БЕЗ ВЕРХНИХ ЛЕЙБЛОВ */}
                       <div className="grid gap-3 sm:grid-cols-2">
                         <SelectField
-                          label="Формат сертификата"
+                          label={pageForm.formatLabel}
                           labelVisibility="sr-only"
                           value={selectedFormat}
                           onChange={(e) => setSelectedFormat(e.target.value as 'box' | 'digital')}
@@ -737,7 +773,7 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
                         />
 
                         <SelectField
-                          label="Направление или номинал"
+                          label={pageForm.purposeLabel}
                           labelVisibility="sr-only"
                           value={selectedPurpose}
                           onChange={(e) => setSelectedPurpose(e.target.value)}
@@ -756,14 +792,14 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
                       {/* Имя и контакт — БЕЗ ВЕРХНИХ ЛЕЙБЛОВ */}
                       <div className="grid gap-3 sm:grid-cols-2">
                         <Field
-                          label="Ваше имя"
+                          label={pageForm.namePlaceholder}
                           labelVisibility="sr-only"
                           name="name"
                           autoComplete="name"
                           required
                           minLength={2}
                           maxLength={100}
-                          placeholder="Ваше имя"
+                          placeholder={pageForm.namePlaceholder}
                         />
 
                         <Field
@@ -775,30 +811,30 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
                           maxLength={100}
                           placeholder={
                             preferredChannel === 'telegram'
-                              ? 'Telegram @username'
+                              ? pageForm.contactTelegramPlaceholder
                               : preferredChannel === 'phone'
-                              ? '+7 (___) ___-__-__'
-                              : 'Профиль VK (vk.com/id)'
+                              ? pageForm.contactPhonePlaceholder
+                              : pageForm.contactVKPlaceholder
                           }
                         />
                       </div>
 
                       {/* Получатель — БЕЗ ВЕРХНЕГО ЛЕЙБЛА */}
                       <Field
-                        label="Имя получателя"
+                        label={pageForm.recipientPlaceholder}
                         labelVisibility="sr-only"
                         name="recipientName"
                         maxLength={100}
-                        placeholder="Кому подарок (для именного сертификата)"
+                        placeholder={pageForm.recipientPlaceholder}
                       />
 
                       {/* Комментарий — БЕЗ ВЕРХНЕГО ЛЕЙБЛА */}
                       <TextareaField
-                        label="Пожелание или комментарий"
+                        label={pageForm.commentPlaceholder}
                         labelVisibility="sr-only"
                         name="comment"
                         maxLength={500}
-                        placeholder="Пожелание или комментарий к заказу..."
+                        placeholder={pageForm.commentPlaceholder}
                       />
 
                       {/* Согласие */}
@@ -808,14 +844,14 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
                         defaultChecked
                         label={
                           <span>
-                            Согласие на обработку персональных данных (текст требует юридического согласования) ·{' '}
+                            {pageForm.consentLabel} ·{' '}
                             <a
                               href="/policy"
                               target="_blank"
                               rel="noreferrer"
                               className="text-ink underline hover:text-lime-deep"
                             >
-                              политика конфиденциальности
+                              {pageForm.policyLabel}
                             </a>
                           </span>
                         }
@@ -838,7 +874,7 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
                           {typograph(
                             formState === 'submitting'
                               ? 'Отправка...'
-                              : 'Получить сертификат'
+                              : pageForm.submitLabel
                           )}
                         </Button>
                       </div>

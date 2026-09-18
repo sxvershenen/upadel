@@ -45,7 +45,36 @@ export async function createThematicPageProjection(payload: Payload, options: { 
     const trial = rates.docs.find((item) => item.cardVariant === 'trial')
     return parseThematicPageDTO({ ...base, kind, infographicEyebrow: String(page.infographicEyebrow ?? ''), infographicTitle: String(page.infographicTitle ?? ''), infographicCopy: String(page.infographicCopy ?? ''), programsTitle: String(page.programsTitle ?? ''), blocks: (page.blocks ?? []).map(({ title, body, icon }: Row) => ({ title, body, icon })), articleHTML: richContentHTML(page.article ?? {}), action: actionDTO(page.action), programs: programs.docs.map((item) => program(item, origin)), trial: trial ? rentalRate(trial) : null })
   }
-  if (kind === 'gift') return parseThematicPageDTO({ ...base, kind, offerEyebrow: page.offerEyebrow, offerTitle: page.offerTitle, offerCopy: page.offerCopy, benefits: page.benefits ?? [], stepsEyebrow: page.stepsEyebrow, stepsTitle: page.stepsTitle, steps: page.steps ?? [], articleHTML: richContentHTML(page.article ?? {}), faqTitle: page.faqTitle, faq: page.faq ?? [], action: actionDTO(page.action) })
+  if (kind === 'gift') return parseThematicPageDTO({
+    ...base,
+    kind,
+    offerEyebrow: page.offerEyebrow,
+    offerTitle: page.offerTitle,
+    offerCopy: page.offerCopy,
+    formatsTitle: page.formatsTitle,
+    formatsCopy: page.formatsCopy,
+    termsTitle: page.termsTitle,
+    termsCopy: page.termsCopy,
+    benefits: (page.benefits ?? []).map(({ badge, title, body, icon }: Row) => ({ badge: String(badge ?? ''), title: String(title ?? ''), body: String(body ?? ''), icon })),
+    formats: (page.formats ?? []).map(({ formatId, badge, title, image, features, buttonText, buttonSelectedText }: Row) => ({
+      id: formatId,
+      badge: String(badge ?? ''),
+      title: String(title ?? ''),
+      image: requiredMedia(image, origin, 'original'),
+      features: (features ?? []).map(({ text }: Row) => String(text ?? '')),
+      buttonText: String(buttonText ?? ''),
+      buttonSelectedText: String(buttonSelectedText ?? ''),
+    })),
+    terms: (page.terms ?? []).map(({ title, text, icon }: Row) => ({ title: String(title ?? ''), text: String(text ?? ''), icon })),
+    stepsEyebrow: page.stepsEyebrow,
+    stepsTitle: page.stepsTitle,
+    steps: page.steps ?? [],
+    articleHTML: richContentHTML(page.article ?? {}),
+    faqTitle: page.faqTitle,
+    faq: page.faq ?? [],
+    form: page.form,
+    action: actionDTO(page.action),
+  })
   if (kind === 'courts') {
     const [courts, gallery] = await Promise.all([publishedCollection(payload, 'courts', preview), publishedCollection(payload, 'gallery-items', preview, { showOnCourtsPage: { equals: true } }, ['courtsPageOrder', '-createdAt', 'id'])])
     return parseThematicPageDTO({ ...base, kind, infographicTitle: page.infographicTitle, infographicCopy: page.infographicCopy, metrics: page.metrics ?? [], courts: courts.docs.map(court), gallery: gallery.docs.map((item) => galleryItem(item, origin)) })

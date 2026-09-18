@@ -90,3 +90,28 @@ test('typograph helper binds prepositions and short words with non-breaking spac
   assert.equal(typograph('Игра с тренером и аренда корта'), 'Игра с\u00A0тренером и\u00A0аренда корта')
   assert.equal(typograph('подарок для друга'), 'подарок для\u00A0друга')
 })
+
+test('GiftLandingPage uses the typed CMS content when it is available', () => {
+  const html = renderToStaticMarkup(
+    <ActionLayerProvider site={mockSite as any}>
+      <GiftLandingPage dto={{
+        kind: 'gift',
+        site: mockSite,
+        page: { title: 'CMS hero title', intro: 'CMS hero intro', hero: { grayscale: false, media: { url: '/cms-hero.webp', alt: 'CMS hero', mimeType: 'image/webp' } } },
+        offerTitle: 'CMS use cases', offerCopy: 'CMS use case copy', formatsTitle: 'CMS formats', formatsCopy: 'CMS formats copy', termsTitle: 'CMS terms', termsCopy: 'CMS terms copy',
+        benefits: [{ badge: 'CMS badge', title: 'CMS benefit', body: 'CMS benefit copy', icon: 'Gift' }],
+        formats: [{ id: 'box', badge: 'CMS box', title: 'CMS box title', image: { url: '/cms-box.webp', alt: 'CMS box', mimeType: 'image/webp' }, features: ['CMS feature'], buttonText: 'CMS select', buttonSelectedText: 'CMS selected' }],
+        terms: [{ title: 'CMS rule', text: 'CMS rule copy', icon: 'CalendarCheck' }],
+        stepsEyebrow: '', stepsTitle: '', steps: [], articleHTML: '', faqTitle: 'CMS FAQ', faq: [{ question: 'CMS question', answer: 'CMS answer' }],
+        form: { sectionTitle: 'CMS form title', sectionCopy: 'CMS form copy', channelLabel: 'Связаться в', telegramLabel: 'CMS Telegram', phoneLabel: 'CMS phone', vkLabel: 'CMS VK', formatLabel: 'CMS format label', purposeLabel: 'CMS purpose label', namePlaceholder: 'CMS name', contactPhonePlaceholder: 'CMS phone placeholder', contactTelegramPlaceholder: 'CMS telegram placeholder', contactVKPlaceholder: 'CMS VK placeholder', recipientPlaceholder: 'CMS recipient', commentPlaceholder: 'CMS comment', consentLabel: 'CMS consent', policyLabel: 'CMS policy', submitLabel: 'CMS submit', successTitle: 'CMS success', successText: 'CMS success copy', resubmitLabel: 'CMS resubmit' },
+      } as any} />
+    </ActionLayerProvider>
+  )
+
+  assert.match(html, /CMS hero title/)
+  assert.match(html, /CMS benefit/)
+  assert.match(html, /CMS box title/)
+  assert.match(html, /CMS rule/)
+  assert.match(html, /CMS form title/)
+  assert.match(html, /CMS question/)
+})

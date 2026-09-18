@@ -77,6 +77,8 @@ const localMedia = {
   padelRacket: 'padel-racket.png',
   parkingSign: 'parking-sign.png',
   varlionEquipment: 'images/benefits/varlion-equipment.png',
+  giftBox: 'images/gift/box.jpg',
+  giftCard: 'images/gift/card.jpg',
 } as const
 const pageHeroKinds = ['blog', 'coaches', 'tournaments', 'prices', 'training', 'courts', 'gallery', 'about'] as const
 type SeededRecord = { id: number | string; [key: string]: unknown }
@@ -398,9 +400,13 @@ async function seed() {
       parkingSign: await ensureLocalMedia(payload, localMedia.parkingSign, 'Знак парковки'),
       varlionEquipment: await ensureLocalMedia(payload, localMedia.varlionEquipment, 'Игрок с ракеткой Varlion в падел-клубе'),
     }
+    const giftMedia = {
+      box: await ensureLocalMedia(payload, localMedia.giftBox, 'Подарочный бокс UNLIM PADEL'),
+      card: await ensureLocalMedia(payload, localMedia.giftCard, 'Электронный сертификат UNLIM PADEL'),
+    }
     const pageHeroMedia: Record<string, { id: number | string }> = {}
     for (const kind of pageHeroKinds) pageHeroMedia[kind] = await ensureLocalMedia(payload, `page-heroes/${kind}.webp`, `Фон страницы ${kind}`)
-    const heroMediaFor = (slug: string) => pageHeroMedia[slug.replace('-page', '')] ?? pageHeroMedia.about
+    const heroMediaFor = (slug: string) => slug === 'gift-page' ? giftMedia.card : pageHeroMedia[slug.replace('-page', '')] ?? pageHeroMedia.about
 
     const mediaID = (source: string) => {
       const media = remoteMedia.get(source)
@@ -776,6 +782,48 @@ async function seed() {
       }
     }
 
+    const giftFormatsSeed = [
+      {
+        formatId: 'box', badge: 'Физический бокс', title: 'Подарочный бокс', image: giftMedia.box.id,
+        features: [
+          { text: 'Премиальный матовый кейс и тиснёная пластиковая карта' },
+          { text: 'Брендовая лента и дизайнерская открытка с пожеланием' },
+          { text: 'Самовывоз на ресепшн клуба или доставка курьером по Москве' },
+          { text: 'Идеально подходит для личного торжественного вручения' },
+        ],
+        buttonText: 'Выбрать бокс', buttonSelectedText: 'Выбран бокс',
+      },
+      {
+        formatId: 'digital', badge: 'Электронный PDF', title: 'Электронный сертификат', image: giftMedia.card.id,
+        features: [
+          { text: 'Согласование и отправка менеджером в Telegram или на Email' },
+          { text: 'Персональный QR-код и номер для мгновенной активации' },
+          { text: 'Стильный клубный PDF-сертификат UNLIM PADEL' },
+          { text: 'Удобный вариант, если получатель находится в другом городе' },
+        ],
+        buttonText: 'Выбрать PDF', buttonSelectedText: 'Выбран PDF',
+      },
+    ]
+    const giftTermsSeed = [
+      { title: 'Срок действия 365 дней', text: 'Сертификат действует целый год с момента оформления для свободного выбора удобного времени.', icon: 'CalendarCheck' },
+      { title: 'Несгораемый баланс', text: 'Остаток средств не сгорает после игры, а сохраняется на личном счёте для следующих визитов.', icon: 'ShieldCheck' },
+      { title: 'Любые услуги клуба', text: 'Номинал можно потратить на аренду кортов, персональные или групповые занятия и участие в турнирах.', icon: 'Layers' },
+      { title: 'Экипировка Varlion включена', text: 'Профессиональные ракетки Varlion и турнирные мячи бесплатно предоставляются на каждую игру.', icon: 'PackageCheck' },
+      { title: 'На предъявителя', text: 'Сертификат можно свободно передавать друзьям, коллегам или членам семьи без переоформления.', icon: 'Users' },
+      { title: 'Предварительное бронирование', text: 'Дата и время корта или тренера согласуются заранее с администратором клуба под ваше расписание.', icon: 'ClipboardCheck' },
+    ]
+    const giftFormSeed = {
+      sectionTitle: 'Оформить подарочный сертификат',
+      sectionCopy: 'Оставьте контакты — менеджер клуба свяжется с вами в течение 5 минут для согласования деталей, проведения оплаты и отправки сертификата.',
+      channelLabel: 'Связаться в', telegramLabel: 'Telegram', phoneLabel: 'Телефон', vkLabel: 'ВКонтакте',
+      formatLabel: 'Формат сертификата', purposeLabel: 'Направление или номинал', namePlaceholder: 'Ваше имя',
+      contactPhonePlaceholder: '+7 (___) ___-__-__', contactTelegramPlaceholder: 'Telegram @username', contactVKPlaceholder: 'Профиль VK (vk.com/id)',
+      recipientPlaceholder: 'Кому подарок (для именного сертификата)', commentPlaceholder: 'Пожелание или комментарий к заказу...',
+      consentLabel: 'Согласие на обработку персональных данных (текст требует юридического согласования)', policyLabel: 'политика конфиденциальности',
+      submitLabel: 'Получить сертификат', successTitle: 'Заявка успешно отправлена!',
+      successText: 'Менеджер клуба свяжется с вами в течение 5 минут для согласования и проведения оплаты.', resubmitLabel: 'Оформить ещё один сертификат',
+    }
+
     const thematicGlobals = [
       {
         slug: 'prices-page' as const, data: {
@@ -816,14 +864,18 @@ async function seed() {
       },
       {
         slug: 'gift-page' as const, data: {
-          eyebrow: 'Подарочный сертификат', title: 'Подарить падел', intro: 'Сертификат на игру и занятия в клубе — подарок, который превращается в новый опыт на корте.',
-          offerEyebrow: 'Подарок-впечатление', offerTitle: 'Подарите время для игры', offerCopy: 'Сертификат можно подобрать под разные форматы клуба. Детали и доступность администратор подтвердит перед оформлением.',
+          eyebrow: 'Подарочный сертификат', title: 'Подарочный сертификат на падел в Москве', intro: 'Подарите динамичную игру и эмоции в UNLIM RIGA PADEL: аренда кортов Jubo, тренировки с тренером и ракетки Varlion.',
+          offerEyebrow: 'Подарок-впечатление', offerTitle: 'На что можно потратить сертификат', offerCopy: 'Получатель сам выбирает формат: игра с друзьями, урок с тренером или тест-драйв ракеток Varlion.',
+          formatsTitle: 'Форматы вручения', formatsCopy: 'Премиальный бокс для личного вручения или электронный PDF с доставкой в мессенджер.',
+          termsTitle: 'Условия и правила', termsCopy: 'Понятные правила действия сертификата без скрытых условий.',
           benefits: [
-            { title: 'Аренда корта', body: 'Сертификат можно направить на самостоятельную игру; условия бронирования администратор подтвердит при активации.', icon: 'Gift' },
-            { title: 'Тренировки и занятия', body: 'Подойдёт для знакомства с паделом или продолжения занятий в доступном формате.', icon: 'BadgeCheck' },
-            { title: 'Удобный выбор времени', body: 'Получатель согласует дату и формат визита с клубом с учётом актуального расписания.', icon: 'CalendarCheck' },
-            { title: 'Эмоции вместо вещи', body: 'Подарок объединяет движение, игру и время с друзьями или близкими.', icon: 'Sparkles' },
+            { badge: 'Корты Jubo', title: 'Аренда кортов', body: '4 панорамных корта Jubo Super Panoramic с профессиональным покрытием Mondo и климат-контролем.', icon: 'Gift' },
+            { badge: 'PRO-тренеры', title: 'Занятия с тренером', body: 'Персональные и сплит-тренировки с тренерами категорий PRO и Master для любого уровня.', icon: 'BadgeCheck' },
+            { badge: 'Varlion Tech', title: 'Тест-драйв ракеток', body: 'Премиальные ракетки испанского бренда Varlion и мячи уже включены в каждый визит.', icon: 'CalendarCheck' },
+            { badge: 'Матчи 2х2', title: 'Игра для четверых', body: 'Классический парный матч с друзьями или коллегами: азартная динамичная игра с первого розыгрыша.', icon: 'Sparkles' },
           ],
+          formats: giftFormatsSeed,
+          terms: giftTermsSeed,
           steps: [
             { title: 'Оставьте заявку', body: 'Сообщите администратору, для кого и к какому поводу нужен сертификат.' },
             { title: 'Выберите наполнение', body: 'Согласуйте доступный номинал или формат использования и уточните действующие условия.' },
@@ -847,6 +899,7 @@ async function seed() {
             { question: 'Нужно ли сразу выбирать дату?', answer: 'Обычно дату можно согласовать позже из доступного расписания. Актуальные правила администратор подтвердит до оплаты.' },
             { question: 'Как узнать срок действия и условия?', answer: 'Срок, номинал, порядок активации и возможные ограничения указываются при оформлении сертификата.' },
           ],
+          form: giftFormSeed,
           action: { label: 'Оформить сертификат', mode: 'lead-form', leadType: 'gift' },
           seo: { title: 'Подарочный сертификат на падел в Москве — тренировки и аренда корта | UNLIM', description: 'Купить подарочный сертификат на игру в падел в Москве. Электронный за 2 минуты или премиальный бокс. Аренда панорамных кортов Jubo, тренировки с тренером и ракетки Varlion.', robots: 'index-follow' },
         },
@@ -915,7 +968,18 @@ async function seed() {
         }
       }
       if (current.seedVersion === seedVersion && page.slug === 'gift-page') {
-        const additions = Object.fromEntries(['offerEyebrow', 'offerTitle', 'offerCopy', 'stepsEyebrow', 'stepsTitle', 'faqTitle'].filter((key) => current[key] == null).map((key) => [key, (page.data as Record<string, unknown>)[key]]))
+        const giftData = page.data as Record<string, unknown>
+        const seededBenefits = Array.isArray(current.benefits) && current.benefits[0] && typeof current.benefits[0] === 'object'
+          ? current.benefits[0] as Record<string, unknown>
+          : null
+        const additions = Object.fromEntries(['offerEyebrow', 'offerTitle', 'offerCopy', 'formatsTitle', 'formatsCopy', 'termsTitle', 'termsCopy', 'stepsEyebrow', 'stepsTitle', 'faqTitle', 'formats', 'terms', 'form'].filter((key) => current[key] == null || Array.isArray(current[key]) && current[key].length === 0).map((key) => [key, giftData[key]]))
+        if (!current.form || typeof current.form !== 'object' || !current.form.sectionTitle) additions.form = giftData.form
+        if (seededBenefits && (seededBenefits.badge == null || seededBenefits.title !== 'Аренда кортов')) additions.benefits = giftData.benefits
+        if (current.title === 'Подарить падел') {
+          additions.title = giftData.title
+          additions.intro = giftData.intro
+        }
+        additions.heroImage = giftMedia.card.id
         if (Object.keys(additions).length > 0) {
           await payload.updateGlobal({ slug: page.slug, draft: false, overrideAccess: true, data: { ...additions, _status: 'published' } as never })
           stats.globalsPublished += 1

@@ -4,6 +4,7 @@ import { authenticated } from '../fields/access'
 import { createActionField } from '../fields/action'
 import { pageHeroFields } from '../fields/pageHero'
 import { padelCourtZakazContentTabs } from '../fields/padelCourtZakaz'
+import { imageOnlyFilter } from '../fields/media'
 import { seoField } from '../fields/seo'
 import { requirePublishedGlobal } from '../hooks/requirePublishedGlobal'
 
@@ -103,40 +104,108 @@ export const TrainingPage = createThematicPage({
 })
 
 export const GiftPage = createThematicPage({
-  slug: 'gift-page', label: 'Подарочный сертификат', kind: 'gift', fields: [
-    { name: 'offerEyebrow', type: 'text', label: 'Надзаголовок предложения', required: true },
-    { name: 'offerTitle', type: 'text', label: 'Заголовок предложения', required: true },
-    { name: 'offerCopy', type: 'textarea', label: 'Описание предложения', required: true },
+  slug: 'gift-page', label: 'Подарочный сертификат', kind: 'gift', contentTabs: [
     {
-      name: 'benefits', type: 'array', label: 'Варианты и преимущества', minRows: 3, maxRows: 4, required: true,
-      fields: [
-        { name: 'title', type: 'text', label: 'Заголовок', required: true },
-        { name: 'body', type: 'textarea', label: 'Описание', required: true },
-        { name: 'icon', type: 'select', label: 'Иконка', required: true, options: [
-          { label: 'Подарок', value: 'Gift' }, { label: 'Проверено', value: 'BadgeCheck' },
-          { label: 'Дата', value: 'CalendarCheck' }, { label: 'Впечатление', value: 'Sparkles' },
-        ] },
+      label: 'Контент', fields: [
+        { name: 'offerEyebrow', type: 'text', label: 'Надзаголовок предложения', required: true },
+        { name: 'offerTitle', type: 'text', label: 'Заголовок предложения', required: true },
+        { name: 'offerCopy', type: 'textarea', label: 'Описание предложения', required: true },
+        { name: 'formatsTitle', type: 'text', label: 'Заголовок форматов', required: true },
+        { name: 'formatsCopy', type: 'textarea', label: 'Описание форматов', required: true },
+        { name: 'termsTitle', type: 'text', label: 'Заголовок условий', required: true },
+        { name: 'termsCopy', type: 'textarea', label: 'Описание условий', required: true },
+        {
+          name: 'benefits', type: 'array', label: 'Варианты и преимущества', minRows: 3, maxRows: 4, required: true,
+          fields: [
+            { name: 'badge', type: 'text', label: 'Метка', required: true },
+            { name: 'title', type: 'text', label: 'Заголовок', required: true },
+            { name: 'body', type: 'textarea', label: 'Описание', required: true },
+            { name: 'icon', type: 'select', label: 'Иконка', required: true, options: [
+              { label: 'Подарок', value: 'Gift' }, { label: 'Проверено', value: 'BadgeCheck' },
+              { label: 'Дата', value: 'CalendarCheck' }, { label: 'Впечатление', value: 'Sparkles' },
+            ] },
+          ],
+        },
+        { name: 'stepsEyebrow', type: 'text', label: 'Надзаголовок шагов', required: true },
+        { name: 'stepsTitle', type: 'text', label: 'Заголовок шагов', required: true },
+        {
+          name: 'steps', type: 'array', label: 'Как подарить', minRows: 3, maxRows: 4, required: true,
+          fields: [
+            { name: 'title', type: 'text', label: 'Заголовок', required: true },
+            { name: 'body', type: 'textarea', label: 'Описание', required: true },
+          ],
+        },
+        { name: 'article', type: 'richText', label: 'SEO-статья', required: true },
+        { name: 'faqTitle', type: 'text', label: 'Заголовок вопросов', required: true },
+        {
+          name: 'faq', type: 'array', label: 'Частые вопросы', minRows: 2, maxRows: 8, required: true,
+          fields: [
+            { name: 'question', type: 'text', label: 'Вопрос', required: true },
+            { name: 'answer', type: 'textarea', label: 'Ответ', required: true },
+          ],
+        },
+        createActionField('action', 'Основное действие'),
       ],
     },
-    { name: 'stepsEyebrow', type: 'text', label: 'Надзаголовок шагов', required: true },
-    { name: 'stepsTitle', type: 'text', label: 'Заголовок шагов', required: true },
     {
-      name: 'steps', type: 'array', label: 'Как подарить', minRows: 3, maxRows: 4, required: true,
-      fields: [
-        { name: 'title', type: 'text', label: 'Заголовок', required: true },
-        { name: 'body', type: 'textarea', label: 'Описание', required: true },
+      label: 'Форматы и условия', fields: [
+        {
+          name: 'formats', type: 'array', label: 'Форматы сертификата', minRows: 2, maxRows: 2, required: true,
+          fields: [
+            { name: 'formatId', type: 'select', label: 'Идентификатор', required: true, options: [{ label: 'Бокс', value: 'box' }, { label: 'Электронный PDF', value: 'digital' }] },
+            { name: 'badge', type: 'text', label: 'Метка', required: true },
+            { name: 'title', type: 'text', label: 'Заголовок', required: true },
+            { name: 'image', type: 'upload', relationTo: 'media', filterOptions: imageOnlyFilter, label: 'Изображение', required: true },
+            {
+              name: 'features', type: 'array', label: 'Преимущества', minRows: 1, maxRows: 6, required: true,
+              fields: [{ name: 'text', type: 'text', label: 'Текст', required: true }],
+            },
+            { name: 'buttonText', type: 'text', label: 'Текст кнопки', required: true },
+            { name: 'buttonSelectedText', type: 'text', label: 'Текст выбранной кнопки', required: true },
+          ],
+        },
+        {
+          name: 'terms', type: 'array', label: 'Условия и правила', minRows: 1, maxRows: 8, required: true,
+          fields: [
+            { name: 'title', type: 'text', label: 'Заголовок', required: true },
+            { name: 'text', type: 'textarea', label: 'Текст', required: true },
+            { name: 'icon', type: 'select', label: 'Иконка', required: true, options: [
+              { label: 'Срок', value: 'CalendarCheck' }, { label: 'Баланс', value: 'ShieldCheck' },
+              { label: 'Услуги', value: 'Layers' }, { label: 'Экипировка', value: 'PackageCheck' },
+              { label: 'На предъявителя', value: 'Users' }, { label: 'Бронь', value: 'ClipboardCheck' },
+            ] },
+          ],
+        },
       ],
     },
-    { name: 'article', type: 'richText', label: 'SEO-статья', required: true },
-    { name: 'faqTitle', type: 'text', label: 'Заголовок вопросов', required: true },
     {
-      name: 'faq', type: 'array', label: 'Частые вопросы', minRows: 2, maxRows: 8, required: true,
-      fields: [
-        { name: 'question', type: 'text', label: 'Вопрос', required: true },
-        { name: 'answer', type: 'textarea', label: 'Ответ', required: true },
+      label: 'Форма заказа', fields: [
+        {
+          name: 'form', type: 'group', label: 'Тексты формы', fields: [
+            { name: 'sectionTitle', type: 'text', label: 'Заголовок секции', required: true },
+            { name: 'sectionCopy', type: 'textarea', label: 'Описание секции', required: true },
+            { name: 'channelLabel', type: 'text', label: 'Подпись каналов', required: true },
+            { name: 'telegramLabel', type: 'text', label: 'Кнопка Telegram', required: true },
+            { name: 'phoneLabel', type: 'text', label: 'Кнопка телефона', required: true },
+            { name: 'vkLabel', type: 'text', label: 'Кнопка VK', required: true },
+            { name: 'formatLabel', type: 'text', label: 'Поле формата', required: true },
+            { name: 'purposeLabel', type: 'text', label: 'Поле направления', required: true },
+            { name: 'namePlaceholder', type: 'text', label: 'Имя', required: true },
+            { name: 'contactPhonePlaceholder', type: 'text', label: 'Телефон', required: true },
+            { name: 'contactTelegramPlaceholder', type: 'text', label: 'Telegram', required: true },
+            { name: 'contactVKPlaceholder', type: 'text', label: 'VK', required: true },
+            { name: 'recipientPlaceholder', type: 'text', label: 'Получатель', required: true },
+            { name: 'commentPlaceholder', type: 'text', label: 'Комментарий', required: true },
+            { name: 'consentLabel', type: 'text', label: 'Согласие', required: true },
+            { name: 'policyLabel', type: 'text', label: 'Политика', required: true },
+            { name: 'submitLabel', type: 'text', label: 'Отправка', required: true },
+            { name: 'successTitle', type: 'text', label: 'Успех: заголовок', required: true },
+            { name: 'successText', type: 'textarea', label: 'Успех: текст', required: true },
+            { name: 'resubmitLabel', type: 'text', label: 'Повторная заявка', required: true },
+          ],
+        },
       ],
     },
-    createActionField('action', 'Основное действие'),
   ],
 })
 

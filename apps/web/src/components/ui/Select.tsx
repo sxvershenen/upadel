@@ -135,7 +135,7 @@ export function Select({
           exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -4, scale: 0.985 }}
           transition={reduceMotion ? { duration: 0.01 } : { duration: 0.2, ease: [0.2, 0.8, 0.2, 1] }}
           style={{ position: 'fixed', top: menuPosition.top, left: menuPosition.left, width: menuPosition.width }}
-          className="ui-select-menu z-[100] origin-top"
+          className="ui-select-menu z-[100] origin-top type-ui font-medium"
         >
           {options.map((option) => <button
             key={option.value}

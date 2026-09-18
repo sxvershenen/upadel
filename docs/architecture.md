@@ -27,6 +27,7 @@ Migration stage: the CMS-backed homepage prerenders visible HTML plus one `clien
 
 - Globals: site identity, navigation, contacts, footer, integrations, booking provider and homepage composition.
 - Pages: code-defined page templates with parent/child relationships, CMS-managed content/SEO and per-page hero image/grayscale settings; `/gift` and `/padel-court-zakaz` are typed landings, not free-form page builders.
+- `/gift` reads its hero, use cases, formats, terms, FAQ and form copy/media from the typed `gift-page` global; layout, responsive behavior and icon mapping remain code-defined.
 - Page hero rule: `eyebrow` is reserved for the homepage and the commercial `/padel-court-zakaz` hero; catalog, detail and thematic page heroes lead with `title` and `intro`. Use the eyebrow role for section or card context when that small label adds meaning. Shared desktop page heroes use `pt-24` and `pb-12`; `/padel-court-zakaz` keeps its own full-screen spacing.
 - Collections: articles/categories, coaches, courts, training types, prices/memberships, tournaments/leagues, reviews, FAQ, partners and leads.
 - Media: raster uploads are auto-oriented and normalized to WebP quality 80 before storage; SVG/GIF remain untranscoded. Desktop-navigation rows and their optional typed submenu children may reference SVG icons as Media relations rendered through safe image URLs. Alt/focal point/rights, schema-aware reverse usage links (including article bodies and retained versions) and referenced-file deletion safeguards remain in Payload.

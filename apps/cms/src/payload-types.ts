@@ -2689,7 +2689,12 @@ export interface GiftPage {
   offerEyebrow: string;
   offerTitle: string;
   offerCopy: string;
+  formatsTitle: string;
+  formatsCopy: string;
+  termsTitle: string;
+  termsCopy: string;
   benefits: {
+    badge: string;
     title: string;
     body: string;
     icon: 'Gift' | 'BadgeCheck' | 'CalendarCheck' | 'Sparkles';
@@ -2731,6 +2736,47 @@ export interface GiftPage {
      */
     href?: string | null;
     leadType?: ('membership' | 'gift' | 'trial' | 'consultation' | 'other') | null;
+  };
+  formats: {
+    formatId: 'box' | 'digital';
+    badge: string;
+    title: string;
+    image: number | Media;
+    features: {
+      text: string;
+      id?: string | null;
+    }[];
+    buttonText: string;
+    buttonSelectedText: string;
+    id?: string | null;
+  }[];
+  terms: {
+    title: string;
+    text: string;
+    icon: 'CalendarCheck' | 'ShieldCheck' | 'Layers' | 'PackageCheck' | 'Users' | 'ClipboardCheck';
+    id?: string | null;
+  }[];
+  form: {
+    sectionTitle: string;
+    sectionCopy: string;
+    channelLabel: string;
+    telegramLabel: string;
+    phoneLabel: string;
+    vkLabel: string;
+    formatLabel: string;
+    purposeLabel: string;
+    namePlaceholder: string;
+    contactPhonePlaceholder: string;
+    contactTelegramPlaceholder: string;
+    contactVKPlaceholder: string;
+    recipientPlaceholder: string;
+    commentPlaceholder: string;
+    consentLabel: string;
+    policyLabel: string;
+    submitLabel: string;
+    successTitle: string;
+    successText: string;
+    resubmitLabel: string;
   };
   /**
    * Если поле пустое, используется подготовленный фон страницы.
@@ -3808,9 +3854,14 @@ export interface GiftPageSelect<T extends boolean = true> {
   offerEyebrow?: T;
   offerTitle?: T;
   offerCopy?: T;
+  formatsTitle?: T;
+  formatsCopy?: T;
+  termsTitle?: T;
+  termsCopy?: T;
   benefits?:
     | T
     | {
+        badge?: T;
         title?: T;
         body?: T;
         icon?: T;
@@ -3841,6 +3892,55 @@ export interface GiftPageSelect<T extends boolean = true> {
         mode?: T;
         href?: T;
         leadType?: T;
+      };
+  formats?:
+    | T
+    | {
+        formatId?: T;
+        badge?: T;
+        title?: T;
+        image?: T;
+        features?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        buttonText?: T;
+        buttonSelectedText?: T;
+        id?: T;
+      };
+  terms?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        icon?: T;
+        id?: T;
+      };
+  form?:
+    | T
+    | {
+        sectionTitle?: T;
+        sectionCopy?: T;
+        channelLabel?: T;
+        telegramLabel?: T;
+        phoneLabel?: T;
+        vkLabel?: T;
+        formatLabel?: T;
+        purposeLabel?: T;
+        namePlaceholder?: T;
+        contactPhonePlaceholder?: T;
+        contactTelegramPlaceholder?: T;
+        contactVKPlaceholder?: T;
+        recipientPlaceholder?: T;
+        commentPlaceholder?: T;
+        consentLabel?: T;
+        policyLabel?: T;
+        submitLabel?: T;
+        successTitle?: T;
+        successText?: T;
+        resubmitLabel?: T;
       };
   heroImage?: T;
   heroGrayscale?: T;

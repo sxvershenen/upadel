@@ -179,13 +179,49 @@ export type GiftPageDTO = ThematicPageBase & {
   offerEyebrow: string
   offerTitle: string
   offerCopy: string
-  benefits: Array<{ title: string; body: string; icon: 'Gift' | 'BadgeCheck' | 'CalendarCheck' | 'Sparkles' }>
+  formatsTitle: string
+  formatsCopy: string
+  termsTitle: string
+  termsCopy: string
+  benefits: Array<{ badge: string; title: string; body: string; icon: 'Gift' | 'BadgeCheck' | 'CalendarCheck' | 'Sparkles' }>
+  formats: Array<{
+    id: 'box' | 'digital'
+    badge: string
+    title: string
+    image: MediaDTO
+    features: string[]
+    buttonText: string
+    buttonSelectedText: string
+  }>
+  terms: Array<{ title: string; text: string; icon: 'CalendarCheck' | 'ShieldCheck' | 'Layers' | 'PackageCheck' | 'Users' | 'ClipboardCheck' }>
   stepsEyebrow: string
   stepsTitle: string
   steps: Array<{ title: string; body: string }>
   articleHTML: string
   faqTitle: string
   faq: Array<{ question: string; answer: string }>
+  form: {
+    sectionTitle: string
+    sectionCopy: string
+    channelLabel: string
+    telegramLabel: string
+    phoneLabel: string
+    vkLabel: string
+    formatLabel: string
+    purposeLabel: string
+    namePlaceholder: string
+    contactPhonePlaceholder: string
+    contactTelegramPlaceholder: string
+    contactVKPlaceholder: string
+    recipientPlaceholder: string
+    commentPlaceholder: string
+    consentLabel: string
+    policyLabel: string
+    submitLabel: string
+    successTitle: string
+    successText: string
+    resubmitLabel: string
+  }
   action: ActionDTO
 }
 

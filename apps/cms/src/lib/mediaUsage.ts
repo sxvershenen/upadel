@@ -194,6 +194,12 @@ function scanCatalogPage(target: Map<string, MediaUsage>, doc: Record<string, un
       if (mediaID) addUsage(target, { mediaID, href: `/admin/globals/${slug}`, location: `${label} → ${fieldLabel}` }, state)
     }
   }
+  if (slug === 'gift-page') {
+    for (const value of valuesAtPath(doc, 'formats.image')) {
+      const mediaID = relationID(value)
+      if (mediaID) addUsage(target, { mediaID, href: `/admin/globals/${slug}`, location: `${label} → Форматы сертификата → изображение` }, state)
+    }
+  }
 }
 
 async function findReferencingDocs(payload: Payload, entry: RegistryEntry, ids: string[], draft: boolean, req?: PayloadRequest) {
