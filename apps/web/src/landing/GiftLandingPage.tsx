@@ -369,7 +369,7 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
       />
 
       {/* 1. HERO ШАПКА ВИДОМ КАК У PAGE-VIEW (БЕЗ БЕЙДЖЕЙ, БЕЗ КНОПОК И МЕТРИК) */}
-      <header className="page-hero relative isolate overflow-hidden bg-ink py-12 text-white md:py-16">
+      <header className="page-hero relative isolate overflow-hidden bg-ink py-12 text-white md:pb-12 md:pt-24">
         <div
           className="absolute inset-0 -z-20 bg-cover bg-center grayscale"
           style={{ backgroundImage: `url(/images/gift/card.jpg)` }}

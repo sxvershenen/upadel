@@ -7,7 +7,7 @@ import {
 export async function GET() {
   const cms = import.meta.env.CMS_URL;
   if (!cms) throw new Error("CMS_URL is required for sitemap.");
-  const origin = import.meta.env.PUBLIC_SITE_URL ?? "http://127.0.0.1:4324";
+  const origin = import.meta.env.PUBLIC_SITE_URL ?? "http://127.0.0.1:4321";
   const response = await fetch(new URL("/api/public/seo-index", cms));
   if (!response.ok) throw new Error(`SEO index failed: ${response.status}`);
   const data = (await response.json()) as {
