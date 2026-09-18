@@ -658,7 +658,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                 </span>
               </>
             }
-            className="!flex-nowrap items-center justify-between gap-2 sm:gap-6 mb-6"
+            className="!flex-nowrap items-end justify-between gap-2 sm:gap-6 mb-6"
             titleClassName="type-section font-semibold text-ink leading-tight"
             actionClassName="ml-auto shrink-0"
             action={
@@ -1019,7 +1019,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                       : 'bg-[#fed7aa] text-[#7c2d12] shadow-2xs'
                   const labelColor = isFirst ? 'text-white' : isSecond ? 'text-[#1e293b]' : 'text-[#431407]'
                   const titleColor = isFirst ? 'text-white/60' : isSecond ? 'text-[#64748b]' : 'text-[#7c2d12]'
-                  const rewardColor = isFirst ? 'text-gold' : isSecond ? 'text-[#0f172a]' : 'text-[#431407]'
+                  const rewardColor = isFirst ? 'text-white' : isSecond ? 'text-[#0f172a]' : 'text-[#431407]'
                   const descColor = isFirst ? 'text-white/70' : isSecond ? 'text-[#475569]' : 'text-[#7c2d12]'
                   const borderColor = isFirst ? 'border-white/10' : isSecond ? 'border-[#94a3b8]/35' : 'border-[#ea580c]/25'
 
