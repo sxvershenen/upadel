@@ -390,7 +390,7 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
       </header>
 
       {/* 2. НА ЧТО МОЖНО ПОТРАТИТЬ (USE CASES) — БЕЗ EYEBROW */}
-      <section className="container-page py-16 md:py-24" aria-labelledby="usecases-title">
+      <section className="container-page py-20 md:py-28" aria-labelledby="usecases-title">
         <Reveal className="mb-10 max-w-[760px]">
           <Typography as="h2" id="usecases-title" role="section" className="font-semibold text-ink">
             {typograph('На\u00A0что можно потратить сертификат')}
@@ -432,9 +432,9 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
       </section>
 
       {/* 3. ФОРМАТЫ ВРУЧЕНИЯ: СЛЕВА ФИЗИЧЕСКИЙ, СПРАВА ЭЛЕКТРОННЫЙ (СВАЙПЕР НА МОБИЛКЕ) — БЕЗ EYEBROW */}
-      <section className="border-t border-ink/10 bg-surface-subtle py-16 md:py-24" aria-labelledby="formats-title">
+      <section className="bg-surface-subtle py-20 md:py-28" aria-labelledby="formats-title">
         <div className="container-page">
-          <Reveal className="mb-8 flex items-end justify-between gap-4 md:mb-12">
+          <Reveal className="mb-10 flex items-end justify-between gap-4 md:mb-12">
             <div>
               <Typography as="h2" id="formats-title" role="section" className="font-semibold text-ink">
                 {typograph('Форматы вручения')}
@@ -492,39 +492,37 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
       </section>
 
       {/* 4. ОБЪЕДИНЁННЫЙ БЛОК: УСЛОВИЯ СЛЕВА, FAQ СПРАВА (БЕЗ ОБЁРТКИ КАРТОЧКИ) — БЕЗ EYEBROW */}
-      <section id="terms" className="container-page py-16 md:py-24" aria-labelledby="terms-title">
-        <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
+      <section id="terms" className="container-page py-20 md:py-28" aria-labelledby="terms-title">
+        <div className="grid gap-12 lg:grid-cols-2 lg:gap-0 lg:divide-x lg:divide-ink/10">
           {/* Слева: Условия */}
-          <div>
+          <div className="lg:pr-16">
             <Reveal>
               <Typography as="h2" id="terms-title" role="section" className="font-semibold text-ink">
                 {typograph('Условия и правила')}
               </Typography>
-              <Typography role="body" tone="subtle" className="mt-2.5 max-w-[520px]">
-                {typograph(
-                  'Простые и\u00A0прозрачные правила действия и\u00A0активации сертификата без скрытых звёздочек.'
-                )}
+              <Typography role="body" tone="subtle" className="mt-2.5 max-w-none lg:whitespace-nowrap">
+                {typograph('Понятные правила действия сертификата без скрытых условий.')}
               </Typography>
             </Reveal>
 
-            <div className="mt-8 space-y-3.5">
+            <div className="mt-8 border-y border-ink/10" data-gift-terms-list>
               {termsList.map((term, idx) => {
                 const Icon = termsIcons[idx] ?? Check
                 return (
-                <Reveal key={term.title} delay={idx * 0.05}>
-                  <SurfaceCard tone="white" interactive={false} className="p-5">
-                    <div className="flex items-start gap-3">
-                      <span className="se-1 flex h-10 w-10 shrink-0 items-center justify-center bg-surface-muted text-ink" aria-hidden="true">
-                        <Icon size={18} strokeWidth={1.8} />
-                      </span>
-                      <Typography as="h3" role="title-compact" className="font-semibold text-ink">
+                <Reveal key={term.title} delay={idx * 0.05} className="border-b border-ink/10 last:border-b-0">
+                  <div className="flex items-start gap-3 py-5">
+                    <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center text-ink-soft" aria-hidden="true">
+                      <Icon size={18} strokeWidth={1.8} />
+                    </span>
+                    <div className="min-w-0">
+                      <Typography as="h3" role="body" className="font-medium text-ink">
                         {typograph(term.title)}
                       </Typography>
+                      <Typography role="body-small" tone="subtle" className="mt-1.5 leading-relaxed">
+                        {typograph(term.text)}
+                      </Typography>
                     </div>
-                    <Typography role="body-small" tone="subtle" className="mt-2 leading-relaxed">
-                      {typograph(term.text)}
-                    </Typography>
-                  </SurfaceCard>
+                  </div>
                 </Reveal>
                 )
               })}
@@ -532,7 +530,7 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
           </div>
 
           {/* Справа: FAQ без карточной обёртки */}
-          <div>
+          <div className="lg:pl-16">
             <Reveal>
               <Typography as="h2" id="faq-title" role="section" className="font-semibold text-ink">
                 {typograph('Частые вопросы')}
@@ -550,7 +548,7 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
       </section>
 
       {/* 5. CTA БЛОК И ФОРМА ЗАКАЗА (ПОЛЯ БЕЗ ВЕРХНИХ ПОДПИСЕЙ, С GHOST-ТЕКСТОМ) — БЕЗ EYEBROW */}
-      <section id="order-section" className="border-t border-ink/10 bg-surface-subtle py-16 md:py-24" aria-labelledby="order-title">
+      <section id="order-section" className="bg-surface-subtle py-20 md:py-28" aria-labelledby="order-title">
         <div className="container-page">
           <div className="grid gap-12 lg:grid-cols-[.9fr_1.1fr] lg:items-start">
             {/* Левая колонка: мессенджеры и детали */}
