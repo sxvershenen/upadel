@@ -76,7 +76,7 @@ export const includedPerks = [
   },
 ]
 
-export function getFaqItems(category: string, format: string) {
+export function getFaqItems(level: string, format: string) {
   const isAmericano = format.toLowerCase().includes('americano')
   return [
     {
@@ -87,7 +87,7 @@ export function getFaqItems(category: string, format: string) {
     },
     {
       q: 'Какой уровень подготовки требуется?',
-      a: `Турнир рассчитан на категорию «${category}». Если вы сомневаетесь в своём уровне подготовки, свяжитесь с нами — дежурный тренер проведёт быструю оценку и подскажет комфортную группу.`,
+      a: `Турнир рассчитан на уровень ${level}. Если вы сомневаетесь в своём уровне подготовки, свяжитесь с нами — дежурный тренер проведёт быструю оценку и подскажет комфортную группу.`,
     },
     {
       q: 'Какая экипировка нужна для турнира?',
@@ -122,7 +122,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
       : 'После регистрации координатор подтвердит бронь вашего слота.',
   ]
 
-  const faqItems = getFaqItems(dto.item.category, dto.item.format)
+  const faqItems = getFaqItems(dto.item.level, dto.item.format)
 
   return (
     <SiteFrame site={dto.site} backLink={{ href: '/tournaments' }}>
@@ -163,9 +163,9 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                   <span className="type-title-card font-semibold text-ink block leading-snug">
                     {typograph(dto.item.format)}
                   </span>
-                  {dto.item.category && (
+                  {dto.item.level && (
                     <span className="type-caption text-ink-soft mt-1 block">
-                      {typograph(dto.item.category)}
+                      {typograph(`Уровень ${dto.item.level}`)}
                     </span>
                   )}
                 </dd>

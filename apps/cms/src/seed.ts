@@ -523,20 +523,20 @@ async function seed() {
 
     const tournaments = [
       {
-        slug: 'americano', title: 'Game Party / Americano', category: 'Клубная пятница', lifecycle: 'active',
+        slug: 'americano', title: 'Game Party / Americano', category: 'Клубная пятница', level: '2.0', lifecycle: 'active',
         scheduleLabel: 'Каждую пятницу · 19:30–22:30', format: 'Americano (смена напарников каждый сет)',
         entryFee: '2 500 ₽ / участник', description: 'Самый душевный формат для знакомства с игроками клуба. Музыкальный сет, питьевая вода и динамичные матчи.',
         prizeLabel: 'Стоимость за участника', prize: '2 500 ₽', visualStyle: 'image', image: mediaID(images.tournamentParty),
         imageOverlay: 'overlay-dark', icon: 'PartyPopper', regulation: richText('Регистрация закрывается за 2 часа до начала. Формат — Americano со сменой напарников каждый сет. На матч приезжайте за 15 минут до старта.'),
       },
       {
-        slug: 'open-league', title: 'Unlim Riga Masters Cup', category: 'Мужская Лига (B/C)', lifecycle: 'finished',
+        slug: 'open-league', title: 'Unlim Riga Masters Cup', category: 'Мужская Лига (B/C)', level: '4.0', lifecycle: 'finished',
         scheduleLabel: 'Суббота, 14 марта · 11:00–17:00', format: 'Групповой этап + Олимпийская сетка',
         entryFee: 'Взнос: 4 500 ₽ / пара', description: 'Рейтинговый кубок для опытных пар с розыгрышем клубных призов, кубков и медалей от наших партнеров Bullpadel.',
         prizeLabel: 'Призовой фонд', prize: '80 000 ₽', visualStyle: 'mesh', meshStyle: 'deep-blue', icon: 'Trophy', regulation: richText('Участники играют групповой этап, затем проходят в олимпийскую сетку. Пара должна быть на месте за 30 минут до начала. Победитель определяется по сумме выигранных геймов.'),
       },
       {
-        slug: 'junior-cup', title: "Women's Morning Cup", category: 'Женский Турнир (Open)', lifecycle: 'finished',
+        slug: 'junior-cup', title: "Women's Morning Cup", category: 'Женский Турнир (Open)', level: '2.0', lifecycle: 'finished',
         scheduleLabel: 'Воскресенье, 15 марта · 10:30–15:30', format: 'Round Robin + Финальный плей-офф',
         entryFee: 'Взнос: 3 500 ₽ / пара', description: 'Элегантный женский турнир в непринужденной атмосфере: игристое безалкогольное, подарки от бьюти-партнеров и памятные фото.',
         prizeLabel: 'Призовой фонд', prize: '50 000 ₽', visualStyle: 'mesh', meshStyle: 'lavender', icon: 'Medal', regulation: richText('Формат Round Robin с финальным плей-офф. Все пары проходят общий групповой этап. Регистрация подтверждается после внесения взноса.'),
@@ -544,9 +544,9 @@ async function seed() {
     ]
     for (const [index, tournament] of tournaments.entries()) {
       const facets = [
-        { categoryKey: 'club-game', formatKey: 'americano', action: { label: 'Записаться', mode: 'booking' } },
-        { categoryKey: 'mens-league', formatKey: 'groups-knockout', action: { label: 'Турнир завершён', mode: 'none' } },
-        { categoryKey: 'womens-open', formatKey: 'round-robin-playoff', action: { label: 'Турнир завершён', mode: 'none' } },
+        { categoryKey: 'club-game', level: '2.0', levelKey: '2.0', formatKey: 'americano', action: { label: 'Записаться', mode: 'booking' } },
+        { categoryKey: 'mens-league', level: '4.0', levelKey: '4.0', formatKey: 'groups-knockout', action: { label: 'Турнир завершён', mode: 'none' } },
+        { categoryKey: 'womens-open', level: '2.0', levelKey: '2.0', formatKey: 'round-robin-playoff', action: { label: 'Турнир завершён', mode: 'none' } },
       ][index]
       const seededTournament = await ensureSeeded(payload, 'tournaments', `prototype:tournament:${tournament.slug}`, {
         ...tournament,

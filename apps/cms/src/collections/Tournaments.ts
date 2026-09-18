@@ -43,16 +43,29 @@ export const Tournaments: CollectionConfig = {
             {
               name: 'category',
               type: 'text',
-              label: 'Категория',
+              label: 'Legacy: категория',
               required: true,
+              admin: { hidden: true },
             },
             {
-              name: 'categoryKey', type: 'select', label: 'Категория — фильтр', required: true,
+              name: 'categoryKey', type: 'select', label: 'Legacy: категория — фильтр', required: true,
               options: [
                 { label: 'Клубная игра', value: 'club-game' }, { label: 'Мужская лига', value: 'mens-league' },
                 { label: 'Женский Open', value: 'womens-open' }, { label: 'Детский турнир', value: 'junior' },
                 { label: 'Открытый турнир', value: 'open' },
               ],
+              admin: { hidden: true },
+            },
+            {
+              name: 'level',
+              type: 'text',
+              label: 'Уровень игроков',
+              required: true,
+              admin: { description: 'Шкала подготовки игрока от 1.0 до 7.0.' },
+            },
+            {
+              name: 'levelKey', type: 'select', label: 'Уровень игроков — фильтр', required: true,
+              options: [...['1.0', '2.0', '3.0', '4.0', '5.0', '6.0', '7.0'].map((value) => ({ label: value, value }))],
             },
             {
               name: 'lifecycle',

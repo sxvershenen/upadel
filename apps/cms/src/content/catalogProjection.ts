@@ -24,7 +24,7 @@ function coachItem(coach: Coach, origin: string): CoachCatalogItem {
 }
 
 function tournamentItem(item: Tournament, origin: string): TournamentCatalogItem {
-  return { id: String(item.id), slug: item.slug, visualStyle: item.visualStyle, image: mediaDTO(item.image, origin), imageOverlay: item.imageOverlay, meshStyle: item.meshStyle, category: item.category, icon: item.icon, title: item.title, scheduleLabel: item.scheduleLabel, format: item.format, entryFee: item.entryFee, description: item.description, prizeLabel: item.prizeLabel, prize: item.prize, action: actionDTO(item.action), lifecycle: item.lifecycle, categoryKey: item.categoryKey, formatKey: item.formatKey, regulationHTML: richContentHTML(item.regulation ?? {}) }
+  return { id: String(item.id), slug: item.slug, visualStyle: item.visualStyle, image: mediaDTO(item.image, origin), imageOverlay: item.imageOverlay, meshStyle: item.meshStyle, level: String(item.level ?? item.category), icon: item.icon, title: item.title, scheduleLabel: item.scheduleLabel, format: item.format, entryFee: item.entryFee, description: item.description, prizeLabel: item.prizeLabel, prize: item.prize, action: actionDTO(item.action), lifecycle: item.lifecycle, levelKey: String(item.levelKey ?? item.categoryKey), formatKey: item.formatKey, regulationHTML: richContentHTML(item.regulation ?? {}) }
 }
 
 const escapeHTML = (value: string) => value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;')

@@ -122,7 +122,7 @@ export type HomepageDTO = {
   }
   entities: {
     coaches: Array<{ id: string; name: string; slug: string; photo: MediaDTO; specialization: string; bio: string; level: string; experience: string; languages: string; rating: number; reviewsCount: number; certificates: string[]; priceFrom: number; action: ActionDTO }>
-    tournaments: Array<{ id: string; slug: string; visualStyle: 'image' | 'mesh'; image?: MediaDTO | null; imageOverlay?: string | null; meshStyle?: string | null; category: string; icon: 'PartyPopper' | 'Trophy' | 'Medal'; title: string; scheduleLabel: string; format: string; entryFee: string; description: string; prizeLabel: string; prize: string }>
+    tournaments: Array<{ id: string; slug: string; visualStyle: 'image' | 'mesh'; image?: MediaDTO | null; imageOverlay?: string | null; meshStyle?: string | null; level: string; icon: 'PartyPopper' | 'Trophy' | 'Medal'; title: string; scheduleLabel: string; format: string; entryFee: string; description: string; prizeLabel: string; prize: string }>
     articles: Array<{ id: string; slug: string; image: MediaDTO; category: string; readingTimeMinutes: number; title: string; excerpt: string }>
     articleRows: Array<{ id: string; slug: string; title: string; excerpt: string }>
     courts: Array<{ id: string; slug: string; title: string; eyebrow?: string | null; description?: string | null; cardVariant: 'panoramic' | 'metrics' | 'damping' | 'surface'; metrics?: Array<{ value: string; label: string; icon: 'PanelTop' | 'Lightbulb' | 'Activity' | 'Layers3' }> | null }>
@@ -140,7 +140,7 @@ export type PageSEO = HomepageDTO['seo']
 export type CatalogPageHeader = { eyebrow: string; title: string; intro: string; hero: PageHeroDTO; seo: PageSEO }
 export type ArticleCatalogItem = Omit<HomepageDTO['entities']['articles'][number], 'category'> & { category: { slug: string; title: string }; publishedAt: string; popularityScore: number }
 export type CoachCatalogItem = HomepageDTO['entities']['coaches'][number] & { levels: string[]; focusAreas: string[]; languageCodes: string[] }
-export type TournamentCatalogItem = HomepageDTO['entities']['tournaments'][number] & { action: ActionDTO; lifecycle: 'upcoming' | 'active' | 'finished' | 'cancelled'; categoryKey: string; formatKey: string; regulationHTML: string }
+export type TournamentCatalogItem = HomepageDTO['entities']['tournaments'][number] & { action: ActionDTO; lifecycle: 'upcoming' | 'active' | 'finished' | 'cancelled'; levelKey: string; formatKey: string; regulationHTML: string }
 
 type CatalogBase = { version: typeof homepageDTOversion; preview: boolean; generatedAt: string; page: CatalogPageHeader; site: SiteDTO }
 export type BlogCatalogDTO = CatalogBase & { kind: 'blog'; items: ArticleCatalogItem[]; categories: Array<{ slug: string; title: string }> }

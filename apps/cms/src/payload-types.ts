@@ -683,6 +683,11 @@ export interface Tournament {
   category: string;
   categoryKey: 'club-game' | 'mens-league' | 'womens-open' | 'junior' | 'open';
   /**
+   * Шкала подготовки игрока от 1.0 до 7.0.
+   */
+  level: string;
+  levelKey: '1.0' | '2.0' | '3.0' | '4.0' | '5.0' | '6.0' | '7.0';
+  /**
    * Не зависит от статуса черновик/опубликовано.
    */
   lifecycle: 'upcoming' | 'active' | 'finished' | 'cancelled';
@@ -1649,6 +1654,8 @@ export interface TournamentsSelect<T extends boolean = true> {
   title?: T;
   category?: T;
   categoryKey?: T;
+  level?: T;
+  levelKey?: T;
   lifecycle?: T;
   scheduleLabel?: T;
   startsAt?: T;
