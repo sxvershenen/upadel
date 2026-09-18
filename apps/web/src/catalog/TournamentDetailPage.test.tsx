@@ -167,7 +167,7 @@ test('TournamentDetailPage renders Swiss layout with hero, passport, prizes, par
   // 5. Regulations (collapsed by default, expandable)
   assert.match(html, /aria-label="Регламент турнира"/)
   assert.match(html, /Регламент[\s\S]*?турнира/)
-  assert.match(html, /Развернуть регламент/)
+  assert.match(html, /Регламент и\u00A0правила/)
 
   // 6. Checklist and Perks
   assert.match(html, /Перед выходом на\u00A0корт/)
@@ -183,9 +183,10 @@ test('TournamentDetailPage renders Swiss layout with hero, passport, prizes, par
   assert.match(html, /Частые[\s\S]*?вопросы/)
   assert.match(html, /Нужен ли постоянный напарник для\u00A0участия\?/)
 
-  // 8. Single CTA button inside Hero
+  // 8. CTA and no remaining slots text
   assert.match(html, /Записаться/)
-  assert.match(html, /Осталось/)
+  assert.doesNotMatch(html, /Осталось/)
+  assert.doesNotMatch(html, /слотов/)
 
   // 9. Related Tournaments
   assert.match(html, /aria-label="Другие турниры"/)
@@ -213,7 +214,6 @@ test('TournamentDetailPage renders completed lifecycle state appropriately', () 
   )
 
   assert.match(html, /Турнир завершён/)
-  assert.match(html, /Этот турнир уже завершился/)
   assert.match(html, /80[\s\u00A0]000[\s\u00A0]₽/)
   assert.match(html, /Все турниры/)
   assert.match(html, /Итоги/)
@@ -279,6 +279,7 @@ test('TournamentDetailPage renders pairs cleanly in participants and standings',
   assert.match(html, /Воронов/)
   assert.match(html, /Кузнецов/)
   assert.match(html, /Пара/)
+  assert.doesNotMatch(html, /Подтверждён/)
 })
 
 test('TournamentDetailPage renders 3 competition tabs and 4 collapsible left sections with FAQ on right', () => {
@@ -302,8 +303,10 @@ test('TournamentDetailPage renders 3 competition tabs and 4 collapsible left sec
   // Right section: FAQ
   assert.match(html, /aria-label="Частые вопросы"/)
 
-  // Exactly one booking button on the entire page
+  // Hero booking button + empty slot booking buttons ("Занять")
   const bookingButtons = html.match(/data-analytics-action="booking"/g)
-  assert.equal(bookingButtons?.length, 1)
+  assert.equal(bookingButtons?.length, 5) // 1 hero CTA + 4 empty slots
+  assert.match(html, /Занять/)
+  assert.match(html, /Развернуть/)
 })
 
