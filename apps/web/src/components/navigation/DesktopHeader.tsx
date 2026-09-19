@@ -27,10 +27,6 @@ const navigationIcons: Record<NavigationIconPreset, LucideIcon> = {
 const iconHover = { scale: 1.08, y: -1 }
 const headerEntranceSpring = { type: 'spring' as const, visualDuration: 0.42, bounce: 0.06 }
 const headerLayoutSpring = { type: 'spring' as const, visualDuration: 0.2, bounce: 0.06, velocity: 0 }
-const headerSwapTransition = (visible: boolean, delay = 0) => ({ duration: 0.1, ease: [0.2, 0.8, 0.2, 1] as const, delay: visible ? delay : 0 })
-const expandedContentDelay = 0.16
-const bookingLabelDelay = 0.22
-const headerButtonWidthTransition = { duration: 0.2, ease: [0.2, 0.8, 0.2, 1] as const }
 
 function NavigationIcon({ href, icon, size = 16 }: { href: string; icon?: { url: string } | null; size?: number }) {
   if (icon) return <img src={icon.url} alt="" aria-hidden="true" className="h-4 w-4 object-contain" />
@@ -39,7 +35,7 @@ function NavigationIcon({ href, icon, size = 16 }: { href: string; icon?: { url:
 }
 
 function useWideHeader() {
-  const [wide, setWide] = useState(false)
+  const [wide, setWide] = useState(() => typeof window === 'undefined' ? true : window.matchMedia('(min-width: 1200px)').matches)
   useEffect(() => {
     const query = window.matchMedia('(min-width: 1200px)')
     const update = () => setWide(query.matches)
@@ -74,9 +70,9 @@ function CompactTooltip({ children, filterId, reduceMotion }: { children: ReactN
 }
 
 function AnimatedNavigationContents({ expanded, item }: { expanded: boolean; item: DesktopNavigationChild }) {
-  return <span className="relative grid place-items-center overflow-hidden">
-    <motion.span aria-hidden={!expanded} animate={{ opacity: expanded ? 1 : 0, scale: expanded ? 1 : 0.68, y: expanded ? 0 : -2 }} transition={headerSwapTransition(expanded, expandedContentDelay)} className="desktop-header-nav-label col-start-1 row-start-1 block origin-center">{item.label}</motion.span>
-    <motion.span aria-hidden="true" animate={{ opacity: expanded ? 0 : 1, scale: expanded ? 0.68 : 1, y: expanded ? 2 : 0 }} transition={headerSwapTransition(!expanded, 0.02)} className="desktop-header-nav-icon col-start-1 row-start-1 inline-flex origin-center items-center justify-center"><NavigationIcon href={item.href} icon={item.icon} /></motion.span>
+  return <span data-header-nav-mode={expanded ? 'expanded' : 'compact'} className="desktop-header-nav-content relative grid place-items-center overflow-hidden">
+    <span aria-hidden={!expanded} data-header-nav-label className="desktop-header-nav-label col-start-1 row-start-1 block">{item.label}</span>
+    <span aria-hidden="true" data-header-nav-icon className="desktop-header-nav-icon col-start-1 row-start-1 inline-flex items-center justify-center"><NavigationIcon href={item.href} icon={item.icon} /></span>
   </span>
 }
 
@@ -248,12 +244,12 @@ function HeaderBrand({ compact, filterId, homeHref, logo, logoMode, name, reduce
   const replaceBrand = showLogo && logoMode === 'replace'
   return <div className="desktop-header-brand desktop-header-compact-control relative shrink-0">
     <motion.a href={homeHref} aria-label={name} whileHover={compact && !reduceMotion ? iconHover : undefined} whileTap={compact && !reduceMotion ? tapScaleSm : undefined} transition={springSnappy} className={`flex h-[var(--control-sm)] shrink-0 items-center justify-center overflow-hidden leading-none focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2 ${compact ? 'w-[var(--control-sm)] text-white/70 hover:text-white' : 'text-white'}`}>
-      <span className="grid place-items-center">
-        <motion.span animate={{ opacity: compact ? 1 : 0, scale: compact ? 1 : 0.68, y: compact ? 0 : 2 }} transition={headerSwapTransition(compact, 0.02)} className="col-start-1 row-start-1 inline-flex origin-center items-center justify-center" aria-hidden={!compact}><Home aria-hidden="true" size={17} strokeWidth={1.9} /></motion.span>
-        <motion.span animate={{ opacity: compact ? 0 : 1, scale: compact ? 0.68 : 1, y: compact ? -2 : 0 }} transition={headerSwapTransition(!compact, expandedContentDelay)} className="col-start-1 row-start-1 flex origin-center items-center gap-2.5" aria-hidden={compact}>
+      <span data-header-brand-mode={compact ? 'compact' : 'expanded'} className="desktop-header-brand-content grid place-items-center">
+        <span data-header-brand-icon className="col-start-1 row-start-1 inline-flex items-center justify-center" aria-hidden={!compact}><Home aria-hidden="true" size={17} strokeWidth={1.9} /></span>
+        <span data-header-brand-label className="col-start-1 row-start-1 flex items-center gap-2.5" aria-hidden={compact}>
           {showLogo ? <img src={logo?.url} alt="" aria-hidden="true" className={replaceBrand ? 'h-9 max-w-[150px] object-contain' : 'h-7 w-7 object-contain'} /> : <span className="h-2.5 w-2.5 shrink-0 rounded-[3px] bg-lime" />}
           {!replaceBrand && <span className="flex flex-col"><span className="text-[14px] font-semibold tracking-[0] text-white">{name}</span><span className="desktop-header-subtitle type-micro text-white/50">{subtitle}</span></span>}
-        </motion.span>
+        </span>
       </span>
     </motion.a>
     {compact && <CompactTooltip filterId={filterId} reduceMotion={reduceMotion}>Главная</CompactTooltip>}
@@ -264,16 +260,15 @@ function UtilityControl({ className = '', compact, filterId, label, reduceMotion
   return <div className={`desktop-header-compact-control relative shrink-0 ${className}`}>{children}{compact && <CompactTooltip filterId={filterId} reduceMotion={reduceMotion}>{label}</CompactTooltip>}</div>
 }
 
-function BookingControl({ compact, label, reduceMotion }: { compact: boolean; label: string; reduceMotion: boolean }) {
-  const widthTransition = reduceMotion ? { duration: 0.01 } : headerButtonWidthTransition
-  return <motion.div animate={{ width: compact ? 40 : 136 }} transition={{ width: widthTransition }} className="desktop-header-booking-control relative h-[var(--control-sm)] shrink-0">
+function BookingControl({ compact, label }: { compact: boolean; label: string }) {
+  return <div data-booking-mode={compact ? 'compact' : 'expanded'} style={{ width: compact ? 40 : 136 }} className="desktop-header-booking-control relative h-[var(--control-sm)] shrink-0">
     <ContentAction action={{ mode: 'booking', label }} variant="primary" size="sm" aria-label={label} className="h-[var(--control-sm)] w-full overflow-hidden px-0">
       <span className="grid place-items-center">
-        <motion.span animate={{ opacity: compact ? 1 : 0 }} transition={headerSwapTransition(compact, 0.02)} className="col-start-1 row-start-1 inline-flex items-center justify-center" aria-hidden={!compact}><CalendarCheck aria-hidden="true" size={17} strokeWidth={1.9} /></motion.span>
-        <motion.span animate={{ opacity: compact ? 0 : 1 }} transition={headerSwapTransition(!compact, bookingLabelDelay)} className="col-start-1 row-start-1 block" aria-hidden={compact}>{label}</motion.span>
+        <span data-booking-icon className="col-start-1 row-start-1 inline-flex items-center justify-center" aria-hidden={!compact}><CalendarCheck aria-hidden="true" size={17} strokeWidth={1.9} /></span>
+        <span data-booking-label className="col-start-1 row-start-1 block" aria-hidden={compact}>{label}</span>
       </span>
     </ContentAction>
-  </motion.div>
+  </div>
 }
 
 export function DesktopHeader() {
@@ -335,7 +330,7 @@ export function DesktopHeader() {
         {telegram && <UtilityControl className="hidden lg:block" compact={compact} filterId={tooltipFilterId} label="Telegram" reduceMotion={reduceMotion}><motion.a href={telegram.url} data-contact-confirmed data-analytics-action="telegram" onClick={(event) => { event.preventDefault(); requestContact('telegram') }} target="_blank" rel="noreferrer" aria-label="Telegram" whileHover={reduceMotion ? undefined : iconHover} whileTap={reduceMotion ? undefined : tapScaleSm} transition={springSnappy} className={`desktop-header-utility-link flex h-[var(--control-sm)] w-[var(--control-sm)] items-center justify-center focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2 ${utilityClass}`}><TelegramIcon size={16} /></motion.a></UtilityControl>}
         {vk && <UtilityControl className="hidden lg:block" compact={compact} filterId={tooltipFilterId} label="VK" reduceMotion={reduceMotion}><motion.a href={vk.url} data-contact-confirmed data-analytics-action="vk" onClick={(event) => { event.preventDefault(); requestContact('vk') }} target="_blank" rel="noreferrer" aria-label="VK" whileHover={reduceMotion ? undefined : iconHover} whileTap={reduceMotion ? undefined : tapScaleSm} transition={springSnappy} className={`desktop-header-utility-link flex h-[var(--control-sm)] w-[var(--control-sm)] items-center justify-center focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2 ${utilityClass}`}><VkIcon size={18} /></motion.a></UtilityControl>}
         <UtilityControl compact={compact} filterId={tooltipFilterId} label="Позвонить" reduceMotion={reduceMotion}><motion.a href={`tel:${site.contacts.phoneValue}`} data-contact-confirmed data-analytics-action="phone" onClick={(event) => { event.preventDefault(); requestContact('phone') }} aria-label="Позвонить" whileHover={reduceMotion ? undefined : iconHover} whileTap={reduceMotion ? undefined : tapScaleSm} transition={springSnappy} className={`desktop-header-utility-link flex h-[var(--control-sm)] w-[var(--control-sm)] items-center justify-center focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2 ${utilityClass}`}><PhoneIcon size={16} /></motion.a></UtilityControl>
-        <UtilityControl compact={compact} filterId={tooltipFilterId} label={site.booking.buttonLabel} reduceMotion={reduceMotion}><BookingControl compact={compact} label={site.booking.buttonLabel} reduceMotion={reduceMotion} /></UtilityControl>
+        <UtilityControl compact={compact} filterId={tooltipFilterId} label={site.booking.buttonLabel} reduceMotion={reduceMotion}><BookingControl compact={compact} label={site.booking.buttonLabel} /></UtilityControl>
       </div>
     </motion.div>
   </motion.header>

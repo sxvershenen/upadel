@@ -32,9 +32,27 @@ function updateMetadata(nextDocument: Document) {
   document.querySelector('link[rel="canonical"]')?.setAttribute('href', canonical ?? '')
 }
 
-function waitFor(animation: gsap.core.Animation) {
+function waitFor(animation: gsap.core.Animation, interruptCleanup?: () => void) {
   if (animation.progress() >= 1) return Promise.resolve()
-  return new Promise<void>((resolve) => animation.eventCallback('onComplete', resolve))
+  return new Promise<void>((resolve) => {
+    let settled = false
+    const onComplete = animation.eventCallback('onComplete')
+    const animationOnInterrupt = animation.eventCallback('onInterrupt')
+    const finish = () => {
+      if (settled) return
+      settled = true
+      resolve()
+    }
+    animation.eventCallback('onComplete', () => {
+      onComplete?.()
+      finish()
+    })
+    animation.eventCallback('onInterrupt', () => {
+      animationOnInterrupt?.()
+      interruptCleanup?.()
+      finish()
+    })
+  })
 }
 
 function animateOut() {
@@ -46,7 +64,7 @@ function animateOut() {
     scale: 1.03,
     duration: 0.45,
     ease: 'power2.in',
-  }))
+  }), resetTransitionStyles)
 }
 
 function animateIn() {
@@ -60,7 +78,7 @@ function animateIn() {
     duration: 0.6,
     ease: 'power4.out',
     onComplete: () => gsap.set(surface, { clearProps: 'transform,opacity' }),
-  }))
+  }), resetTransitionStyles)
 }
 
 export function GlobalPageTransitionRuntime() {

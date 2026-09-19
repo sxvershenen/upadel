@@ -141,7 +141,36 @@ html[data-reveal-ready] [data-reveal-visible="true"] [data-reveal-word] { --reve
 .desktop-header[data-header-compact="true"] .desktop-header-utilities { gap: 0; }
 .desktop-header[data-header-compact="true"] .desktop-header-utilities > .desktop-header-compact-control:last-child { margin-left: .25rem; }
 .desktop-header[data-header-compact="true"] .desktop-header-utility-link { border-left: 0; background: transparent; }
-.desktop-header-booking-control { width: 136px; }
+.desktop-header-booking-control { width: 136px; transition: width 200ms cubic-bezier(.2,.8,.2,1); }
+.desktop-header-nav-content > [data-header-nav-label],
+.desktop-header-nav-content > [data-header-nav-icon],
+.desktop-header-brand-content > [data-header-brand-icon],
+.desktop-header-brand-content > [data-header-brand-label],
+.desktop-header-booking-control [data-booking-icon],
+.desktop-header-booking-control [data-booking-label] {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 160ms ease, visibility 0s linear 160ms;
+}
+.desktop-header-nav-content[data-header-nav-mode="expanded"] > [data-header-nav-label],
+.desktop-header-nav-content[data-header-nav-mode="compact"] > [data-header-nav-icon],
+.desktop-header-brand-content[data-header-brand-mode="expanded"] > [data-header-brand-label],
+.desktop-header-brand-content[data-header-brand-mode="compact"] > [data-header-brand-icon],
+.desktop-header-booking-control[data-booking-mode="expanded"] [data-booking-label],
+.desktop-header-booking-control[data-booking-mode="compact"] [data-booking-icon] {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .desktop-header-booking-control,
+  .desktop-header-nav-content > [data-header-nav-label],
+  .desktop-header-nav-content > [data-header-nav-icon],
+  .desktop-header-brand-content > [data-header-brand-icon],
+  .desktop-header-brand-content > [data-header-brand-label],
+  .desktop-header-booking-control [data-booking-icon],
+  .desktop-header-booking-control [data-booking-label] { transition: none; }
+}
 .desktop-header-booking-measure { position: absolute; width: max-content; padding-inline: 16px; visibility: hidden; white-space: nowrap; pointer-events: none; }
 .desktop-header-tooltip {
   position: absolute;

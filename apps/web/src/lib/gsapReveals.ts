@@ -6,12 +6,27 @@ type RevealTarget = HTMLElement & {
 
 let observer: IntersectionObserver | null = null
 let mutations: MutationObserver | null = null
-let activeTweens: Array<{ kill: () => void }> = []
+let activeTweens: Array<{ kill: () => void; target: RevealTarget }> = []
 let generation = 0
+
+function clearRevealStyles(target: RevealTarget) {
+  target.style.removeProperty('opacity')
+  target.style.removeProperty('visibility')
+  target.style.removeProperty('--gsap-reveal-offset')
+}
+
+function stopActiveTweens() {
+  activeTweens.forEach((tween) => {
+    tween.kill()
+    clearRevealStyles(tween.target)
+  })
+  activeTweens = []
+}
 
 export async function startGsapReveals() {
   if (typeof window === 'undefined' || typeof document === 'undefined') return
   const runGeneration = ++generation
+  stopActiveTweens()
 
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     document.documentElement.setAttribute('data-gsap-reveal-ready', 'true')
@@ -23,18 +38,18 @@ export async function startGsapReveals() {
   if (runGeneration !== generation) return
   observer?.disconnect()
   mutations?.disconnect()
-  activeTweens.forEach((tween) => tween.kill())
-  activeTweens = []
   document.documentElement.setAttribute('data-gsap-reveal-ready', 'true')
 
   const show = (target: RevealTarget) => {
     target.dataset.gsapRevealVisible = 'true'
     observer?.unobserve(target)
     if (target.dataset.gsapRevealFade === 'false') {
-      activeTweens.push(gsap.fromTo(target, { '--gsap-reveal-offset': `${target.dataset.gsapRevealY ?? 24}px` }, { '--gsap-reveal-offset': '0px', duration: 0.68, delay: Number.parseFloat(target.style.getPropertyValue('--gsap-reveal-delay') || '0'), ease: 'power3.out' }))
+      const tween = gsap.fromTo(target, { '--gsap-reveal-offset': `${target.dataset.gsapRevealY ?? 24}px` }, { '--gsap-reveal-offset': '0px', duration: 0.68, delay: Number.parseFloat(target.style.getPropertyValue('--gsap-reveal-delay') || '0'), ease: 'power3.out', onComplete: () => clearRevealStyles(target) })
+      activeTweens.push({ kill: () => tween.kill(), target })
       return
     }
-    activeTweens.push(gsap.fromTo(target, { autoAlpha: 0, '--gsap-reveal-offset': `${target.dataset.gsapRevealY ?? 24}px` }, { autoAlpha: 1, '--gsap-reveal-offset': '0px', duration: 0.68, delay: Number.parseFloat(target.style.getPropertyValue('--gsap-reveal-delay') || '0'), ease: 'power3.out' }))
+    const tween = gsap.fromTo(target, { autoAlpha: 0, '--gsap-reveal-offset': `${target.dataset.gsapRevealY ?? 24}px` }, { autoAlpha: 1, '--gsap-reveal-offset': '0px', duration: 0.68, delay: Number.parseFloat(target.style.getPropertyValue('--gsap-reveal-delay') || '0'), ease: 'power3.out', onComplete: () => clearRevealStyles(target) })
+    activeTweens.push({ kill: () => tween.kill(), target })
   }
 
   const refresh = () => {
@@ -76,8 +91,8 @@ export function stopGsapReveals() {
   observer = null
   mutations?.disconnect()
   mutations = null
-  activeTweens.forEach((tween) => tween.kill())
-  activeTweens = []
+  stopActiveTweens()
+  document.querySelectorAll<RevealTarget>('[data-gsap-reveal]').forEach(clearRevealStyles)
   document.querySelectorAll<RevealTarget>('[data-gsap-reveal-owner]').forEach((target) => delete target.dataset.gsapRevealOwner)
   document.documentElement.removeAttribute('data-gsap-reveal-ready')
   document.querySelector('#swup')?.setAttribute('data-main-ready', 'false')
