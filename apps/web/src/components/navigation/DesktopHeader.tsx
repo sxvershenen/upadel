@@ -35,7 +35,7 @@ function NavigationIcon({ href, icon, size = 16 }: { href: string; icon?: { url:
 }
 
 function useWideHeader() {
-  const [wide, setWide] = useState(() => typeof window === 'undefined' ? true : window.matchMedia('(min-width: 1200px)').matches)
+  const [wide, setWide] = useState(true)
   useEffect(() => {
     const query = window.matchMedia('(min-width: 1200px)')
     const update = () => setWide(query.matches)
@@ -262,7 +262,7 @@ function UtilityControl({ className = '', compact, filterId, label, reduceMotion
 
 function BookingControl({ compact, label }: { compact: boolean; label: string }) {
   return <div data-booking-mode={compact ? 'compact' : 'expanded'} style={{ width: compact ? 40 : 136 }} className="desktop-header-booking-control relative h-[var(--control-sm)] shrink-0">
-    <ContentAction action={{ mode: 'booking', label }} variant="primary" size="sm" aria-label={label} className="h-[var(--control-sm)] w-full overflow-hidden px-0">
+    <ContentAction reveal={false} action={{ mode: 'booking', label }} variant="primary" size="sm" aria-label={label} className="h-[var(--control-sm)] w-full overflow-hidden px-0">
       <span className="grid place-items-center">
         <span data-booking-icon className="col-start-1 row-start-1 inline-flex items-center justify-center" aria-hidden={!compact}><CalendarCheck aria-hidden="true" size={17} strokeWidth={1.9} /></span>
         <span data-booking-label className="col-start-1 row-start-1 block" aria-hidden={compact}>{label}</span>
@@ -279,7 +279,6 @@ export function DesktopHeader() {
   const vk = site.footer.socialLinks.find(({ provider }) => provider === 'vk')
   const [scrollState, setScrollState] = useState<HeaderScrollState>(() => initialHeaderScrollState())
   const [tooltipSuppressed, setTooltipSuppressed] = useState(false)
-  const headerRef = useRef<HTMLElement>(null)
   const morphLockUntilRef = useRef(0)
   const wide = useWideHeader()
   const compact = scrollState.compact
@@ -287,7 +286,6 @@ export function DesktopHeader() {
   const tooltipFilterId = `header-tooltip-goo-${useId().replaceAll(':', '')}`
 
   useEffect(() => {
-    headerRef.current?.setAttribute('data-header-hydrated', 'true')
     const suppressTooltips = () => setTooltipSuppressed(true)
     const disposeScroll = bindHeaderScroll({
       scrollTarget: window,
@@ -313,13 +311,12 @@ export function DesktopHeader() {
       window.removeEventListener('scroll', suppressTooltips)
       document.removeEventListener('astro:after-swap', suppressTooltips)
       document.removeEventListener('swup:page:view', suppressTooltips)
-      headerRef.current?.removeAttribute('data-header-hydrated')
     }
   }, [])
 
   const utilityClass = compact ? 'bg-transparent text-white/70 hover:text-white' : 'se-1 bg-white/10 text-white hover:bg-white/20'
 
-  return <motion.header ref={headerRef} initial={false} animate={{ opacity: 1, y: 0 }} transition={headerEntranceSpring} data-header-compact={compact ? 'true' : 'false'} data-header-direction={scrollState.direction ?? 'none'} data-header-hydrated="false" data-header-scroll="true" data-header-tooltips={tooltipSuppressed ? 'suppressed' : 'ready'} onClickCapture={() => setTooltipSuppressed(true)} onFocusCapture={() => setTooltipSuppressed(false)} onPointerLeave={() => setTooltipSuppressed(false)} onPointerMove={() => setTooltipSuppressed(false)} className="desktop-header fixed inset-x-0 top-0 z-50 hidden justify-center md:flex">
+  return <motion.header initial={false} animate={{ opacity: 1, y: 0 }} transition={headerEntranceSpring} data-header-compact={compact ? 'true' : 'false'} data-header-direction={scrollState.direction ?? 'none'} data-header-scroll="true" data-header-tooltips={tooltipSuppressed ? 'suppressed' : 'ready'} onClickCapture={() => setTooltipSuppressed(true)} onFocusCapture={() => setTooltipSuppressed(false)} onPointerLeave={() => setTooltipSuppressed(false)} onPointerMove={() => setTooltipSuppressed(false)} className="desktop-header fixed inset-x-0 top-0 z-50 hidden justify-center md:flex">
     <GooFilter id={tooltipFilterId} strength={5} />
       <motion.div layout="position" transition={headerLayoutSpring} className={`desktop-header-island se-top-2 mx-4 flex h-[60px] items-center whitespace-nowrap bg-black text-white ${compact ? 'gap-0 py-1.5 pl-3 pr-2' : 'justify-between gap-4 py-2.5 pl-7 pr-3'}`}>
       <HeaderBrand compact={compact} filterId={tooltipFilterId} homeHref={homeHref} logo={site.brandLogo} logoMode={site.brandLogoMode} name={site.brandName} reduceMotion={reduceMotion} subtitle={site.headerSubtitle} />

@@ -36,9 +36,12 @@ export function SplitTextReveal({
   const revealStyle = { "--reveal-delay": `${delay}s` } as CSSProperties;
   return <span data-reveal-text={reveal && !animateOnMount ? true : undefined} className={cn("inline", className)} style={reveal && !animateOnMount ? revealStyle : undefined}>
       {words.map((item, index) => (
-        <span key={`${item}-${index}`} data-hero-word={animateOnMount && reveal ? "" : undefined} data-reveal-word={reveal && !animateOnMount ? true : undefined} style={animateOnMount && reveal ? { "--hero-word-index": index } as CSSProperties : undefined} className="mr-[0.25em] inline-block last:mr-0">
+        <React.Fragment key={`${item}-${index}`} >
+        {index > 0 && " "}
+        <span data-hero-word={animateOnMount && reveal ? "" : undefined} data-reveal-word={reveal && !animateOnMount ? true : undefined} style={animateOnMount && reveal ? { "--hero-word-index": index } as CSSProperties : undefined} className="inline-block">
           {item}
         </span>
+        </React.Fragment>
       ))}
     </span>;
 }

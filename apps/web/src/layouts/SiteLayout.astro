@@ -59,53 +59,6 @@ const enableGlobalTransitions = !Astro.url.pathname.startsWith('/transitions/') 
       if (window.__unlimSiteEnhancements) return
       window.__unlimSiteEnhancements = true
 
-      let headerLastY = Math.max(0, window.scrollY)
-      let headerAnchorY = headerLastY
-      let headerDirection = null
-      let headerCompact = headerLastY > 32
-      let headerFrame = 0
-      const headerTopThreshold = 32
-      const headerDirectionThreshold = 14
-      const applyHeaderState = () => {
-        document.querySelectorAll('[data-header-scroll][data-header-hydrated="true"]').forEach((header) => {
-          header.setAttribute('data-header-compact', headerCompact ? 'true' : 'false')
-        })
-      }
-      const updateHeaderState = () => {
-        headerFrame = 0
-        const nextY = Math.max(0, window.scrollY)
-        if (nextY <= headerTopThreshold) {
-          headerLastY = nextY
-          headerAnchorY = nextY
-          headerDirection = null
-          headerCompact = false
-          applyHeaderState()
-          return
-        }
-        if (nextY === headerLastY) return
-        const direction = nextY > headerLastY ? 'down' : 'up'
-        if (direction !== headerDirection) headerAnchorY = headerLastY
-        headerDirection = direction
-        if (Math.abs(nextY - headerAnchorY) >= headerDirectionThreshold) headerCompact = direction === 'down'
-        headerLastY = nextY
-        applyHeaderState()
-      }
-      const onHeaderScroll = () => {
-        if (headerFrame) return
-        headerFrame = window.requestAnimationFrame(updateHeaderState)
-      }
-      const syncHeaderState = () => {
-        headerLastY = Math.max(0, window.scrollY)
-        headerAnchorY = headerLastY
-        headerDirection = null
-        headerCompact = headerLastY > headerTopThreshold
-        applyHeaderState()
-      }
-      window.addEventListener('scroll', onHeaderScroll, { passive: true })
-      document.addEventListener('swup:page:view', syncHeaderState)
-      document.addEventListener('astro:after-swap', syncHeaderState)
-      applyHeaderState()
-
       let revealObserver = null
       let revealTimer = 0
       const revealSelector = '[data-reveal], [data-reveal-text]'
@@ -117,7 +70,7 @@ const enableGlobalTransitions = !Astro.url.pathname.startsWith('/transitions/') 
         revealTimer = 0
         revealObserver?.disconnect()
         document.documentElement.setAttribute('data-reveal-ready', 'true')
-        const targets = Array.from(document.querySelectorAll(revealSelector))
+        const targets = Array.from(document.querySelector('#swup')?.querySelectorAll(revealSelector) ?? [])
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
           targets.forEach((target) => markRevealVisible(target))
           return
@@ -132,17 +85,12 @@ const enableGlobalTransitions = !Astro.url.pathname.startsWith('/transitions/') 
         })
       }
       const scheduleScrollReveals = () => {
-        if (document.readyState !== 'complete') return
+        const root = document.querySelector('#swup')
+        if (!root || (root.querySelector('astro-island') && root.dataset.mainReady !== 'true')) return
         if (revealTimer) window.clearTimeout(revealTimer)
-        revealTimer = window.setTimeout(setupScrollReveals, 180)
+        revealTimer = window.setTimeout(setupScrollReveals, 0)
       }
-      const scheduleAfterMainReady = () => {
-        if (document.readyState !== 'complete') {
-          window.addEventListener('load', scheduleScrollReveals, { once: true })
-          return
-        }
-        scheduleScrollReveals()
-      }
+      const scheduleAfterMainReady = () => scheduleScrollReveals()
       const resetScrollReveals = () => {
         if (revealTimer) window.clearTimeout(revealTimer)
         revealTimer = 0
@@ -151,6 +99,7 @@ const enableGlobalTransitions = !Astro.url.pathname.startsWith('/transitions/') 
         document.documentElement.removeAttribute('data-reveal-ready')
       }
       scheduleAfterMainReady()
+      window.addEventListener('DOMContentLoaded', scheduleAfterMainReady, { once: true })
       document.addEventListener('unlim:main-ready', scheduleAfterMainReady)
       document.addEventListener('astro:after-swap', scheduleAfterMainReady)
       document.addEventListener('astro:before-swap', resetScrollReveals)
@@ -221,7 +170,6 @@ const enableGlobalTransitions = !Astro.url.pathname.startsWith('/transitions/') 
         else window.setTimeout(flushTypography, 0)
       }
       new MutationObserver((mutations) => {
-        applyHeaderState()
         if (mutations.some((mutation) => mutation.addedNodes.length > 0)) scheduleScrollReveals()
         mutations.forEach((mutation) => {
           mutation.addedNodes.forEach((node) => pending.add(node))
@@ -234,34 +182,13 @@ const enableGlobalTransitions = !Astro.url.pathname.startsWith('/transitions/') 
   <script>
     import { startGsapReveals, stopGsapReveals } from '../lib/gsapReveals'
 
-    let revealIdle: ReturnType<typeof setTimeout> | 0 = 0
-    let revealIdleCallback = 0
-    const cancelScheduledGsapReveal = () => {
-      if (revealIdle) clearTimeout(revealIdle)
-      revealIdle = 0
-      if (revealIdleCallback && 'cancelIdleCallback' in window) window.cancelIdleCallback(revealIdleCallback)
-      revealIdleCallback = 0
-    }
-    const scheduleGsapReveals = () => {
-      if (document.readyState !== 'complete') return
-      cancelScheduledGsapReveal()
-      const start = () => { revealIdleCallback = 0; void startGsapReveals() }
-      const eager = document.querySelector('[data-gsap-reveal-eager="true"]')
-      if (eager) revealIdle = setTimeout(start, 0)
-      else if ('requestIdleCallback' in window) revealIdleCallback = window.requestIdleCallback(start, { timeout: 1200 })
-      else revealIdle = setTimeout(start, 700)
-    }
-    const scheduleAfterMainReady = () => {
-      if (document.readyState !== 'complete') {
-        window.addEventListener('load', scheduleGsapReveals, { once: true })
-        return
-      }
-      scheduleGsapReveals()
-    }
-    document.addEventListener('astro:before-swap', () => { cancelScheduledGsapReveal(); stopGsapReveals() })
-    document.addEventListener('astro:after-swap', scheduleAfterMainReady)
-    document.addEventListener('unlim:main-ready', scheduleAfterMainReady)
-    window.addEventListener('load', scheduleAfterMainReady)
-    scheduleAfterMainReady()
+    // React's effect marker means the commit is finished. Astro's ssr attribute
+    // disappears earlier, while React may still be hydrating concurrently.
+    const start = () => { void startGsapReveals().catch(() => stopGsapReveals()) }
+    document.addEventListener('astro:before-swap', stopGsapReveals)
+    document.addEventListener('astro:after-swap', start)
+    document.addEventListener('unlim:main-ready', start)
+    document.addEventListener('DOMContentLoaded', start, { once: true })
+    start()
   </script>
 </html>

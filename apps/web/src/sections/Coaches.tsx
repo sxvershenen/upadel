@@ -59,6 +59,7 @@ export function Coaches() {
               setAtStart(s.isBeginning);
               setAtEnd(s.isEnd);
             }}
+            onResize={(s) => { setAtStart(s.isBeginning); setAtEnd(s.isEnd); }}
             spaceBetween={16}
             slidesPerView={1}
             breakpoints={{

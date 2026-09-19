@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 
 import { useSite } from '../content/ContentContext'
 import { useActionLayer } from '../actions/ActionLayer'
+import type { RevealConfig } from './ui/revealAttributes'
 import { Button, ButtonLink, type ButtonSize, type ButtonVariant } from './ui/Button'
 
 type Props = {
@@ -17,6 +18,7 @@ type Props = {
   iconOnly?: boolean
   iconDivider?: boolean
   iconPosition?: 'left' | 'right'
+  reveal?: RevealConfig
   size?: ButtonSize
   sourceEntity?: string
   sourcePage?: string

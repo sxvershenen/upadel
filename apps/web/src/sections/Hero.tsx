@@ -117,7 +117,7 @@ export function Hero() {
       <div className="container-page relative z-10 flex h-full flex-col justify-end pb-[calc(104px+env(safe-area-inset-bottom))] pt-32 sm:pb-9 lg:pb-12">
         <div className="flex max-w-[980px] flex-col">
           <h1 className="type-hero font-semibold text-white">
-            <SplitTextReveal text={hero.titleLine} animateOnMount />
+            <SplitTextReveal text={hero.titleLine} animateOnMount />{" "}
             <br />
             <SplitTextReveal text={hero.titleConnector} animateOnMount />{" "}
             <span data-hero-accent="" className="inline-block text-[#c2f542]">

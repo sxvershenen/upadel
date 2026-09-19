@@ -81,24 +81,29 @@ const localMedia = {
   articleTechniqueGlass: 'images/articles/technique-glass.png',
   articleTechniqueOverhead: 'images/articles/technique-overhead.png',
   articleTechniquePreview: 'images/articles/technique-preview.png',
+  articleTechniqueCoverV2: 'images/articles/technique-cover-v2.png',
   articleVarlionShapes: 'images/articles/varlion-shapes.png',
   articleVarlionSummum: 'images/articles/varlion-summum.png',
   articleVarlionBalance: 'images/articles/varlion-balance.png',
   articleVarlionPreview: 'images/articles/varlion-preview.png',
+  articleVarlionCover: 'images/articles/varlion-cover.png',
   articleBeginnerCourt: 'images/articles/beginner-court.png',
   articleBeginnerKit: 'images/articles/beginner-kit.png',
   articleBeginnerDrill: 'images/articles/beginner-drill.png',
   articleBeginnerKitV2: 'images/articles/beginner-kit-v2.png',
   articleBeginnerPreview: 'images/articles/beginner-preview.png',
+  articleBeginnerCoverV2: 'images/articles/beginner-cover-v2.png',
   articlePadelTennisSplit: 'images/articles/padel-tennis-split.png',
   articleJuboGlass: 'images/articles/jubo-glass.png',
   articlePadelTennisTactics: 'images/articles/padel-tennis-tactics.png',
   articlePadelTennisPreview: 'images/articles/padel-tennis-preview.png',
+  articlePadelTennisCoverV2: 'images/articles/tennis-cover-v2.png',
   articleLevelsMatch: 'images/articles/levels-match.png',
   articleLevelsCoach: 'images/articles/levels-coach.png',
   articleLevelsScale: 'images/articles/levels-scale.png',
   articleLevelsCoachV2: 'images/articles/levels-coach-v2.png',
   articleLevelsPreview: 'images/articles/levels-preview.png',
+  articleLevelsCover: 'images/articles/levels-cover.png',
   giftBox: 'images/gift/box.jpg',
   giftCard: 'images/gift/card.jpg',
 } as const
@@ -202,6 +207,81 @@ function richTextArticle(blocks: ArticleBlock[]) {
       version: 1,
     },
   }
+}
+
+function parseEditorialMarkdown(markdown: string, mediaByCaption: Record<string, SeededRecord>): ArticleBlock[] {
+  const blocks: ArticleBlock[] = []
+  let paragraphLines: string[] = []
+  let listItems: string[] = []
+  let lastImage: Extract<ArticleBlock, { type: 'image' }> | null = null
+
+  const flushParagraph = () => {
+    if (paragraphLines.length === 0) return
+    blocks.push({ type: 'paragraph', text: paragraphLines.join(' ').trim() })
+    paragraphLines = []
+  }
+  const flushList = () => {
+    if (listItems.length === 0) return
+    blocks.push({ type: 'list', items: [...listItems] })
+    listItems = []
+  }
+
+  for (const rawLine of markdown.replaceAll('\r\n', '\n').split('\n')) {
+    const line = rawLine.trim()
+    if (!line) {
+      flushParagraph()
+      flushList()
+      lastImage = null
+      continue
+    }
+    if (line.startsWith('# ')) {
+      flushParagraph()
+      flushList()
+      lastImage = null
+      continue
+    }
+    if (line.startsWith('## ')) {
+      flushParagraph()
+      flushList()
+      lastImage = null
+      blocks.push({ type: 'heading', text: line.slice(3).trim() })
+      continue
+    }
+    const photoMatch = line.match(/^\[Фото:\s*(.+)\]$/)
+    if (photoMatch) {
+      flushParagraph()
+      flushList()
+      const caption = photoMatch[1].trim()
+      const media = mediaByCaption[caption]
+      if (!media) throw new Error(`Missing editorial media mapping for caption: ${caption}`)
+      const image: Extract<ArticleBlock, { type: 'image' }> = {
+        type: 'image',
+        media: media.id,
+        alt: caption,
+      }
+      blocks.push(image)
+      lastImage = image
+      continue
+    }
+    const figureCaptionMatch = line.match(/^\*(.+)\*$/)
+    if (figureCaptionMatch && lastImage) {
+      lastImage.caption = figureCaptionMatch[1].trim()
+      lastImage = null
+      continue
+    }
+    if (line.startsWith('- ')) {
+      flushParagraph()
+      listItems.push(line.slice(2).trim())
+      continue
+    }
+    flushList()
+    lastImage = null
+    paragraphLines.push(line)
+  }
+
+  flushParagraph()
+  flushList()
+  return blocks
 }
 
 async function findBySeedKey(payload: Payload, collection: CollectionSlug, seedKey: string): Promise<SeededRecord | undefined> {
@@ -491,24 +571,29 @@ async function seed() {
       techniqueGlass: await ensureLocalMedia(payload, localMedia.articleTechniqueGlass, 'Игрок выполняет удар после отскока мяча от стекла'),
       techniqueOverhead: await ensureLocalMedia(payload, localMedia.articleTechniqueOverhead, 'Игрок выполняет удар над головой в паделе'),
       techniquePreview: await ensureLocalMedia(payload, localMedia.articleTechniquePreview, 'Игрок выходит на позицию на панорамном падельном корте'),
+      techniqueCoverV2: await ensureLocalMedia(payload, localMedia.articleTechniqueCoverV2, 'Игрок занимает защитную позицию рядом со стеклом'),
       varlionShapes: await ensureLocalMedia(payload, localMedia.articleVarlionShapes, 'Три формы ракеток Varlion: круглая, каплевидная и ромбовидная'),
       varlionSummum: await ensureLocalMedia(payload, localMedia.articleVarlionSummum, 'Детали конструкции ракетки Varlion с длинной ручкой и диффузором'),
       varlionBalance: await ensureLocalMedia(payload, localMedia.articleVarlionBalance, 'Схема распределения баланса ракетки для падела'),
       varlionPreview: await ensureLocalMedia(payload, localMedia.articleVarlionPreview, 'Ракетка Varlion на падельном корте рядом с мячами'),
+      varlionCover: await ensureLocalMedia(payload, localMedia.articleVarlionCover, 'Ракетка Varlion на подиуме у панорамного корта'),
       beginnerCourt: await ensureLocalMedia(payload, localMedia.articleBeginnerCourt, 'Новички на первой тренировке по паделу с тренером'),
       beginnerKit: await ensureLocalMedia(payload, localMedia.articleBeginnerKit, 'Базовый комплект экипировки для первой игры в падел'),
       beginnerDrill: await ensureLocalMedia(payload, localMedia.articleBeginnerDrill, 'Тренер показывает новичку базовый удар в паделе'),
       beginnerKitV2: await ensureLocalMedia(payload, localMedia.articleBeginnerKitV2, 'Практичный комплект экипировки для первой игры в падел'),
       beginnerPreview: await ensureLocalMedia(payload, localMedia.articleBeginnerPreview, 'Пара новичков заходит на первый падельный корт'),
+      beginnerCoverV2: await ensureLocalMedia(payload, localMedia.articleBeginnerCoverV2, 'Новичок готовится выполнить первую подачу в паделе'),
       padelTennisSplit: await ensureLocalMedia(payload, localMedia.articlePadelTennisSplit, 'Сравнение площадки для падела и теннисного корта'),
       juboGlass: await ensureLocalMedia(payload, localMedia.articleJuboGlass, 'Панорамный корт JUBO Padel со стеклянными стенами'),
       padelTennisTactics: await ensureLocalMedia(payload, localMedia.articlePadelTennisTactics, 'Схема движения игроков в паделе и большом теннисе'),
       padelTennisPreview: await ensureLocalMedia(payload, localMedia.articlePadelTennisPreview, 'Панорамный падельный и открытый теннисный корты'),
+      padelTennisCoverV2: await ensureLocalMedia(payload, localMedia.articlePadelTennisCoverV2, 'Стеклянный угол падельного корта рядом с открытым теннисным кортом'),
       levelsMatch: await ensureLocalMedia(payload, localMedia.articleLevelsMatch, 'Парная игра в падел на любительском уровне'),
       levelsCoach: await ensureLocalMedia(payload, localMedia.articleLevelsCoach, 'Тренер и игрок обсуждают уровень игры в падел'),
       levelsScale: await ensureLocalMedia(payload, localMedia.articleLevelsScale, 'Абстрактная шкала прогресса уровня игрока в паделе'),
       levelsCoachV2: await ensureLocalMedia(payload, localMedia.articleLevelsCoachV2, 'Тренер объясняет игроку тактическую поправку после розыгрыша'),
       levelsPreview: await ensureLocalMedia(payload, localMedia.articleLevelsPreview, 'Игроки обсуждают следующий розыгрыш у сетки'),
+      levelsCover: await ensureLocalMedia(payload, localMedia.articleLevelsCover, 'Игрок наблюдает за розыгрышем на панорамном падельном корте'),
     }
     const giftMedia = {
       box: await ensureLocalMedia(payload, localMedia.giftBox, 'Подарочный бокс UNLIM PADEL'),
@@ -605,45 +690,63 @@ async function seed() {
       }))
     }
 
-    const articles = [
-      ['first-visit', 'Что взять с собой на первую тренировку по паделу', 'Экипировка, обувь и мелочи, которые упростят первый визит в клуб — от ракетки до бутылки воды.', 'guide', images.blog[0], 6, '1'],
-      ['technique', 'Три упражнения для уверенного удара от стекла', 'Разбираем базовую механику отскока от панорамного стекла и даём тренировочный план на неделю.', 'technique', images.blog[1], 8, '2'],
-      ['nutrition', 'Как питаться в дни интенсивных тренировок', 'Простые принципы питания и сна, которые ускоряют восстановление между матчами и сборами.', 'recovery', images.blog[2], 5, '3'],
-      ['first-racket', 'Как выбрать первую ракетку', 'Форма, баланс и жёсткость — что важно новичку.', 'guide', images.blog[0], 5, null],
-      ['serve-rules', 'Разбор правил подачи', 'Частые ошибки судейства на любительском уровне.', 'technique', images.blog[1], 5, null],
-      ['padel-vs-tennis', 'Падел vs большой теннис', 'Что переносится, а чему учиться заново.', 'guide', images.blog[0], 5, null],
-      ['americano-prep', 'Как подготовиться к Americano', 'Тактика для смешанных пар и ротаций.', 'technique', images.blog[1], 5, null],
-      ['warmup', 'Разминка на 10 минут перед игрой', 'Снижаем риск травм плеча и голеностопа.', 'recovery', images.blog[2], 5, null],
-      ['booking-guide', 'Гид по бронированию корта', 'Как ловить лучшие слоты на вечер и выходные.', 'guide', images.blog[0], 5, null],
-    ] as const
-    for (const [index, [slug, title, excerpt, category, previewImage, readingTimeMinutes, homePosition]] of articles.entries()) {
-      await ensureSeeded(payload, 'articles', `prototype:article:${slug}`, {
-        slug,
-        title,
-        excerpt,
-        category: categories.get(category)?.id,
-        previewImage: mediaID(previewImage),
-        readingTimeMinutes,
-        homePosition,
-        publishedAt: new Date(Date.UTC(2026, 0, index + 1, 9)).toISOString(),
-        content: richText(excerpt),
-        seo: { robots: 'index-follow' },
-      })
+    const legacyArticleSlugs = ['first-visit', 'technique', 'nutrition', 'first-racket', 'serve-rules', 'padel-vs-tennis', 'americano-prep', 'warmup', 'booking-guide'] as const
+    for (const slug of legacyArticleSlugs) {
+      const legacy = await findBySeedKey(payload, 'articles', `prototype:article:${slug}`)
+      if (!legacy) continue
+      await payload.delete({ collection: 'articles', id: legacy.id, overrideAccess: true } as never)
+      stats.skipped += 1
     }
 
     const articleAuthor = (): ArticleBlock => ({
       type: 'paragraph',
       children: ['Автор статьи: ', { text: 'Константин Кузнецов', url: 'https://t.me/sovershenen' }],
     })
+    const sourceArticle = async (filename: string, mediaByCaption: Record<string, SeededRecord>) => richTextArticle([
+      ...parseEditorialMarkdown(await readFile(path.join(dirname, 'content/editorial-articles', filename), 'utf8'), mediaByCaption),
+      articleAuthor(),
+    ])
+    const sourceEditorialContent = {
+      'padel-udary-tehnika-ot-stekla': await sourceArticle('05-udary-v-padele-tehnika.md', {
+        'Игрок выходит на позицию на панорамном падельном корте': articleMedia.techniquePreview,
+        'Игрок в падел в стойке готовности перед ударом': articleMedia.techniqueReady,
+        'Игрок выполняет удар после отскока мяча от стекла': articleMedia.techniqueGlass,
+        'Игрок выполняет удар над головой в паделе': articleMedia.techniqueOverhead,
+      }),
+      'kak-vybrat-raketku-dlya-padela': await sourceArticle('04-kak-vybrat-raketku-dlya-padela.md', {
+        'Ракетка Varlion на падельном корте рядом с мячами': articleMedia.varlionPreview,
+        'Три формы ракеток Varlion: круглая, каплевидная и ромбовидная': articleMedia.varlionShapes,
+        'Схема распределения баланса ракетки для падела': articleMedia.varlionBalance,
+        'Детали конструкции ракетки Varlion с длинной ручкой и диффузором': articleMedia.varlionSummum,
+      }),
+      'padel-dlya-nachinayushchikh-s-nulya': await sourceArticle('03-padel-dlya-nachinayushchih.md', {
+        'Пара новичков заходит на первый падельный корт': articleMedia.beginnerPreview,
+        'Практичный комплект экипировки для первой игры в падел': articleMedia.beginnerKitV2,
+        'Новички на первой тренировке по паделу с тренером': articleMedia.beginnerCourt,
+        'Тренер показывает новичку базовый удар в паделе': articleMedia.beginnerDrill,
+      }),
+      'padel-i-bolshoy-tennis-otlichiya': await sourceArticle('02-padel-i-bolshoy-tennis-otlichie.md', {
+        'Панорамный падельный и открытый теннисный корты': articleMedia.padelTennisPreview,
+        'Сравнение площадки для падела и теннисного корта': articleMedia.padelTennisSplit,
+        'Панорамный корт JUBO Padel со стеклянными стенами': articleMedia.juboGlass,
+        'Схема движения игроков в паделе и большом теннисе': articleMedia.padelTennisTactics,
+      }),
+      'urovni-v-padela-kak-opredelit-svoy': await sourceArticle('01-padel-urovni-kak-opredelit-svoy-uroven-igry.md', {
+        'Игроки обсуждают следующий розыгрыш у сетки': articleMedia.levelsPreview,
+        'Абстрактная шкала прогресса уровня игрока в паделе': articleMedia.levelsScale,
+        'Парная игра в падел на любительском уровне': articleMedia.levelsMatch,
+        'Тренер объясняет игроку тактическую поправку после розыгрыша': articleMedia.levelsCoachV2,
+      }),
+    }
     const editorialArticles = [
       {
-        seedKey: 'editorial:article:padel-strikes-v4',
+        seedKey: 'editorial:article:padel-strikes-v5',
         slug: 'padel-udary-tehnika-ot-stekla',
         title: 'Удары в паделе: техника, виды и удар от стекла',
         excerpt: 'Разбираю базовые удары в паделе, работу ног и понятную механику удара после отскока мяча от стекла.',
         category: 'technique',
         readingTimeMinutes: 8,
-        previewImage: articleMedia.techniquePreview.id,
+        previewImage: articleMedia.techniqueCoverV2.id,
         seo: {
           title: 'Удары в паделе: техника, виды и удар от стекла',
           description: 'Какие бывают удары в паделе, как подготовиться к контакту и научиться спокойно играть после стекла.',
@@ -669,13 +772,13 @@ async function seed() {
         ]),
       },
       {
-        seedKey: 'editorial:article:varlion-racket-choice-v4',
+        seedKey: 'editorial:article:varlion-racket-choice-v5',
         slug: 'kak-vybrat-raketku-dlya-padela',
         title: 'Как выбрать ракетку для падела: баланс, форма и жёсткость',
         excerpt: 'Объясняю, как форма, баланс и жёсткость ракетки меняют ощущения в игре, и разбираю технологии Varlion без маркетинговой шелухи.',
         category: 'guide',
         readingTimeMinutes: 9,
-        previewImage: articleMedia.varlionPreview.id,
+        previewImage: articleMedia.varlionCover.id,
         seo: {
           title: 'Как выбрать ракетку для падела: баланс, форма и жёсткость',
           description: 'Круглая, каплевидная или ромбовидная ракетка Varlion: что выбрать новичку, как читать баланс и зачем нужны технологии Summum и Prisma.',
@@ -697,13 +800,13 @@ async function seed() {
         ]),
       },
       {
-        seedKey: 'editorial:article:padel-for-beginners-v4',
+        seedKey: 'editorial:article:padel-for-beginners-v5',
         slug: 'padel-dlya-nachinayushchikh-s-nulya',
         title: 'Падел для начинающих: как начать играть с нуля',
         excerpt: 'Понятный маршрут для первого визита: что взять, как проходит тренировка и что делать, чтобы не перегореть после первой игры.',
         category: 'guide',
         readingTimeMinutes: 7,
-        previewImage: articleMedia.beginnerPreview.id,
+        previewImage: articleMedia.beginnerCoverV2.id,
         seo: {
           title: 'Падел для начинающих: как начать играть с нуля',
           description: 'Падел с нуля: экипировка, первая тренировка, ракетка для начинающих и план первых занятий без лишнего стресса.',
@@ -727,13 +830,13 @@ async function seed() {
         ]),
       },
       {
-        seedKey: 'editorial:article:padel-vs-tennis-v4',
+        seedKey: 'editorial:article:padel-vs-tennis-v5',
         slug: 'padel-i-bolshoy-tennis-otlichiya',
         title: 'Падел и большой теннис: отличие правил, корта и техники',
         excerpt: 'Сравниваю падел и большой теннис по корту, подаче, стенам, движению и ощущениям для игрока, который переходит из одного спорта в другой.',
         category: 'guide',
         readingTimeMinutes: 8,
-        previewImage: articleMedia.padelTennisPreview.id,
+        previewImage: articleMedia.padelTennisCoverV2.id,
         seo: {
           title: 'Падел и большой теннис: отличие правил, корта и техники',
           description: 'Отличие падела от тенниса: правила, размеры и устройство корта, подача, стекло и техника розыгрыша.',
@@ -755,13 +858,13 @@ async function seed() {
         ]),
       },
       {
-        seedKey: 'editorial:article:padel-levels-v4',
+        seedKey: 'editorial:article:padel-levels-v5',
         slug: 'urovni-v-padela-kak-opredelit-svoy',
         title: 'Падел уровни: как определить свой уровень игры',
         excerpt: 'Разбираю, как не завышать уровень по ощущениям, чем отличаются PadelApp и Lunda и какие признаки действительно видны на корте.',
         category: 'technique',
         readingTimeMinutes: 9,
-        previewImage: articleMedia.levelsPreview.id,
+        previewImage: articleMedia.levelsCover.id,
         seo: {
           title: 'Падел уровни: как определить свой уровень игры',
           description: 'Уровни игры в паделе: шкала Lunda 1.0–7.0, уровень PadelApp, признаки техники, стабильности и тактики.',
@@ -922,7 +1025,7 @@ async function seed() {
     }
 
     for (const [index, article] of editorialArticles.entries()) {
-      const previousSeedKey = article.seedKey.replace(/-v4$/, '-v3')
+      const previousSeedKey = article.seedKey.replace(/-v5$/, '-v4')
       await migrateSeededArticle(payload, previousSeedKey, article.seedKey, {
         slug: article.slug,
         title: article.title,
@@ -931,7 +1034,7 @@ async function seed() {
         previewImage: article.previewImage,
         readingTimeMinutes: article.readingTimeMinutes,
         publishedAt: new Date(Date.UTC(2026, 8, 18, 12, index)).toISOString(),
-        content: rewrittenContent[article.slug] ?? article.content,
+        content: sourceEditorialContent[article.slug] ?? rewrittenContent[article.slug] ?? article.content,
         seo: article.seo,
       })
     }

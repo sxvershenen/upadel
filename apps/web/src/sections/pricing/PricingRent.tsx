@@ -18,7 +18,7 @@ export function PricingRent({ onSwiperChange }: { onSwiperChange?: (swiper: Swip
   return <div className="grid gap-4 lg:grid-cols-12 lg:grid-rows-[minmax(320px,1fr)_minmax(190px,auto)]">
     {standardRates.map((rate, index) => <Reveal key={rate.id} delay={index * 0.06} className="hidden lg:col-span-4 lg:row-start-1 lg:block"><RentalRateCard rate={rate} /></Reveal>)}
     {trial && <Reveal delay={0.1} className="hidden lg:col-span-8 lg:row-start-2 lg:block"><RentalRateCard rate={trial} /></Reveal>}
-    <div ref={swipeHintRef} className="-mx-5 lg:hidden"><Swiper {...horizontalSwiperProps} onSwiper={(swiper) => { swiperRef.current = swiper; onSwiperChange?.(swiper); }} onSlideChange={(swiper) => onSwiperChange?.(swiper)} slidesPerView={1} spaceBetween={12} className="swiper-breathe !px-5">{[...standardRates, ...(trial ? [trial] : [])].map((rate) => <SwiperSlide key={rate.id} className="!h-auto"><RentalRateCard rate={rate} /></SwiperSlide>)}</Swiper></div>
+    <div ref={swipeHintRef} className="-mx-5 lg:hidden"><Swiper {...horizontalSwiperProps} onSwiper={(swiper) => { swiperRef.current = swiper; onSwiperChange?.(swiper); }} onSlideChange={(swiper) => onSwiperChange?.(swiper)} onResize={(swiper) => onSwiperChange?.(swiper)} slidesPerView={1} spaceBetween={12} className="swiper-breathe !px-5">{[...standardRates, ...(trial ? [trial] : [])].map((rate) => <SwiperSlide key={rate.id} className="!h-auto"><RentalRateCard rate={rate} /></SwiperSlide>)}</Swiper></div>
     {standards && <Reveal delay={0.14} className="lg:col-span-4 lg:col-start-9 lg:row-span-2 lg:row-start-1"><RentalRateCard rate={standards} /></Reveal>}
   </div>;
 }
