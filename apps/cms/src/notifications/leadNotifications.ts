@@ -13,16 +13,31 @@ const clean = (value: unknown) =>
   String(value ?? "")
     .replace(/[<>\r\n]+/g, " ")
     .slice(0, 300);
+
+const leadTypeLabels: Record<string, string> = {
+  membership: "Абонемент",
+  gift: "Подарочный сертификат",
+  trial: "Пробная тренировка",
+  consultation: "Консультация",
+  other: "Другое",
+};
+
 export function formatLeadNotificationMessage(lead: Lead): string {
-  const source = [clean(lead.sourcePage), clean(lead.sourceEntity)].filter(Boolean).join(" · ");
+  const createdAt = lead.createdAt ? new Date(lead.createdAt) : null;
+  const createdLabel = createdAt && !Number.isNaN(createdAt.valueOf())
+    ? new Intl.DateTimeFormat("ru-RU", { dateStyle: "short", timeStyle: "short", timeZone: "Europe/Moscow" }).format(createdAt)
+    : null;
   return [
-    `Новое обращение: ${clean(lead.type)}`,
+    `Новое обращение: ${leadTypeLabels[lead.type] ?? clean(lead.type)}`,
+    createdLabel && `Время: ${createdLabel} (МСК)`,
     `Имя: ${clean(lead.name)}`,
     lead.phone && `Телефон: ${clean(lead.phone)}`,
     lead.email && `Email: ${clean(lead.email)}`,
     lead.telegram && `Telegram: ${clean(lead.telegram)}`,
     lead.vk && `VK: ${clean(lead.vk)}`,
-    `Источник: ${source}`,
+    lead.comment && `Комментарий: ${clean(lead.comment)}`,
+    `Страница: ${clean(lead.sourcePage)}`,
+    lead.sourceEntity && `Форма: ${clean(lead.sourceEntity)}`,
   ]
     .filter(Boolean)
     .join("\n");

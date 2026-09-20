@@ -36,9 +36,11 @@ test('duplicate orchestration never invokes delivery', async () => {
 })
 
 test('notification message preserves lead type, page and useful source entity', async () => {
-  const tournamentLead = { ...lead, type: 'consultation', sourcePage: '/tournaments/summer-open', sourceEntity: 'Summer Open — регистрация' } as Lead
-  assert.match(formatLeadNotificationMessage(tournamentLead), /Новое обращение: consultation/)
-  assert.match(formatLeadNotificationMessage(tournamentLead), /Источник: \/tournaments\/summer-open · Summer Open — регистрация/)
+  const tournamentLead = { ...lead, type: 'consultation', sourcePage: '/tournaments/summer-open', sourceEntity: 'Summer Open — регистрация', comment: 'Нужна суббота' } as Lead
+  assert.match(formatLeadNotificationMessage(tournamentLead), /Новое обращение: Консультация/)
+  assert.match(formatLeadNotificationMessage(tournamentLead), /Страница: \/tournaments\/summer-open/)
+  assert.match(formatLeadNotificationMessage(tournamentLead), /Форма: Summer Open — регистрация/)
+  assert.match(formatLeadNotificationMessage(tournamentLead), /Комментарий: Нужна суббота/)
 
   const messages: string[] = []
   await deliverLeadNotifications(payload(settings, []), tournamentLead, async (_url, init) => {

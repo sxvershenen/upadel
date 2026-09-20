@@ -34,6 +34,8 @@ Run analytics aggregation every 15 minutes with `npm run analytics:maintain`; `n
 
 Production admin uses `PAYLOAD_ADMIN_ROUTE` and `ADMIN_USERNAME` from the server-only environment. Schema changes ship as Payload migrations; never run `migrate:fresh` or commit production secrets.
 
+Production backup uses [`deploy/backup.sh`](deploy/backup.sh): one weekly archive plus a pre-migration archive, retaining only `unlim-backup-latest.tar.gz` and `unlim-backup-previous.tar.gz`. The archive contains PostgreSQL, Payload media, production environment and release metadata; source/build dependencies remain reproducible from GitHub.
+
 ## Product surface
 
 Public routes: `/`, `/blog`, `/prices`, `/training`, `/coaches`, `/courts`, `/tournaments`, `/about`, `/contacts`, `/policy`, `/oferta`, `/padel-court-zakaz` (with `/padel-courts` redirect), plus article and entity detail pages.
