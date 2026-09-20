@@ -29,6 +29,8 @@ const resolvedCanonical = canonical?.trim() || new URL(Astro.url.pathname, publi
 const enableGlobalTransitions = !Astro.url.pathname.startsWith('/transitions/') && !Astro.url.pathname.startsWith('/preview/')
 const pageEntrance = Astro.url.pathname === '/gift'
   ? 'gift'
+  : /^\/blog\/[^/]+\/?$/.test(Astro.url.pathname)
+    ? 'article'
   : /^\/(coaches|tournaments)\/[^/]+\/?$/.test(Astro.url.pathname)
     ? 'detail'
     : undefined
@@ -62,6 +64,11 @@ const pageEntrance = Astro.url.pathname === '/gift'
   <script is:inline>
     (() => {
       const pageEntrance = document.querySelector('#swup')?.getAttribute('data-page-entrance')
+      if (['gift', 'detail', 'article'].includes(pageEntrance ?? '') && !location.hash) {
+        history.scrollRestoration = 'manual'
+        window.scrollTo(0, 0)
+        window.requestAnimationFrame(() => window.scrollTo(0, 0))
+      }
       if (pageEntrance !== 'gift' && pageEntrance !== 'detail' && document.querySelector('#swup [data-gsap-reveal]')) document.documentElement.setAttribute('data-gsap-reveal-prepared', 'true')
       document.documentElement.setAttribute('data-unlim-enhancements', 'true')
       if (window.__unlimSiteEnhancements) return

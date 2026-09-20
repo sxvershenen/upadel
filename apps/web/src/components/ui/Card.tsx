@@ -82,10 +82,10 @@ export function ImageCard({ src, alt, overlay, className, children, imgClassName
   >
     <div ref={imageRef} data-parallax-viewport className="parallax-viewport absolute inset-0 z-0">
       <motion.div
-        initial={{ clipPath: "inset(0 0 12% 0)" }}
-        whileInView={{ clipPath: "inset(0 0 0% 0)" }}
-        viewport={{ once: true, amount: 0.2 }}
-        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+        initial={interactive ? { clipPath: "inset(0 0 12% 0)" } : undefined}
+        whileInView={interactive ? { clipPath: "inset(0 0 0% 0)" } : undefined}
+        viewport={interactive ? { once: true, amount: 0.2 } : undefined}
+        transition={interactive ? { duration: 0.9, ease: [0.22, 1, 0.36, 1] } : undefined}
         style={{ y: imageY }}
         data-parallax-layer
         className="parallax-layer overflow-hidden"
