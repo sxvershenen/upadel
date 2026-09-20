@@ -16,5 +16,5 @@ const canonical = content.page.seo.canonical ?? new URL('/padel-court-zakaz', im
 	socialImage={content.page.seo.socialImage?.url ?? content.page.hero.media.url}
 	webmasterVerification={content.site.analytics.vendors.webmasterVerification}
 >
-	<PadelCourtZakazPage client:load dto={content} />
+	<PadelCourtZakazPage client:load dto={content} publicOrigin={Astro.url.origin} />
 </SiteLayout>

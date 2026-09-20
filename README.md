@@ -22,7 +22,7 @@ npm install
 cp apps/cms/.env.example apps/cms/.env
 cp apps/web/.env.example apps/web/.env
 npm run seed:cms
-ADMIN_EMAIL=admin@example.test ADMIN_PASSWORD='change-me' npm run admin:create
+ADMIN_USERNAME=admin ADMIN_EMAIL=admin@example.test ADMIN_PASSWORD='change-me' npm run admin:create
 npm run analytics:demo # optional: fill local analytics with 30-day demo data
 npm run dev:cms
 npm run dev:web
@@ -31,6 +31,8 @@ npm run dev:web
 Run the seed after PostgreSQL is available; it is idempotent and does not overwrite unrelated records. Public web builds require the CMS endpoint configured by `CMS_URL`. Build/typecheck commands are in the root `package.json`.
 
 Run analytics aggregation every 15 minutes with `npm run analytics:maintain`; `npm run analytics:demo` is an idempotent local fixture for UI checks and must not be used as production traffic. Production must provide `ANALYTICS_JOB_SECRET` to the protected maintenance endpoint.
+
+Production admin uses `PAYLOAD_ADMIN_ROUTE` and `ADMIN_USERNAME` from the server-only environment. Schema changes ship as Payload migrations; never run `migrate:fresh` or commit production secrets.
 
 ## Product surface
 

@@ -25,7 +25,35 @@ const {
 } = Astro.props
 const robotsContent = robots?.replace('-', ', ')
 const publicOrigin = import.meta.env.PUBLIC_SITE_URL ?? Astro.url.origin
-const resolvedCanonical = canonical?.trim() || new URL(Astro.url.pathname, publicOrigin).toString()
+const canonicalPath = Astro.url.pathname === '/' ? '/' : `${Astro.url.pathname.replace(/\/+$/, '')}/`
+const resolvedCanonical = canonical?.trim() || new URL(canonicalPath, publicOrigin).toString()
+const siteSchema = site ? {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': `${publicOrigin}/#organization`,
+      name: site.brandName,
+      url: publicOrigin,
+      ...(site.brandLogo?.url ? { logo: site.brandLogo.url } : {}),
+      sameAs: site.footer.socialLinks.map(({ url }) => url).filter((url) => /^https?:\/\//i.test(url)),
+    },
+    {
+      '@type': 'SportsActivityLocation',
+      '@id': `${publicOrigin}/#club`,
+      name: site.brandName,
+      url: publicOrigin,
+      address: site.contacts.address,
+      telephone: site.contacts.phoneValue || undefined,
+      email: site.contacts.email || undefined,
+      ...(site.contacts.map.latitude || site.contacts.map.longitude
+        ? { geo: { '@type': 'GeoCoordinates', latitude: site.contacts.map.latitude, longitude: site.contacts.map.longitude } }
+        : {}),
+      parentOrganization: { '@id': `${publicOrigin}/#organization` },
+    },
+  ],
+} : null
+const siteSchemaJSON = siteSchema ? JSON.stringify(siteSchema).replaceAll('<', '\\u003c') : null
 const enableGlobalTransitions = !Astro.url.pathname.startsWith('/transitions/') && !Astro.url.pathname.startsWith('/preview/')
 const pageEntrance = Astro.url.pathname === '/gift'
   ? 'gift'
@@ -44,10 +72,18 @@ const pageEntrance = Astro.url.pathname === '/gift'
     <meta name="description" content={description} />
     {robotsContent && <meta name="robots" content={robotsContent} />}
     <link rel="canonical" href={resolvedCanonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site?.brandName ?? 'UNLIM RIGA PADEL'} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={resolvedCanonical} />
     {socialImage && <meta property="og:image" content={socialImage} />}
+    {socialImage && <meta property="og:image:alt" content={site?.brandName ?? title} />}
+    <meta name="twitter:card" content={socialImage ? 'summary_large_image' : 'summary'} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {socialImage && <meta name="twitter:image" content={socialImage} />}
+    {siteSchemaJSON && <script type="application/ld+json" is:inline set:html={siteSchemaJSON} />}
     {socialImage && <link rel="preload" href={socialImage} as="image" fetchpriority="high" />}
     {webmasterVerification?.trim() && <meta name="yandex-verification" content={webmasterVerification.trim()} />}
     <link rel="preload" href="/fonts/inter-tight/inter-tight-v9-cyrillic.woff2" as="font" type="font/woff2" crossorigin />

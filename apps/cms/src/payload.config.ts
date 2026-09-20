@@ -34,8 +34,11 @@ import { BlogPage } from './globals/BlogPage'
 import { CoachesPage } from './globals/CoachesPage'
 import { TournamentsPage } from './globals/TournamentsPage'
 import { AboutPage, ContactsPage, CourtsPage, GalleryPage, GiftPage, OfertaPage, PadelCourtZakazPage, PolicyPage, PricesPage, TrainingPage } from './globals/ThematicPages'
+import { migrations } from './migrations'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
+const configuredAdminRoute = process.env.PAYLOAD_ADMIN_ROUTE?.trim() ?? ''
+const adminRoute = /^\/[a-z0-9-]+$/.test(configuredAdminRoute) ? configuredAdminRoute : '/urp-panel'
 
 export default buildConfig({
   ...payloadPublicURLConfig({
@@ -61,6 +64,13 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     user: Users.slug,
+  },
+  routes: {
+    admin: adminRoute,
+  },
+  graphQL: {
+    disable: true,
+    disablePlaygroundInProduction: true,
   },
   i18n: {
     fallbackLanguage: 'ru',
@@ -93,6 +103,8 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URL ?? '',
     },
+    prodMigrations: migrations,
+    push: false,
   }),
   editor: lexicalEditor(),
   globals: [

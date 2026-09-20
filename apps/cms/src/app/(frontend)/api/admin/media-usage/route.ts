@@ -2,13 +2,14 @@ import config from '@payload-config'
 import { getPayload } from 'payload'
 
 import { getMediaUsage } from '@/lib/mediaUsage'
+import { requireAdmin } from '@/lib/adminAuth'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: Request): Promise<Response> {
   const payload = await getPayload({ config })
-  const { user } = await payload.auth({ headers: request.headers })
-  if (!user) return Response.json({ error: 'Authentication required.' }, { status: 401, headers: { 'Cache-Control': 'no-store' } })
+  const denied = await requireAdmin(payload, request.headers)
+  if (denied) return denied
 
   let input: unknown
   try {

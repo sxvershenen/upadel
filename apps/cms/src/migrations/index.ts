@@ -11,6 +11,7 @@ import * as migration_20260915_234500_add_lead_vk from './20260915_234500_add_le
 import * as migration_20260916_065756_desktop_navigation_icon from './20260916_065756_desktop_navigation_icon';
 import * as migration_20260916_111209_mega_menu_navigation from './20260916_111209_mega_menu_navigation';
 import * as migration_20260917_201823_add_padel_court_zakaz_page from './20260917_201823_add_padel_court_zakaz_page';
+import * as migration_20260920_181150_add_admin_username from './20260920_181150_add_admin_username';
 
 export const migrations = [
   {
@@ -76,6 +77,11 @@ export const migrations = [
   {
     up: migration_20260917_201823_add_padel_court_zakaz_page.up,
     down: migration_20260917_201823_add_padel_court_zakaz_page.down,
-    name: '20260917_201823_add_padel_court_zakaz_page'
+    name: '20260917_201823_add_padel_court_zakaz_page',
+  },
+  {
+    up: migration_20260920_181150_add_admin_username.up,
+    down: migration_20260920_181150_add_admin_username.down,
+    name: '20260920_181150_add_admin_username',
   },
 ];

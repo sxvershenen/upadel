@@ -536,8 +536,11 @@ function DirectContactButtons({ contacts }: { contacts: PadelCourtZakazPageDTO['
   )
 }
 
-export function PadelCourtZakazPage({ dto }: { dto: PadelCourtZakazPageDTO }) {
+export function PadelCourtZakazPage({ dto, publicOrigin }: { dto: PadelCourtZakazPageDTO; publicOrigin: string }) {
   const { site } = dto
+  const origin = new URL(publicOrigin).origin
+  const pageURL = new URL('/padel-court-zakaz', origin).toString()
+  const heroImageURL = new URL(dto.page.hero.media.url, origin).toString()
   const [activeModelForForm, setActiveModelForForm] = useState<ModelId>(dto.models.items[0]?.id ?? 'consultation')
   const heroRef = useRef<HTMLElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -577,13 +580,13 @@ export function PadelCourtZakazPage({ dto }: { dto: PadelCourtZakazPageDTO }) {
               {
                 '@type': 'Organization',
                 name: site.brandName,
-                url: 'https://unlimpadel.ru',
+                url: origin,
                 description: dto.page.intro,
               },
               {
                 '@type': 'Product',
                 name: dto.page.title,
-                image: dto.page.hero.media.url,
+                image: heroImageURL,
                 description: dto.page.intro,
                 brand: { '@type': 'Brand', name: 'JUBO Padel' },
                 offers: {
@@ -599,8 +602,8 @@ export function PadelCourtZakazPage({ dto }: { dto: PadelCourtZakazPageDTO }) {
               {
                 '@type': 'BreadcrumbList',
                 itemListElement: [
-                  { '@type': 'ListItem', position: 1, name: 'Главная', item: 'https://unlimpadel.ru/' },
-                  { '@type': 'ListItem', position: 2, name: dto.page.title, item: 'https://unlimpadel.ru/padel-court-zakaz' },
+                  { '@type': 'ListItem', position: 1, name: 'Главная', item: new URL('/', origin).toString() },
+                  { '@type': 'ListItem', position: 2, name: dto.page.title, item: pageURL },
                 ],
               },
             ],

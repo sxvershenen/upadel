@@ -2,13 +2,14 @@ import config from '@payload-config'
 import { getPayload } from 'payload'
 
 import { aggregateRecent, maintenancePreview, runMaintenance } from '@/analytics/aggregate'
+import { requireAdmin } from '@/lib/adminAuth'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: Request): Promise<Response> {
   const payload = await getPayload({ config })
-  const { user } = await payload.auth({ headers: request.headers })
-  if (!user) return Response.json({ error: 'Authentication required.' }, { status: 401 })
+  const denied = await requireAdmin(payload, request.headers)
+  if (denied) return denied
   let input: unknown
   try { input = await request.json() } catch { return Response.json({ error: 'Invalid JSON.' }, { status: 400 }) }
   const mode = input && typeof input === 'object' && 'mode' in input ? (input as { mode: unknown }).mode : null
@@ -21,4 +22,3 @@ export async function POST(request: Request): Promise<Response> {
     return Response.json({ error: 'Optimization stopped without deleting unverified data.' }, { status: 500, headers: { 'Cache-Control': 'no-store' } })
   }
 }
-

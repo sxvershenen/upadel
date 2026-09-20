@@ -2,6 +2,7 @@ import config from '@payload-config'
 import { getPayload } from 'payload'
 
 import { analyticsReport, type Period } from '@/analytics/report'
+import { requireAdmin } from '@/lib/adminAuth'
 
 export const dynamic = 'force-dynamic'
 const datePattern = /^\d{4}-\d{2}-\d{2}$/
@@ -26,8 +27,8 @@ function reportHeaders(cache: 'hit' | 'miss'): HeadersInit {
 
 export async function GET(request: Request): Promise<Response> {
   const payload = await getPayload({ config })
-  const { user } = await payload.auth({ headers: request.headers })
-  if (!user) return Response.json({ error: 'Authentication required.' }, { status: 401, headers: { 'Cache-Control': 'no-store' } })
+  const denied = await requireAdmin(payload, request.headers)
+  if (denied) return denied
   const url = new URL(request.url)
   const toDefault = new Date(Date.now() + 3 * 60 * 60_000 - 86_400_000).toISOString().slice(0, 10)
   const fromDefault = new Date(Date.parse(`${toDefault}T00:00:00Z`) - 29 * 86_400_000).toISOString().slice(0, 10)

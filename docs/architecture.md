@@ -52,9 +52,11 @@ Article bodies use a collection-specific Payload Lexical editor with H2–H4, fi
 - The shared code route registry drives the authenticated page map and public SEO index. Redirects are loaded once when Astro starts and require restart/deploy to change.
 - Payload custom tools use the native admin shell and grouped navigation. The page map renders the code registry as a collapsed-by-default hierarchy and can create an immutable-path draft placeholder under an existing route; a page becomes public only after its code-defined template and typed projection are implemented.
 - Track a versioned event contract. Store raw events for a bounded period and query mergeable daily aggregates for long historical ranges.
+- Analytics public endpoints remain consent-aware and bounded; production must add proxy/WAF rate limits because in-process limits do not coordinate across instances.
 - Analytics uses deduplicated raw events, 30-minute sessions and HLL p=14 daily sketches; retention aggregates and verifies all expired days before deleting any raw day.
 - External analytics is code-defined and consent-gated. Lead notification secrets are server-only; delivery failure never rolls back a saved lead.
 - Before production launch, choose Russian hosting/data-processing vendors and review the privacy policy, form consents, analytics basis and operator obligations under applicable Russian law.
+- Payload production schema changes run forward-only migrations from `apps/cms/src/migrations`; existing databases created by development schema push require an explicit baseline before the first production migration run. The admin route is configurable via `PAYLOAD_ADMIN_ROUTE`, with account lockout and proxy-backed login throttling required at the perimeter.
 
 ## Initial repository map
 
