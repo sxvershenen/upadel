@@ -69,7 +69,7 @@ export interface ImageCardProps extends Omit<HTMLMotionProps<"div">, "children">
 /** Full-bleed image card with a mandatory colorized overlay. */
 export function ImageCard({ src, alt, overlay, className, children, imgClassName, interactive = true, loading = "lazy", reveal = true, style, ...props }: ImageCardProps & { loading?: "eager" | "lazy"; reveal?: RevealConfig }) {
   const imageRef = useRef<HTMLDivElement>(null);
-  const imageY = useImageParallax(imageRef);
+  const imageY = useImageParallax(imageRef, interactive ? 11 : 0);
   const revealProps = revealAttributes(reveal, style, true);
   return <motion.div
     {...props}
@@ -86,7 +86,7 @@ export function ImageCard({ src, alt, overlay, className, children, imgClassName
         whileInView={interactive ? { clipPath: "inset(0 0 0% 0)" } : undefined}
         viewport={interactive ? { once: true, amount: 0.2 } : undefined}
         transition={interactive ? { duration: 0.9, ease: [0.22, 1, 0.36, 1] } : undefined}
-        style={{ y: imageY }}
+        style={interactive ? { y: imageY } : undefined}
         data-parallax-layer
         className="parallax-layer overflow-hidden"
       >
