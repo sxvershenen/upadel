@@ -491,6 +491,9 @@ async function ensureRemoteMedia(payload: Payload, sourceURL: string, alt: strin
     return createMedia(payload, sourceURL, { data: await readFile(filePath), mimetype, name: `fallback-${hash(sourceURL)}.${name.split('.').pop()}` }, alt, 'Local project media restored for the approved prototype content.', 'Project-owned demo asset. Verify attribution and production usage rights before launch.')
   }
 
+  const localMedia = await useLocalFallback()
+  if (localMedia) return localMedia
+
   let response: Response
   try {
     response = await fetch(sourceURL, { signal: AbortSignal.timeout(45_000) })
