@@ -1,4 +1,4 @@
-type RevealTarget = HTMLElement & {
+export type RevealTarget = HTMLElement & {
   dataset: DOMStringMap & {
     gsapRevealVisible?: string
   }
@@ -46,6 +46,27 @@ export function settleRevealTarget(target: RevealTarget, snapshot: RevealStyleSn
 
 export function shouldOwnRevealTarget(visible: boolean, animating: boolean) {
   return !visible || animating
+}
+
+/**
+ * Explicit Reveal scopes own a section when they are the deepest scope in
+ * that branch. Atomic targets remain available everywhere else, but never
+ * compete with the section that contains them.
+ */
+export function selectRevealTargets(allTargets: RevealTarget[]) {
+  const scopes = allTargets.filter((target) => target.dataset.gsapRevealScope === 'true')
+  const leafScopes = scopes.filter((scope) => !scope.querySelector('[data-gsap-reveal-scope="true"]'))
+  const selectedScopes = new Set(leafScopes)
+
+  return allTargets.filter((target) => {
+    const hasScopeAncestor = Boolean(target.parentElement?.closest('[data-gsap-reveal-scope="true"]'))
+    if (hasScopeAncestor) return selectedScopes.has(target)
+
+    const hasBoundaryAncestor = Boolean(target.parentElement?.closest('[data-gsap-reveal-boundary="true"]'))
+    if (hasBoundaryAncestor) return false
+    if (selectedScopes.has(target) || target.dataset.gsapRevealBoundary === 'true') return true
+    return !target.querySelector('[data-gsap-reveal-boundary="true"], [data-gsap-reveal]')
+  })
 }
 
 function settleActiveTweens() {
@@ -138,12 +159,7 @@ export async function startGsapReveals() {
 
   const refresh = () => {
     const allTargets = Array.from(root.querySelectorAll<RevealTarget>('[data-gsap-reveal]'))
-    const targets = allTargets.filter((target) => {
-      const hasBoundaryAncestor = Boolean(target.parentElement?.closest('[data-gsap-reveal-boundary="true"]'))
-      if (hasBoundaryAncestor) return false
-      if (target.dataset.gsapRevealBoundary === 'true') return true
-      return !target.querySelector('[data-gsap-reveal-boundary="true"], [data-gsap-reveal]')
-    })
+    const targets = selectRevealTargets(allTargets)
     const targetSet = new Set(targets)
     allTargets.forEach((target) => {
       const ownsReveal = targetSet.has(target) && shouldOwnRevealTarget(target.dataset.gsapRevealVisible === 'true', originalStyles.has(target))

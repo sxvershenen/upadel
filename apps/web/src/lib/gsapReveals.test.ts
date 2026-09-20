@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { captureRevealStyles, settleRevealTarget, shouldOwnRevealTarget, isRevealRootReady } from './gsapReveals'
+import { captureRevealStyles, settleRevealTarget, shouldOwnRevealTarget, isRevealRootReady, selectRevealTargets, type RevealTarget } from './gsapReveals'
 
 class TestStyle {
   private properties = new Map<string, { priority: string; value: string }>()
@@ -51,4 +51,51 @@ test('page reveals wait for the React commit but static HTML needs no hydration'
 test('visible SSR targets remain eligible for an initial GSAP entrance', () => {
   assert.equal(shouldOwnRevealTarget(false, false), true)
   assert.equal(shouldOwnRevealTarget(true, false), false)
+})
+
+type FakeTarget = {
+  dataset: { gsapRevealScope?: string; gsapRevealBoundary?: string }
+  parentElement: FakeTarget | null
+  closest: (selector: string) => FakeTarget | null
+  querySelector: (selector: string) => FakeTarget | null
+}
+
+function fakeTarget({ scope = false, boundary = false, parent = null as FakeTarget | null, descendants = [] as FakeTarget[] } = {}) {
+  let target: FakeTarget
+  target = {
+    dataset: {
+      gsapRevealScope: scope ? 'true' : undefined,
+      gsapRevealBoundary: boundary ? 'true' : undefined,
+    },
+    parentElement: parent,
+    closest(selector: string) {
+      let current: FakeTarget | null = target
+      while (current) {
+        if (selector.includes('scope') && current.dataset.gsapRevealScope === 'true') return current
+        if (selector.includes('boundary') && current.dataset.gsapRevealBoundary === 'true') return current
+        current = current.parentElement
+      }
+      return null
+    },
+    querySelector(selector: string) {
+      return descendants.find((item) => selector.includes('scope') && item.dataset.gsapRevealScope === 'true')
+        ?? descendants.find((item) => selector.includes('data-gsap-reveal') && (item.dataset.gsapRevealScope === 'true' || item.dataset.gsapRevealBoundary === 'true'))
+        ?? null
+    },
+  }
+  return target
+}
+
+test('leaf Reveal scopes take ownership over atomic targets inside them', () => {
+  const root = fakeTarget()
+  const sectionDescendants: FakeTarget[] = []
+  const section = fakeTarget({ scope: true, parent: root, descendants: sectionDescendants })
+  const badge = fakeTarget({ parent: section })
+  assert.deepEqual(selectRevealTargets([section, badge] as unknown as RevealTarget[]), [section])
+
+  const nested = fakeTarget({ scope: true, parent: section })
+  sectionDescendants.push(nested)
+  const nestedButton = fakeTarget({ parent: nested })
+
+  assert.deepEqual(selectRevealTargets([section, nested, nestedButton] as unknown as RevealTarget[]), [nested])
 })
