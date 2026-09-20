@@ -1309,13 +1309,15 @@ async function seed() {
         title: 'Блог и статьи',
         intro: 'Практические материалы о паделе, тренировках, экипировке и восстановлении от команды клуба.',
         seoTitle: 'Блог о паделе — UNLIM RIGA PADEL',
+        seoDescription: 'Статьи о паделе, тренировках, экипировке и подготовке к турнирам от команды UNLIM RIGA PADEL.',
       },
       {
         slug: 'coaches-page' as const,
         eyebrow: 'Команда',
         title: 'Тренеры',
         intro: 'Выберите тренера по уровню, направлению подготовки и языку — от первого занятия до турниров.',
-        seoTitle: 'Тренеры по паделу — UNLIM RIGA PADEL',
+        seoTitle: 'Тренеры по падел теннису в Москве — Unlim Riga Padel',
+        seoDescription: 'Тренеры по падел-теннису в UNLIM RIGA PADEL: занятия для новичков, продолжающих и детей, подбор программы и тренировки на Новой Риге.',
       },
       {
         slug: 'tournaments-page' as const,
@@ -1323,6 +1325,7 @@ async function seed() {
         title: 'Турниры и лиги',
         intro: 'Клубные игры, рейтинговые кубки и открытые турниры для разных уровней подготовки.',
         seoTitle: 'Турниры по паделу — UNLIM RIGA PADEL',
+        seoDescription: 'Турниры и лиги по паделу в Москве и на Новой Риге для новичков, продолжающих и игроков турнирного уровня.',
       },
     ]
     for (const page of catalogGlobals) {
@@ -1341,7 +1344,7 @@ async function seed() {
         await payload.updateGlobal({ slug: page.slug, draft: false, overrideAccess: true, data: {
           seedVersion, _status: 'published', eyebrow: page.eyebrow, title: page.title, intro: page.intro,
           heroImage: heroMediaFor(page.slug)?.id, heroGrayscale: true,
-          seo: { title: page.seoTitle, description: page.intro, robots: 'index-follow' },
+          seo: { title: page.seoTitle, description: page.seoDescription ?? page.intro, robots: 'index-follow' },
         } as never })
         stats.globalsPublished += 1
       }
@@ -1398,7 +1401,7 @@ async function seed() {
             { title: 'Бронирование', content: richText('Стоимость фиксируется при бронировании. Инвентарь и базовый клубный сервис включены согласно выбранному тарифу.') },
             { title: 'Отмена и перенос', content: richText('Условия отмены и переноса уточняйте у администратора клуба до подтверждения бронирования.') },
           ],
-          seo: { title: 'Цены на падел — UNLIM RIGA PADEL', description: 'Аренда кортов, тренировки и клубные абонементы.', robots: 'index-follow' },
+          seo: { title: 'Цены на падел корт — Москва, Красногорск, Новая Рига', description: 'Цены на падел в Москве, Красногорске и на Новой Риге: аренда панорамного корта, тренировки с тренером, пробное занятие и абонементы.', robots: 'index-follow' },
         },
       },
       {
@@ -1424,7 +1427,7 @@ async function seed() {
             { type: 'paragraph', text: 'Для старта нужна удобная спортивная форма и обувь, подходящая для корта. Условия предоставления инвентаря, доступное время и состав занятия лучше подтвердить у администратора при записи.' },
           ]),
           action: { label: 'Подобрать тренировку', mode: 'trial-booking' },
-          seo: { title: 'Тренировки по паделу — UNLIM RIGA PADEL', description: 'Индивидуальные, групповые и детские тренировки по паделу.', robots: 'index-follow' },
+          seo: { title: 'Падел тренировки в Москве — групповые, индивидуальные и для детей', description: 'Падел-тренировки в Москве и Красногорске: индивидуальные и групповые занятия, детские секции от 5 лет, пробная тренировка и подготовка к турнирам.', robots: 'index-follow' },
         },
       },
       {
@@ -1717,8 +1720,8 @@ async function seed() {
             externalRatingLabel: '4.8 на Яндекс Картах', externalReviewsLabel: '312 отзывов о клубе', externalReviewsURL: 'https://yandex.ru/maps',
           },
           seo: {
-            title: 'UNLIM RIGA PADEL — премиальный падел-клуб',
-            description: 'UNLIM RIGA PADEL — премиальный падел-клуб: панорамные корты, тренеры, турниры и абонементы.',
+            title: 'Падел-клуб — аренда корта, поиграть в Москве — Unlim Riga',
+            description: 'Падел-клуб UNLIM RIGA PADEL на Новой Риге: аренда крытых панорамных кортов, игры с друзьями, тренировки для взрослых и детей, турниры и абонементы.',
             robots: 'index-follow',
           },
         } as never,
@@ -1802,7 +1805,6 @@ async function seed() {
             { provider: 'telegram', label: 'Telegram', url: 'https://t.me' },
             { provider: 'video', label: 'Видео клуба', url: '#' },
             { provider: 'vk', label: 'VK', url: 'https://vk.com' },
-            { provider: 'instagram', label: 'Instagram', url: '#' },
           ],
           legalLinks: [...legalLinks],
           copyright: '© 2026 Unlim Riga Padel. Все права защищены.',

@@ -11,7 +11,7 @@ export const seoField: GroupField = {
       name: 'title',
       type: 'text',
       label: 'Заголовок страницы',
-      maxLength: 60,
+      maxLength: 80,
     },
     {
       name: 'description',
