@@ -25,6 +25,7 @@ let originalStyles = new WeakMap<RevealTarget, RevealStyleSnapshot>()
 let refreshFrame = 0
 let generation = 0
 let activeRoot: HTMLElement | null = null
+let scrollListener: (() => void) | null = null
 
 export function captureRevealStyles(target: Pick<HTMLElement, 'style'>): RevealStyleSnapshot {
   return animatedStyleProperties.map((name) => ({
@@ -86,6 +87,8 @@ function disconnectRevealRuntime() {
   activeRoot = null
   if (refreshFrame) window.cancelAnimationFrame(refreshFrame)
   refreshFrame = 0
+  if (scrollListener) window.removeEventListener('scroll', scrollListener)
+  scrollListener = null
   observer?.disconnect()
   observer = null
   mutations?.disconnect()
@@ -196,18 +199,28 @@ export async function startGsapReveals() {
     })
   }
 
-  observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting && entry.boundingClientRect.width > 0 && entry.boundingClientRect.height > 0) show(entry.target as RevealTarget)
-    })
-  }, { rootMargin: '80px' })
-  mutations = new MutationObserver(() => {
+  const scheduleRefresh = () => {
     if (refreshFrame) return
     refreshFrame = window.requestAnimationFrame(() => {
       refreshFrame = 0
       refresh()
     })
-  })
+  }
+
+  observer = new IntersectionObserver((entries) => {
+    entries
+      .filter((entry) => entry.isIntersecting && entry.boundingClientRect.width > 0 && entry.boundingClientRect.height > 0)
+      .sort((left, right) => {
+        const position = left.target.compareDocumentPosition(right.target)
+        return position & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1
+      })
+      .forEach((entry) => {
+        show(entry.target as RevealTarget)
+      })
+  }, { rootMargin: '80px' })
+  scrollListener = scheduleRefresh
+  window.addEventListener('scroll', scrollListener, { passive: true })
+  mutations = new MutationObserver(scheduleRefresh)
   mutations.observe(root, { childList: true, subtree: true })
   refresh()
 }
