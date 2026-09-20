@@ -14,14 +14,14 @@ export function Marquee({
 }) {
   const gap = gapClass ?? "gap-10";
   const trackPadding = gap === "gap-4 md:gap-7" ? "pr-4 md:pr-7" : "pr-10";
+  const copies = Array.from({ length: 4 });
   return (
     <div className={cn("no-scrollbar relative flex overflow-hidden", className)}>
       <div
         className="flex w-max min-w-max shrink-0 animate-marquee"
         style={reverse ? { animationDirection: "reverse" } : undefined}
       >
-        <div className={cn("flex shrink-0 items-center", gap, trackPadding)}>{children}</div>
-        <div aria-hidden className={cn("flex shrink-0 items-center", gap, trackPadding)}>{children}</div>
+        {copies.map((_, index) => <div key={index} aria-hidden={index > 0} className={cn("flex shrink-0 items-center", gap, trackPadding)}>{children}</div>)}
       </div>
     </div>
   );
