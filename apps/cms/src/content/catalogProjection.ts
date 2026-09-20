@@ -1,7 +1,8 @@
-import { homepageDTOversion, type ArticleCatalogItem, type CatalogDTO, type CatalogPageHeader, type CoachCatalogItem, type DetailDTO, type TournamentCatalogItem } from '@unlim/content-contract'
+import { homepageDTOversion, type ArticleCatalogItem, type CatalogDTO, type CatalogPageHeader, type CoachCatalogItem, type DetailDTO, type PageSEO, type TournamentCardDTO, type TournamentCatalogItem } from '@unlim/content-contract'
 import type { Payload } from 'payload'
 
-import type { Article, Coach, Tournament } from '../payload-types'
+import type { Article, Coach, SiteSetting, Tournament, TournamentDefault } from '../payload-types'
+import { formatTournamentLevel, formatTournamentSchedule, resolveTournamentFormatLabel } from '../tournaments/model'
 import { articleContentHTML } from './articleContent'
 import { actionDTO, mediaDTO, pageHeroDTO, requiredMedia, seoDTO, siteDTO } from './normalize'
 
@@ -23,8 +24,62 @@ function coachItem(coach: Coach, origin: string): CoachCatalogItem {
   return { id: String(coach.id), slug: coach.slug, name: coach.name, photo: requiredMedia(coach.photo, origin), specialization: coach.specialization, bio: coach.bio, level: coach.level, experience: coach.experience, languages: coach.languages, rating: coach.rating, reviewsCount: coach.reviewsCount, certificates: (coach.certificates ?? []).map(({ title }) => title), priceFrom: coach.priceFrom, action: actionDTO(coach.action), levels: coach.levels ?? [], focusAreas: coach.focusAreas ?? [], languageCodes: coach.languageCodes ?? [] }
 }
 
-function tournamentItem(item: Tournament, origin: string): TournamentCatalogItem {
-  return { id: String(item.id), slug: item.slug, visualStyle: item.visualStyle, image: mediaDTO(item.image, origin), imageOverlay: item.imageOverlay, meshStyle: item.meshStyle, level: String(item.level ?? item.category), icon: item.icon, title: item.title, scheduleLabel: item.scheduleLabel, format: item.format, entryFee: item.entryFee, description: item.description, prizeLabel: item.prizeLabel, prize: item.prize, action: actionDTO(item.action), lifecycle: item.lifecycle, levelKey: String(item.levelKey ?? item.categoryKey), formatKey: item.formatKey, regulationHTML: richContentHTML(item.regulation ?? {}) }
+export function tournamentCard(item: Tournament, origin: string): TournamentCardDTO {
+  const levelFrom = Number(item.levelFrom)
+  const levelTo = Number(item.levelTo)
+  return {
+    id: String(item.id), slug: item.slug, visualStyle: item.visualStyle, image: mediaDTO(item.image, origin), imageOverlay: item.imageOverlay,
+    meshStyle: item.meshStyle, levelFrom, levelTo, levelLabel: formatTournamentLevel(levelFrom, levelTo), icon: item.icon, title: item.title,
+    startsAt: item.startsAt, endsAt: item.endsAt, scheduleLabel: formatTournamentSchedule(item.startsAt, item.endsAt), format: item.format,
+    formatLabel: resolveTournamentFormatLabel(item.format, item.customFormat), entryFee: item.entryFee, description: item.description,
+    prizeLabel: item.prizeLabel, prize: item.prize,
+  }
+}
+
+type TournamentContext = { defaults: TournamentDefault; site: SiteSetting }
+
+function withIDs<T extends Record<string, unknown>>(rows: T[] | null | undefined): Array<T & { id: string }> {
+  return (rows ?? []).map((row, index) => ({ ...row, id: typeof row.id === 'string' ? row.id : String(index + 1) }))
+}
+
+function tournamentItem(item: Tournament, origin: string, context: TournamentContext): TournamentCatalogItem {
+  const inherited = context.defaults
+  const siteTelegram = context.site.socialLinks?.find(({ provider }) => provider === 'telegram')
+  const coordinator = item.useClubCoordinatorContacts !== false
+    ? { telegramLabel: siteTelegram?.label ?? 'Telegram', telegramURL: siteTelegram?.url, phoneDisplay: context.site.phoneDisplay, phoneValue: context.site.phoneValue }
+    : item.coordinator ?? {}
+  return {
+    ...tournamentCard(item, origin),
+    action: actionDTO(item.action), lifecycle: item.lifecycle, participantMode: item.participantMode, totalSlots: item.totalSlots,
+    participants: withIDs(item.participants).map(({ id, name, partnerName, level, status }) => ({ id, name, partnerName, level, status })),
+    standings: withIDs(item.standings).map(({ id, name, partnerName, matches, points, difference, award }, index) => ({ id, rank: index + 1, name, partnerName, matches, points, difference, award })),
+    prizes: withIDs(item.prizes).map(({ id, title, reward, description }, index) => ({ id, place: index + 1, title, reward, description })),
+    checklist: withIDs(item.useDefaultChecklist === false ? item.checklist : inherited.checklist).map(({ id, text }) => ({ id, text })),
+    perks: withIDs(item.useDefaultPerks === false ? item.perks : inherited.perks).map(({ id, icon, title, description }) => ({ id, icon, title, description })),
+    matchday: withIDs(item.useDefaultMatchday === false ? item.matchday : inherited.matchday).map(({ id, timing, title, description }) => ({ id, timing, title, description })),
+    faqs: withIDs(item.useDefaultFaq === false ? item.faqs : inherited.faqs).map(({ id, question, answer }) => ({ id, question, answer })),
+    coordinator,
+    regulationHTML: richContentHTML(item.regulation ?? {}),
+  }
+}
+
+function truncateSEO(value: string, maxLength = 160): string {
+  if (value.length <= maxLength) return value
+  const shortened = value.slice(0, maxLength - 1)
+  const boundary = shortened.lastIndexOf(' ')
+  return `${shortened.slice(0, boundary > 110 ? boundary : maxLength - 1).replace(/[.,;:!?\s]+$/u, '')}…`
+}
+
+export function tournamentSEO(item: Tournament, origin: string): PageSEO {
+  const explicit = seoDTO(item.seo, origin)
+  const level = formatTournamentLevel(item.levelFrom, item.levelTo)
+  const format = resolveTournamentFormatLabel(item.format, item.customFormat)
+  const value = item.prize?.trim() ? `${item.prizeLabel}: ${item.prize}` : `Взнос: ${item.entryFee}`
+  return {
+    ...explicit,
+    title: explicit.title?.trim() || `${item.title} — падел турнир Москва`,
+    description: explicit.description?.trim() || truncateSEO(`${item.title} — падел-турнир в Москве. Формат: ${format}; уровень ${level}; ${value}.`),
+  }
 }
 
 const escapeHTML = (value: string) => value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;')
@@ -62,21 +117,22 @@ export function richContentHTML(value: { root?: unknown }): string {
 }
 
 async function baseData(payload: Payload, kind: CatalogKind, origin: string, preview: boolean) {
-  const [page, site, partners] = await Promise.all([
+  const [page, site, partners, tournamentDefaults] = await Promise.all([
     payload.findGlobal({ slug: pageSlugs[kind], draft: preview, depth: 2, overrideAccess: true }),
     payload.findGlobal({ slug: 'site-settings', draft: preview, depth: 2, overrideAccess: true }),
     payload.find({ collection: 'partners', depth: 1, draft: preview, pagination: false, overrideAccess: true, sort: 'homepageOrder', where: preview ? undefined : { and: [{ _status: { equals: 'published' } }, { isActive: { equals: true } }] } }),
+    kind === 'tournaments' ? payload.findGlobal({ slug: 'tournament-defaults', draft: preview, depth: 0, overrideAccess: true }) : Promise.resolve(null),
   ])
-  if (!preview && (page._status !== 'published' || site._status !== 'published')) throw new Error('Published catalog globals are unavailable.')
+  if (!preview && (page._status !== 'published' || site._status !== 'published' || kind === 'tournaments' && tournamentDefaults?._status !== 'published')) throw new Error('Published catalog globals are unavailable.')
   const hero = pageHeroDTO(page, kind, origin)
   const seo = seoDTO(page.seo, origin)
   const header: CatalogPageHeader = { eyebrow: page.eyebrow, title: page.title, intro: page.intro, hero, seo: { ...seo, socialImage: seo.socialImage ?? hero.media } }
-  return { header, site: siteDTO(site, origin, partners.docs as unknown as Array<Record<string, unknown>>) }
+  return { header, rawSite: site as SiteSetting, site: siteDTO(site, origin, partners.docs as unknown as Array<Record<string, unknown>>), tournamentDefaults: tournamentDefaults as TournamentDefault | null }
 }
 
 export async function createCatalogProjection(payload: Payload, options: { kind: CatalogKind; origin: string; preview: boolean }): Promise<CatalogDTO> {
   const { kind, origin, preview } = options
-  const { header, site } = await baseData(payload, kind, origin, preview)
+  const { header, rawSite, site, tournamentDefaults } = await baseData(payload, kind, origin, preview)
   const where = preview ? undefined : kind === 'coaches' ? { and: [{ _status: { equals: 'published' } }, { isActive: { equals: true } }] } : { _status: { equals: 'published' } }
   const result = await payload.find({ collection: collectionSlugs[kind], depth: 2, draft: preview, limit: 100, overrideAccess: true, pagination: false, sort: kind === 'blog' ? '-publishedAt' : kind === 'coaches' ? 'name' : 'homepageOrder', where } as never) as unknown as { docs: Array<Article | Coach | Tournament> }
   const base = { version: homepageDTOversion, preview, generatedAt: new Date().toISOString(), page: header, site }
@@ -85,12 +141,13 @@ export async function createCatalogProjection(payload: Payload, options: { kind:
     return { ...base, kind, items: (result.docs as Article[]).map((item) => articleItem(item, origin)), categories: categories.docs.map(({ slug, title }) => ({ slug, title })) }
   }
   if (kind === 'coaches') return { ...base, kind, items: (result.docs as Coach[]).map((item) => coachItem(item, origin)) }
-  return { ...base, kind, items: (result.docs as Tournament[]).map((item) => tournamentItem(item, origin)) }
+  if (!tournamentDefaults) throw new Error('Tournament defaults are unavailable.')
+  return { ...base, kind, items: (result.docs as Tournament[]).map((item) => tournamentItem(item, origin, { defaults: tournamentDefaults, site: rawSite })) }
 }
 
 export async function createDetailProjection(payload: Payload, options: { kind: CatalogKind; origin: string; preview: boolean; slug: string }): Promise<DetailDTO | null> {
   const { kind, origin, preview, slug } = options
-  const { header, site } = await baseData(payload, kind, origin, preview)
+  const { header, rawSite, site, tournamentDefaults } = await baseData(payload, kind, origin, preview)
   const where = { and: [{ slug: { equals: slug } }, ...(!preview ? [{ _status: { equals: 'published' } }] : []), ...(kind === 'coaches' && !preview ? [{ isActive: { equals: true } }] : [])] }
   const result = await payload.find({ collection: collectionSlugs[kind], depth: 2, draft: preview, limit: 1, overrideAccess: true, where } as never) as unknown as { docs: Array<Article | Coach | Tournament> }
   const item = result.docs[0]
@@ -100,5 +157,7 @@ export async function createDetailProjection(payload: Payload, options: { kind: 
   if (kind === 'blog') { const article = item as Article; return { ...base, kind, item: { ...articleItem(article, origin), contentHTML: await articleContentHTML(article.content, { origin, payload }), seo: seoDTO(article.seo, origin) }, related: (relatedResult.docs as Article[]).map((entry) => articleItem(entry, origin)) } }
   if (kind === 'coaches') { const coach = item as Coach; return { ...base, kind, item: { ...coachItem(coach, origin), seo: seoDTO(coach.seo, origin) }, related: (relatedResult.docs as Coach[]).map((entry) => coachItem(entry, origin)) } }
   const tournament = item as Tournament
-  return { ...base, kind, item: { ...tournamentItem(tournament, origin), seo: seoDTO(tournament.seo, origin) }, related: (relatedResult.docs as Tournament[]).map((entry) => tournamentItem(entry, origin)) }
+  if (!tournamentDefaults) throw new Error('Tournament defaults are unavailable.')
+  const context = { defaults: tournamentDefaults, site: rawSite }
+  return { ...base, kind, item: { ...tournamentItem(tournament, origin, context), seo: tournamentSEO(tournament, origin) }, related: (relatedResult.docs as Tournament[]).map((entry) => tournamentItem(entry, origin, context)) }
 }

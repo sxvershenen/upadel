@@ -129,6 +129,7 @@ export interface Config {
   fallbackLocale: null;
   globals: {
     'site-settings': SiteSetting;
+    'tournament-defaults': TournamentDefault;
     homepage: Homepage;
     'blog-page': BlogPage;
     'coaches-page': CoachesPage;
@@ -146,6 +147,7 @@ export interface Config {
   };
   globalsSelect: {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    'tournament-defaults': TournamentDefaultsSelect<false> | TournamentDefaultsSelect<true>;
     homepage: HomepageSelect<false> | HomepageSelect<true>;
     'blog-page': BlogPageSelect<false> | BlogPageSelect<true>;
     'coaches-page': CoachesPageSelect<false> | CoachesPageSelect<true>;
@@ -680,29 +682,19 @@ export interface Membership {
 export interface Tournament {
   id: number;
   title: string;
-  category: string;
-  categoryKey: 'club-game' | 'mens-league' | 'womens-open' | 'junior' | 'open';
-  /**
-   * Шкала подготовки игрока от 1.0 до 7.0.
-   */
-  level: string;
-  levelKey: '1.0' | '2.0' | '3.0' | '4.0' | '5.0' | '6.0' | '7.0';
+  description: string;
   /**
    * Не зависит от статуса черновик/опубликовано.
    */
   lifecycle: 'upcoming' | 'active' | 'finished' | 'cancelled';
-  /**
-   * Например: Каждую пятницу · 19:30–22:30.
-   */
-  scheduleLabel: string;
-  startsAt?: string | null;
-  endsAt?: string | null;
-  format: string;
-  formatKey: 'americano' | 'groups-knockout' | 'round-robin-playoff' | 'other';
-  entryFee: string;
-  description: string;
-  prizeLabel: string;
-  prize: string;
+  startsAt: string;
+  endsAt: string;
+  levelFrom: '1.0' | '1.5' | '2.0' | '2.5' | '3.0' | '3.5' | '4.0' | '4.5' | '5.0' | '5.5' | '6.0' | '6.5' | '7.0';
+  levelTo: '1.0' | '1.5' | '2.0' | '2.5' | '3.0' | '3.5' | '4.0' | '4.5' | '5.0' | '5.5' | '6.0' | '6.5' | '7.0';
+  format: 'americano' | 'groups-knockout' | 'round-robin-playoff' | 'other';
+  customFormat?: string | null;
+  participantMode: 'players' | 'pairs';
+  totalSlots: number;
   action: {
     label?: string | null;
     mode: 'none' | 'booking' | 'trial-booking' | 'internal-link' | 'external-link' | 'phone' | 'email' | 'lead-form';
@@ -711,6 +703,16 @@ export interface Tournament {
      */
     href?: string | null;
     leadType?: ('membership' | 'gift' | 'trial' | 'consultation' | 'other') | null;
+  };
+  useClubCoordinatorContacts?: boolean | null;
+  coordinator?: {
+    telegramLabel?: string | null;
+    telegramURL?: string | null;
+    phoneDisplay?: string | null;
+    /**
+     * Например: +79990000000.
+     */
+    phoneValue?: string | null;
   };
   visualStyle: 'image' | 'mesh';
   image?: (number | null) | Media;
@@ -732,6 +734,59 @@ export interface Tournament {
     ('indigo' | 'deep-blue' | 'dark' | 'lime' | 'lime-soft' | 'sky' | 'lavender' | 'sunset' | 'navy-gold') | null;
   icon: 'PartyPopper' | 'Trophy' | 'Medal';
   /**
+   * Строки можно перетаскивать. Нумерация на сайте следует этому порядку.
+   */
+  participants?:
+    | {
+        name: string;
+        /**
+         * Оставьте пустым для индивидуального формата.
+         */
+        partnerName?: string | null;
+        level?:
+          | ('1.0' | '1.5' | '2.0' | '2.5' | '3.0' | '3.5' | '4.0' | '4.5' | '5.0' | '5.5' | '6.0' | '6.5' | '7.0')
+          | null;
+        status: 'confirmed' | 'waitlist';
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Место определяется только порядком строк. Перетащите строку, чтобы изменить место; очки не сортируют список.
+   */
+  standings?:
+    | {
+        name: string;
+        partnerName?: string | null;
+        matches: number;
+        points: number;
+        difference: string;
+        award?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  entryFee: string;
+  prizeLabel: string;
+  prize: string;
+  /**
+   * Место определяется порядком строк.
+   */
+  prizes?:
+    | {
+        title: string;
+        reward: string;
+        description: string;
+        id?: string | null;
+      }[]
+    | null;
+  useDefaultFaq?: boolean | null;
+  faqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
    * Показывается отдельным читаемым блоком на странице турнира.
    */
   regulation?: {
@@ -749,6 +804,34 @@ export interface Tournament {
     };
     [k: string]: unknown;
   } | null;
+  useDefaultChecklist?: boolean | null;
+  checklist?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  useDefaultPerks?: boolean | null;
+  perks?:
+    | {
+        icon: 'Sparkles' | 'Droplets' | 'ShowerHead' | 'Camera';
+        title: string;
+        description: string;
+        id?: string | null;
+      }[]
+    | null;
+  useDefaultMatchday?: boolean | null;
+  matchday?:
+    | {
+        timing: string;
+        title: string;
+        description: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Если заголовок или описание пусты, сайт автоматически соберёт их из названия, Москвы, формата, уровня и призов/взноса.
+   */
   seo: {
     title?: string | null;
     description?: string | null;
@@ -1653,20 +1736,16 @@ export interface MembershipsSelect<T extends boolean = true> {
  */
 export interface TournamentsSelect<T extends boolean = true> {
   title?: T;
-  category?: T;
-  categoryKey?: T;
-  level?: T;
-  levelKey?: T;
+  description?: T;
   lifecycle?: T;
-  scheduleLabel?: T;
   startsAt?: T;
   endsAt?: T;
+  levelFrom?: T;
+  levelTo?: T;
   format?: T;
-  formatKey?: T;
-  entryFee?: T;
-  description?: T;
-  prizeLabel?: T;
-  prize?: T;
+  customFormat?: T;
+  participantMode?: T;
+  totalSlots?: T;
   action?:
     | T
     | {
@@ -1675,12 +1754,85 @@ export interface TournamentsSelect<T extends boolean = true> {
         href?: T;
         leadType?: T;
       };
+  useClubCoordinatorContacts?: T;
+  coordinator?:
+    | T
+    | {
+        telegramLabel?: T;
+        telegramURL?: T;
+        phoneDisplay?: T;
+        phoneValue?: T;
+      };
   visualStyle?: T;
   image?: T;
   imageOverlay?: T;
   meshStyle?: T;
   icon?: T;
+  participants?:
+    | T
+    | {
+        name?: T;
+        partnerName?: T;
+        level?: T;
+        status?: T;
+        id?: T;
+      };
+  standings?:
+    | T
+    | {
+        name?: T;
+        partnerName?: T;
+        matches?: T;
+        points?: T;
+        difference?: T;
+        award?: T;
+        id?: T;
+      };
+  entryFee?: T;
+  prizeLabel?: T;
+  prize?: T;
+  prizes?:
+    | T
+    | {
+        title?: T;
+        reward?: T;
+        description?: T;
+        id?: T;
+      };
+  useDefaultFaq?: T;
+  faqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
   regulation?: T;
+  useDefaultChecklist?: T;
+  checklist?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  useDefaultPerks?: T;
+  perks?:
+    | T
+    | {
+        icon?: T;
+        title?: T;
+        description?: T;
+        id?: T;
+      };
+  useDefaultMatchday?: T;
+  matchday?:
+    | T
+    | {
+        timing?: T;
+        title?: T;
+        description?: T;
+        id?: T;
+      };
   seo?:
     | T
     | {
@@ -2181,6 +2333,48 @@ export interface SiteSetting {
     credentialEnvironmentVariable?: string | null;
     buttonLabel?: string | null;
   };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Изменения применяются ко всем турнирам, где для соответствующего блока включено наследование.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tournament-defaults".
+ */
+export interface TournamentDefault {
+  id: number;
+  seedVersion?: string | null;
+  checklist?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  perks?:
+    | {
+        icon: 'Sparkles' | 'Droplets' | 'ShowerHead' | 'Camera';
+        title: string;
+        description: string;
+        id?: string | null;
+      }[]
+    | null;
+  matchday?:
+    | {
+        timing: string;
+        title: string;
+        description: string;
+        id?: string | null;
+      }[]
+    | null;
+  faqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
   _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -3491,6 +3685,46 @@ export interface SiteSettingsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tournament-defaults_select".
+ */
+export interface TournamentDefaultsSelect<T extends boolean = true> {
+  seedVersion?: T;
+  checklist?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  perks?:
+    | T
+    | {
+        icon?: T;
+        title?: T;
+        description?: T;
+        id?: T;
+      };
+  matchday?:
+    | T
+    | {
+        timing?: T;
+        title?: T;
+        description?: T;
+        id?: T;
+      };
+  faqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "homepage_select".
  */
 export interface HomepageSelect<T extends boolean = true> {
@@ -4423,6 +4657,7 @@ export interface TaskSchedulePublish {
     global?:
       | (
           | 'site-settings'
+          | 'tournament-defaults'
           | 'homepage'
           | 'blog-page'
           | 'coaches-page'

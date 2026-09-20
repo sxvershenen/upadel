@@ -1,8 +1,9 @@
 import { homepageDTOversion, parseHomepageDTO, type HomepageDTO } from '@unlim/content-contract'
 import type { Payload } from 'payload'
 
-import type { ArticleCategory } from '../payload-types'
+import type { ArticleCategory, Tournament } from '../payload-types'
 import { actionDTO, mediaDTO, requiredMedia, seoDTO, siteDTO } from './normalize'
+import { tournamentCard } from './catalogProjection'
 import { resolveHomepageArticles } from '../hooks/resolveHomepageArticles'
 import { homepageCollectionLimits, resolveHomepageEntities } from '../hooks/resolveHomepageEntities'
 
@@ -92,7 +93,7 @@ export async function createHomepageProjection(
     },
     entities: {
       coaches: entities.coaches.map((coach) => ({ id: String(coach.id), name: String(coach.name), slug: String(coach.slug), photo: requiredMedia(coach.photo, origin), specialization: String(coach.specialization), bio: String(coach.bio), level: String(coach.level), experience: String(coach.experience), languages: String(coach.languages), rating: Number(coach.rating), reviewsCount: Number(coach.reviewsCount), certificates: Array.isArray(coach.certificates) ? coach.certificates.map((item) => String((item as { title: unknown }).title)) : [], priceFrom: Number(coach.priceFrom), action: actionDTO(coach.action) })),
-      tournaments: entities.tournaments.map((item) => ({ id: String(item.id), slug: String(item.slug), visualStyle: item.visualStyle as 'image' | 'mesh', image: mediaDTO(item.image, origin), imageOverlay: item.imageOverlay as string | null, meshStyle: item.meshStyle as string | null, level: String(item.level ?? item.category), icon: item.icon as 'PartyPopper' | 'Trophy' | 'Medal', title: String(item.title), scheduleLabel: String(item.scheduleLabel), format: String(item.format), entryFee: String(item.entryFee), description: String(item.description), prizeLabel: String(item.prizeLabel), prize: String(item.prize) })),
+      tournaments: entities.tournaments.map((item) => tournamentCard(item as unknown as Tournament, origin)),
       articles: articles.map((article) => ({ id: String(article.id), slug: article.slug, image: requiredMedia(article.previewImage, origin), category: relationTitle(article.category as ArticleCategory), readingTimeMinutes: article.readingTimeMinutes, title: article.title, excerpt: article.excerpt })),
       articleRows: articleRowsResult.docs.map((article) => ({ id: String(article.id), slug: article.slug, title: article.title, excerpt: article.excerpt })),
       courts: entities.courts.map((item) => ({ id: String(item.id), slug: String(item.slug), title: String(item.title), eyebrow: item.eyebrow as string | null, description: item.description as string | null, cardVariant: item.cardVariant as 'panoramic' | 'metrics' | 'damping' | 'surface', metrics: item.metrics as HomepageDTO['entities']['courts'][number]['metrics'] })),

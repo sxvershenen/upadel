@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import type { TournamentCatalogItem, TournamentDetailDTO } from '@unlim/content-contract'
+import type { TournamentDetailDTO } from '@unlim/content-contract'
 import { gsap } from 'gsap'
 import {
   Award,
@@ -139,75 +139,7 @@ export function parseLevelRange(levelStr: string): { min: number; max: number; i
   return { min, max, isRange: min !== max }
 }
 
-export const matchdaySteps = [
-  {
-    timing: 'За 30 минут',
-    title: 'Сбор и разминка',
-    desc: 'Регистрация участников на ресепшн, переодевание и разминка на кортах.',
-  },
-  {
-    timing: 'За 10 минут',
-    title: 'Брифинг и жеребьёвка',
-    desc: 'Судья озвучивает регламент, распределяет корты и даёт старт первому туру.',
-  },
-  {
-    timing: 'Основное время',
-    title: 'Турнирные матчи',
-    desc: 'Серия динамичных встреч с ротацией и оперативным ведением счёта на табло.',
-  },
-  {
-    timing: 'Финал турнира',
-    title: 'Награждение и лаунж',
-    desc: 'Финальные розыгрыши, вручение призов и неформальное общение.',
-  },
-]
-
-export const includedPerks = [
-  {
-    icon: Sparkles,
-    title: 'Турнирные мячи',
-    desc: 'Профессиональные мячи Bullpadel на каждый сет.',
-  },
-  {
-    icon: Droplets,
-    title: 'Питьевая вода',
-    desc: 'Бутилированная и фильтрованная вода для участников.',
-  },
-  {
-    icon: ShowerHead,
-    title: 'Раздевалки и сауна',
-    desc: 'Просторные душевые, свежие полотенца и финская сауна.',
-  },
-  {
-    icon: Camera,
-    title: 'Судейство и фотоотчёт',
-    desc: 'Координатор сеток, хронометраж и памятные фотографии.',
-  },
-]
-
-export function getFaqItems(level: string, format: string) {
-  const isAmericano = format.toLowerCase().includes('americano')
-  return [
-    {
-      q: 'Нужен ли постоянный напарник для участия?',
-      a: isAmericano
-        ? 'Нет, в турнирах формата Americano напарник меняется каждый сет — вы играете в паре с разными участниками. В парных кубках вы можете заявиться готовой парой или мы поможем найти напарника вашего уровня.'
-        : 'Вы можете заявиться готовой парой. Если у вас пока нет партнёра, оставьте заявку — администратор турнира подберёт вам напарника соответствующего уровня игры.',
-    },
-    {
-      q: 'Какой уровень подготовки требуется?',
-      a: `Турнир рассчитан на уровень ${level}. Если вы сомневаетесь в своём уровне подготовки, свяжитесь с нами — дежурный тренер проведёт быструю оценку и подскажет комфортную группу.`,
-    },
-    {
-      q: 'Какая экипировка нужна для турнира?',
-      a: 'Обязательна спортивная обувь для падела или тенниса с немаркой подошвой (non-marking). Ракетку можно принести свою или бесплатно взять на тест-драйв модель Varlion в клубном про-шопе.',
-    },
-    {
-      q: 'Что делать, если планы изменились после регистрации?',
-      a: 'Пожалуйста, предупредите координатора не позднее чем за 24 часа до старта турнира для переноса участия.',
-    },
-  ]
-}
+const perkIcons = { Sparkles, Droplets, ShowerHead, Camera } as const
 
 const tournamentIcons = {
   PartyPopper,
@@ -261,156 +193,9 @@ function LevelGauge({ levelStr }: { levelStr: string }) {
   )
 }
 
-interface PrizeItem {
-  place: string
-  placeNum: string
-  title: string
-  reward: string
-  desc: string
-}
-
-function getPrizeDistribution(item: TournamentCatalogItem): PrizeItem[] {
-  const hasDistinctPrize =
-    Boolean(item.prize?.trim()) &&
-    !item.entryFee?.includes(item.prize.trim()) &&
-    item.prize.trim() !== item.entryFee.trim()
-
-  const isAmericano = item.format.toLowerCase().includes('americano')
-
-  if (isAmericano) {
-    return [
-      {
-        place: '1 МЕСТО',
-        placeNum: '01',
-        title: 'Победитель Americano',
-        reward: hasDistinctPrize ? item.prize : 'Золотой кубок + 15 000 ₽',
-        desc: 'Кубок клуба, памятная медаль и сертификат Bullpadel.',
-      },
-      {
-        place: '2 МЕСТО',
-        placeNum: '02',
-        title: 'Серебряный призёр',
-        reward: 'Серебряная медаль + 10 000 ₽',
-        desc: 'Клубный мерч и комплект турнирных мячей Bullpadel Gold.',
-      },
-      {
-        place: '3 МЕСТО',
-        placeNum: '03',
-        title: 'Бронзовый призёр',
-        reward: 'Бронзовая медаль + 5 000 ₽',
-        desc: 'Сертификат в клубное кафе и памятный сувенир турнира.',
-      },
-    ]
-  }
-
-  return [
-    {
-      place: '1 МЕСТО',
-      placeNum: '01',
-      title: 'Чемпионы турнира',
-      reward: hasDistinctPrize ? item.prize : 'Кубок чемпионов + 50 000 ₽',
-      desc: 'Главный кубок соревнований, золотые медали и ценные призы.',
-    },
-    {
-      place: '2 МЕСТО',
-      placeNum: '02',
-      title: 'Финалисты кубка',
-      reward: 'Серебряные медали + 25 000 ₽',
-      desc: 'Серебряные медали и сертификаты на тренировки в клубе.',
-    },
-    {
-      place: '3 МЕСТО',
-      placeNum: '03',
-      title: 'Призёры кубка',
-      reward: 'Бронзовые медали + 15 000 ₽',
-      desc: 'Бронзовые медали турнира и фирменные аксессуары.',
-    },
-  ]
-}
-
-interface ParticipantItem {
-  id: string
-  name: string
-  isPair?: boolean
-  player1?: string
-  player2?: string
-  level: string
-  status: 'confirmed' | 'waitlist'
-}
-
-function getParticipants(item: TournamentCatalogItem): ParticipantItem[] {
-  const isAmericano = item.format.toLowerCase().includes('americano')
-
-  if (isAmericano) {
-    return [
-      { id: '1', name: 'Максим Воронов', level: item.level, status: 'confirmed' },
-      { id: '2', name: 'Анна Кузнецова', level: item.level, status: 'confirmed' },
-      { id: '3', name: 'Денис Соколов', level: item.level, status: 'confirmed' },
-      { id: '4', name: 'Екатерина Морозова', level: item.level, status: 'confirmed' },
-      { id: '5', name: 'Артём Лебедев', level: item.level, status: 'confirmed' },
-      { id: '6', name: 'Полина Новикова', level: item.level, status: 'confirmed' },
-      { id: '7', name: 'Михаил Белов', level: item.level, status: 'confirmed' },
-      { id: '8', name: 'София Павлова', level: item.level, status: 'confirmed' },
-      { id: '9', name: 'Роман Орлов', level: item.level, status: 'confirmed' },
-      { id: '10', name: 'Дарья Смирнова', level: item.level, status: 'confirmed' },
-      { id: '11', name: 'Кирилл Фёдоров', level: item.level, status: 'confirmed' },
-      { id: '12', name: 'Елена Попова', level: item.level, status: 'confirmed' },
-    ]
-  }
-
-  return [
-    { id: '1', name: 'Воронов М. / Кузнецов А.', isPair: true, player1: 'М. Воронов', player2: 'А. Кузнецов', level: item.level, status: 'confirmed' },
-    { id: '2', name: 'Соколов Д. / Васильев И.', isPair: true, player1: 'Д. Соколов', player2: 'И. Васильев', level: item.level, status: 'confirmed' },
-    { id: '3', name: 'Лебедев А. / Фёдоров К.', isPair: true, player1: 'А. Лебедев', player2: 'К. Фёдоров', level: item.level, status: 'confirmed' },
-    { id: '4', name: 'Орлов Р. / Медведев С.', isPair: true, player1: 'Р. Орлов', player2: 'С. Медведев', level: item.level, status: 'confirmed' },
-    { id: '5', name: 'Белов М. / Новиков П.', isPair: true, player1: 'М. Белов', player2: 'П. Новиков', level: item.level, status: 'confirmed' },
-    { id: '6', name: 'Морозов Е. / Ильин О.', isPair: true, player1: 'Е. Морозов', player2: 'О. Ильин', level: item.level, status: 'confirmed' },
-  ]
-}
-
-interface StandingItem {
-  rank: number
-  name: string
-  isPair?: boolean
-  player1?: string
-  player2?: string
-  matches: number
-  points: number
-  diff: string
-  award?: string
-}
-
-function getStandings(item: TournamentCatalogItem): StandingItem[] {
-  const isAmericano = item.format.toLowerCase().includes('americano')
-
-  if (isAmericano) {
-    return [
-      { rank: 1, name: 'Максим Воронов', matches: 7, points: 142, diff: '+38', award: 'Золотой кубок' },
-      { rank: 2, name: 'Екатерина Морозова', matches: 7, points: 136, diff: '+26', award: 'Серебряный призёр' },
-      { rank: 3, name: 'Артём Лебедев', matches: 7, points: 131, diff: '+18', award: 'Бронзовый призёр' },
-      { rank: 4, name: 'Анна Кузнецова', matches: 7, points: 125, diff: '+12' },
-      { rank: 5, name: 'Михаил Белов', matches: 7, points: 119, diff: '+4' },
-      { rank: 6, name: 'Полина Новикова', matches: 7, points: 114, diff: '-2' },
-      { rank: 7, name: 'Денис Соколов', matches: 7, points: 108, diff: '-14' },
-      { rank: 8, name: 'София Павлова', matches: 7, points: 102, diff: '-22' },
-      { rank: 9, name: 'Роман Орлов', matches: 7, points: 98, diff: '-28' },
-      { rank: 10, name: 'Дарья Смирнова', matches: 7, points: 94, diff: '-32' },
-    ]
-  }
-
-  return [
-    { rank: 1, name: 'Воронов М. / Кузнецов А.', isPair: true, player1: 'М. Воронов', player2: 'А. Кузнецов', matches: 5, points: 15, diff: '+24', award: 'Чемпионы' },
-    { rank: 2, name: 'Соколов Д. / Васильев И.', isPair: true, player1: 'Д. Соколов', player2: 'И. Васильев', matches: 5, points: 12, diff: '+16', award: 'Финалисты' },
-    { rank: 3, name: 'Лебедев А. / Фёдоров К.', isPair: true, player1: 'А. Лебедев', player2: 'К. Фёдоров', matches: 5, points: 9, diff: '+8', award: '3-е место' },
-    { rank: 4, name: 'Орлов Р. / Медведев С.', isPair: true, player1: 'Р. Орлов', player2: 'С. Медведев', matches: 5, points: 6, diff: '-4' },
-    { rank: 5, name: 'Белов М. / Новиков П.', isPair: true, player1: 'М. Белов', player2: 'П. Новиков', matches: 5, points: 3, diff: '-18' },
-  ]
-}
-
 export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
   const completed = dto.item.lifecycle === 'finished' || dto.item.lifecycle === 'cancelled'
   const sourcePage = `/tournaments/${dto.item.slug}`
-  const isAmericano = dto.item.format.toLowerCase().includes('americano')
 
   const Icon = tournamentIcons[dto.item.icon as keyof typeof tournamentIcons] || Trophy
 
@@ -443,22 +228,26 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
     return () => ctx.revert()
   }, [activeTab])
 
-  const hasDistinctPrize =
-    Boolean(dto.item.prize?.trim()) &&
-    !dto.item.entryFee?.includes(dto.item.prize.trim()) &&
-    dto.item.prize.trim() !== dto.item.entryFee.trim()
-
-  const checklist = [
-    'Приезжайте за 15–30 минут до начала для спокойной разминки и жеребьёвки.',
-    'Возьмите спортивную обувь с немаркой подошвой (non-marking).',
-    'Ракетку можно принести свою или взять на тест-драйв в про-шопе.',
-  ]
-
-  const faqItems = getFaqItems(dto.item.level, dto.item.format)
-  const prizes = getPrizeDistribution(dto.item)
-  const participants = getParticipants(dto.item)
-  const standings = getStandings(dto.item)
-  const totalSlots = isAmericano ? 16 : 8
+  const checklist = dto.item.checklist.map(({ text }) => text)
+  const faqItems = dto.item.faqs.map(({ question: q, answer: a }) => ({ q, a }))
+  const prizes = dto.item.prizes.map(({ place, title, reward, description: desc }) => ({ place: `${place} МЕСТО`, title, reward, desc }))
+  const participants = dto.item.participants.map((participant) => ({
+    ...participant,
+    isPair: dto.item.participantMode === 'pairs',
+    player1: participant.name,
+    player2: participant.partnerName,
+    level: participant.level || dto.item.levelLabel,
+  }))
+  const standings = dto.item.standings.map((standing) => ({
+    ...standing,
+    isPair: dto.item.participantMode === 'pairs',
+    player1: standing.name,
+    player2: standing.partnerName,
+    diff: standing.difference,
+  }))
+  const includedPerks = dto.item.perks
+  const matchdaySteps = dto.item.matchday
+  const totalSlots = dto.item.totalSlots
   const availableSlots = Math.max(0, totalSlots - participants.length)
 
   // Внутренний контент Hero Left визитки
@@ -523,7 +312,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
         </div>
 
         <div className="se-2 bg-black/35 backdrop-blur-sm p-3 border-0">
-          <LevelGauge levelStr={dto.item.level} />
+          <LevelGauge levelStr={dto.item.levelLabel} />
         </div>
       </div>
     </div>
@@ -593,7 +382,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                     </dt>
                     <dd className="mt-1">
                       <span className="type-body-sm font-semibold text-ink block leading-snug">
-                        {typograph(dto.item.format)}
+                        {typograph(dto.item.formatLabel)}
                       </span>
                     </dd>
                   </div>
@@ -613,11 +402,11 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                   <div className="flex flex-col">
                     <dt className="type-micro font-medium uppercase tracking-wider text-ink-muted flex items-center gap-1.5">
                       <Award size={14} className="text-ink-muted" />
-                      {typograph(hasDistinctPrize ? dto.item.prizeLabel : 'Призовой фонд')}
+                      {typograph(dto.item.prizeLabel)}
                     </dt>
                     <dd className="mt-1">
                       <span className="type-body-sm font-semibold text-ink block leading-snug">
-                        {typograph(hasDistinctPrize ? dto.item.prize : 'Кубки и клубные призы')}
+                        {typograph(dto.item.prize)}
                       </span>
                     </dd>
                   </div>
@@ -628,20 +417,22 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
               <div className="pt-5 border-t border-ink/10 flex flex-wrap items-center justify-between gap-3 text-ink-soft type-caption mt-6">
                 <span className="text-ink-muted font-medium">Вопросы координатору:</span>
                 <div className="flex items-center gap-4">
-                  <a
-                    href="https://t.me/unlimpadel"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1.5 font-medium text-ink hover:text-ink/70 transition-colors"
-                  >
-                    <Send size={13} /> Telegram
-                  </a>
-                  {dto.site.contacts?.phoneDisplay && (
+                  {dto.item.coordinator.telegramURL && (
                     <a
-                      href={`tel:${dto.site.contacts.phoneValue}`}
+                      href={dto.item.coordinator.telegramURL}
+                      target="_blank"
+                      rel="noreferrer"
                       className="inline-flex items-center gap-1.5 font-medium text-ink hover:text-ink/70 transition-colors"
                     >
-                      <Phone size={13} /> {dto.site.contacts.phoneDisplay}
+                      <Send size={13} /> {dto.item.coordinator.telegramLabel || 'Telegram'}
+                    </a>
+                  )}
+                  {dto.item.coordinator.phoneDisplay && dto.item.coordinator.phoneValue && (
+                    <a
+                      href={`tel:${dto.item.coordinator.phoneValue}`}
+                      className="inline-flex items-center gap-1.5 font-medium text-ink hover:text-ink/70 transition-colors"
+                    >
+                      <Phone size={13} /> {dto.item.coordinator.phoneDisplay}
                     </a>
                   )}
                 </div>
@@ -727,7 +518,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                               {player.player2}
                             </div>
                             <p className="type-micro text-ink-soft mt-0.5">
-                              Пара · Уровень {player.level}
+                              Пара · Уровень {player.level}{player.status === 'waitlist' ? ' · Лист ожидания' : ''}
                             </p>
                           </div>
                         ) : (
@@ -736,7 +527,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                               {typograph(player.name)}
                             </p>
                             <p className="type-micro text-ink-soft mt-0.5">
-                              Игрок · Уровень {player.level}
+                              Игрок · Уровень {player.level}{player.status === 'waitlist' ? ' · Лист ожидания' : ''}
                             </p>
                           </div>
                         )}
@@ -794,14 +585,6 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
 
             {/* ТАБ 2: Итоги (Топ-3 в одну строку на ПК [_][_][_] + список) */}
             <div id="tab-standings" className={activeTab === 'standings' ? 'block' : 'hidden'} role="tabpanel">
-              <p className="type-caption text-ink-soft mb-3 sm:mb-4">
-                {typograph(
-                  isAmericano
-                    ? 'Система Americano: начисление очков по сумме всех выигранных геймов в сыгранных турах.'
-                    : 'Итоговые результаты турнира по сумме побед и разнице выигранных геймов.'
-                )}
-              </p>
-
               {/* Топ-3 призёра крупно в одну строку [_][_][_] на ПК */}
               <div className="hidden sm:grid sm:grid-cols-3 gap-4 mb-6">
                 {standings.slice(0, 3).map((st) => {
@@ -1085,24 +868,18 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
               />
               <div className="flex flex-col">
                 {/* 1. Регламент турнира */}
-                <AnimatedAccordionItem
-                  ariaLabel="Регламент турнира"
-                  title="Регламент турнира"
-                  icon={<FileText size={16} className="text-ink-muted shrink-0" />}
-                >
-                  {dto.item.regulationHTML ? (
+                {dto.item.regulationHTML && (
+                  <AnimatedAccordionItem
+                    ariaLabel="Регламент турнира"
+                    title="Регламент турнира"
+                    icon={<FileText size={16} className="text-ink-muted shrink-0" />}
+                  >
                     <div
                       className="type-body-sm text-ink-soft leading-relaxed [&>p]:mb-3 [&>ul]:mb-3 [&>ul]:list-disc [&>ul]:pl-5 [&>ol]:mb-3 [&>ol]:list-decimal [&>ol]:pl-5 [&>*:last-child]:mb-0"
                       dangerouslySetInnerHTML={{ __html: typograph(dto.item.regulationHTML) }}
                     />
-                  ) : (
-                    <p className="type-body-sm text-ink-soft">
-                      {typograph(
-                        'Регламент соревнований публикуется судейской коллегией перед началом турнира.'
-                      )}
-                    </p>
-                  )}
-                </AnimatedAccordionItem>
+                  </AnimatedAccordionItem>
+                )}
 
                 {/* 2. Перед выходом на корт */}
                 <AnimatedAccordionItem
@@ -1128,7 +905,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                 >
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     {includedPerks.map((perk) => {
-                      const PerkIcon = perk.icon
+                      const PerkIcon = perkIcons[perk.icon]
                       return (
                         <div key={perk.title} className="flex items-start gap-2.5">
                           <span className="se-1 flex h-7 w-7 shrink-0 items-center justify-center bg-surface-muted text-ink mt-0.5">
@@ -1139,7 +916,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                               {typograph(perk.title)}
                             </span>
                             <span className="type-micro text-ink-soft mt-0.5 block leading-snug">
-                              {typograph(perk.desc)}
+                              {typograph(perk.description)}
                             </span>
                           </div>
                         </div>
@@ -1163,7 +940,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                           </span>
                         </div>
                         <p className="type-caption mt-0.5 text-ink-soft leading-relaxed">
-                          {typograph(step.desc)}
+                          {typograph(step.description)}
                         </p>
                       </div>
                     ))}

@@ -33,6 +33,7 @@ import { SiteSettings } from './globals/SiteSettings'
 import { BlogPage } from './globals/BlogPage'
 import { CoachesPage } from './globals/CoachesPage'
 import { TournamentsPage } from './globals/TournamentsPage'
+import { TournamentDefaults } from './globals/TournamentDefaults'
 import { AboutPage, ContactsPage, CourtsPage, GalleryPage, GiftPage, OfertaPage, PadelCourtZakazPage, PolicyPage, PricesPage, TrainingPage } from './globals/ThematicPages'
 import { migrations } from './migrations'
 
@@ -109,6 +110,7 @@ export default buildConfig({
   editor: lexicalEditor(),
   globals: [
     SiteSettings,
+    TournamentDefaults,
     ...[HomePage, BlogPage, CoachesPage, TournamentsPage, PricesPage, TrainingPage, GiftPage, CourtsPage, PadelCourtZakazPage, GalleryPage, AboutPage, ContactsPage, PolicyPage, OfertaPage]
       .map((global) => ({ ...global, admin: { ...global.admin, group: 'Контент' } })),
   ],

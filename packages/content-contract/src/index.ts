@@ -1,4 +1,4 @@
-export const homepageDTOversion = 10 as const
+export const homepageDTOversion = 11 as const
 
 export const publicRouteRegistry = [
   { path: '/', parent: null, template: 'homepage', globalSlug: 'homepage' },
@@ -68,6 +68,38 @@ export type ActionDTO = {
   mode: 'none' | 'booking' | 'trial-booking' | 'internal-link' | 'external-link' | 'phone' | 'email' | 'lead-form'
 }
 
+export type TournamentFormat = 'americano' | 'groups-knockout' | 'round-robin-playoff' | 'other'
+export type TournamentParticipantMode = 'players' | 'pairs'
+export type TournamentParticipantDTO = { id: string; name: string; partnerName?: string | null; level?: string | null; status: 'confirmed' | 'waitlist' }
+export type TournamentStandingDTO = { id: string; rank: number; name: string; partnerName?: string | null; matches: number; points: number; difference: string; award?: string | null }
+export type TournamentPrizeDTO = { id: string; place: number; title: string; reward: string; description: string }
+export type TournamentChecklistDTO = { id: string; text: string }
+export type TournamentPerkDTO = { id: string; icon: 'Sparkles' | 'Droplets' | 'ShowerHead' | 'Camera'; title: string; description: string }
+export type TournamentMatchdayDTO = { id: string; timing: string; title: string; description: string }
+export type TournamentFaqDTO = { id: string; question: string; answer: string }
+export type TournamentCardDTO = {
+  id: string
+  slug: string
+  visualStyle: 'image' | 'mesh'
+  image?: MediaDTO | null
+  imageOverlay?: string | null
+  meshStyle?: string | null
+  levelFrom: number
+  levelTo: number
+  levelLabel: string
+  icon: 'PartyPopper' | 'Trophy' | 'Medal'
+  title: string
+  startsAt: string
+  endsAt: string
+  scheduleLabel: string
+  format: TournamentFormat
+  formatLabel: string
+  entryFee: string
+  description: string
+  prizeLabel: string
+  prize: string
+}
+
 export type HomeSectionKey =
   | 'hero' | 'benefits' | 'offers' | 'courts' | 'pricing' | 'coaches'
   | 'methodist-banner' | 'tournaments' | 'gallery' | 'blog' | 'reviews-faq'
@@ -122,7 +154,7 @@ export type HomepageDTO = {
   }
   entities: {
     coaches: Array<{ id: string; name: string; slug: string; photo: MediaDTO; specialization: string; bio: string; level: string; experience: string; languages: string; rating: number; reviewsCount: number; certificates: string[]; priceFrom: number; action: ActionDTO }>
-    tournaments: Array<{ id: string; slug: string; visualStyle: 'image' | 'mesh'; image?: MediaDTO | null; imageOverlay?: string | null; meshStyle?: string | null; level: string; icon: 'PartyPopper' | 'Trophy' | 'Medal'; title: string; scheduleLabel: string; format: string; entryFee: string; description: string; prizeLabel: string; prize: string }>
+    tournaments: TournamentCardDTO[]
     articles: Array<{ id: string; slug: string; image: MediaDTO; category: string; readingTimeMinutes: number; title: string; excerpt: string }>
     articleRows: Array<{ id: string; slug: string; title: string; excerpt: string }>
     courts: Array<{ id: string; slug: string; title: string; eyebrow?: string | null; description?: string | null; cardVariant: 'panoramic' | 'metrics' | 'damping' | 'surface'; metrics?: Array<{ value: string; label: string; icon: 'PanelTop' | 'Lightbulb' | 'Activity' | 'Layers3' }> | null }>
@@ -140,7 +172,21 @@ export type PageSEO = HomepageDTO['seo']
 export type CatalogPageHeader = { eyebrow: string; title: string; intro: string; hero: PageHeroDTO; seo: PageSEO }
 export type ArticleCatalogItem = Omit<HomepageDTO['entities']['articles'][number], 'category'> & { category: { slug: string; title: string }; publishedAt: string; popularityScore: number }
 export type CoachCatalogItem = HomepageDTO['entities']['coaches'][number] & { levels: string[]; focusAreas: string[]; languageCodes: string[] }
-export type TournamentCatalogItem = HomepageDTO['entities']['tournaments'][number] & { action: ActionDTO; lifecycle: 'upcoming' | 'active' | 'finished' | 'cancelled'; levelKey: string; formatKey: string; regulationHTML: string }
+export type TournamentCatalogItem = TournamentCardDTO & {
+  action: ActionDTO
+  lifecycle: 'upcoming' | 'active' | 'finished' | 'cancelled'
+  participantMode: TournamentParticipantMode
+  totalSlots: number
+  participants: TournamentParticipantDTO[]
+  standings: TournamentStandingDTO[]
+  prizes: TournamentPrizeDTO[]
+  checklist: TournamentChecklistDTO[]
+  perks: TournamentPerkDTO[]
+  matchday: TournamentMatchdayDTO[]
+  faqs: TournamentFaqDTO[]
+  coordinator: { telegramLabel?: string | null; telegramURL?: string | null; phoneDisplay?: string | null; phoneValue?: string | null }
+  regulationHTML: string
+}
 
 type CatalogBase = { version: typeof homepageDTOversion; preview: boolean; generatedAt: string; page: CatalogPageHeader; site: SiteDTO }
 export type BlogCatalogDTO = CatalogBase & { kind: 'blog'; items: ArticleCatalogItem[]; categories: Array<{ slug: string; title: string }> }

@@ -19,8 +19,6 @@ const selectClass = 'ui-select se-2 h-[var(--control-md)] bg-white px-4 type-ui 
 function FilterLabel({ label, children }: { label: string; children: ReactNode }) { return <label className="type-caption flex min-w-0 flex-col gap-2"><span className="sr-only">{label}</span>{children}</label> }
 const levelLabels: Record<string, string> = { beginner: 'Новички', intermediate: 'Продолжающие', medium: 'Средний уровень', tournament: 'Турнирный уровень', kids: 'Дети', all: 'Любой уровень' }
 const focusLabels: Record<string, string> = { technique: 'Техника', 'pair-tactics': 'Тактика пары', 'tournament-prep': 'Турнирная подготовка', kids: 'Детские группы', fitness: 'Физическая подготовка', 'beginner-start': 'Старт с нуля', groups: 'Групповые тренировки', women: 'Женские группы' }
-const formatLabels: Record<string, string> = { americano: 'Americano', 'groups-knockout': 'Группы + олимпийская сетка', 'round-robin-playoff': 'Round Robin + плей-офф', other: 'Другой' }
-
 function BlogCatalog({ dto }: { dto: BlogCatalogDTO }) {
   const [category, setCategory] = useState('__all')
   const [sort, setSort] = useState<'newest' | 'popular'>('newest')
@@ -43,10 +41,19 @@ function TournamentsCatalog({ dto }: { dto: TournamentsCatalogDTO }) {
   const [lifecycle, setLifecycle] = useState('__all')
   const [level, setLevel] = useState('__all')
   const [format, setFormat] = useState('__all')
-  const items = dto.items.filter((item) => (lifecycle === '__all' || item.lifecycle === lifecycle) && (level === '__all' || item.levelKey === level) && (format === '__all' || item.formatKey === format))
-  const levels = [...new Set(dto.items.map((item) => item.levelKey))]
-  const formats = [...new Set(dto.items.map((item) => item.formatKey))]
-  return <><Header page={dto.page} /><section className="container-page pb-8 pt-8 md:pb-12 md:pt-8"><div data-page-enter="content" style={entranceDelay(160)} className="mb-8 grid grid-cols-3 gap-2 sm:gap-3"><FilterLabel label="Состояние"><Select className={`${selectClass} w-full min-w-0`} value={lifecycle} onChange={setLifecycle} options={[{ value: '__all', label: 'Все турниры' }, { value: 'upcoming', label: 'Предстоящие' }, { value: 'active', label: 'Идут сейчас' }, { value: 'finished', label: 'Завершённые' }, { value: 'cancelled', label: 'Отменённые' }]} aria-label="Состояние" /></FilterLabel><FilterLabel label="Уровень игроков"><Select className={`${selectClass} w-full min-w-0`} value={level} onChange={setLevel} options={[{ value: '__all', label: 'Все уровни' }, ...levels.map((value) => ({ value, label: value }))]} aria-label="Уровень игроков" /></FilterLabel><FilterLabel label="Формат"><Select className={`${selectClass} w-full min-w-0`} value={format} onChange={setFormat} options={[{ value: '__all', label: 'Все форматы' }, ...formats.map((value) => ({ value, label: formatLabels[value] ?? value }))]} aria-label="Формат" /></FilterLabel></div><div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">{items.map((item, index) => <div key={item.id} data-page-enter="content" style={entranceDelay(220 + Math.min(index, 5) * 60)} className="h-full"><div className={`h-full ${item.lifecycle === 'finished' || item.lifecycle === 'cancelled' ? 'grayscale opacity-55' : ''}`}><TournamentCard tournament={item} /></div></div>)}</div>{items.length === 0 && <p role="status">Турниров с такими параметрами нет.</p>}</section></>
+  const items = dto.items.filter((item) => {
+    const selectedLevel = Number(level)
+    return (lifecycle === '__all' || item.lifecycle === lifecycle)
+      && (level === '__all' || selectedLevel >= item.levelFrom && selectedLevel <= item.levelTo)
+      && (format === '__all' || item.format === format)
+  })
+  const levels = [...new Set(dto.items.flatMap((item) => {
+    const values: string[] = []
+    for (let value = item.levelFrom; value <= item.levelTo; value += 0.5) values.push(value.toFixed(1))
+    return values
+  }))].sort((a, b) => Number(a) - Number(b))
+  const formats = [...new Map(dto.items.map((item) => [item.format, item.formatLabel])).entries()]
+  return <><Header page={dto.page} /><section className="container-page pb-8 pt-8 md:pb-12 md:pt-8"><div data-page-enter="content" style={entranceDelay(160)} className="mb-8 grid grid-cols-3 gap-2 sm:gap-3"><FilterLabel label="Состояние"><Select className={`${selectClass} w-full min-w-0`} value={lifecycle} onChange={setLifecycle} options={[{ value: '__all', label: 'Все турниры' }, { value: 'upcoming', label: 'Предстоящие' }, { value: 'active', label: 'Идут сейчас' }, { value: 'finished', label: 'Завершённые' }, { value: 'cancelled', label: 'Отменённые' }]} aria-label="Состояние" /></FilterLabel><FilterLabel label="Уровень игроков"><Select className={`${selectClass} w-full min-w-0`} value={level} onChange={setLevel} options={[{ value: '__all', label: 'Все уровни' }, ...levels.map((value) => ({ value, label: value }))]} aria-label="Уровень игроков" /></FilterLabel><FilterLabel label="Формат"><Select className={`${selectClass} w-full min-w-0`} value={format} onChange={setFormat} options={[{ value: '__all', label: 'Все форматы' }, ...formats.map(([value, label]) => ({ value, label }))]} aria-label="Формат" /></FilterLabel></div><div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">{items.map((item, index) => <div key={item.id} data-page-enter="content" style={entranceDelay(220 + Math.min(index, 5) * 60)} className="h-full"><div className={`h-full ${item.lifecycle === 'finished' || item.lifecycle === 'cancelled' ? 'grayscale opacity-55' : ''}`}><TournamentCard tournament={item} /></div></div>)}</div>{items.length === 0 && <p role="status">Турниров с такими параметрами нет.</p>}</section></>
 }
 
 export function CatalogPage({ dto }: { dto: CatalogDTO }) {

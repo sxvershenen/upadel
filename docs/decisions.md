@@ -65,6 +65,7 @@ CMS users and SEO redirects are also managed from dedicated tabs inside `Нас�
 
 - `/coaches`: filtered catalog, quick profile, then `/coaches/[slug]` detail.
 - `/tournaments`: filtered catalog and `/tournaments/[slug]` detail rendered with a compact Swiss-style layout (non-fullscreen branded hero on image or mesh gradient with live status badge, 1.0–7.0 level visual gauge and single CTA button; 4-metric tournament passport dl without duplicate address/buttons; 3-tab competition module with participants grid, pair visualization, responsive standings without horizontal scroll, and prize distribution by places; 2-column lower section with left collapsible details for regulations, pre-court checklist, included perks, matchday timeline, and right FAQ accordion; and related tournaments). Tournament filtering uses player levels `1.0–7.0`; cards foreground the tournament format and keep the player level in metadata.
+- Tournament editing uses tabs for core data, card presentation, participants, sortable manual standings, prizes/fees, FAQ, regulations/rules and SEO. A result row's array order is its place; points never reorder it. Format is one canonical select (plus a custom label only for `other`), and player level is a `from`/`to` range.
 - `/blog`: catalog and `/blog/[slug]` article.
 - Courts, prices, training and about remain single thematic pages; `/contacts` redirects to `/about`, while shared contact details stay in the footer and site settings.
 

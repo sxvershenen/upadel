@@ -40,6 +40,7 @@ Article bodies use a collection-specific Payload Lexical editor with H2–H4, fi
 
 - Coaches, tournaments and articles are created once in their collections. Detail/catalog pages and homepage cards read the same record.
 - Coaches and tournaments use homepage visibility/order fields; the homepage never stores copied card content.
+- Tournament schedule labels are derived from required `startsAt`/`endsAt` values in Moscow time. Participants, manual result order, prizes, coordinator overrides, FAQ and regulations are collection-owned; reusable pre-court, included, matchday and FAQ content resolves from the published `tournament-defaults` global while inheritance is enabled.
 - The blog homepage resolves three slots: explicitly pinned articles first, then newest published articles for empty slots. Preview images come from the article record.
 - Unpublishing or deleting an entity removes it from every consumer; references must not leave copied stale content.
 

@@ -8,6 +8,7 @@ import { getPayload, type CollectionSlug, type Payload } from 'payload'
 import config from './payload.config'
 import { mergeRequiredNavigation, navigationChanged, normalizeDesktopNavigation, priceNavigationChildren, requiredPageLinks } from './content/requiredNavigation'
 import { padelCourtZakazSeed } from './content/padelCourtZakazSeed'
+import { tournamentDefaultContent } from './globals/TournamentDefaults'
 
 const seedVersion = 'prototype-v2'
 const dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -1039,41 +1040,87 @@ async function seed() {
       })
     }
 
+    const currentTournamentDefaults = await payload.findGlobal({ slug: 'tournament-defaults', draft: true, depth: 0, overrideAccess: true, showHiddenFields: true } as never) as unknown as Record<string, unknown>
+    if (currentTournamentDefaults.seedVersion === seedVersion) stats.skipped += 1
+    else {
+      assertGlobalCanBeSeeded('tournament-defaults', currentTournamentDefaults)
+      await payload.updateGlobal({ slug: 'tournament-defaults', draft: false, overrideAccess: true, data: { ...tournamentDefaultContent, seedVersion, _status: 'published' } as never })
+      stats.globalsPublished += 1
+    }
+
+    const americanoPlayers = ['Максим Воронов', 'Анна Кузнецова', 'Денис Соколов', 'Екатерина Морозова', 'Артём Лебедев', 'Полина Новикова', 'Михаил Белов', 'София Павлова', 'Роман Орлов', 'Дарья Смирнова', 'Кирилл Фёдоров', 'Елена Попова']
+    const americanoParticipants = americanoPlayers.map((name) => ({ name, level: '2.0', status: 'confirmed' }))
+    const americanoStandings = [
+      ['Максим Воронов', 142, '+38', 'Золотой кубок'], ['Екатерина Морозова', 136, '+26', 'Серебряный призёр'],
+      ['Артём Лебедев', 131, '+18', 'Бронзовый призёр'], ['Анна Кузнецова', 125, '+12', null],
+      ['Михаил Белов', 119, '+4', null], ['Полина Новикова', 114, '-2', null], ['Денис Соколов', 108, '-14', null],
+      ['София Павлова', 102, '-22', null], ['Роман Орлов', 98, '-28', null], ['Дарья Смирнова', 94, '-32', null],
+    ].map(([name, points, difference, award]) => ({ name, matches: 7, points, difference, award }))
+    const pairs = [
+      ['М. Воронов', 'А. Кузнецов'], ['Д. Соколов', 'И. Васильев'], ['А. Лебедев', 'К. Фёдоров'],
+      ['Р. Орлов', 'С. Медведев'], ['М. Белов', 'П. Новиков'], ['Е. Морозов', 'О. Ильин'],
+    ]
+    const pairParticipants = pairs.map(([name, partnerName]) => ({ name, partnerName, level: '4.0', status: 'confirmed' }))
+    const pairStandings = pairs.slice(0, 5).map(([name, partnerName], index) => ({
+      name, partnerName, matches: 5, points: 15 - index * 3, difference: ['+24', '+16', '+8', '-4', '-18'][index], award: ['Чемпионы', 'Финалисты', '3-е место'][index] ?? null,
+    }))
     const tournaments = [
       {
-        slug: 'americano', title: 'Game Party / Americano', category: 'Клубная пятница', level: '2.0', lifecycle: 'active',
-        scheduleLabel: 'Каждую пятницу · 19:30–22:30', format: 'Americano (смена напарников каждый сет)',
+        slug: 'americano', title: 'Game Party / Americano', lifecycle: 'active', startsAt: '2026-09-20T16:30:00.000Z', endsAt: '2026-09-20T19:30:00.000Z',
+        levelFrom: '2.0', levelTo: '2.0', format: 'americano', participantMode: 'players', totalSlots: 16, participants: americanoParticipants, standings: americanoStandings,
         entryFee: '2 500 ₽ / участник', description: 'Самый душевный формат для знакомства с игроками клуба. Музыкальный сет, питьевая вода и динамичные матчи.',
         prizeLabel: 'Стоимость за участника', prize: '2 500 ₽', visualStyle: 'image', image: mediaID(images.tournamentParty),
+        prizes: [
+          { title: 'Победитель Americano', reward: 'Золотой кубок + 15 000 ₽', description: 'Кубок клуба, памятная медаль и сертификат Bullpadel.' },
+          { title: 'Серебряный призёр', reward: 'Серебряная медаль + 10 000 ₽', description: 'Клубный мерч и комплект турнирных мячей Bullpadel Gold.' },
+          { title: 'Бронзовый призёр', reward: 'Бронзовая медаль + 5 000 ₽', description: 'Сертификат в клубное кафе и памятный сувенир турнира.' },
+        ],
         imageOverlay: 'overlay-dark', icon: 'PartyPopper', regulation: richText('Регистрация закрывается за 2 часа до начала. Формат — Americano со сменой напарников каждый сет. На матч приезжайте за 15 минут до старта.'),
       },
       {
-        slug: 'open-league', title: 'Unlim Riga Masters Cup', category: 'Мужская Лига (B/C)', level: '4.0', lifecycle: 'finished',
-        scheduleLabel: 'Суббота, 14 марта · 11:00–17:00', format: 'Групповой этап + Олимпийская сетка',
+        slug: 'open-league', title: 'Unlim Riga Masters Cup', lifecycle: 'finished', startsAt: '2026-03-14T08:00:00.000Z', endsAt: '2026-03-14T14:00:00.000Z',
+        levelFrom: '4.0', levelTo: '4.0', format: 'groups-knockout', participantMode: 'pairs', totalSlots: 8, participants: pairParticipants, standings: pairStandings,
         entryFee: 'Взнос: 4 500 ₽ / пара', description: 'Рейтинговый кубок для опытных пар с розыгрышем клубных призов, кубков и медалей от наших партнеров Bullpadel.',
-        prizeLabel: 'Призовой фонд', prize: '80 000 ₽', visualStyle: 'mesh', meshStyle: 'deep-blue', icon: 'Trophy', regulation: richText('Участники играют групповой этап, затем проходят в олимпийскую сетку. Пара должна быть на месте за 30 минут до начала. Победитель определяется по сумме выигранных геймов.'),
+        prizeLabel: 'Призовой фонд', prize: '80 000 ₽', prizes: [
+          { title: 'Чемпионы турнира', reward: 'Кубок чемпионов + 50 000 ₽', description: 'Главный кубок соревнований, золотые медали и ценные призы.' },
+          { title: 'Финалисты кубка', reward: 'Серебряные медали + 25 000 ₽', description: 'Серебряные медали и сертификаты на тренировки в клубе.' },
+          { title: 'Призёры кубка', reward: 'Бронзовые медали + 15 000 ₽', description: 'Бронзовые медали турнира и фирменные аксессуары.' },
+        ], visualStyle: 'mesh', meshStyle: 'deep-blue', icon: 'Trophy', regulation: richText('Участники играют групповой этап, затем проходят в олимпийскую сетку. Пара должна быть на месте за 30 минут до начала. Победитель определяется по сумме выигранных геймов.'),
       },
       {
-        slug: 'junior-cup', title: "Women's Morning Cup", category: 'Женский Турнир (Open)', level: '2.0', lifecycle: 'finished',
-        scheduleLabel: 'Воскресенье, 15 марта · 10:30–15:30', format: 'Round Robin + Финальный плей-офф',
+        slug: 'junior-cup', title: "Women's Morning Cup", lifecycle: 'finished', startsAt: '2026-03-15T07:30:00.000Z', endsAt: '2026-03-15T12:30:00.000Z',
+        levelFrom: '2.0', levelTo: '2.0', format: 'round-robin-playoff', participantMode: 'pairs', totalSlots: 8, participants: [], standings: [],
         entryFee: 'Взнос: 3 500 ₽ / пара', description: 'Элегантный женский турнир в непринужденной атмосфере: игристое безалкогольное, подарки от бьюти-партнеров и памятные фото.',
-        prizeLabel: 'Призовой фонд', prize: '50 000 ₽', visualStyle: 'mesh', meshStyle: 'lavender', icon: 'Medal', regulation: richText('Формат Round Robin с финальным плей-офф. Все пары проходят общий групповой этап. Регистрация подтверждается после внесения взноса.'),
+        prizeLabel: 'Призовой фонд', prize: '50 000 ₽', prizes: [], visualStyle: 'mesh', meshStyle: 'lavender', icon: 'Medal', regulation: richText('Формат Round Robin с финальным плей-офф. Все пары проходят общий групповой этап. Регистрация подтверждается после внесения взноса.'),
       },
     ]
     for (const [index, tournament] of tournaments.entries()) {
       const facets = [
-        { categoryKey: 'club-game', level: '2.0', levelKey: '2.0', formatKey: 'americano', action: { label: 'Записаться', mode: 'booking' } },
-        { categoryKey: 'mens-league', level: '4.0', levelKey: '4.0', formatKey: 'groups-knockout', action: { label: 'Турнир завершён', mode: 'none' } },
-        { categoryKey: 'womens-open', level: '2.0', levelKey: '2.0', formatKey: 'round-robin-playoff', action: { label: 'Турнир завершён', mode: 'none' } },
+        { action: { label: 'Записаться', mode: 'booking' } },
+        { action: { label: 'Турнир завершён', mode: 'none' } },
+        { action: { label: 'Турнир завершён', mode: 'none' } },
       ][index]
       const seededTournament = await ensureSeeded(payload, 'tournaments', `prototype:tournament:${tournament.slug}`, {
         ...tournament,
         ...facets,
         showOnHomepage: true,
         homepageOrder: index + 1,
+        useClubCoordinatorContacts: true,
+        useDefaultChecklist: true,
+        useDefaultPerks: true,
+        useDefaultMatchday: true,
+        useDefaultFaq: true,
         seo: { robots: 'index-follow' },
       })
-      await fillMissingSeededFields(payload, 'tournaments', seededTournament.id, facets)
+      await fillMissingSeededFields(payload, 'tournaments', seededTournament.id, {
+        ...tournament,
+        ...facets,
+        useClubCoordinatorContacts: true,
+        useDefaultChecklist: true,
+        useDefaultPerks: true,
+        useDefaultMatchday: true,
+        useDefaultFaq: true,
+      })
       await fillMissingSeededFields(payload, 'tournaments', seededTournament.id, { regulation: tournament.regulation })
       await migrateSeededField(payload, 'tournaments', seededTournament.id, 'action', { label: null, mode: 'none', href: null }, facets.action)
       if (index > 0) await migrateSeededField(payload, 'tournaments', seededTournament.id, 'lifecycle', 'upcoming', 'finished')

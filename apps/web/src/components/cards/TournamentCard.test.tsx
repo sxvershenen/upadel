@@ -14,11 +14,16 @@ test('TournamentCard shows format in the top badge and player level in metadata'
     image: null,
     imageOverlay: null,
     meshStyle: 'deep-blue',
-    level: '2.0',
+    levelFrom: 2,
+    levelTo: 4,
+    levelLabel: '2.0–4.0',
     icon: 'Trophy',
     title: 'Game Party',
     scheduleLabel: 'Каждую пятницу',
-    format: 'Americano',
+    startsAt: '2026-09-20T16:30:00.000Z',
+    endsAt: '2026-09-20T19:30:00.000Z',
+    format: 'americano',
+    formatLabel: 'Americano',
     entryFee: '2 500 ₽',
     description: 'Описание турнира',
     prizeLabel: 'Призы',
@@ -26,5 +31,5 @@ test('TournamentCard shows format in the top badge and player level in metadata'
   }} />)
 
   assert.ok(html.indexOf('Americano') < html.indexOf('Game Party'))
-  assert.match(html, /Уровень 2\.0/)
+  assert.match(html, /Уровень 2\.0–4\.0/)
 })

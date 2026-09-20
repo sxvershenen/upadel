@@ -66,7 +66,7 @@ const mockSite = {
 }
 
 const mockTournamentDTO = {
-  version: 10,
+  version: 11,
   kind: 'tournaments',
   preview: false,
   generatedAt: new Date().toISOString(),
@@ -85,10 +85,17 @@ const mockTournamentDTO = {
     id: 't-americano',
     slug: 'americano',
     title: 'Game Party / Americano',
-    level: '2.0',
+    levelFrom: 2,
+    levelTo: 2,
+    levelLabel: '2.0',
     lifecycle: 'upcoming',
-    scheduleLabel: 'Каждую пятницу · 19:30–22:30',
-    format: 'Americano (смена напарников каждый сет)',
+    startsAt: '2026-09-20T16:30:00.000Z',
+    endsAt: '2026-09-20T19:30:00.000Z',
+    scheduleLabel: 'Воскресенье, 20 сентября · 19:30–22:30',
+    format: 'americano',
+    formatLabel: 'Americano (смена напарников каждый сет)',
+    participantMode: 'players',
+    totalSlots: 16,
     entryFee: '2 500 ₽ / участник',
     description: 'Самый душевный формат для знакомства с игроками клуба. Музыкальный сет, питьевая вода и динамичные матчи.',
     prizeLabel: 'Стоимость за участника',
@@ -97,8 +104,24 @@ const mockTournamentDTO = {
     image: { url: '/tournaments/party.webp', alt: 'Party', mimeType: 'image/webp' },
     icon: 'PartyPopper',
     regulationHTML: '<p>Регистрация закрывается за 2 часа до начала. Формат — Americano со сменой напарников каждый сет. На матч приезжайте за 15 минут до старта.</p>',
-    levelKey: '2.0',
-    formatKey: 'americano',
+    participants: ['Максим Воронов', 'Анна Кузнецова', 'Денис Соколов', 'Екатерина Морозова', 'Артём Лебедев', 'Полина Новикова', 'Михаил Белов', 'София Павлова', 'Роман Орлов', 'Дарья Смирнова', 'Кирилл Фёдоров', 'Елена Попова'].map((name, index) => ({ id: `p-${index}`, name, level: '2.0', status: 'confirmed' })),
+    standings: [
+      { id: 's-1', rank: 1, name: 'Максим Воронов', matches: 7, points: 142, difference: '+38', award: 'Золотой кубок' },
+      { id: 's-2', rank: 2, name: 'Екатерина Морозова', matches: 7, points: 136, difference: '+26', award: 'Серебряный призёр' },
+      { id: 's-3', rank: 3, name: 'Артём Лебедев', matches: 7, points: 131, difference: '+18', award: 'Бронзовый призёр' },
+      { id: 's-4', rank: 4, name: 'Анна Кузнецова', matches: 7, points: 125, difference: '+12' },
+      { id: 's-5', rank: 5, name: 'Михаил Белов', matches: 7, points: 119, difference: '+4' },
+    ],
+    prizes: [
+      { id: 'pr-1', place: 1, title: 'Победитель Americano', reward: 'Золотой кубок + 15 000 ₽', description: 'Кубок клуба и сертификат.' },
+      { id: 'pr-2', place: 2, title: 'Серебряный призёр', reward: 'Серебряная медаль + 10 000 ₽', description: 'Клубный мерч.' },
+      { id: 'pr-3', place: 3, title: 'Бронзовый призёр', reward: 'Бронзовая медаль + 5 000 ₽', description: 'Памятный подарок.' },
+    ],
+    checklist: [{ id: 'c-1', text: 'Приезжайте за 15–30 минут до начала.' }],
+    perks: [{ id: 'perk-1', icon: 'Droplets', title: 'Питьевая вода', description: 'Вода для участников.' }, { id: 'perk-2', icon: 'Sparkles', title: 'Турнирные мячи', description: 'Мячи на каждый сет.' }],
+    matchday: [{ id: 'm-1', timing: 'За 30 минут', title: 'Сбор и разминка', description: 'Регистрация участников.' }, { id: 'm-2', timing: 'За 10 минут', title: 'Брифинг и жеребьёвка', description: 'Судья объясняет регламент.' }],
+    faqs: [{ id: 'f-1', question: 'Нужен ли постоянный напарник для участия?', answer: 'Нет.' }],
+    coordinator: { telegramLabel: 'Telegram', telegramURL: 'https://t.me/unlimpadel', phoneDisplay: '+7 (495) 000-00-00', phoneValue: '+74950000000' },
     action: { label: 'Записаться', mode: 'booking' },
     seo: { robots: 'index-follow' },
   },
@@ -107,10 +130,15 @@ const mockTournamentDTO = {
       id: 't-open',
       slug: 'open-league',
       title: 'Unlim Riga Masters Cup',
-      level: '4.0',
+      levelFrom: 4,
+      levelTo: 4,
+      levelLabel: '4.0',
       lifecycle: 'finished',
+      startsAt: '2026-03-14T08:00:00.000Z',
+      endsAt: '2026-03-14T14:00:00.000Z',
       scheduleLabel: 'Суббота, 14 марта · 11:00–17:00',
-      format: 'Групповой этап + Олимпийская сетка',
+      format: 'groups-knockout',
+      formatLabel: 'Групповой этап + Олимпийская сетка',
       entryFee: 'Взнос: 4 500 ₽ / пара',
       description: 'Рейтинговый кубок для опытных пар.',
       prizeLabel: 'Призовой фонд',
@@ -119,8 +147,6 @@ const mockTournamentDTO = {
       meshStyle: 'deep-blue',
       icon: 'Trophy',
       regulationHTML: '<p>Олимпийская сетка.</p>',
-      levelKey: '4.0',
-      formatKey: 'groups-knockout',
       action: { label: 'Турнир завершён', mode: 'none' },
     },
   ],
@@ -219,6 +245,20 @@ test('TournamentDetailPage renders completed lifecycle state appropriately', () 
   assert.match(html, /Итоги/)
 })
 
+test('TournamentDetailPage preserves an external tournament action', () => {
+  const externalDTO = {
+    ...mockTournamentDTO,
+    item: { ...mockTournamentDTO.item, action: { label: 'Регистрация на сайте партнёра', mode: 'external-link', href: 'https://booking.example/tournament' } },
+  } as unknown as TournamentDetailDTO
+  const html = renderToStaticMarkup(
+    <ActionLayerProvider site={mockSite as any}>
+      <TournamentDetailPage dto={externalDTO} />
+    </ActionLayerProvider>
+  )
+  assert.match(html, /data-analytics-action="external"/)
+  assert.match(html, /Регистрация на сайте партнёра|Записаться/)
+})
+
 test('typograph utility glues prepositions with non-breaking spaces', () => {
   const input = 'Матч в субботу и в воскресенье для игроков на кортах'
   const expected = 'Матч в\u00A0субботу и\u00A0в\u00A0воскресенье для\u00A0игроков на\u00A0кортах'
@@ -237,7 +277,9 @@ test('TournamentDetailPage renders level range and omits club address', () => {
     ...mockTournamentDTO,
     item: {
       ...mockTournamentDTO.item,
-      level: '2.5 – 4.5',
+      levelFrom: 2.5,
+      levelTo: 4.5,
+      levelLabel: '2.5–4.5',
     },
   } as unknown as TournamentDetailDTO
 
@@ -264,8 +306,14 @@ test('TournamentDetailPage renders pairs cleanly in participants and standings',
     ...mockTournamentDTO,
     item: {
       ...mockTournamentDTO.item,
-      format: 'Парный кубок (фиксированные пары)',
-      level: '3.0 - 4.5',
+      format: 'other',
+      formatLabel: 'Парный кубок (фиксированные пары)',
+      participantMode: 'pairs',
+      levelFrom: 3,
+      levelTo: 4.5,
+      levelLabel: '3.0–4.5',
+      participants: [{ id: 'pair-1', name: 'М. Воронов', partnerName: 'А. Кузнецов', level: '4.0', status: 'confirmed' }],
+      standings: [{ id: 'pair-s-1', rank: 1, name: 'М. Воронов', partnerName: 'А. Кузнецов', matches: 5, points: 15, difference: '+24', award: 'Чемпионы' }],
     },
   } as unknown as TournamentDetailDTO
 
@@ -309,4 +357,3 @@ test('TournamentDetailPage renders 3 competition tabs and 4 collapsible left sec
   assert.match(html, /Занять/)
   assert.match(html, /Развернуть/)
 })
-
