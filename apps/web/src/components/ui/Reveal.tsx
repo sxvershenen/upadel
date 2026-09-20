@@ -8,6 +8,7 @@ export function Reveal({
   className,
   fade = true,
   eager = false,
+  scope = true,
 }: {
   children: ReactNode;
   delay?: number;
@@ -15,7 +16,8 @@ export function Reveal({
   className?: string;
   fade?: boolean;
   eager?: boolean;
+  scope?: boolean;
 }) {
   const style = { "--gsap-reveal-delay": `${delay}s`, "--gsap-reveal-y": `${y}px` } as CSSProperties;
-  return <div data-gsap-reveal="true" data-gsap-reveal-scope="true" data-gsap-reveal-eager={eager ? "true" : undefined} data-gsap-reveal-fade={fade ? undefined : "false"} data-gsap-reveal-y={y} style={style} className={className}>{children}</div>;
+  return <div data-gsap-reveal="true" data-gsap-reveal-scope={scope ? "true" : undefined} data-gsap-reveal-eager={eager ? "true" : undefined} data-gsap-reveal-fade={fade ? undefined : "false"} data-gsap-reveal-y={y} style={style} className={className}>{children}</div>;
 }

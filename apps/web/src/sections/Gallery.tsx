@@ -12,7 +12,7 @@ export function Gallery() {
   return (
     <section className="py-20 md:py-28">
       <div className="container-page">
-        <Reveal>
+        <Reveal scope={false}>
           <SectionHeader
             eyebrow={home.gallerySection.eyebrow}
             title={home.gallerySection.title}
@@ -32,8 +32,8 @@ export function Gallery() {
               gapClass="gap-4 md:gap-7"
               className="marquee-breathe"
             >
-              {row.map((item) => (
-                <GalleryCard key={item.id} src={item.media.url} />
+              {row.map((item, index) => (
+                <GalleryCard key={item.id} src={item.media.url} reveal={{ delay: index * 0.06 }} />
               ))}
             </Marquee>
           </Reveal>

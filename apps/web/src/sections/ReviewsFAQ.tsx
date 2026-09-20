@@ -58,7 +58,7 @@ export function ReviewsFAQ() {
           <Reveal>
             <SectionHeader eyebrow={home.reviewsSection.faqEyebrow} title={home.reviewsSection.faqTitle} className="mb-8" />
           </Reveal>
-          <Reveal>
+          <Reveal scope={false}>
             <Accordion items={faqItems} />
           </Reveal>
         </div>

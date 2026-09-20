@@ -74,7 +74,13 @@ button:not(:disabled), a[href], [role="button"] { cursor: pointer; }
   [data-page-enter="actions"] { --page-enter-delay: 180ms; }
   [data-page-enter]:has([data-gsap-reveal]):not([data-page-enter-owner="true"]):not([data-page-enter="content"]) { animation: none !important; }
   #swup article[data-page-enter="surface"] > div:first-child { animation: unlim-enter-up .68s cubic-bezier(.16, 1, .3, 1) backwards; }
-  #swup[data-page-entrance="detail"] main > article,
+  #swup[data-page-entrance="detail"] main > article > [data-gsap-reveal-scope] {
+    animation: unlim-enter-up .68s cubic-bezier(.16, 1, .3, 1) backwards;
+  }
+  #swup[data-page-entrance="detail"] main > article > [data-gsap-reveal-scope]:nth-of-type(1) { animation-delay: 0s; }
+  #swup[data-page-entrance="detail"] main > article > [data-gsap-reveal-scope]:nth-of-type(2) { animation-delay: 80ms; }
+  #swup[data-page-entrance="detail"] main > article > [data-gsap-reveal-scope]:nth-of-type(3) { animation-delay: 160ms; }
+  #swup[data-page-entrance="detail"] main > article > [data-gsap-reveal-scope]:nth-of-type(4) { animation-delay: 240ms; }
   #swup[data-page-entrance="gift"] main > div.min-h-screen {
     animation: unlim-enter-up .68s cubic-bezier(.16, 1, .3, 1) backwards;
   }
