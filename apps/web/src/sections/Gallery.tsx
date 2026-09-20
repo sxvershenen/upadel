@@ -12,7 +12,7 @@ export function Gallery() {
   return (
     <section className="py-20 md:py-28">
       <div className="container-page">
-        <Reveal scope={false}>
+        <Reveal>
           <SectionHeader
             eyebrow={home.gallerySection.eyebrow}
             title={home.gallerySection.title}
@@ -26,7 +26,7 @@ export function Gallery() {
 
       <div className="flex flex-col gap-4 md:gap-6">
         {rows.map((row, rowIndex) => (
-          <Reveal key={rowIndex}>
+          <Reveal key={rowIndex} scope={false}>
             <Marquee
               reverse={rowIndex === 1}
               gapClass="gap-4 md:gap-7"
