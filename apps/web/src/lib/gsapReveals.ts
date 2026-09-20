@@ -177,7 +177,7 @@ export async function startGsapReveals() {
     }
     autoDelays = new Map(
       targets
-        .filter((target) => Number.parseFloat(target.style.getPropertyValue('--gsap-reveal-delay') || '0') === 0)
+        .filter((target) => target.dataset.gsapRevealDelayExplicit !== 'true' && Number.parseFloat(target.style.getPropertyValue('--gsap-reveal-delay') || '0') === 0)
         .map((target, index) => [target, Math.min(index, 5) * 0.08]),
     )
     const targetSet = new Set(targets)

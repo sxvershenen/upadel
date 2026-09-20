@@ -7,6 +7,7 @@ type RevealStyle = CSSProperties | MotionStyle
 type RevealAttributeResult<T> = {
   'data-gsap-reveal'?: string
   'data-gsap-reveal-boundary'?: string
+  'data-gsap-reveal-delay-explicit'?: string
   'data-gsap-reveal-fade'?: string
   'data-gsap-reveal-y'?: number
   style?: T
@@ -20,6 +21,7 @@ export function revealAttributes(reveal: RevealConfig | undefined, style?: Revea
   return {
     'data-gsap-reveal': 'true',
     'data-gsap-reveal-boundary': boundary ? 'true' : undefined,
+    'data-gsap-reveal-delay-explicit': typeof reveal === 'object' && settings.delay !== undefined ? 'true' : undefined,
     'data-gsap-reveal-fade': settings.fade === false ? 'false' : undefined,
     'data-gsap-reveal-y': settings.y ?? 24,
     style: {
