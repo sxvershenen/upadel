@@ -22,5 +22,5 @@ const socialImage = isGift
   : dto.page.seo.socialImage?.url
 ---
 <SiteLayout site={dto.site} title={pageTitle} description={pageDescription} canonical={dto.page.seo.canonical} robots={dto.page.seo.robots} socialImage={socialImage} webmasterVerification={dto.site.analytics.vendors.webmasterVerification}>
-  <ThematicPage client:load dto={dto} />
+  <ThematicPage client:load dto={dto} publicOrigin={Astro.url.origin} />
 </SiteLayout>

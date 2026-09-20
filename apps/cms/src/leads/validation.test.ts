@@ -44,3 +44,31 @@ test('validated lead preserves source fields and rejects invalid source or conse
   assert.equal(parseLeadSubmission({ ...input, sourcePage: '/unknown' }), null)
   assert.equal(parseLeadSubmission({ ...input, consent: false }), null)
 })
+
+test('accepts the normalized gift landing payload with its exact source entity', () => {
+  assert.deepEqual(parseLeadSubmission({
+    name: 'Анна',
+    phone: '',
+    telegram: '@anna_padel',
+    vk: '',
+    email: '',
+    comment: 'Формат: Электронный PDF. Назначение: match',
+    consent: true,
+    type: 'gift',
+    sourcePage: '/gift',
+    sourceEntity: 'Подарочный сертификат: Электронный PDF',
+    idempotencyKey: 'gift-landing-test-01',
+    company: '',
+  }), {
+    name: 'Анна',
+    phone: '',
+    email: '',
+    telegram: '@anna_padel',
+    vk: '',
+    comment: 'Формат: Электронный PDF. Назначение: match',
+    type: 'gift',
+    sourcePage: '/gift',
+    sourceEntity: 'Подарочный сертификат: Электронный PDF',
+    idempotencyKey: 'gift-landing-test-01',
+  })
+})

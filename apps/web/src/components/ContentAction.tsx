@@ -40,7 +40,7 @@ export function ContentAction({ action, children, sourceEntity, sourcePage, ...b
     href = site.booking.externalURL ?? undefined
   }
 
-  const analyticsObject = sourcePage?.startsWith('/coaches') ? 'coach' : sourcePage?.startsWith('/tournaments') ? 'tournament' : sourcePage?.startsWith('/blog') ? 'article' : undefined
+  const analyticsObject = action.mode === 'lead-form' ? 'form' : sourcePage?.startsWith('/coaches') ? 'coach' : sourcePage?.startsWith('/tournaments') ? 'tournament' : sourcePage?.startsWith('/blog') ? 'article' : undefined
   const analyticsProps = { 'data-analytics-action': action.mode === 'booking' || action.mode === 'trial-booking' ? 'booking' : action.mode === 'phone' ? 'phone' : action.mode === 'email' ? 'email' : action.mode === 'lead-form' ? 'lead' : action.mode === 'external-link' ? 'external' : action.mode === 'internal-link' ? 'internal' : undefined, 'data-analytics-object-type': analyticsObject, 'data-analytics-object-id': sourceEntity }
   if (action.mode === 'phone' || action.mode === 'email') { const contactMode = action.mode; return <Button {...buttonProps} {...analyticsProps} onClick={() => requestContact(contactMode)}>{label}</Button> }
   const leadType = action.mode === 'lead-form' ? action.leadType ?? 'other' : action.mode === 'trial-booking' && !href ? 'trial' : action.mode === 'booking' && !site.booking.ready ? 'consultation' : null

@@ -1697,8 +1697,8 @@ async function seed() {
           },
           offersSection: {
             cards: [
-              { variant: 'tournament-venue', badge: 'Турниры', title: 'Площадка для турниров', description: 'Профессиональные корты, инфраструктура и команда с опытом проведения соревнований любого масштаба.', image: mediaID(images.offerTournament), overlay: 'overlay-blue', icon: 'Trophy', action: { mode: 'none' } },
-              { variant: 'event', badge: 'Мероприятия', title: 'Ваше мероприятие', description: 'Арендуйте площадку для корпоратива, закрытой тренировки, турнира, дня рождения или спортивной встречи — подберём формат и время под вашу задачу.', image: mediaID(images.offerEvent), overlay: 'overlay-violet', icon: 'PartyPopper', action: { mode: 'none' } },
+              { variant: 'tournament-venue', badge: 'Турниры', title: 'Площадка для турниров', description: 'Профессиональные корты, инфраструктура и команда с опытом проведения соревнований любого масштаба.', image: mediaID(images.offerTournament), overlay: 'overlay-blue', icon: 'Trophy', action: { mode: 'lead-form', leadType: 'consultation', label: 'Обсудить турнир' } },
+              { variant: 'event', badge: 'Мероприятия', title: 'Ваше мероприятие', description: 'Арендуйте площадку для корпоратива, закрытой тренировки, турнира, дня рождения или спортивной встречи — подберём формат и время под вашу задачу.', image: mediaID(images.offerEvent), overlay: 'overlay-violet', icon: 'PartyPopper', action: { mode: 'lead-form', leadType: 'consultation', label: 'Обсудить мероприятие' } },
             ],
           },
           courtsSection: { titleLineOne: 'Инженерный подход', titleLineTwo: 'к каждой детали корта', backgroundMedia: mediaID(images.courtsBg), backgroundAlt: 'Панорамные корты Unlim Riga Padel' },

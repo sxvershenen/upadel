@@ -27,6 +27,8 @@
 - Canonical URL нормализует trailing slash; добавлены OG/Twitter metadata и Organization/SportsActivityLocation JSON-LD.
 - Удалён hardcoded домен из JSON-LD landing page; URL строятся от текущего public origin.
 - Redirect map больше не выключает весь сайт при временной недоступности CMS.
+- Карточки «Площадка для турниров» и «Ваше мероприятие» ведут в lead form с отдельным `sourceEntity`; это значение попадает в аналитику и текст уведомления.
+- Gift landing теперь отправляет тот же нормализованный lead payload, что и остальные формы; Padel landing использует допустимые event/object types и не создаёт дублирующий success event.
 
 ## Authentication, brute force и IDOR
 

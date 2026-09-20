@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import type { ThematicPageDTO } from '@unlim/content-contract'
 import {
   CalendarCheck,
@@ -187,8 +187,9 @@ export const faqItems = [
   },
 ]
 
-export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
+export function GiftLandingPage({ dto, publicOrigin = 'https://unlimriga.ru' }: { dto: ThematicPageDTO; publicOrigin?: string }) {
   const site = dto.site
+  const origin = new URL(publicOrigin).origin
   const giftPage = dto.kind === 'gift' ? dto : null
   const pageUseCases = giftPage?.benefits?.length
     ? giftPage.benefits.map((item) => ({ icon: giftBenefitIcons[item.icon] ?? Layers, badge: item.badge, title: item.title, text: item.body }))
@@ -209,7 +210,12 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
   const [formState, setFormState] = useState<'idle' | 'submitting' | 'success'>('idle')
   const [errorMessage, setErrorMessage] = useState('')
   const started = useRef(false)
+  const [idempotencyKey] = useState(() => globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`)
   const { requestContact } = useActionLayer()
+
+  useEffect(() => {
+    trackAnalytics({ name: 'form_view', formType: 'gift', objectType: 'form', objectId: 'gift-landing' })
+  }, [])
 
   // Swiper state for mobile formats
   const swiperRef = useRef<SwiperType | null>(null)
@@ -222,9 +228,9 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
       started.current = true
       trackAnalytics({
         name: 'form_start',
-        formType: 'consultation',
-        objectType: 'gift_landing_order',
-        objectId: selectedFormat,
+        formType: 'gift',
+        objectType: 'form',
+        objectId: `gift:${selectedFormat}`,
       })
     }
   }
@@ -244,34 +250,52 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
     if (!name) {
       setErrorMessage('Укажите ваше имя')
       setFormState('idle')
+      trackAnalytics({ name: 'form_error', formType: 'gift', objectType: 'form', objectId: `gift:${selectedFormat}` })
       return
     }
 
     if (!contactValue) {
       setErrorMessage('Укажите контакт для связи')
       setFormState('idle')
+      trackAnalytics({ name: 'form_error', formType: 'gift', objectType: 'form', objectId: `gift:${selectedFormat}` })
       return
     }
 
+    const validContact = preferredChannel === 'phone'
+      ? /^[+\d\s()-]{6,40}$/.test(contactValue)
+      : /^@?[\p{L}\p{N}_.-]{3,80}$/u.test(contactValue)
+    if (!validContact) {
+      setErrorMessage('Проверьте формат контакта')
+      setFormState('idle')
+      trackAnalytics({ name: 'form_error', formType: 'gift', objectType: 'form', objectId: `gift:${selectedFormat}` })
+      return
+    }
+
+    const phone = preferredChannel === 'phone' ? contactValue : ''
+    const telegram = preferredChannel === 'telegram' ? contactValue : ''
+    const vk = preferredChannel === 'vk' ? contactValue : ''
+    const formatLabel = selectedFormat === 'box' ? 'Подарочный бокс' : 'Электронный PDF'
+    const sourceEntity = `Подарочный сертификат: ${formatLabel}`
+    const fullComment = [`Формат: ${formatLabel}`, `Назначение: ${selectedPurpose}`, recipientName ? `Получатель: ${recipientName}` : '', comment ? `Пожелание: ${comment}` : ''].filter(Boolean).join('. ')
+    trackAnalytics({ name: 'form_submit_attempt', formType: 'gift', objectType: 'form', objectId: `gift:${selectedFormat}` })
+
     try {
-      const endpoint = site?.contactConfirmation?.leadEndpoint || '/api/leads'
+      const endpoint = site.contactConfirmation.leadEndpoint
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: 'gift',
           name,
-          contact: {
-            channel: preferredChannel,
-            value: contactValue,
-          },
-          details: {
-            source: 'gift_seo_landing',
-            format: selectedFormat === 'box' ? 'Подарочный бокс' : 'Электронный PDF',
-            purpose: selectedPurpose,
-            recipientName: recipientName || undefined,
-            comment: comment || undefined,
-          },
+          phone,
+          telegram,
+          vk,
+          email: '',
+          comment: fullComment,
+          consent: true,
+          sourcePage: '/gift',
+          sourceEntity,
+          idempotencyKey,
           analytics: analyticsServerContext(),
         }),
       })
@@ -280,17 +304,11 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
         throw new Error('Ошибка отправки заявки')
       }
 
-      trackAnalytics({
-        name: 'generate_lead',
-        formType: 'gift',
-        objectType: 'gift_landing_order',
-        objectId: selectedFormat,
-      })
-
       setFormState('success')
     } catch {
       setErrorMessage('Не удалось отправить заявку. Пожалуйста, напишите нам напрямую в мессенджер.')
       setFormState('idle')
+      trackAnalytics({ name: 'form_error', formType: 'gift', objectType: 'form', objectId: `gift:${selectedFormat}` })
     }
   }
 
@@ -367,13 +385,13 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
               {
                 '@type': 'Organization',
                 name: site.brandName,
-                url: 'https://unlimpadel.ru',
+                url: origin,
                 description: 'Премиальный падел-клуб UNLIM RIGA PADEL в Москве и Московской области.',
               },
               {
                 '@type': 'Product',
                 name: giftPage?.page.title ?? 'Подарочный сертификат на падел в Москве',
-                image: giftPage?.formats?.[0]?.image.url ?? 'https://unlimpadel.ru/images/gift/card.jpg',
+                image: giftPage?.formats?.[0]?.image.url ?? new URL('/images/gift/card.jpg', origin).toString(),
                 description: giftPage?.page.intro ?? 'Подарочный сертификат на аренду панорамных кортов Jubo, тренировки с тренером и экипировку Varlion в клубе UNLIM RIGA PADEL.',
                 brand: { '@type': 'Brand', name: 'UNLIM PADEL' },
                 offers: {
@@ -387,8 +405,8 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
               {
                 '@type': 'BreadcrumbList',
                 itemListElement: [
-                  { '@type': 'ListItem', position: 1, name: 'Главная', item: 'https://unlimpadel.ru/' },
-                  { '@type': 'ListItem', position: 2, name: 'Подарочный сертификат', item: 'https://unlimpadel.ru/gift' },
+                  { '@type': 'ListItem', position: 1, name: 'Главная', item: new URL('/', origin).toString() },
+                  { '@type': 'ListItem', position: 2, name: 'Подарочный сертификат', item: new URL('/gift', origin).toString() },
                 ],
               },
               {
@@ -613,7 +631,7 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
                     icon={<TelegramIcon size={15} />}
                     iconPosition="left"
                     onClick={() => {
-                      trackAnalytics({ name: 'direct_messenger_click', actionKind: 'telegram', objectType: 'lead' })
+                      trackAnalytics({ name: 'contact_click', actionKind: 'telegram', objectType: 'contact', objectId: 'gift-landing' })
                     }}
                   >
                     Telegram
@@ -628,7 +646,7 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
                     icon={<VkIcon size={17} />}
                     iconPosition="left"
                     onClick={() => {
-                      trackAnalytics({ name: 'direct_messenger_click', actionKind: 'vk', objectType: 'lead' })
+                      trackAnalytics({ name: 'contact_click', actionKind: 'vk', objectType: 'contact', objectId: 'gift-landing' })
                     }}
                   >
                     ВКонтакте
@@ -640,7 +658,7 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
                     icon={<PhoneIcon size={15} />}
                     iconPosition="left"
                     onClick={() => {
-                      trackAnalytics({ name: 'direct_call_click', actionKind: 'phone', objectType: 'lead' })
+                      trackAnalytics({ name: 'contact_click', actionKind: 'phone', objectType: 'contact', objectId: 'gift-landing' })
                       requestContact('phone')
                     }}
                   >

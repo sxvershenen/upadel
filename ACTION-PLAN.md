@@ -7,6 +7,7 @@
 3. Сделать backup PostgreSQL и media. Не запускать `migrate:fresh`, `seed` и не удалять volume.
 4. Для существующей БД, созданной через dev schema push, сначала определить baseline migration. Не запускать весь migration history вслепую: локальный `migrate:status` показал, что history table не отражает текущую уже существующую схему.
 5. Проверить production login на `/urp-panel/login`, `401/403/429`, cookie `HttpOnly; Secure; SameSite=Lax` и недоступность `/admin`.
+6. После подключения уведомлений отправить тестовые заявки из `/`, `/gift`, `/padel-court-zakaz`, `/training`, `/coaches/*`, `/tournaments/*` и проверить `sourcePage`, `sourceEntity`, аналитику и Telegram/VK.
 
 ## P1 — первая неделя
 

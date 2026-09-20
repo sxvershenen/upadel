@@ -230,6 +230,10 @@ function InlineLeadCalculatorForm({
   )
   const started = useRef(false)
 
+  useEffect(() => {
+    trackAnalytics({ name: 'form_view', formType: 'consultation', objectType: 'form', objectId: `court:${initialModel}` })
+  }, [initialModel])
+
   React.useEffect(() => {
     if (initialModel) setSelectedModel(initialModel)
   }, [initialModel])
@@ -240,8 +244,8 @@ function InlineLeadCalculatorForm({
       trackAnalytics({
         name: 'form_start',
         formType: 'consultation',
-        objectType: 'court_landing_calculator',
-        objectId: selectedModel,
+        objectType: 'form',
+        objectId: `court:${selectedModel}`,
       })
     }
   }
@@ -289,8 +293,8 @@ function InlineLeadCalculatorForm({
       trackAnalytics({
         name: 'form_error',
         formType: 'consultation',
-        objectType: 'court_landing_calculator',
-        objectId: selectedModel,
+        objectType: 'form',
+        objectId: `court:${selectedModel}`,
       })
       return
     }
@@ -303,8 +307,8 @@ function InlineLeadCalculatorForm({
     trackAnalytics({
       name: 'form_submit_attempt',
       formType: 'consultation',
-      objectType: 'court_landing_calculator',
-      objectId: selectedModel,
+      objectType: 'form',
+      objectId: `court:${selectedModel}`,
     })
 
     const controller = new AbortController()
@@ -334,20 +338,14 @@ function InlineLeadCalculatorForm({
       const result = (await response.json().catch(() => ({}))) as { error?: string; ok?: boolean }
       if (response.ok && result.ok) {
         setState('success')
-        trackAnalytics({
-          name: 'form_submit_success',
-          formType: 'consultation',
-          objectType: 'court_landing_calculator',
-          objectId: selectedModel,
-        })
       } else {
         setState('form')
         setError(result.error ?? formCopy.submitError)
         trackAnalytics({
           name: 'form_error',
           formType: 'consultation',
-          objectType: 'court_landing_calculator',
-          objectId: selectedModel,
+          objectType: 'form',
+          objectId: `court:${selectedModel}`,
         })
       }
     } catch {
@@ -356,8 +354,8 @@ function InlineLeadCalculatorForm({
       trackAnalytics({
         name: 'form_error',
         formType: 'consultation',
-        objectType: 'court_landing_calculator',
-        objectId: selectedModel,
+        objectType: 'form',
+        objectId: `court:${selectedModel}`,
       })
     } finally {
       window.clearTimeout(timeout)
@@ -503,7 +501,7 @@ function DirectContactButtons({ contacts }: { contacts: PadelCourtZakazPageDTO['
         icon={<TelegramIcon size={15} />}
         iconPosition="left"
         onClick={() => {
-          trackAnalytics({ name: 'direct_messenger_click', actionKind: 'telegram', objectType: 'lead' })
+          trackAnalytics({ name: 'contact_click', actionKind: 'telegram', objectType: 'contact', objectId: 'padel-court-zakaz' })
         }}
       >{contacts.telegramLabel}</ButtonLink>
 
@@ -517,7 +515,7 @@ function DirectContactButtons({ contacts }: { contacts: PadelCourtZakazPageDTO['
         icon={<VkIcon size={17} />}
         iconPosition="left"
         onClick={() => {
-          trackAnalytics({ name: 'direct_messenger_click', actionKind: 'vk', objectType: 'lead' })
+          trackAnalytics({ name: 'contact_click', actionKind: 'vk', objectType: 'contact', objectId: 'padel-court-zakaz' })
         }}
       >{contacts.vkLabel}</ButtonLink>
 
@@ -528,7 +526,7 @@ function DirectContactButtons({ contacts }: { contacts: PadelCourtZakazPageDTO['
         icon={<PhoneIcon size={15} />}
         iconPosition="left"
         onClick={() => {
-          trackAnalytics({ name: 'direct_call_click', actionKind: 'phone', objectType: 'lead' })
+          trackAnalytics({ name: 'contact_click', actionKind: 'phone', objectType: 'contact', objectId: 'padel-court-zakaz' })
           requestContact('phone')
         }}
       >{contacts.phoneLabel}</Button>

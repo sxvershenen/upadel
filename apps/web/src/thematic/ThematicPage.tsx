@@ -108,11 +108,11 @@ function PageBody({ dto }: { dto: Exclude<ThematicPageDTO, PricesPageDTO> }) {
   return <article className="container-page pb-8 pt-8 md:pb-12 md:pt-8"><div className="mx-auto max-w-[860px]">{!dto.approved && <div role="status" className="se-2 bg-lime-soft p-5 type-body-sm text-ink"><strong className="block">Документ ожидает согласования</strong><span>{dto.notice}</span></div>}<div className={`article-content text-ink ${dto.approved ? '' : 'mt-10'}`} dangerouslySetInnerHTML={{ __html: dto.contentHTML }} /></div></article>
 }
 
-export function ThematicPage({ dto }: { dto: ThematicPageDTO }) {
+export function ThematicPage({ dto, publicOrigin }: { dto: ThematicPageDTO; publicOrigin?: string }) {
   if (dto.kind === 'gift') {
     return (
       <SiteFrame site={dto.site}>
-        <GiftLandingPage dto={dto} />
+        <GiftLandingPage dto={dto} publicOrigin={publicOrigin} />
       </SiteFrame>
     )
   }
