@@ -1,3 +1,4 @@
+import { randomInt } from "node:crypto";
 import type { Payload } from "payload";
 import type { Lead, SiteSetting } from "../payload-types";
 
@@ -53,6 +54,8 @@ const timeoutFetch = async (
   try {
     const response = await fetcher(url, { ...init, signal: controller.signal });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const payload = await response.clone().json().catch(() => null) as { ok?: boolean; error?: unknown } | null;
+    if (payload?.ok === false || payload?.error) throw new Error("API error");
   } finally {
     clearTimeout(timer);
   }
@@ -74,8 +77,8 @@ export async function deliverLeadNotifications(
   const cfg = site.leadNotifications;
   const telegramToken = process.env.TELEGRAM_BOT_TOKEN || cfg?.telegramBotToken;
   const telegramChat = process.env.TELEGRAM_CHAT_ID || cfg?.telegramChatID;
-  const vkToken = process.env.VK_ACCESS_TOKEN || cfg?.vkAccessToken;
-  const vkPeer = process.env.VK_PEER_ID || cfg?.vkPeerID;
+  const vkToken = (process.env.VK_ACCESS_TOKEN || cfg?.vkAccessToken || '').replace(/^api\s+/i, '').trim();
+  const vkPeer = (process.env.VK_PEER_ID || cfg?.vkPeerID || '').trim();
   const tasks: Array<{ name: string; run: () => Promise<void> }> = [];
   const message = formatLeadNotificationMessage(lead);
   // Telegram requires the token in its Bot API path. The path is never logged, returned, or persisted.
@@ -106,7 +109,7 @@ export async function deliverLeadNotifications(
             body: new URLSearchParams({
               access_token: vkToken,
               peer_id: vkPeer,
-              random_id: "0",
+              random_id: String(randomInt(1, 2_147_483_647)),
               message,
               v: cfg.vkAPIVersion || "5.199",
             }),
