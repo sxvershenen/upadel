@@ -34,7 +34,7 @@ function NavigationIcon({ href, icon, size = 16 }: { href: string; icon?: { url:
         const Icon = navigationIcons[navigationIconPreset(href)]
         return <Icon aria-hidden="true" size={size} strokeWidth={1.9} />
       })()
-  return <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center">{content}</span>
+  return <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center leading-none [&>img]:block [&>svg]:block">{content}</span>
 }
 
 function useWideHeader() {

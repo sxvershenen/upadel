@@ -479,10 +479,11 @@ html[data-reveal-ready] [data-reveal-visible="true"] [data-reveal-word] { --reve
 .cool-ball::before { content: ""; position: absolute; inset: 3px 4px; border-radius: 50%; background: rgb(255 255 255 / 50%); transform: rotate(32deg); }
 
 @keyframes marquee-x { from { transform: translateX(0); } to { transform: translateX(-100%); } }
-.animate-marquee { animation: marquee-x 32s linear infinite; }
+.animate-marquee { animation: marquee-x 32s linear infinite; will-change: transform; }
 @keyframes reviews-y { from { transform: translateY(0); } to { transform: translateY(-50%); } }
 .animate-reviews { animation: reviews-y 28s linear infinite; }
 @media (prefers-reduced-motion: reduce) { .animate-marquee, .animate-reviews { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; } }
+@media (prefers-reduced-motion: reduce) { .partners-marquee .animate-marquee { animation-duration: 32s !important; animation-iteration-count: infinite !important; } }
 
 .transition-demo-chrome { position: relative; z-index: 70; }
 .transition-demo-switcher { position: fixed; right: 18px; top: 18px; z-index: 90; width: min(292px, calc(100vw - 36px)); padding: 16px; border: 1px solid rgb(255 255 255 / 12%); border-radius: 18px; background: rgb(20 20 26 / 90%); box-shadow: 0 18px 60px rgb(0 0 0 / 22%); backdrop-filter: blur(20px); }

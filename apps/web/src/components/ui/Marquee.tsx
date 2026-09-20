@@ -17,14 +17,14 @@ export function Marquee({
   return (
     <div className={cn("no-scrollbar relative flex overflow-hidden", className)}>
       <div
-        className={cn("flex min-w-max shrink-0 animate-marquee items-center", gap, trackPadding)}
+        className={cn("flex w-max min-w-max shrink-0 animate-marquee items-center", gap, trackPadding)}
         style={reverse ? { animationDirection: "reverse" } : undefined}
       >
         {children}
       </div>
       <div
         aria-hidden
-        className={cn("flex min-w-max shrink-0 animate-marquee items-center", gap, trackPadding)}
+        className={cn("flex w-max min-w-max shrink-0 animate-marquee items-center", gap, trackPadding)}
         style={reverse ? { animationDirection: "reverse" } : undefined}
       >
         {children}

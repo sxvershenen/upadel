@@ -74,16 +74,6 @@ export function CookieBanner() {
 
 export function CookiePreferencesButton() {
   const site = useSite()
-  const [hasChoice, setHasChoice] = useState(false)
-
-  useEffect(() => {
-    if (site.analytics.mode !== 'consent-required') return
-    const sync = () => setHasChoice(Boolean(localStorage.getItem(ANALYTICS_CONSENT_KEY)))
-    sync()
-    window.addEventListener('unlim:analytics-consent', sync)
-    return () => window.removeEventListener('unlim:analytics-consent', sync)
-  }, [site.analytics.mode])
-
-  if (site.analytics.mode !== 'consent-required' || !hasChoice) return null
+  if (site.analytics.mode !== 'consent-required') return null
   return <button type="button" onClick={() => window.dispatchEvent(new Event('unlim:open-cookie-settings'))} className="transition-colors hover:text-white/70">{site.footer.cookieNotice.manageLabel}</button>
 }
