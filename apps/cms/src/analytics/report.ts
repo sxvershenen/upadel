@@ -6,6 +6,7 @@ const DAY_MS = 86_400_000
 type Row = Record<string, unknown>
 type Filters = { channel?: string; device?: string; language?: string }
 export type Period = { from: string; to: string }
+export type AnalyticsGroup = { name: string; browsers: number; sessions: number; targetSessions: number; actions: number; leads: number; activeMs: number }
 
 export function comparisonPeriod(period: Period, mode: 'previous' | 'year'): Period {
   const from = Date.parse(`${period.from}T00:00:00.000Z`)
@@ -50,7 +51,7 @@ function summarize(rows: Row[]) {
   return { browsers: estimateHLL(browsers), sessions: estimateHLL(sessions), targetSessions: estimateHLL(targetSessions), actions, leads, activeMs }
 }
 
-function grouped(rows: Row[], key: string) {
+function grouped(rows: Row[], key: string): AnalyticsGroup[] {
   const groups = new Map<string, Row[]>()
   for (const row of rows) {
     const value = String(row[key] ?? '') || 'Не определено'
@@ -59,20 +60,39 @@ function grouped(rows: Row[], key: string) {
   return [...groups].map(([name, group]) => ({ name, ...summarize(group) })).sort((a, b) => b.browsers - a.browsers || b.actions - a.actions)
 }
 
+export function withPageLeadCounts(groups: AnalyticsGroup[], leadRows: Row[]): AnalyticsGroup[] {
+  const leadsByPath = new Map<string, number>()
+  for (const row of leadRows) {
+    const path = String(row.sourcePage ?? row.path ?? '') || '/'
+    const count = row.exactLeadCount === undefined ? 1 : Number(row.exactLeadCount)
+    leadsByPath.set(path, (leadsByPath.get(path) ?? 0) + count)
+  }
+  return groups.map((group) => ({ ...group, leads: leadsByPath.get(group.name) ?? 0 }))
+}
+
 function eventSessions(rows: Row[], predicate: (row: Row) => boolean): number {
   const hll = createHLL()
   for (const row of rows) if (predicate(row)) mergeHLL(hll, deserializeHLL(String(row.sessionHll ?? '')))
   return estimateHLL(hll)
 }
 
-async function exactLeadCount(payload: Payload, period: Period, filters: Filters): Promise<number> {
+function leadWhere(period: Period, filters: Filters): Where[] {
   const from = new Date(Date.parse(`${period.from}T00:00:00.000Z`) - 3 * 60 * 60_000).toISOString()
   const to = new Date(Date.parse(`${period.to}T00:00:00.000Z`) + DAY_MS - 3 * 60 * 60_000).toISOString()
   const and: Where[] = [{ createdAt: { greater_than_equal: from } }, { createdAt: { less_than: to } }]
   if (filters.channel && filters.channel !== 'all') and.push({ analyticsChannel: { equals: filters.channel } })
   if (filters.device && filters.device !== 'all') and.push({ analyticsDevice: { equals: filters.device } })
   if (filters.language && filters.language !== 'all') and.push({ analyticsLanguage: { equals: filters.language } })
-  return (await payload.count({ collection: 'leads', overrideAccess: true, where: { and } })).totalDocs
+  return and
+}
+
+async function exactLeadCount(payload: Payload, period: Period, filters: Filters): Promise<number> {
+  return (await payload.count({ collection: 'leads', overrideAccess: true, where: { and: leadWhere(period, filters) } })).totalDocs
+}
+
+async function savedLeadsForPeriod(payload: Payload, period: Period, filters: Filters): Promise<Row[]> {
+  const result = await payload.find({ collection: 'leads', depth: 0, pagination: false, overrideAccess: true, where: { and: leadWhere(period, filters) } })
+  return result.docs as unknown as Row[]
 }
 
 export async function analyticsReport(payload: Payload, period: Period, compare: 'previous' | 'year', filters: Filters) {
@@ -90,7 +110,8 @@ export async function analyticsReport(payload: Payload, period: Period, compare:
     return { date, ...summarize(currentRows.filter((row) => String(row.date).slice(0, 10) === date)) }
   })
   const pageViews = currentRows.filter((row) => row.eventName === 'page_view')
-  const topPages = grouped(pageViews, 'path').slice(0, 10)
+  const savedLeads = await savedLeadsForPeriod(payload, period, filters)
+  const topPages = withPageLeadCounts(grouped(pageViews, 'path'), savedLeads).slice(0, 10)
   const audience = {
     visitorType: grouped(pageViews, 'visitorType'), device: grouped(pageViews, 'device'), language: grouped(pageViews, 'language'),
     averageActiveSeconds: current.sessions ? Math.round(current.activeMs / current.sessions / 1000) : 0,

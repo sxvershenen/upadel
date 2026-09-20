@@ -61,7 +61,7 @@ function LeadForm({ site, lead, onClose, onContact }: { site: SiteDTO; lead: Lea
       <Field label="VK / логин" labelVisibility="sr-only" name="vk" autoComplete="off" placeholder="VK — id или @username" maxLength={80} />
     </fieldset>
     <TextareaField label="Комментарий" labelVisibility="sr-only" name="comment" maxLength={2000} placeholder="Например, удобный день и время" />
-    <label className="absolute -left-[10000px]" aria-hidden="true">Компания<input name="company" tabIndex={-1} autoComplete="off" /></label>
+    <label className="absolute -left-[10000px]" aria-hidden="true">Сайт<input name="website" tabIndex={-1} autoComplete="off" /></label>
     <CheckboxField name="consent" required label={<>{site.contactConfirmation.consentLabel} · <a href={site.contactConfirmation.policyHref} target="_blank" rel="noreferrer" className="underline">политика</a></>} />
     {error && <p role="alert" className="type-body-sm text-red-700">{error}</p>}
     <Button type="submit" loading={state === 'sending'} fullWidth>{site.contactConfirmation.submitLabel}</Button>

@@ -28,6 +28,7 @@ Common envelope: `event_id`, schema version, occurred/received time, `session_id
 Canonical events: `page_view`, `active_time`, `cta_click`, `contact_click`, `form_start`, `form_step`, `form_submit_attempt`, `form_submit_success`, `form_error`, `web_vital`. Coach, tournament and article events use object type/id instead of separate event families.
 
 - Emit `form_submit_success` only after the server persists a lead.
+- The popular-pages report joins saved lead records back to their sanitized `sourcePage`; it therefore works even when analytics consent is absent. A honeypot hit is never persisted and never emits the success goal.
 - Deduplicate deliveries; close sessions after 30 minutes of inactivity.
 - Count funnel steps once per session and object, in order.
 - A phone/message/booking click is an intent signal, not a confirmed outcome.

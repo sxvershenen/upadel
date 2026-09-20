@@ -4,7 +4,7 @@ import config from '@payload-config'
 import { getPayload } from 'payload'
 import { sanitizeAnalyticsEvent } from '@/analytics/contract'
 import { detectClient, persistAnalyticsEvent } from '@/analytics/ingest'
-import { parseLeadSubmission } from '@/leads/validation'
+import { isLeadHoneypotTriggered, parseLeadSubmission } from '@/leads/validation'
 import { deliverOnlyForNewLead, notifyAndRecord } from '@/notifications/leadNotifications'
 
 export const dynamic = 'force-dynamic'
@@ -40,6 +40,7 @@ export async function POST(request: Request): Promise<Response> {
     const raw = await request.text()
     if (raw.length > 12_000) return Response.json({ ok: false, error: 'Некорректный запрос.' }, { status: 413, headers })
     const input = JSON.parse(raw) as Record<string, unknown>
+    if (isLeadHoneypotTriggered(input)) return Response.json({ ok: true, accepted: false }, { status: 200, headers })
     const submission = parseLeadSubmission(input)
     if (!submission) return Response.json({ ok: false, error: 'Проверьте заполненные поля и согласие.' }, { status: 400, headers })
     const { name, phone, email, telegram, vk, comment, type, sourcePage, sourceEntity, idempotencyKey } = submission

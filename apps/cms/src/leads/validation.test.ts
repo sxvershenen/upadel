@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { isAllowedLeadSourcePage, parseLeadSubmission } from './validation'
+import { isAllowedLeadSourcePage, isLeadHoneypotTriggered, parseLeadSubmission } from './validation'
 
 test('lead sources include fixed, code-defined, tournament catalog and safe detail routes', () => {
   for (const path of ['/training', '/gift', '/padel-court-zakaz', '/padel-courts', '/tournaments', '/tournaments/summer-open', '/coaches/anna-smith']) {
@@ -71,4 +71,10 @@ test('accepts the normalized gift landing payload with its exact source entity',
     sourceEntity: 'Подарочный сертификат: Электронный PDF',
     idempotencyKey: 'gift-landing-test-01',
   })
+})
+
+test('honeypot rejects bot-filled fields without treating them as a valid lead', () => {
+  const input = { name: 'Анна', phone: '+7 999 000-00-00', type: 'consultation', sourcePage: '/training', idempotencyKey: 'honeypot-test-01', consent: true, company: '', website: 'https://bot.invalid' }
+  assert.equal(isLeadHoneypotTriggered(input), true)
+  assert.equal(parseLeadSubmission(input), null)
 })
