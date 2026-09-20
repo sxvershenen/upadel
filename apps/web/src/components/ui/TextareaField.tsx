@@ -13,7 +13,7 @@ export interface TextareaFieldProps extends TextareaHTMLAttributes<HTMLTextAreaE
 }
 
 export const TextareaField = forwardRef<HTMLTextAreaElement, TextareaFieldProps>(
-  ({ id: suppliedId, label, description, error, tone = "light", labelVisibility = "visible", reveal = true, className, containerClassName, disabled, "aria-describedby": suppliedDescribedBy, "aria-invalid": suppliedInvalid, ...nativeProps }, ref) => {
+  ({ id: suppliedId, label, description, error, tone = "light", labelVisibility = "visible", reveal = false, className, containerClassName, disabled, "aria-describedby": suppliedDescribedBy, "aria-invalid": suppliedInvalid, ...nativeProps }, ref) => {
     const generatedId = useId();
     const id = suppliedId ?? `textarea-${generatedId}`;
     const descriptionId = description ? `${id}-description` : undefined;

@@ -43,7 +43,7 @@ export interface TypographyProps extends HTMLAttributes<HTMLElement> {
   reveal?: RevealConfig;
 }
 
-export function Typography({ as: Component = "p", role = "body", tone, className, children, reveal = true, style, ...props }: TypographyProps) {
+export function Typography({ as: Component = "p", role = "body", tone, className, children, reveal = false, style, ...props }: TypographyProps) {
   return createElement(Component, { className: cn(roleClasses[role], tone && toneClasses[tone], className), ...props, ...revealAttributes(reveal, style) }, children);
 }
 

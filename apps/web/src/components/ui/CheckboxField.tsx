@@ -9,7 +9,7 @@ export interface CheckboxFieldProps extends Omit<InputHTMLAttributes<HTMLInputEl
   reveal?: RevealConfig;
 }
 
-export const CheckboxField = forwardRef<HTMLInputElement, CheckboxFieldProps>(({ label, error, reveal = true, className, ...props }, ref) => <div {...revealAttributes(reveal)}>
+export const CheckboxField = forwardRef<HTMLInputElement, CheckboxFieldProps>(({ label, error, reveal = false, className, ...props }, ref) => <div {...revealAttributes(reveal)}>
   <label className="type-body-sm flex cursor-pointer items-start gap-3 text-ink-soft">
     <span className="relative mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center">
       <input ref={ref} type="checkbox" className={cn("peer absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0", className)} {...props} />

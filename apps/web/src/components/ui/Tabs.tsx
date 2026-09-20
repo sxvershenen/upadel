@@ -5,7 +5,7 @@ import { springSnappy, tapScaleSm } from "../../lib/motion";
 import { cn } from "../../utils/cn";
 import { revealAttributes, type RevealConfig } from "./revealAttributes";
 
-export function Tabs<T extends string>({ tabs, value, onChange, className, fullWidth = false, reveal = true, containerRef, onScroll, layoutId = "tab-indicator", "aria-label": ariaLabel = "Разделы" }: {
+export function Tabs<T extends string>({ tabs, value, onChange, className, fullWidth = false, reveal = false, containerRef, onScroll, layoutId = "tab-indicator", "aria-label": ariaLabel = "Разделы" }: {
   tabs: { id: T; label: string; panelId?: string }[];
   value: T;
   onChange: (id: T) => void;
