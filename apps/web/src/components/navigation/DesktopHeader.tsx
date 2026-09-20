@@ -74,9 +74,9 @@ function CompactTooltip({ children, filterId, reduceMotion }: { children: ReactN
 }
 
 function AnimatedNavigationContents({ expanded, item }: { expanded: boolean; item: DesktopNavigationChild }) {
-  return <span data-header-nav-mode={expanded ? 'expanded' : 'compact'} className="desktop-header-nav-content relative grid place-items-center overflow-hidden">
+  return <span data-header-nav-mode={expanded ? 'expanded' : 'compact'} className="desktop-header-nav-content relative grid h-full w-full place-items-center overflow-hidden">
     <span aria-hidden={!expanded} data-header-nav-label className="desktop-header-nav-label col-start-1 row-start-1 block">{item.label}</span>
-    <span aria-hidden="true" data-header-nav-icon className="desktop-header-nav-icon col-start-1 row-start-1 inline-flex items-center justify-center"><NavigationIcon href={item.href} icon={item.icon} /></span>
+    <span aria-hidden="true" data-header-nav-icon className="desktop-header-nav-icon col-start-1 row-start-1 inline-flex h-full w-full items-center justify-center"><NavigationIcon href={item.href} icon={item.icon} /></span>
   </span>
 }
 
