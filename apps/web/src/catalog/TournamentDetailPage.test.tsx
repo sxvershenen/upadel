@@ -185,7 +185,7 @@ test('TournamentDetailPage renders Swiss layout with hero, passport, prizes, par
 
   // 4. Participants & Standings section with tab switcher
   assert.match(html, /aria-label="Участники и результаты"/)
-  assert.match(html, /Сетка[\s\S]*?и[\s\S]*?участники/)
+  assert.match(html, /Турнир/)
   assert.match(html, /Участники/)
   assert.match(html, /Итоги/)
   assert.match(html, /Максим Воронов/)

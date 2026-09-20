@@ -446,16 +446,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
         <Reveal>
         <section aria-label="Участники и результаты">
           <SectionHeader
-            title={
-              <>
-                <span className="sm:hidden">
-                  Сетка и<br />участники
-                </span>
-                <span className="hidden sm:inline">
-                  {typograph('Сетка и участники')}
-                </span>
-              </>
-            }
+            title={typograph('Турнир')}
             className="!flex-nowrap items-end justify-between gap-2 sm:gap-6 mb-6"
             titleClassName="type-section font-semibold text-ink leading-tight"
             actionClassName="ml-auto shrink-0"
@@ -594,11 +585,11 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                   // 1: Золото / dark mesh / белое золото подложка
                   // 2: Серебро / silver mesh / серебряная подложка
                   // 3: Бронза / bronze mesh / бронзовая подложка
-                  const cardBg = isTop1 ? 'mesh-dark shadow-xs' : isTop2 ? 'mesh-silver shadow-xs' : 'mesh-bronze shadow-xs'
+                  const cardBg = isTop1 ? 'mesh-dark glow-inset-dark shadow-xs' : isTop2 ? 'mesh-silver glow-inset-light shadow-xs' : 'mesh-bronze glow-inset-light shadow-xs'
                   const podlozhka = isTop1
                     ? 'bg-gold text-gold-ink shadow-2xs'
                     : isTop2
-                      ? 'bg-white/80 text-[#334155] shadow-2xs'
+                      ? 'bg-[#cbd5e1] text-[#1e293b] shadow-2xs'
                       : 'bg-[#fed7aa] text-[#7c2d12] shadow-2xs'
                   const labelColor = isTop1 ? 'text-white' : isTop2 ? 'text-[#1e293b]' : 'text-[#431407]'
                   const nameColor = isTop1 ? 'text-white' : isTop2 ? 'text-[#0f172a]' : 'text-[#431407]'
@@ -801,11 +792,11 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                   const isSecond = idx === 1
                   const IconComp = isFirst ? Trophy : Medal
 
-                  const cardBg = isFirst ? 'mesh-dark shadow-xs' : isSecond ? 'mesh-silver shadow-xs' : 'mesh-bronze shadow-xs'
+                  const cardBg = isFirst ? 'mesh-dark glow-inset-dark shadow-xs' : isSecond ? 'mesh-silver glow-inset-light shadow-xs' : 'mesh-bronze glow-inset-light shadow-xs'
                   const podlozhka = isFirst
                     ? 'bg-gold text-gold-ink shadow-2xs'
                     : isSecond
-                      ? 'bg-white/80 text-[#334155] shadow-2xs'
+                      ? 'bg-[#cbd5e1] text-[#1e293b] shadow-2xs'
                       : 'bg-[#fed7aa] text-[#7c2d12] shadow-2xs'
                   const labelColor = isFirst ? 'text-white' : isSecond ? 'text-[#1e293b]' : 'text-[#431407]'
                   const titleColor = isFirst ? 'text-white/60' : isSecond ? 'text-[#64748b]' : 'text-[#7c2d12]'
