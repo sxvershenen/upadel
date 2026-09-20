@@ -356,7 +356,7 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
   }
 
   return (
-    <div data-page-enter="surface" className="min-h-screen bg-page text-ink selection:bg-lime selection:text-lime-ink">
+    <div className="min-h-screen bg-page text-ink selection:bg-lime selection:text-lime-ink">
       {/* Schema.org JSON-LD */}
       <script
         type="application/ld+json"

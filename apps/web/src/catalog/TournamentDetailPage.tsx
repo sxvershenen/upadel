@@ -532,7 +532,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
   return (
     <SiteFrame site={dto.site} backLink={{ href: '/tournaments' }}>
       {/* На мобилке нет верхнего navbar, поэтому отступ сверху pt-4 (равен боковому --page-gutter), на десктопе pt-28 md:pt-32 */}
-      <article data-page-enter="surface" className="container-page pb-24 pt-4 sm:pt-28 md:pt-32 space-y-16 sm:space-y-20 md:space-y-28">
+      <article className="container-page pb-24 pt-4 sm:pt-28 md:pt-32 space-y-16 sm:space-y-20 md:space-y-28">
         {/* 1. Первый экран: Равнозначный сплит 50/50: Hero Left (визитка) + Hero Right (инфо без карточки) */}
         <Reveal>
         <section aria-label="Визитка и паспорт турнира">
