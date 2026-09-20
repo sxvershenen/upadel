@@ -28,13 +28,14 @@ const iconHover = { scale: 1.08, y: -1 }
 const headerMorphTransition = { duration: 0.32, ease: [0.4, 0, 0.2, 1] as const }
 
 function NavigationIcon({ href, icon, size = 16 }: { href: string; icon?: { url: string } | null; size?: number }) {
+  const preset = navigationIconPreset(href)
   const content = icon
     ? <img src={icon.url} alt="" aria-hidden="true" className="h-4 w-4 object-contain" />
     : (() => {
-        const Icon = navigationIcons[navigationIconPreset(href)]
+        const Icon = navigationIcons[preset]
         return <Icon aria-hidden="true" size={size} strokeWidth={1.9} />
       })()
-  return <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center leading-none [&>img]:block [&>svg]:block">{content}</span>
+  return <span data-navigation-icon={preset} className="relative block h-5 w-5 shrink-0"><span className="absolute inset-0 flex items-center justify-center leading-none [&>img]:block [&>svg]:block">{content}</span></span>
 }
 
 function useWideHeader() {
