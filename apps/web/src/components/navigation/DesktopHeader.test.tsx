@@ -26,7 +26,7 @@ function tagWithClass(html: string, className: string) {
 test('desktop header SSR emits one visible booking state before hydration', () => {
   const html = renderToStaticMarkup(<SiteProvider site={site} captureContacts={false}><DesktopHeader /></SiteProvider>)
   const control = tagWithClass(html, 'desktop-header-booking-control')
-  assert.match(control, /style="[^"]*width:136px/)
+  assert.match(tagWithClass(html, 'desktop-header fixed'), /style="[^"]*--header-progress:0/)
   assert.match(control, /data-booking-mode="expanded"/)
   assert.match(html, /<span[^>]*data-booking-icon="true"[^>]*aria-hidden="true"/)
   assert.match(html, /<span[^>]*data-booking-label="true"[^>]*aria-hidden="false"/)

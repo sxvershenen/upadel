@@ -69,10 +69,10 @@ const enableGlobalTransitions = !Astro.url.pathname.startsWith('/transitions/') 
       const setupScrollReveals = () => {
         revealTimer = 0
         revealObserver?.disconnect()
-        document.documentElement.setAttribute('data-reveal-ready', 'true')
         const targets = Array.from(document.querySelector('#swup')?.querySelectorAll(revealSelector) ?? [])
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
           targets.forEach((target) => markRevealVisible(target))
+          document.documentElement.setAttribute('data-reveal-ready', 'true')
           return
         }
         revealObserver = new IntersectionObserver((entries) => {
@@ -83,6 +83,8 @@ const enableGlobalTransitions = !Astro.url.pathname.startsWith('/transitions/') 
           if (rect.bottom > -80 && rect.top < window.innerHeight + 80) markRevealVisible(target)
           else revealObserver.observe(target)
         })
+        // Do not briefly hide visible SSR text when enabling scroll reveals.
+        document.documentElement.setAttribute('data-reveal-ready', 'true')
       }
       const scheduleScrollReveals = () => {
         const root = document.querySelector('#swup')

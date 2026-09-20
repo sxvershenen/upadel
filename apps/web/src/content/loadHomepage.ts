@@ -18,7 +18,7 @@ export async function loadHomepage(options: { cmsURL: string | undefined; previe
 
   let response: Response
   try {
-    response = await fetch(endpoint, { headers: { Accept: 'application/json' } })
+    response = await fetch(endpoint, { headers: { Accept: 'application/json' }, cache: 'no-store' })
   } catch (error) {
     throw new HomepageLoadError(`Unable to reach CMS at ${endpoint.origin}: ${error instanceof Error ? error.message : String(error)}`)
   }

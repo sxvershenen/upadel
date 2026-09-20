@@ -420,9 +420,12 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
   const [standingsExpanded, setStandingsExpanded] = useState(false)
 
   const tabPanelsRef = useRef<HTMLDivElement>(null)
+  const previousTabRef = useRef(activeTab)
 
   useEffect(() => {
-    if (!tabPanelsRef.current) return
+    if (previousTabRef.current === activeTab) return
+    previousTabRef.current = activeTab
+    if (!tabPanelsRef.current || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const ctx = gsap.context(() => {
       gsap.fromTo(
         tabPanelsRef.current,
@@ -528,7 +531,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
   return (
     <SiteFrame site={dto.site} backLink={{ href: '/tournaments' }}>
       {/* На мобилке нет верхнего navbar, поэтому отступ сверху pt-4 (равен боковому --page-gutter), на десктопе pt-28 md:pt-32 */}
-      <article data-page-enter="content" className="container-page pb-24 pt-4 sm:pt-28 md:pt-32 space-y-16 sm:space-y-20 md:space-y-28">
+      <article data-page-enter="surface" className="container-page pb-24 pt-4 sm:pt-28 md:pt-32 space-y-16 sm:space-y-20 md:space-y-28">
         {/* 1. Первый экран: Равнозначный сплит 50/50: Hero Left (визитка) + Hero Right (инфо без карточки) */}
         <section aria-label="Визитка и паспорт турнира">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-12 items-stretch">

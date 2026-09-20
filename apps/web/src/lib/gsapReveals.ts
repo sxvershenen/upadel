@@ -24,6 +24,8 @@ let ownedTargets = new Set<RevealTarget>()
 let originalStyles = new WeakMap<RevealTarget, RevealStyleSnapshot>()
 let refreshFrame = 0
 let generation = 0
+let activeRoot: HTMLElement | null = null
+const initializedRoots = new WeakSet<HTMLElement>()
 
 export function captureRevealStyles(target: Pick<HTMLElement, 'style'>): RevealStyleSnapshot {
   return animatedStyleProperties.map((name) => ({
@@ -59,6 +61,7 @@ function settleActiveTweens() {
 }
 
 function disconnectRevealRuntime() {
+  activeRoot = null
   if (refreshFrame) window.cancelAnimationFrame(refreshFrame)
   refreshFrame = 0
   observer?.disconnect()
@@ -74,10 +77,15 @@ export function isRevealRootReady(root: HTMLElement) {
   return root.dataset.mainReady === 'true' || !root.querySelector('astro-island')
 }
 
+function isInRevealViewport(target: HTMLElement) {
+  const rect = target.getBoundingClientRect()
+  return rect.width > 0 && rect.height > 0 && rect.bottom > -80 && rect.top < window.innerHeight + 80 && rect.right > -80 && rect.left < window.innerWidth + 80
+}
+
 export async function startGsapReveals() {
   if (typeof window === 'undefined' || typeof document === 'undefined') return
   const root = document.querySelector<HTMLElement>('#swup')
-  if (root && !isRevealRootReady(root)) return
+  if (root && (!isRevealRootReady(root) || root === activeRoot)) return
   const runGeneration = ++generation
   disconnectRevealRuntime()
   if (!root) {
@@ -85,6 +93,7 @@ export async function startGsapReveals() {
     return
   }
 
+  activeRoot = root
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     document.documentElement.setAttribute('data-gsap-reveal-ready', 'true')
     root.querySelectorAll<RevealTarget>('[data-gsap-reveal]').forEach((target) => {
@@ -128,6 +137,7 @@ export async function startGsapReveals() {
     activeTweens.add(reveal)
   }
 
+  let initialPagePass = !initializedRoots.has(root)
   const refresh = () => {
     const allTargets = Array.from(root.querySelectorAll<RevealTarget>('[data-gsap-reveal]'))
     const targets = allTargets.filter((target) => {
@@ -136,6 +146,13 @@ export async function startGsapReveals() {
       if (target.dataset.gsapRevealBoundary === 'true') return true
       return !target.querySelector('[data-gsap-reveal-boundary="true"], [data-gsap-reveal]')
     })
+    // Classify before enabling hidden-state selectors. Anything already in the
+    // first viewport belongs to the SSR entrance, never a post-hydration replay.
+    if (initialPagePass) {
+      targets.forEach((target) => {
+        if (isInRevealViewport(target)) target.dataset.gsapRevealVisible = 'true'
+      })
+    }
     const targetSet = new Set(targets)
     allTargets.forEach((target) => {
       const ownsReveal = targetSet.has(target) && shouldOwnRevealTarget(target.dataset.gsapRevealVisible === 'true', originalStyles.has(target))
@@ -150,11 +167,11 @@ export async function startGsapReveals() {
     observer?.disconnect()
     targets.forEach((target) => {
       if (target.dataset.gsapRevealVisible === 'true') return
-      const rect = target.getBoundingClientRect()
-      const visible = rect.width > 0 && rect.height > 0 && rect.bottom > -80 && rect.top < window.innerHeight + 80 && rect.right > -80 && rect.left < window.innerWidth + 80
-      if (visible) show(target)
+      if (isInRevealViewport(target)) show(target)
       else observer?.observe(target)
     })
+    initialPagePass = false
+    initializedRoots.add(root)
   }
 
   observer = new IntersectionObserver((entries) => {

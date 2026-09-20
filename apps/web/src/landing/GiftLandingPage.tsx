@@ -356,7 +356,7 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
   }
 
   return (
-    <div className="min-h-screen bg-page text-ink selection:bg-lime selection:text-lime-ink">
+    <div data-page-enter="surface" className="min-h-screen bg-page text-ink selection:bg-lime selection:text-lime-ink">
       {/* Schema.org JSON-LD */}
       <script
         type="application/ld+json"
@@ -429,7 +429,7 @@ export function GiftLandingPage({ dto }: { dto: ThematicPageDTO }) {
       </header>
 
       {/* 2. НА ЧТО МОЖНО ПОТРАТИТЬ (USE CASES) — БЕЗ EYEBROW */}
-      <section className="container-page py-12 md:py-20" aria-labelledby="usecases-title">
+      <section data-page-enter="surface" className="container-page py-12 md:py-20" aria-labelledby="usecases-title">
         <Reveal className="mb-10 max-w-[760px]">
           <Typography as="h2" id="usecases-title" role="section" className="font-semibold text-ink">
             {typograph(giftPage?.offerTitle ?? 'На\u00A0что можно потратить сертификат')}

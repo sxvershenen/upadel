@@ -129,10 +129,10 @@ export function Hero() {
           </p>
           <div className="mt-8 flex flex-nowrap items-center gap-2 sm:gap-3">
             <div data-hero-cta="primary" className="flex-1 sm:flex-none">
-              <ContentAction action={hero.primaryAction} variant="primary" size="lg" icon={<CalendarCheck size={17} />} className="w-full min-w-0 whitespace-nowrap px-4 !leading-none text-[14px] sm:w-auto sm:px-5 sm:text-base" />
+              <ContentAction reveal={false} action={hero.primaryAction} variant="primary" size="lg" icon={<CalendarCheck size={17} />} className="w-full min-w-0 whitespace-nowrap px-4 !leading-none text-[14px] sm:w-auto sm:px-5 sm:text-base" />
             </div>
             <div data-hero-cta="secondary" className="flex-1 sm:flex-none">
-              <ContentAction action={hero.secondaryAction} variant="glass" size="lg" icon={<Play size={17} />} className="w-full min-w-0 whitespace-nowrap px-4 !leading-none text-[14px] sm:w-auto sm:px-5 sm:text-base">Попробовать</ContentAction>
+              <ContentAction reveal={false} action={hero.secondaryAction} variant="glass" size="lg" icon={<Play size={17} />} className="w-full min-w-0 whitespace-nowrap px-4 !leading-none text-[14px] sm:w-auto sm:px-5 sm:text-base">Попробовать</ContentAction>
             </div>
             <SocialProof className="hidden md:flex" />
           </div>

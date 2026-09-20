@@ -8,6 +8,8 @@ export function getStaticPaths() {
   return (['serve', 'rally'] as TransitionPageKey[]).map((page) => ({ params: { page }, props: { page } }))
 }
 
+export const prerender = true
+
 const page = Astro.props.page as TransitionPageKey
 const content = page === 'rally' ? 'Rally' : 'Serve'
 ---

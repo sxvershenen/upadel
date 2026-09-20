@@ -8,7 +8,7 @@ async function requestCMS<T>(cmsURL: string | undefined, kind: Kind, options: { 
   const url = new URL(`/api/public/catalog/${kind}`, cmsURL)
   if (options.slug) url.searchParams.set('slug', options.slug)
   if (options.previewSecret) { url.searchParams.set('preview', '1'); url.searchParams.set('secret', options.previewSecret) }
-  const response = await fetch(url, { headers: { Accept: 'application/json' } })
+  const response = await fetch(url, { headers: { Accept: 'application/json' }, cache: 'no-store' })
   if (!response.ok) throw new CatalogLoadError(`CMS ${kind} projection failed with HTTP ${response.status}.`, response.status)
   return parse(await response.json())
 }

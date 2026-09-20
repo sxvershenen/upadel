@@ -4,7 +4,7 @@ SEO-first multipage website for a Russian padel brand in Moscow/Krasnogorsk, wit
 
 ## Status
 
-All fixed public routes are CMS-backed, including catalog/detail pages, mobile price tabs and responsive gallery/lightbox experiences. Astro prerenders published Payload content, protected routes power live preview, and Payload includes analytics, integrations, lead notifications, a hierarchical page/SEO map and visual media library.
+All fixed public routes are CMS-backed, including catalog/detail pages, mobile price tabs and responsive gallery/lightbox experiences. Astro server-renders published Payload content on request, protected routes power live preview, and Payload includes analytics, integrations, lead notifications, a hierarchical page/SEO map and visual media library.
 
 ## Target shape
 

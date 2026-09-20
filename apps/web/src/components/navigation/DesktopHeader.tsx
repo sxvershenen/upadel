@@ -25,8 +25,7 @@ const navigationIcons: Record<NavigationIconPreset, LucideIcon> = {
 }
 
 const iconHover = { scale: 1.08, y: -1 }
-const headerEntranceSpring = { type: 'spring' as const, visualDuration: 0.42, bounce: 0.06 }
-const headerLayoutSpring = { type: 'spring' as const, visualDuration: 0.2, bounce: 0.06, velocity: 0 }
+const headerMorphTransition = { duration: 0.32, ease: [0.4, 0, 0.2, 1] as const }
 
 function NavigationIcon({ href, icon, size = 16 }: { href: string; icon?: { url: string } | null; size?: number }) {
   if (icon) return <img src={icon.url} alt="" aria-hidden="true" className="h-4 w-4 object-contain" />
@@ -230,7 +229,7 @@ function DesktopNavigationLink({ compact, filterId, item, wide }: { compact: boo
       className={`desktop-header-nav-link se-1 relative flex h-[var(--control-sm)] shrink-0 items-center justify-center gap-2 overflow-hidden py-1.5 font-medium text-white/70 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2 ${expanded ? 'px-2.5 type-caption' : 'w-[var(--control-sm)] px-0 type-caption'}`}
     >
       <AnimatedNavigationContents expanded={expanded} item={item} />
-      {hasMenu && expanded && <motion.span animate={{ rotate: open ? 180 : 0 }} transition={springSnappy} className="inline-flex" aria-hidden="true"><ChevronDown size={13} /></motion.span>}
+      {hasMenu && <motion.span animate={{ rotate: open ? 180 : 0 }} transition={springSnappy} className="desktop-header-nav-chevron inline-flex" aria-hidden="true"><ChevronDown size={13} /></motion.span>}
     </motion.a>
     {!expanded && !hasMenu && <CompactTooltip filterId={filterId} reduceMotion={reduceMotion}>{item.label}</CompactTooltip>}
     <AnimatePresence initial={false}>
@@ -261,7 +260,7 @@ function UtilityControl({ className = '', compact, filterId, label, reduceMotion
 }
 
 function BookingControl({ compact, label }: { compact: boolean; label: string }) {
-  return <div data-booking-mode={compact ? 'compact' : 'expanded'} style={{ width: compact ? 40 : 136 }} className="desktop-header-booking-control relative h-[var(--control-sm)] shrink-0">
+  return <div data-booking-mode={compact ? 'compact' : 'expanded'} className="desktop-header-booking-control relative h-[var(--control-sm)] shrink-0">
     <ContentAction reveal={false} action={{ mode: 'booking', label }} variant="primary" size="sm" aria-label={label} className="h-[var(--control-sm)] w-full overflow-hidden px-0">
       <span className="grid place-items-center">
         <span data-booking-icon className="col-start-1 row-start-1 inline-flex items-center justify-center" aria-hidden={!compact}><CalendarCheck aria-hidden="true" size={17} strokeWidth={1.9} /></span>
@@ -280,10 +279,40 @@ export function DesktopHeader() {
   const [scrollState, setScrollState] = useState<HeaderScrollState>(() => initialHeaderScrollState())
   const [tooltipSuppressed, setTooltipSuppressed] = useState(false)
   const morphLockUntilRef = useRef(0)
+  const headerRef = useRef<HTMLElement>(null)
   const wide = useWideHeader()
   const compact = scrollState.compact
   const reduceMotion = useReducedMotion() ?? false
   const tooltipFilterId = `header-tooltip-goo-${useId().replaceAll(':', '')}`
+
+  useEffect(() => {
+    const header = headerRef.current
+    if (!header) return
+    const brand = header.querySelector<HTMLElement>('[data-header-brand-label]')!
+    const links = Array.from(header.querySelectorAll<HTMLElement>('.desktop-header-nav-link'))
+    const intrinsicWidth = (element: HTMLElement) => Math.ceil(Number.parseFloat(getComputedStyle(element).width) || element.scrollWidth)
+    const measure = () => {
+      header.style.setProperty('--header-brand-width', `${intrinsicWidth(brand)}px`)
+      links.forEach((link) => {
+        const label = link.querySelector<HTMLElement>('[data-header-nav-label]')!
+        link.style.setProperty('--header-link-width', `${intrinsicWidth(label) + 20 + (link.hasAttribute('aria-haspopup') ? 21 : 0)}px`)
+      })
+      const utilities = Array.from(header.querySelectorAll<HTMLElement>('.desktop-header-utility-link'))
+      const visibleUtilities = utilities.filter((link) => link.getClientRects().length > 0)
+      const controlSize = visibleUtilities[0]?.offsetHeight || 40
+      header.style.setProperty('--header-compact-width', `${(links.length + visibleUtilities.length + 2) * controlSize + 24}px`)
+      header.dataset.headerGeometryReady = 'true'
+    }
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(brand)
+    links.forEach((link) => observer.observe(link.querySelector('[data-header-nav-label]')!))
+    window.addEventListener('resize', measure)
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('resize', measure)
+    }
+  }, [site.brandName, site.brandLogo?.url, site.desktopNavigation])
 
   useEffect(() => {
     const suppressTooltips = () => setTooltipSuppressed(true)
@@ -316,9 +345,9 @@ export function DesktopHeader() {
 
   const utilityClass = compact ? 'bg-transparent text-white/70 hover:text-white' : 'se-1 bg-white/10 text-white hover:bg-white/20'
 
-  return <motion.header initial={false} animate={{ opacity: 1, y: 0 }} transition={headerEntranceSpring} data-header-compact={compact ? 'true' : 'false'} data-header-direction={scrollState.direction ?? 'none'} data-header-scroll="true" data-header-tooltips={tooltipSuppressed ? 'suppressed' : 'ready'} onClickCapture={() => setTooltipSuppressed(true)} onFocusCapture={() => setTooltipSuppressed(false)} onPointerLeave={() => setTooltipSuppressed(false)} onPointerMove={() => setTooltipSuppressed(false)} className="desktop-header fixed inset-x-0 top-0 z-50 hidden justify-center md:flex">
+  return <motion.header ref={headerRef} initial={false} animate={{ '--header-progress': compact ? 1 : 0 }} transition={reduceMotion ? { duration: 0 } : headerMorphTransition} data-header-compact={compact ? 'true' : 'false'} data-header-direction={scrollState.direction ?? 'none'} data-header-scroll="true" data-header-tooltips={tooltipSuppressed ? 'suppressed' : 'ready'} onClickCapture={() => setTooltipSuppressed(true)} onFocusCapture={() => setTooltipSuppressed(false)} onPointerLeave={() => setTooltipSuppressed(false)} onPointerMove={() => setTooltipSuppressed(false)} className="desktop-header fixed inset-x-0 top-0 z-50 hidden justify-center md:flex">
     <GooFilter id={tooltipFilterId} strength={5} />
-      <motion.div layout="position" transition={headerLayoutSpring} className={`desktop-header-island se-top-2 mx-4 flex h-[60px] items-center whitespace-nowrap bg-black text-white ${compact ? 'gap-0 py-1.5 pl-3 pr-2' : 'justify-between gap-4 py-2.5 pl-7 pr-3'}`}>
+      <div className={`desktop-header-island se-top-2 mx-4 flex h-[60px] items-center whitespace-nowrap bg-black text-white ${compact ? 'gap-0 py-1.5 pl-3 pr-2' : 'justify-between gap-4 py-2.5 pl-7 pr-3'}`}>
       <HeaderBrand compact={compact} filterId={tooltipFilterId} homeHref={homeHref} logo={site.brandLogo} logoMode={site.brandLogoMode} name={site.brandName} reduceMotion={reduceMotion} subtitle={site.headerSubtitle} />
       <nav className={`desktop-header-nav flex min-w-0 items-center ${compact ? 'gap-0' : 'gap-0.5'}`} aria-label="Основная навигация">
         {site.desktopNavigation.map((item) => <DesktopNavigationLink key={`${item.href}-${item.label}`} compact={compact} filterId={tooltipFilterId} item={item} wide={wide} />)}
@@ -329,6 +358,6 @@ export function DesktopHeader() {
         <UtilityControl compact={compact} filterId={tooltipFilterId} label="Позвонить" reduceMotion={reduceMotion}><motion.a href={`tel:${site.contacts.phoneValue}`} data-contact-confirmed data-analytics-action="phone" onClick={(event) => { event.preventDefault(); requestContact('phone') }} aria-label="Позвонить" whileHover={reduceMotion ? undefined : iconHover} whileTap={reduceMotion ? undefined : tapScaleSm} transition={springSnappy} className={`desktop-header-utility-link flex h-[var(--control-sm)] w-[var(--control-sm)] items-center justify-center focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2 ${utilityClass}`}><PhoneIcon size={16} /></motion.a></UtilityControl>
         <UtilityControl compact={compact} filterId={tooltipFilterId} label={site.booking.buttonLabel} reduceMotion={reduceMotion}><BookingControl compact={compact} label={site.booking.buttonLabel} /></UtilityControl>
       </div>
-    </motion.div>
+    </div>
   </motion.header>
 }
