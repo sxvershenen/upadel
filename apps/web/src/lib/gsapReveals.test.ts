@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { captureRevealStyles, settleRevealTarget, shouldOwnRevealTarget, isRevealRootReady, startGsapReveals, stopGsapReveals } from './gsapReveals'
+import { captureRevealStyles, settleRevealTarget, shouldOwnRevealTarget, isRevealRootReady } from './gsapReveals'
 
 class TestStyle {
   private properties = new Map<string, { priority: string; value: string }>()
@@ -48,58 +48,7 @@ test('page reveals wait for the React commit but static HTML needs no hydration'
 })
 
 
-test('visible SSR content is not hidden again and repeated readiness does not restart reveals', async () => {
-  // Load GSAP in the Node environment: this scenario must never create a tween.
-  await import('gsap')
-  const target = (top: number, cssEntrance: boolean) => ({
-    dataset: {} as Record<string, string>,
-    style: new TestStyle(),
-    parentElement: null,
-    querySelector: () => null,
-    closest: () => cssEntrance ? {} : null,
-    getBoundingClientRect: () => ({ top, bottom: top + 100, left: 0, right: 200, width: 200, height: 100 }),
-  })
-  const visible = target(120, true)
-  const plainVisible = target(340, false)
-  const belowFold = target(1500, true)
-  const root = { dataset: { mainReady: 'true' }, isConnected: true, querySelectorAll: () => [visible, plainVisible, belowFold] }
-  const observed = new Set<unknown>()
-  let observerCount = 0
-  class Observer {
-    constructor() { observerCount += 1 }
-    observe(element: unknown) { observed.add(element) }
-    unobserve(element: unknown) { observed.delete(element) }
-    disconnect() { observed.clear() }
-  }
-  const replacements = {
-    window: { matchMedia: () => ({ matches: false }), innerWidth: 1440, innerHeight: 900 },
-    document: { querySelector: () => root, documentElement: { setAttribute() {}, removeAttribute() {} } },
-    IntersectionObserver: Observer,
-    MutationObserver: class { observe() {} disconnect() {} },
-  }
-  const descriptors = new Map(Object.keys(replacements).map((name) => [name, Object.getOwnPropertyDescriptor(globalThis, name)]))
-  try {
-    Object.entries(replacements).forEach(([name, value]) => Object.defineProperty(globalThis, name, { value, configurable: true }))
-    await startGsapReveals()
-    assert.equal(visible.dataset.gsapRevealVisible, 'true')
-    assert.equal(plainVisible.dataset.gsapRevealVisible, 'true')
-    assert.equal(plainVisible.dataset.gsapRevealOwner, undefined)
-    assert.equal(plainVisible.style.getPropertyValue('opacity'), '')
-    assert.equal(visible.dataset.gsapRevealOwner, undefined)
-    assert.equal(visible.style.getPropertyValue('opacity'), '')
-    assert.equal(visible.style.getPropertyValue('--gsap-reveal-offset'), '')
-    assert.ok(observed.has(belowFold))
-    assert.equal(belowFold.dataset.gsapRevealVisible, undefined)
-
-    await startGsapReveals()
-    assert.equal(observerCount, 1)
-    assert.equal(visible.style.getPropertyValue('opacity'), '')
-    assert.ok(observed.has(belowFold))
-  } finally {
-    stopGsapReveals()
-    descriptors.forEach((descriptor, name) => {
-      if (descriptor) Object.defineProperty(globalThis, name, descriptor)
-      else Reflect.deleteProperty(globalThis, name)
-    })
-  }
+test('visible SSR targets remain eligible for an initial GSAP entrance', () => {
+  assert.equal(shouldOwnRevealTarget(false, false), true)
+  assert.equal(shouldOwnRevealTarget(true, false), false)
 })
