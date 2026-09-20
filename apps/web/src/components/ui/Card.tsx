@@ -38,7 +38,7 @@ export function SurfaceCard({ tone = "white", interactive = true, reveal = true,
   >{children}</motion.div>;
 }
 
-export function WhiteCard({ className, children, as: _as, interactive = true, ...props }: HTMLMotionProps<"div"> & { as?: "div"; interactive?: boolean }) {
+export function WhiteCard({ className, children, as: _as, interactive = true, ...props }: HTMLMotionProps<"div"> & { as?: "div"; interactive?: boolean; reveal?: RevealConfig }) {
   return <SurfaceCard tone="white" interactive={interactive} className={className} {...props}>{children}</SurfaceCard>;
 }
 
@@ -63,10 +63,11 @@ export interface ImageCardProps extends Omit<HTMLMotionProps<"div">, "children">
   imgClassName?: string;
   children?: ReactNode;
   interactive?: boolean;
+  loading?: "eager" | "lazy";
 }
 
 /** Full-bleed image card with a mandatory colorized overlay. */
-export function ImageCard({ src, alt, overlay, className, children, imgClassName, interactive = true, reveal = true, style, ...props }: ImageCardProps & { reveal?: RevealConfig }) {
+export function ImageCard({ src, alt, overlay, className, children, imgClassName, interactive = true, loading = "lazy", reveal = true, style, ...props }: ImageCardProps & { loading?: "eager" | "lazy"; reveal?: RevealConfig }) {
   const imageRef = useRef<HTMLDivElement>(null);
   const imageY = useImageParallax(imageRef);
   const revealProps = revealAttributes(reveal, style, true);
@@ -89,7 +90,7 @@ export function ImageCard({ src, alt, overlay, className, children, imgClassName
         data-parallax-layer
         className="parallax-layer overflow-hidden"
       >
-        <motion.img src={src} alt={alt} loading="lazy" className={cn("h-full w-full object-cover", imgClassName)} variants={interactive ? imageVariants : undefined} transition={springSoft} />
+        <motion.img src={src} alt={alt} loading={loading} className={cn("h-full w-full object-cover", imgClassName)} variants={interactive ? imageVariants : undefined} transition={springSoft} />
       </motion.div>
     </div>
     <div className="relative z-10 flex h-full flex-col">{children}</div>

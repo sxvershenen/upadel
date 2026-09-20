@@ -5,17 +5,17 @@ import { springSoft } from "../../lib/motion";
 import { useImageParallax } from "../../lib/useImageParallax";
 import { ArrowAction } from "../ui/ArrowAction";
 import { Badge } from "../ui/Badge";
-import { revealAttributes } from "../ui/revealAttributes";
+import { revealAttributes, type RevealConfig } from "../ui/revealAttributes";
 
 export type Article = HomepageDTO["entities"]["articles"][number] | ArticleCatalogItem;
 export type ArticleSummary = Pick<Article, "title" | "excerpt" | "slug">;
 
-export function ArticleCard({ post, mobilePlain = false }: { post: Article; mobilePlain?: boolean }) {
+export function ArticleCard({ post, mobilePlain = false, loading = "eager", reveal = true }: { post: Article; mobilePlain?: boolean; loading?: "eager" | "lazy"; reveal?: RevealConfig }) {
   const imageRef = useRef<HTMLDivElement>(null);
   const imageY = useImageParallax(imageRef);
-  return <motion.a {...revealAttributes(true, undefined, true)} href={`/blog/${post.slug}`} initial="rest" whileHover="hover" variants={{ rest: { y: 0, scale: 1 }, hover: { y: -5, scale: 1.012 } }} transition={springSoft} className="card-spring group group/card flex cursor-pointer flex-col">
+  return <motion.a {...revealAttributes(reveal, undefined, true)} href={`/blog/${post.slug}`} initial="rest" whileHover="hover" variants={{ rest: { y: 0, scale: 1 }, hover: { y: -5, scale: 1.012 } }} transition={springSoft} className="card-spring group group/card flex cursor-pointer flex-col">
     <div ref={imageRef} data-parallax-viewport className="parallax-viewport se-3 relative aspect-[4/3] w-full">
-      <motion.div data-parallax-layer style={{ y: imageY }} className="parallax-layer overflow-hidden"><motion.img src={post.image.url} alt={post.image.alt} loading="lazy" className="h-full w-full object-cover" variants={{ rest: { scale: 1.04 }, hover: { scale: 1.095 } }} transition={springSoft} /></motion.div>
+      <motion.div data-parallax-layer style={{ y: imageY }} className="parallax-layer overflow-hidden"><motion.img src={post.image.url} alt={post.image.alt} loading={loading} className="h-full w-full object-cover" variants={{ rest: { scale: 1.04 }, hover: { scale: 1.095 } }} transition={springSoft} /></motion.div>
       <div className={`absolute left-3 top-3 items-center gap-2 ${mobilePlain ? "hidden md:flex" : "flex"}`}><Badge tone="glass">{typeof post.category === "string" ? post.category : post.category.title}</Badge></div>
       <div className="absolute right-3 top-3"><ArrowAction tone="glass" size="sm" cardHover /></div>
     </div>

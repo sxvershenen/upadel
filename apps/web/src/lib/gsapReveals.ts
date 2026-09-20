@@ -59,6 +59,7 @@ export function selectRevealTargets(allTargets: RevealTarget[]) {
   const selectedScopes = new Set(leafScopes)
 
   return allTargets.filter((target) => {
+    if (target.parentElement?.closest('[data-page-enter-owner="true"]')) return false
     const hasScopeAncestor = Boolean(target.parentElement?.closest('[data-gsap-reveal-scope="true"]'))
     if (hasScopeAncestor) return selectedScopes.has(target)
 
@@ -120,12 +121,15 @@ export async function startGsapReveals() {
       target.dataset.gsapRevealVisible = 'true'
       delete target.dataset.gsapRevealOwner
     })
+    document.documentElement.removeAttribute('data-gsap-reveal-prepared')
     return
   }
 
   const { gsap } = await import('gsap')
   if (runGeneration !== generation || !root.isConnected) return
+  document.documentElement.removeAttribute('data-gsap-reveal-prepared')
   document.documentElement.setAttribute('data-gsap-reveal-ready', 'true')
+  let autoDelays = new Map<RevealTarget, number>()
 
   const show = (target: RevealTarget) => {
     if (target.dataset.gsapRevealVisible === 'true' || originalStyles.has(target)) return
@@ -145,7 +149,7 @@ export async function startGsapReveals() {
     const common = {
       '--gsap-reveal-offset': '0px',
       duration: 0.68,
-      delay: Number.parseFloat(target.style.getPropertyValue('--gsap-reveal-delay') || '0'),
+      delay: autoDelays.get(target) ?? Number.parseFloat(target.style.getPropertyValue('--gsap-reveal-delay') || '0'),
       ease: 'power3.out',
       onComplete: settle,
       onInterrupt: settle,
@@ -160,6 +164,11 @@ export async function startGsapReveals() {
   const refresh = () => {
     const allTargets = Array.from(root.querySelectorAll<RevealTarget>('[data-gsap-reveal]'))
     const targets = selectRevealTargets(allTargets)
+    autoDelays = new Map(
+      targets
+        .filter((target) => Number.parseFloat(target.style.getPropertyValue('--gsap-reveal-delay') || '0') === 0)
+        .map((target, index) => [target, Math.min(index, 5) * 0.08]),
+    )
     const targetSet = new Set(targets)
     allTargets.forEach((target) => {
       const ownsReveal = targetSet.has(target) && shouldOwnRevealTarget(target.dataset.gsapRevealVisible === 'true', originalStyles.has(target))
@@ -198,5 +207,6 @@ export async function startGsapReveals() {
 export function stopGsapReveals() {
   generation += 1
   disconnectRevealRuntime()
+  document.documentElement.removeAttribute('data-gsap-reveal-prepared')
   document.documentElement.removeAttribute('data-gsap-reveal-ready')
 }

@@ -11,20 +11,21 @@ import { WhiteCard } from "../ui/Card";
 import { Dialog } from "../ui/Dialog";
 import { Price } from "../ui/Price";
 import { Typography } from "../ui/Typography";
+import type { RevealConfig } from "../ui/revealAttributes";
 
 export type Coach = HomepageDTO["entities"]["coaches"][number];
 
-export function CoachCard({ coach }: { coach: Coach }) {
+export function CoachCard({ coach, loading = "eager", reveal = true }: { coach: Coach; loading?: "eager" | "lazy"; reveal?: RevealConfig }) {
   const [open, setOpen] = useState(false);
   const photoRef = useRef<HTMLDivElement>(null);
   const photoY = useImageParallax(photoRef);
 
   return <>
     <button type="button" aria-haspopup="dialog" aria-label={`Открыть профиль тренера ${coach.name}`} onClick={() => setOpen(true)} className="block h-full w-full text-left focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-4">
-      <WhiteCard className="flex h-full flex-col overflow-hidden p-4">
+      <WhiteCard reveal={reveal} className="flex h-full flex-col overflow-hidden p-4">
         <div ref={photoRef} data-parallax-viewport className="parallax-viewport se-2 relative aspect-[4/5] w-full">
           <motion.div data-parallax-layer style={{ y: photoY }} className="parallax-layer overflow-hidden">
-            <motion.img src={coach.photo.url} alt={coach.photo.alt} loading="lazy" className="h-full w-full object-cover" variants={{ rest: { scale: 1.04 }, hover: { scale: 1.095 } }} transition={springSoft} />
+            <motion.img src={coach.photo.url} alt={coach.photo.alt} loading={loading} className="h-full w-full object-cover" variants={{ rest: { scale: 1.04 }, hover: { scale: 1.095 } }} transition={springSoft} />
           </motion.div>
           <div className="absolute left-3 top-3"><Badge tone="glass" className="image-glass px-2.5"><Star size={12} className="fill-lime text-lime" /> {coach.rating} · {coach.reviewsCount}</Badge></div>
           <div className="absolute right-3 top-3 flex flex-col items-end gap-1.5">{coach.certificates.slice(0, 2).map((certificate) => <span key={certificate} className="se-1 type-micro image-glass flex items-center gap-1 px-2 py-1 text-white"><BadgeCheck size={11} /> {certificate}</span>)}</div>

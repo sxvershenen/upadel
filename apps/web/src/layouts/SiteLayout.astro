@@ -55,6 +55,7 @@ const enableGlobalTransitions = !Astro.url.pathname.startsWith('/transitions/') 
   </body>
   <script is:inline>
     (() => {
+      if (document.querySelector('#swup [data-gsap-reveal]')) document.documentElement.setAttribute('data-gsap-reveal-prepared', 'true')
       document.documentElement.setAttribute('data-unlim-enhancements', 'true')
       if (window.__unlimSiteEnhancements) return
       window.__unlimSiteEnhancements = true

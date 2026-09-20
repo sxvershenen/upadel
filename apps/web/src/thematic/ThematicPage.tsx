@@ -67,10 +67,10 @@ function TrainingFormats({ dto }: { dto: TrainingPageDTO }) {
       <h2 id="training-programs-title" className="type-section text-ink">{dto.programsTitle}</h2>
       <MobileSwiperNav className="lg:hidden" atStart={atStart} atEnd={atEnd} onPrev={() => swiperRef.current?.slidePrev()} onNext={() => swiperRef.current?.slideNext()} />
     </div>
-    <div className="hidden gap-4 lg:grid lg:grid-cols-4">{items.map((entry) => <div key={entry.item.id} className="h-full">{card(entry)}</div>)}</div>
+    <div className="hidden gap-4 lg:grid lg:grid-cols-4">{items.map((entry) => <div key={`${entry.kind}-${entry.item.id}`} className="h-full">{card(entry)}</div>)}</div>
     <div ref={swipeHintRef} className="-mx-5 lg:hidden">
       <Swiper {...horizontalSwiperProps} onSwiper={(swiper) => { swiperRef.current = swiper; setAtStart(swiper.isBeginning); setAtEnd(swiper.isEnd) }} onSlideChange={(swiper) => { setAtStart(swiper.isBeginning); setAtEnd(swiper.isEnd) }} slidesPerView={1} spaceBetween={12} className="swiper-breathe !px-5">
-        {items.map((entry) => <SwiperSlide key={entry.item.id} className="!h-auto"><div className="h-full min-h-[500px]">{card(entry)}</div></SwiperSlide>)}
+        {items.map((entry) => <SwiperSlide key={`${entry.kind}-${entry.item.id}`} className="!h-auto"><div className="h-full min-h-[500px]">{card(entry)}</div></SwiperSlide>)}
       </Swiper>
     </div>
   </section>
@@ -116,5 +116,6 @@ export function ThematicPage({ dto }: { dto: ThematicPageDTO }) {
       </SiteFrame>
     )
   }
-  return <SiteFrame site={dto.site}><PageHeader page={dto.page} /><div data-page-enter="content" style={{ '--page-enter-delay': '160ms' } as CSSProperties}>{dto.kind === 'prices' ? <Prices dto={dto} /> : <PageBody dto={dto} />}</div></SiteFrame>
+  const ownsPageEntrance = dto.kind === 'prices' || dto.kind === 'training'
+  return <SiteFrame site={dto.site}><PageHeader page={dto.page} /><div data-page-enter="content" data-page-enter-owner={ownsPageEntrance ? 'true' : undefined} style={{ '--page-enter-delay': '160ms' } as CSSProperties}>{dto.kind === 'prices' ? <Prices dto={dto} /> : <PageBody dto={dto} />}</div></SiteFrame>
 }
