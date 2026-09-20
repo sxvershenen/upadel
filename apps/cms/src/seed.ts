@@ -484,10 +484,11 @@ async function ensureRemoteMedia(payload: Payload, sourceURL: string, alt: strin
   const useLocalFallback = async (): Promise<SeededRecord | null> => {
     const prefix = hash(sourceURL)
     const names = (await readdir(mediaDir)).filter((name) => name.startsWith(`remote-${prefix}`) || name.startsWith(`pexels-${prefix}`))
-    const name = names.find((candidate) => !/-\d+x\d+\./.test(candidate)) ?? names[0]
-    if (!name) return null
+    const name = names.find((candidate) => !/-\d+x\d+\./.test(candidate)) ?? names[0] ?? 'page-heroes/courts.webp'
+    const filePath = names.length > 0 ? path.join(mediaDir, name) : path.join(webPublicDir, name)
+    try { await stat(filePath) } catch { return null }
     const mimetype = name.endsWith('.webm') ? 'video/webm' : name.endsWith('.mp4') ? 'video/mp4' : name.endsWith('.png') ? 'image/png' : 'image/webp'
-    return createMedia(payload, sourceURL, { data: await readFile(path.join(mediaDir, name)), mimetype, name }, alt, 'Local project media restored for the approved prototype content.', 'Project-owned demo asset. Verify attribution and production usage rights before launch.')
+    return createMedia(payload, sourceURL, { data: await readFile(filePath), mimetype, name: `fallback-${hash(sourceURL)}.${name.split('.').pop()}` }, alt, 'Local project media restored for the approved prototype content.', 'Project-owned demo asset. Verify attribution and production usage rights before launch.')
   }
 
   let response: Response
