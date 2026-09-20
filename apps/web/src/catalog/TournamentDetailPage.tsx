@@ -31,6 +31,7 @@ import { Badge } from '../components/ui/Badge'
 import { ButtonLink } from '../components/ui/Button'
 import { ImageCard, MeshCard, type ImageOverlay, type MeshTone } from '../components/ui/Card'
 import { SectionHeader } from '../components/ui/SectionHeader'
+import { Reveal } from '../components/ui/Reveal'
 import { cn } from '../utils/cn'
 
 export function AnimatedAccordionItem({
@@ -533,6 +534,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
       {/* На мобилке нет верхнего navbar, поэтому отступ сверху pt-4 (равен боковому --page-gutter), на десктопе pt-28 md:pt-32 */}
       <article data-page-enter="surface" className="container-page pb-24 pt-4 sm:pt-28 md:pt-32 space-y-16 sm:space-y-20 md:space-y-28">
         {/* 1. Первый экран: Равнозначный сплит 50/50: Hero Left (визитка) + Hero Right (инфо без карточки) */}
+        <Reveal>
         <section aria-label="Визитка и паспорт турнира">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-12 items-stretch">
             {/* Hero Left: визитка турнира с мешем/фото, уровнем и кнопкой */}
@@ -647,8 +649,10 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
             </div>
           </div>
         </section>
+        </Reveal>
 
         {/* 2. Соревновательный блок с лаконичными табами: Участники / Итоги / Призы */}
+        <Reveal>
         <section aria-label="Участники и результаты">
           <SectionHeader
             title={
@@ -1068,8 +1072,10 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
             </div>
           </div>
         </section>
+        </Reveal>
 
         {/* 3. Нижний 2-колоночный блок: Регламент и правила (слева) + Частые вопросы (справа) с двумя отдельными заголовками */}
+        <Reveal>
         <section aria-label="Игровой день и вопросы">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
             {/* Левая колонка: 4 анимированных аккордеона с GSAP */}
@@ -1187,9 +1193,11 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
             </div>
           </div>
         </section>
+        </Reveal>
 
         {/* 4. Секция: Другие турниры */}
         {dto.related.length > 0 && (
+          <Reveal>
           <section aria-label="Другие турниры" className="pt-2">
             <SectionHeader
               title={typograph('Другие турниры и лиги')}
@@ -1213,6 +1221,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
               ))}
             </div>
           </section>
+          </Reveal>
         )}
       </article>
     </SiteFrame>
