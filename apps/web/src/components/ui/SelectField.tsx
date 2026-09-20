@@ -36,7 +36,7 @@ export const SelectField = forwardRef<HTMLButtonElement, SelectFieldProps>(
     description,
     error,
     labelVisibility = 'visible',
-    reveal = false,
+    reveal = true,
     className,
     containerClassName,
     value,

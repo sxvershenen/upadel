@@ -15,7 +15,7 @@ export interface FieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
 }
 
 export const Field = forwardRef<HTMLInputElement, FieldProps>(
-  ({ id: suppliedId, label, description, error, suffix, tone = "light", labelVisibility = "visible", reveal = false, className, fieldClassName, containerClassName, disabled, "aria-describedby": suppliedDescribedBy, "aria-invalid": suppliedInvalid, ...nativeProps }, ref) => {
+  ({ id: suppliedId, label, description, error, suffix, tone = "light", labelVisibility = "visible", reveal = true, className, fieldClassName, containerClassName, disabled, "aria-describedby": suppliedDescribedBy, "aria-invalid": suppliedInvalid, ...nativeProps }, ref) => {
     const generatedId = useId();
     const id = suppliedId ?? `field-${generatedId}`;
     const descriptionId = description ? `${id}-description` : undefined;
