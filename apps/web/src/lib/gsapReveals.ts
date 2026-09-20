@@ -60,6 +60,7 @@ export function selectRevealTargets(allTargets: RevealTarget[]) {
 
   return allTargets.filter((target) => {
     if (target.parentElement?.closest('[data-page-enter-owner="true"]')) return false
+    if (target.parentElement?.closest('[data-page-enter="content"]')) return false
     const hasScopeAncestor = Boolean(target.parentElement?.closest('[data-gsap-reveal-scope="true"]'))
     if (hasScopeAncestor) return selectedScopes.has(target)
 
@@ -130,6 +131,7 @@ export async function startGsapReveals() {
   document.documentElement.removeAttribute('data-gsap-reveal-prepared')
   document.documentElement.setAttribute('data-gsap-reveal-ready', 'true')
   let autoDelays = new Map<RevealTarget, number>()
+  let initialCssEntranceSettled = false
 
   const show = (target: RevealTarget) => {
     if (target.dataset.gsapRevealVisible === 'true' || originalStyles.has(target)) return
@@ -164,6 +166,12 @@ export async function startGsapReveals() {
   const refresh = () => {
     const allTargets = Array.from(root.querySelectorAll<RevealTarget>('[data-gsap-reveal]'))
     const targets = selectRevealTargets(allTargets)
+    if (!initialCssEntranceSettled && (root.dataset.pageEntrance === 'detail' || root.dataset.pageEntrance === 'gift')) {
+      targets.forEach((target) => {
+        if (isInRevealViewport(target)) target.dataset.gsapRevealVisible = 'true'
+      })
+      initialCssEntranceSettled = true
+    }
     autoDelays = new Map(
       targets
         .filter((target) => Number.parseFloat(target.style.getPropertyValue('--gsap-reveal-delay') || '0') === 0)

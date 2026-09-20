@@ -27,6 +27,11 @@ const robotsContent = robots?.replace('-', ', ')
 const publicOrigin = import.meta.env.PUBLIC_SITE_URL ?? Astro.url.origin
 const resolvedCanonical = canonical?.trim() || new URL(Astro.url.pathname, publicOrigin).toString()
 const enableGlobalTransitions = !Astro.url.pathname.startsWith('/transitions/') && !Astro.url.pathname.startsWith('/preview/')
+const pageEntrance = Astro.url.pathname === '/gift'
+  ? 'gift'
+  : /^\/(coaches|tournaments)\/[^/]+\/?$/.test(Astro.url.pathname)
+    ? 'detail'
+    : undefined
 ---
 
 <!doctype html>
@@ -49,13 +54,19 @@ const enableGlobalTransitions = !Astro.url.pathname.startsWith('/transitions/') 
   <body>
     {enableGlobalTransitions && <GlobalPageTransition client:load />}
     {site && <SiteChromeIsland client:load site={site} />}
-    <div id="swup" data-swup-container>
+    <div id="swup" data-swup-container data-page-entrance={pageEntrance}>
       <slot />
     </div>
   </body>
   <script is:inline>
     (() => {
-      if (document.querySelector('#swup [data-gsap-reveal]')) document.documentElement.setAttribute('data-gsap-reveal-prepared', 'true')
+      const navigation = performance.getEntriesByType('navigation')[0]
+      if (navigation?.type === 'reload' && !location.hash) {
+        history.scrollRestoration = 'manual'
+        window.scrollTo(0, 0)
+      }
+      const pageEntrance = document.querySelector('#swup')?.getAttribute('data-page-entrance')
+      if (pageEntrance !== 'gift' && pageEntrance !== 'detail' && document.querySelector('#swup [data-gsap-reveal]')) document.documentElement.setAttribute('data-gsap-reveal-prepared', 'true')
       document.documentElement.setAttribute('data-unlim-enhancements', 'true')
       if (window.__unlimSiteEnhancements) return
       window.__unlimSiteEnhancements = true
