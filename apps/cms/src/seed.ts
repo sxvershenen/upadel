@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import { readFile, stat } from 'node:fs/promises'
+import { readFile, readdir, stat } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -481,13 +481,28 @@ async function ensureRemoteMedia(payload: Payload, sourceURL: string, alt: strin
     return existing
   }
 
+  const useLocalFallback = async (): Promise<SeededRecord | null> => {
+    const prefix = hash(sourceURL)
+    const names = (await readdir(mediaDir)).filter((name) => name.startsWith(`remote-${prefix}`) || name.startsWith(`pexels-${prefix}`))
+    const name = names.find((candidate) => !/-\d+x\d+\./.test(candidate)) ?? names[0]
+    if (!name) return null
+    const mimetype = name.endsWith('.webm') ? 'video/webm' : name.endsWith('.mp4') ? 'video/mp4' : name.endsWith('.png') ? 'image/png' : 'image/webp'
+    return createMedia(payload, sourceURL, { data: await readFile(path.join(mediaDir, name)), mimetype, name }, alt, 'Local project media restored for the approved prototype content.', 'Project-owned demo asset. Verify attribution and production usage rights before launch.')
+  }
+
   let response: Response
   try {
     response = await fetch(sourceURL, { signal: AbortSignal.timeout(45_000) })
   } catch (error) {
+    const fallback = await useLocalFallback()
+    if (fallback) return fallback
     throw new Error(`Failed to download demo media ${sourceURL}: ${error instanceof Error ? error.message : String(error)}`)
   }
-  if (!response.ok) throw new Error(`Failed to download demo media ${sourceURL}: HTTP ${response.status}`)
+  if (!response.ok) {
+    const fallback = await useLocalFallback()
+    if (fallback) return fallback
+    throw new Error(`Failed to download demo media ${sourceURL}: HTTP ${response.status}`)
+  }
 
   const mimetype = response.headers.get('content-type')?.split(';')[0] ?? ''
   if (!mimetype.startsWith('image/') && mimetype !== 'video/mp4' && mimetype !== 'video/webm') throw new Error(`Demo media ${sourceURL} returned unexpected type ${mimetype || 'unknown'}.`)
