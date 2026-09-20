@@ -6,6 +6,7 @@ import { Partners } from './Partners'
 import { useActionLayer } from '../actions/ActionLayer'
 import { VkIcon } from '../components/ui/VkIcon'
 import { PhoneIcon, TelegramIcon } from '../components/ui/ContactIcons'
+import { CookiePreferencesButton } from '../components/CookieBanner'
 
 export function Footer() {
   const site = useSite()
@@ -30,5 +31,6 @@ export function Footer() {
     </div></div>
     <div className="container-page mt-16"><Partners /></div>
     <div className="container-page mt-16 flex flex-col gap-8"><div className="flex flex-col justify-between gap-8 md:flex-row"><div className="flex flex-col gap-3"><span className="type-editorial font-semibold text-white">{site.brandName}</span><p className="type-caption max-w-[280px] leading-relaxed text-white/40">{footer.legalEntity}</p><div className="flex items-center gap-2 pt-1">{footer.socialLinks.map((item) => { const Icon = socialIcons[item.provider as keyof typeof socialIcons]; const channel = item.provider === 'telegram' || item.provider === 'vk' ? item.provider : null; return <a key={item.provider} href={item.url} data-analytics-action={channel ?? 'external'} onClick={channel ? (event) => { event.preventDefault(); requestContact(channel) } : undefined} aria-label={item.label} target={item.url.startsWith('https://') ? '_blank' : undefined} rel={item.url.startsWith('https://') ? 'noreferrer' : undefined} className="se-1 type-micro flex h-[var(--control-sm)] w-[var(--control-sm)] items-center justify-center bg-white/10 font-semibold text-white/70 transition-colors hover:bg-white/20 hover:text-white focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2">{Icon ? <Icon size={15} /> : item.provider === 'instagram' ? 'IG' : 'VK'}</a> })}</div></div><div className="type-ui grid grid-cols-2 gap-x-10 gap-y-2 text-white/55 sm:flex sm:gap-16">{navColumns.map((column, index) => <div key={index} className="flex flex-col gap-2.5">{column.map((item) => <a key={item.label} href={item.href} className="transition-colors hover:text-white">{item.label}</a>)}</div>)}</div></div><div className="type-caption flex flex-col gap-3 border-t border-white/10 pt-6 text-white/40 sm:flex-row sm:items-center sm:justify-between"><span>{footer.copyright}</span><div className="flex flex-wrap gap-x-5 gap-y-1">{footer.legalLinks.map((item) => <a key={item.label} href={item.href} className="transition-colors hover:text-white/70">{item.label}</a>)}</div></div></div>
+    <div className="container-page mt-4 type-caption text-white/40"><CookiePreferencesButton /></div>
   </footer>
 }

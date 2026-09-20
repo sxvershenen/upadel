@@ -10,22 +10,25 @@ import { shouldReloadForVendorRevoke } from '../analytics/ExternalAnalytics'
 export function CookieBanner() {
   const site = useSite();
   const [visible, setVisible] = useState(false);
-  const [hasChoice, setHasChoice] = useState(false)
 
   useEffect(() => {
     if (site.analytics.mode !== 'consent-required') return
     const stored = localStorage.getItem(ANALYTICS_CONSENT_KEY)
-    setHasChoice(Boolean(stored))
     if (!stored) {
       const t = setTimeout(() => setVisible(true), 900);
       return () => clearTimeout(t);
     }
   }, [site.analytics.mode]);
 
+  useEffect(() => {
+    const openSettings = () => setVisible(true)
+    window.addEventListener('unlim:open-cookie-settings', openSettings)
+    return () => window.removeEventListener('unlim:open-cookie-settings', openSettings)
+  }, [])
+
   function accept() {
     localStorage.setItem(ANALYTICS_CONSENT_KEY, "accepted");
     window.dispatchEvent(new CustomEvent('unlim:analytics-consent', { detail: 'accepted' }))
-    setHasChoice(true)
     setVisible(false);
   }
 
@@ -34,12 +37,15 @@ export function CookieBanner() {
     localStorage.setItem(ANALYTICS_CONSENT_KEY, 'rejected')
     resetAnalyticsStorage(localStorage)
     window.dispatchEvent(new CustomEvent('unlim:analytics-consent', { detail: 'rejected' }))
-    setHasChoice(true)
     setVisible(false)
     if (hadAcceptedVendors) window.location.reload()
   }
 
   if (site.analytics.mode !== 'consent-required') return null
+
+  const noticeText = site.analytics.vendors.yandexMetrica.enabled
+    ? `${site.footer.cookieNotice.text} При согласии загружается Яндекс.Метрика.`
+    : site.footer.cookieNotice.text
 
   return (
     <><AnimatePresence>
@@ -56,12 +62,28 @@ export function CookieBanner() {
               <Cookie size={17} />
             </span>
             <p className="type-body-sm flex-1 leading-snug text-white/70">
-              {site.footer.cookieNotice.text}
+              {noticeText}
             </p>
             <div className="flex shrink-0 flex-wrap gap-2"><Button variant="neutral" size="sm" onClick={reject}>{site.footer.cookieNotice.rejectLabel}</Button><Button variant="primary" size="sm" onClick={accept}>{site.footer.cookieNotice.acceptLabel}</Button></div>
           </div>
         </motion.div>
       )}
-    </AnimatePresence>{hasChoice && !visible && <button type="button" onClick={() => setVisible(true)} className="fixed bottom-[calc(82px+env(safe-area-inset-bottom))] left-3 z-30 rounded-full bg-white/90 px-3 py-2 type-caption text-ink backdrop-blur md:bottom-3" aria-label={site.footer.cookieNotice.manageLabel}>{site.footer.cookieNotice.manageLabel}</button>}</>
+    </AnimatePresence></>
   );
+}
+
+export function CookiePreferencesButton() {
+  const site = useSite()
+  const [hasChoice, setHasChoice] = useState(false)
+
+  useEffect(() => {
+    if (site.analytics.mode !== 'consent-required') return
+    const sync = () => setHasChoice(Boolean(localStorage.getItem(ANALYTICS_CONSENT_KEY)))
+    sync()
+    window.addEventListener('unlim:analytics-consent', sync)
+    return () => window.removeEventListener('unlim:analytics-consent', sync)
+  }, [site.analytics.mode])
+
+  if (site.analytics.mode !== 'consent-required' || !hasChoice) return null
+  return <button type="button" onClick={() => window.dispatchEvent(new Event('unlim:open-cookie-settings'))} className="transition-colors hover:text-white/70">{site.footer.cookieNotice.manageLabel}</button>
 }
