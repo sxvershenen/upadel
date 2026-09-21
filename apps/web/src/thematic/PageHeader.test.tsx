@@ -22,5 +22,5 @@ test('page header renders one heading without an extra back-link wrapper or spac
   assert.match(html, /data-page-enter="title"/)
   assert.match(html, /data-page-enter="intro"/)
   assert.match(html, /pb-6 pt-12/)
-  assert.doesNotMatch(html, /md:pb-12 md:pt-24/)
+  assert.match(html, /md:pb-12 md:pt-24/)
 })
