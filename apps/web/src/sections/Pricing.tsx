@@ -74,10 +74,10 @@ export function Pricing() {
           role="tabpanel"
           tabIndex={0}
           key={active}
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 4 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.22 }}
+          exit={{ opacity: 0, y: -4 }}
+          transition={{ duration: 0.14, ease: "easeOut" }}
         >
           {active === "rent" && <PricingRent onSwiperChange={syncPricingSwiper} />}
           {active === "training" && <PricingTraining onSwiperChange={syncPricingSwiper} />}
