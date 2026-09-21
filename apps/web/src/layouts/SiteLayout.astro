@@ -109,36 +109,93 @@ const pageEntrance = Astro.url.pathname === '/gift'
       if (window.__unlimSiteEnhancements) return
       window.__unlimSiteEnhancements = true
 
+      let heroParallaxFrame = 0
+      let heroParallaxRoot = null
+      let heroParallaxMedia = null
+      const updateHeroParallax = () => {
+        heroParallaxFrame = 0
+        if (!heroParallaxRoot?.isConnected || !heroParallaxMedia?.isConnected) return
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          heroParallaxMedia.style.removeProperty('--hero-parallax-scale')
+          return
+        }
+        const rect = heroParallaxRoot.getBoundingClientRect()
+        const progress = Math.max(0, Math.min(1, -rect.top / Math.max(1, rect.height)))
+        const mobile = window.matchMedia('(max-width: 767px)').matches
+        const endScale = mobile ? 1.34 : 1.28
+        heroParallaxMedia.style.setProperty('--hero-parallax-scale', String(1.08 + (endScale - 1.08) * progress))
+      }
+      const scheduleHeroParallax = () => {
+        if (!heroParallaxFrame) heroParallaxFrame = window.requestAnimationFrame(updateHeroParallax)
+      }
+      const setupHeroParallax = () => {
+        heroParallaxMedia?.style.removeProperty('--hero-parallax-scale')
+        heroParallaxRoot = document.querySelector('[data-hero-parallax-root]')
+        heroParallaxMedia = Array.from(heroParallaxRoot?.querySelectorAll('[data-hero-parallax-media]') ?? [])
+          .find((media) => window.getComputedStyle(media).display !== 'none') ?? null
+        scheduleHeroParallax()
+      }
+      window.addEventListener('scroll', scheduleHeroParallax, { passive: true })
+      window.addEventListener('resize', setupHeroParallax, { passive: true })
+      window.visualViewport?.addEventListener('resize', scheduleHeroParallax, { passive: true })
+      document.addEventListener('astro:after-swap', setupHeroParallax)
+      setupHeroParallax()
+
       let revealObserver = null
       let revealTimer = 0
-      const revealSelector = '[data-reveal], [data-reveal-text]'
       const markRevealVisible = (element) => {
-        element.setAttribute('data-reveal-visible', 'true')
+        if (element.matches('[data-gsap-reveal]')) element.setAttribute('data-gsap-reveal-visible', 'true')
+        else element.setAttribute('data-reveal-visible', 'true')
         revealObserver?.unobserve(element)
+      }
+      const selectSectionReveals = (allTargets) => {
+        const scopes = allTargets.filter((target) => target.getAttribute('data-gsap-reveal-scope') === 'true')
+        const leafScopes = scopes.filter((scope) => !scope.querySelector('[data-gsap-reveal-scope="true"]'))
+        const selectedScopes = new Set(leafScopes)
+        return allTargets.filter((target) => {
+          if (target.parentElement?.closest('[data-page-enter-owner="true"], [data-page-enter="content"]')) return false
+          if (target.parentElement?.closest('[data-gsap-reveal-boundary="true"]')) return false
+          if (target.parentElement?.closest('[data-gsap-reveal-scope="true"]')) return selectedScopes.has(target)
+          if (selectedScopes.has(target) || target.getAttribute('data-gsap-reveal-boundary') === 'true') return true
+          return !target.querySelector('[data-gsap-reveal-boundary="true"], [data-gsap-reveal]')
+        })
       }
       const setupScrollReveals = () => {
         revealTimer = 0
         revealObserver?.disconnect()
-        const targets = Array.from(document.querySelector('#swup')?.querySelectorAll(revealSelector) ?? [])
+        const root = document.querySelector('#swup')
+        const cssTargets = Array.from(root?.querySelectorAll('[data-reveal], [data-reveal-text]') ?? [])
+        const allSectionTargets = Array.from(root?.querySelectorAll('[data-gsap-reveal]') ?? [])
+        const sectionTargets = selectSectionReveals(allSectionTargets)
+        const sectionSet = new Set(sectionTargets)
+        allSectionTargets.forEach((target) => {
+          if (sectionSet.has(target)) target.setAttribute('data-gsap-reveal-owner', 'true')
+          else target.removeAttribute('data-gsap-reveal-owner')
+        })
+        const targets = [...cssTargets, ...sectionTargets]
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
           targets.forEach((target) => markRevealVisible(target))
           document.documentElement.setAttribute('data-reveal-ready', 'true')
+          document.documentElement.setAttribute('data-gsap-reveal-ready', 'true')
           return
         }
         revealObserver = new IntersectionObserver((entries) => {
-          entries.forEach((entry) => { if (entry.isIntersecting) markRevealVisible(entry.target) })
+          entries.forEach((entry) => {
+            if (entry.isIntersecting && entry.boundingClientRect.width > 0 && entry.boundingClientRect.height > 0) markRevealVisible(entry.target)
+          })
         }, { rootMargin: '80px 0px -80px' })
         targets.forEach((target) => {
           const rect = target.getBoundingClientRect()
-          if (rect.bottom > -80 && rect.top < window.innerHeight + 80) markRevealVisible(target)
+          if (rect.width > 0 && rect.height > 0 && rect.bottom > -80 && rect.top < window.innerHeight + 80) markRevealVisible(target)
           else revealObserver.observe(target)
         })
         // Do not briefly hide visible SSR text when enabling scroll reveals.
         document.documentElement.setAttribute('data-reveal-ready', 'true')
+        document.documentElement.setAttribute('data-gsap-reveal-ready', 'true')
       }
       const scheduleScrollReveals = () => {
         const root = document.querySelector('#swup')
-        if (!root || (root.querySelector('astro-island') && root.dataset.mainReady !== 'true')) return
+        if (!root) return
         if (revealTimer) window.clearTimeout(revealTimer)
         revealTimer = window.setTimeout(setupScrollReveals, 0)
       }
@@ -149,6 +206,7 @@ const pageEntrance = Astro.url.pathname === '/gift'
         revealObserver?.disconnect()
         revealObserver = null
         document.documentElement.removeAttribute('data-reveal-ready')
+        document.documentElement.removeAttribute('data-gsap-reveal-ready')
       }
       scheduleAfterMainReady()
       window.addEventListener('DOMContentLoaded', scheduleAfterMainReady, { once: true })
@@ -224,9 +282,13 @@ const pageEntrance = Astro.url.pathname === '/gift'
       const prepareNativeImage = (image) => {
         if (!(image instanceof HTMLImageElement) || image.dataset.progressiveNative !== 'loading') return
         const settle = () => { image.dataset.progressiveNative = 'loaded' }
-        if (image.complete) settle()
+        const revealDecoded = () => {
+          if (typeof image.decode !== 'function') return settle()
+          image.decode().catch(() => {}).then(settle)
+        }
+        if (image.complete && image.naturalWidth > 0) revealDecoded()
         else {
-          image.addEventListener('load', settle, { once: true })
+          image.addEventListener('load', revealDecoded, { once: true })
           image.addEventListener('error', settle, { once: true })
         }
       }
@@ -244,17 +306,5 @@ const pageEntrance = Astro.url.pathname === '/gift'
         scheduleTypography()
       }).observe(document.body, { childList: true, characterData: true, subtree: true })
     })()
-  </script>
-  <script>
-    import { startGsapReveals, stopGsapReveals } from '../lib/gsapReveals'
-
-    // React's effect marker means the commit is finished. Astro's ssr attribute
-    // disappears earlier, while React may still be hydrating concurrently.
-    const start = () => { void startGsapReveals().catch(() => stopGsapReveals()) }
-    document.addEventListener('astro:before-swap', stopGsapReveals)
-    document.addEventListener('astro:after-swap', start)
-    document.addEventListener('unlim:main-ready', start)
-    document.addEventListener('DOMContentLoaded', start, { once: true })
-    start()
   </script>
 </html>

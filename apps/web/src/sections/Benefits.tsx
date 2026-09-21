@@ -1,7 +1,6 @@
 import { useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import type { Swiper as SwiperType } from "swiper";
-import "swiper/css";
 import { BenefitCard } from "../components/cards/BenefitCards";
 import { useContent } from "../content/ContentContext";
 import { MobileSwiperNav } from "../components/ui/MobileSwiperNav";

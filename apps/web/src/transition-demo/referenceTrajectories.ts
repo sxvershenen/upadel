@@ -23,7 +23,7 @@ const presets = [
   'court_bounce',
 ] as const
 
-export function computeReferenceTrajectory(): ReferenceTrajectory {
+function computeDesktopReferenceTrajectory(): ReferenceTrajectory {
   const preset = presets[Math.floor(Math.random() * presets.length)]
   const jitterX = (Math.random() - 0.5) * 1.5
   const jitterY = (Math.random() - 0.5) * 1
@@ -94,6 +94,31 @@ export function computeReferenceTrajectory(): ReferenceTrajectory {
         spinVector: { x: 1.8, y: 0.5, z: 1, speed: 38 },
       }
   }
+}
+
+function rotatePointForPortrait(point: ReferencePoint): ReferencePoint {
+  return { x: point.y * 0.48, y: -point.x * 0.72, z: point.z }
+}
+
+export function adaptReferenceTrajectory(trajectory: ReferenceTrajectory, portrait: boolean): ReferenceTrajectory {
+  if (!portrait) return trajectory
+  return {
+    ...trajectory,
+    preset: `${trajectory.preset}_portrait`,
+    start: rotatePointForPortrait(trajectory.start),
+    peak: rotatePointForPortrait(trajectory.peak),
+    control: rotatePointForPortrait(trajectory.control),
+    end: rotatePointForPortrait(trajectory.end),
+    spinVector: {
+      ...trajectory.spinVector,
+      x: trajectory.spinVector.y,
+      y: -trajectory.spinVector.x,
+    },
+  }
+}
+
+export function computeReferenceTrajectory(options: { portrait?: boolean } = {}): ReferenceTrajectory {
+  return adaptReferenceTrajectory(computeDesktopReferenceTrajectory(), options.portrait === true)
 }
 
 export function evaluateReferenceTrajectory(traj: ReferenceTrajectory, progress: number): ReferencePoint {

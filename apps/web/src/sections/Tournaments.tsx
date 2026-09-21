@@ -2,7 +2,6 @@ import { useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import type { Swiper as SwiperType } from "swiper";
-import "swiper/css";
 import { useContent } from "../content/ContentContext";
 import { TournamentCard } from "../components/cards/TournamentCard";
 import { SectionHeader } from "../components/ui/SectionHeader";

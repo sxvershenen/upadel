@@ -17,7 +17,7 @@ import type { RevealConfig } from "../ui/revealAttributes";
 
 export type Coach = HomepageDTO["entities"]["coaches"][number];
 
-export function CoachCard({ coach, loading = "eager", reveal = true }: { coach: Coach; loading?: "eager" | "lazy"; reveal?: RevealConfig }) {
+export function CoachCard({ coach, loading = "lazy", reveal = true }: { coach: Coach; loading?: "eager" | "lazy"; reveal?: RevealConfig }) {
   const [open, setOpen] = useState(false);
   const closeDialog = useCallback(() => setOpen(false), []);
   const photoRef = useRef<HTMLDivElement>(null);

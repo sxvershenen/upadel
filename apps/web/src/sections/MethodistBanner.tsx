@@ -24,6 +24,8 @@ export function MethodistBanner() {
             src={banner.decorativeMedia?.url}
             alt=""
             aria-hidden="true"
+            loading="lazy"
+            decoding="async"
             variants={{ rest: { scale: 1, rotate: 0, y: 0 }, hover: { scale: 1.05, rotate: 4, y: -7 } }}
             transition={springSoft}
             className="pointer-events-none absolute -bottom-28 right-[-8%] z-0 h-[230px] w-auto opacity-95 md:right-[10%] md:h-[290px]"

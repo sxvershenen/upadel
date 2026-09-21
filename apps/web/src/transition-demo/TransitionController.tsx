@@ -21,8 +21,9 @@ function getSurface() {
 }
 
 function pickFlight(lastPreset: string | undefined) {
-  let trajectory = computeReferenceTrajectory()
-  if (lastPreset && trajectory.preset === lastPreset) trajectory = computeReferenceTrajectory()
+  const portrait = window.matchMedia('(max-width: 767px) and (orientation: portrait)').matches
+  let trajectory = computeReferenceTrajectory({ portrait })
+  if (lastPreset && trajectory.preset === lastPreset) trajectory = computeReferenceTrajectory({ portrait })
   return trajectory
 }
 

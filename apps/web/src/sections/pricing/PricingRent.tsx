@@ -1,7 +1,6 @@
 import { useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import type { Swiper as SwiperType } from "swiper";
-import "swiper/css";
 import { RentalRateCard } from "../../components/cards/RentPricingCards";
 import { useContent } from "../../content/ContentContext";
 import { Reveal } from "../../components/ui/Reveal";

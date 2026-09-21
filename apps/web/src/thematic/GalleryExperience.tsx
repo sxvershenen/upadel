@@ -3,7 +3,6 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import type { Swiper as SwiperType } from 'swiper'
-import 'swiper/css'
 
 import { Dialog } from '../components/ui/Dialog'
 import { IconButton } from '../components/ui/Button'

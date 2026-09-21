@@ -791,7 +791,7 @@ export function PadelCourtZakazPage({ dto, publicOrigin }: { dto: PadelCourtZaka
 
         {/* 5. ИНФОГРАФИКА ТЕХНОЛОГИЙ JUBO (НЕТ БЛЮРА НА КАРТИНКЕ, НЕТ ОБВОДОК У ПЛАШЕК, АНИМАЦИЯ БЕЗ 0 OPACITY) */}
         <section className="relative isolate overflow-hidden py-16 text-white md:py-24 bg-ink" aria-labelledby="tech-title">
-          <ProgressiveImage src={dto.technology.background.url} alt={dto.technology.background.alt} className="absolute inset-0 h-full w-full object-cover" />
+          <ProgressiveImage src={dto.technology.background.url} alt={dto.technology.background.alt} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
           {/* Чистое затемнение без размытия/блюра фонового изображения */}
           <div className="absolute inset-0 bg-ink/80" />
 

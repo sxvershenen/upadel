@@ -1,6 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useState } from "react";
 import { CalendarCheck, MapPin, Play, Star, Users } from "lucide-react";
 import { ContentAction } from "../components/ContentAction";
 import { useContent } from "../content/ContentContext";
@@ -9,18 +7,15 @@ import { cn } from "../utils/cn";
 import type { MediaDTO } from "@unlim/content-contract";
 import { ProgressiveImage } from "../components/ui/ProgressiveImage";
 
-gsap.registerPlugin(ScrollTrigger);
-const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
-
 export function resolveHeroParallaxTarget<T>(mobile: boolean, desktopTarget: T | null, mobileTarget: T | null) {
   return mobile ? mobileTarget ?? desktopTarget : desktopTarget ?? mobileTarget;
 }
 
-function HeroBackgroundMedia({ media, poster, className, setRef }: { media: MediaDTO; poster?: MediaDTO | null; className?: string; setRef?: (node: HTMLImageElement | HTMLVideoElement | null) => void }) {
+function HeroBackgroundMedia({ media, poster, className }: { media: MediaDTO; poster?: MediaDTO | null; className?: string }) {
   const classes = cn("absolute inset-0 h-full w-full object-cover", className);
   return media.mimeType.startsWith("video/")
-    ? <video ref={setRef} data-hero-parallax-media={setRef ? "" : undefined} autoPlay muted loop playsInline poster={poster?.url} className={classes}><source src={media.url} type={media.mimeType} /></video>
-    : <ProgressiveImage ref={setRef} data-hero-parallax-media={setRef ? "" : undefined} src={media.url} alt={media.alt} loading="eager" fetchPriority="high" decoding="async" className={classes} />;
+    ? <video data-hero-parallax-media="" autoPlay muted loop playsInline poster={poster?.url} className={classes}><source src={media.url} type={media.mimeType} /></video>
+    : <ProgressiveImage data-hero-parallax-media="" src={media.url} alt={media.alt} loading="eager" fetchPriority="high" decoding="async" className={classes} />;
 }
 
 function SocialProof({ className }: { className?: string }) {
@@ -60,60 +55,11 @@ export function Hero() {
   const hero = home.hero;
   const replaceBrand = Boolean(site.brandLogo) && site.brandLogoMode === "replace";
   const [brandLogoFailed, setBrandLogoFailed] = useState(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const desktopMediaRef = useRef<HTMLImageElement | HTMLVideoElement>(null);
-  const mobileMediaRef = useRef<HTMLImageElement | HTMLVideoElement>(null);
-
-  useIsomorphicLayoutEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
-
-    const mediaQueries = gsap.matchMedia();
-    mediaQueries.add({ mobile: "(max-width: 767px)", reduce: "(prefers-reduced-motion: reduce)" }, (context) => {
-      if (context.conditions?.reduce) return;
-      const mobile = Boolean(context.conditions?.mobile);
-      const target = resolveHeroParallaxTarget(mobile, desktopMediaRef.current, mobileMediaRef.current);
-      if (!target) return;
-
-      const sync = () => {
-        ScrollTrigger.refresh();
-        ScrollTrigger.update();
-      };
-      const animation = gsap.fromTo(
-        target,
-        { scale: 1.08 },
-        {
-          scale: mobile ? 1.24 : 1.28,
-          ease: "none",
-          scrollTrigger: {
-            trigger: section,
-            start: "top top",
-            end: "bottom top",
-            scrub: true,
-            invalidateOnRefresh: true,
-          },
-        },
-      );
-      target.addEventListener("load", sync);
-      target.addEventListener("loadeddata", sync);
-      const frame = window.requestAnimationFrame(sync);
-
-      return () => {
-        window.cancelAnimationFrame(frame);
-        target.removeEventListener("load", sync);
-        target.removeEventListener("loadeddata", sync);
-        animation.scrollTrigger?.kill();
-        animation.kill();
-      };
-    });
-
-    return () => mediaQueries.revert();
-  }, [hero.desktopMedia?.url, hero.mobileMedia?.url]);
 
   return (
-    <section id="top" ref={sectionRef} className="relative isolate h-[100svh] min-h-[720px] w-full overflow-hidden bg-ink">
-      {hero.desktopMedia && <HeroBackgroundMedia media={hero.desktopMedia} poster={hero.desktopPoster} setRef={(node) => { desktopMediaRef.current = node; }} className={hero.mobileMedia ? "hidden md:block" : undefined} />}
-      {hero.mobileMedia && <HeroBackgroundMedia media={hero.mobileMedia} poster={hero.mobilePoster} setRef={(node) => { mobileMediaRef.current = node; }} className="md:hidden" />}
+    <section id="top" data-hero-parallax-root="" className="relative isolate h-[100svh] min-h-[720px] w-full overflow-hidden bg-ink">
+      {hero.desktopMedia && <HeroBackgroundMedia media={hero.desktopMedia} poster={hero.desktopPoster} className={hero.mobileMedia ? "hidden md:block" : undefined} />}
+      {hero.mobileMedia && <HeroBackgroundMedia media={hero.mobileMedia} poster={hero.mobilePoster} className="md:hidden" />}
       <div
         className="absolute inset-0"
         style={{

@@ -68,9 +68,9 @@ export function generateSeamPoints(numPoints = 600): THREE.Vector3[] {
 }
 
 // Generate high quality procedural textures for the tennis ball
-export function createTennisBallTextures(style: TennisBallStyle) {
-  const width = 1024;
-  const height = 512;
+export function createTennisBallTextures(style: TennisBallStyle, options: { width?: number; height?: number; seamPoints?: number } = {}) {
+  const width = options.width ?? 512;
+  const height = options.height ?? 256;
 
   const colorCanvas = document.createElement('canvas');
   colorCanvas.width = width;
@@ -87,7 +87,7 @@ export function createTennisBallTextures(style: TennisBallStyle) {
   roughnessCanvas.height = height;
   const roughnessCtx = roughnessCanvas.getContext('2d')!;
 
-  const seamPoints = generateSeamPoints(500);
+  const seamPoints = generateSeamPoints(options.seamPoints ?? Math.max(180, Math.round(width * 0.7)));
 
   // Group seam points by latitude buckets for fast lookup (spatial indexing)
   const numBuckets = 64;
@@ -251,17 +251,17 @@ function stampBrandText(ctx: CanvasRenderingContext2D, text: string, w: number, 
   // Place brand in center of one lobe
   ctx.translate(w * 0.25, h * 0.5);
   ctx.rotate(-0.08);
-  ctx.font = 'bold 32px "Trebuchet MS", "Impact", sans-serif';
+  ctx.font = `bold ${Math.max(10, Math.round(w / 32))}px "Trebuchet MS", "Impact", sans-serif`;
   ctx.fillStyle = 'rgba(20, 25, 20, 0.72)';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.letterSpacing = '3px';
+  ctx.letterSpacing = `${Math.max(1, Math.round(w / 340))}px`;
   ctx.fillText(text, 0, 0);
 
   // Subtle stamped ink texture
-  ctx.font = 'bold 16px monospace';
+  ctx.font = `bold ${Math.max(7, Math.round(w / 64))}px monospace`;
   ctx.fillStyle = 'rgba(30, 35, 30, 0.45)';
-  ctx.fillText('OFFICIAL STAGE 1', 0, 26);
+  ctx.fillText('OFFICIAL STAGE 1', 0, Math.max(9, Math.round(h / 20)));
   ctx.restore();
 }
 

@@ -8,6 +8,7 @@ export function MainContentReady() {
     if (!surface?.isConnected) return
 
     surface.dataset.mainReady = 'true'
+    performance.mark('unlim-main-ready')
     document.dispatchEvent(new Event('unlim:main-ready'))
   }, [])
 

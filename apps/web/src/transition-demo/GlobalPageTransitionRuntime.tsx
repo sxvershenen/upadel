@@ -7,9 +7,9 @@ import { useEffect, useRef } from 'react'
 import { ReferenceBallScene, type ReferenceBallSceneHandle } from './ReferenceBallScene'
 import { waitForGsapAnimation } from './animationLifecycle'
 import { computeReferenceTrajectory } from './referenceTrajectories'
-import { playTransitionWhoosh } from './transitionAudioLoader'
+import { transitionAudio } from './transitionAudio'
 
-const duration = 1000
+const duration = 980
 
 function getSurface() {
   const surface = document.querySelector<HTMLElement>('#swup')
@@ -40,9 +40,9 @@ function animateOut() {
   const surface = getSurface()
   return waitForGsapAnimation(gsap.to(surface, {
     opacity: 0.2,
-    y: -25,
-    scale: 1.03,
-    duration: 0.45,
+    y: -18,
+    scale: 1.02,
+    duration: 0.34,
     ease: 'power2.in',
     onInterrupt: () => clearTransitionStyles(surface),
   }))
@@ -51,12 +51,12 @@ function animateOut() {
 function animateIn() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return Promise.resolve()
   const surface = getSurface()
-  gsap.set(surface, { opacity: 0, y: 35, scale: 0.95 })
+  gsap.set(surface, { opacity: 0, y: 28, scale: 0.97 })
   return waitForGsapAnimation(gsap.to(surface, {
     opacity: 1,
     y: 0,
     scale: 1,
-    duration: 0.6,
+    duration: 0.64,
     ease: 'power4.out',
     onComplete: () => clearTransitionStyles(surface),
     onInterrupt: () => clearTransitionStyles(surface),
@@ -77,12 +77,18 @@ export function GlobalPageTransitionRuntime() {
         return new URL(url, window.location.href).pathname.startsWith('/transitions/')
       },
       hooks: {
-        'visit:start': () => {
+        'visit:start': (visit) => {
+          // Keep the current page stable until the next document is ready.
+          // The visual transition can then run as one uninterrupted timeline.
+          visit.animation.wait = true
+        },
+        'animation:out:start': () => {
           document.dispatchEvent(new Event('astro:before-swap'))
           if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            const trajectory = computeReferenceTrajectory()
+            const portrait = window.matchMedia('(max-width: 767px) and (orientation: portrait)').matches
+            const trajectory = computeReferenceTrajectory({ portrait })
             ballRef.current?.startFlight(trajectory, duration)
-            playTransitionWhoosh(duration / 1000)
+            transitionAudio.playWhoosh(duration / 1000)
           }
         },
         'page:view': () => {

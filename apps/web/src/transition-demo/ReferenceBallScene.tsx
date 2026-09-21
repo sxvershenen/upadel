@@ -15,8 +15,6 @@ interface ActiveFlight {
   duration: number
 }
 
-const TRAIL_COUNT = 80
-
 export const ReferenceBallScene = forwardRef<ReferenceBallSceneHandle>(function ReferenceBallScene(_props, ref) {
   const mountRef = useRef<HTMLDivElement>(null)
   const ballGroupRef = useRef<THREE.Group | null>(null)
@@ -32,6 +30,7 @@ export const ReferenceBallScene = forwardRef<ReferenceBallSceneHandle>(function 
   useImperativeHandle(ref, () => ({
     startFlight: (trajectory, duration) => {
       activeFlightRef.current = { trajectory, duration, startedAt: performance.now() }
+      if (mountRef.current) mountRef.current.dataset.flightActive = 'true'
       if (animationFrameRef.current === null) animationFrameRef.current = window.requestAnimationFrame(() => tickRef.current?.())
     },
     cancel: () => {
@@ -41,6 +40,10 @@ export const ReferenceBallScene = forwardRef<ReferenceBallSceneHandle>(function 
       if (trailRef.current) trailRef.current.visible = false
       if (animationFrameRef.current !== null) window.cancelAnimationFrame(animationFrameRef.current)
       animationFrameRef.current = null
+      if (mountRef.current) {
+        delete mountRef.current.dataset.flightActive
+        delete mountRef.current.dataset.flightProgress
+      }
       renderRef.current?.()
     },
   }), [])
@@ -51,18 +54,20 @@ export const ReferenceBallScene = forwardRef<ReferenceBallSceneHandle>(function 
 
     const width = Math.max(1, container.clientWidth)
     const height = Math.max(1, container.clientHeight)
+    const compact = window.matchMedia('(max-width: 767px), (max-height: 560px)').matches || (navigator.hardwareConcurrency ?? 8) <= 4
+    const trailCount = compact ? 24 : 48
     const scene = new THREE.Scene()
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100)
     camera.position.set(0, 0, 5)
     let renderer: THREE.WebGLRenderer
     try {
-      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'high-performance' })
+      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: !compact, powerPreference: 'high-performance' })
     } catch {
       // Page navigation must remain available when WebGL is unavailable or denied.
       return
     }
     renderer.setSize(width, height)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, compact ? 1.25 : 1.75))
     renderer.toneMapping = THREE.ACESFilmicToneMapping
     renderer.toneMappingExposure = 1.15
     renderer.domElement.style.pointerEvents = 'none'
@@ -89,8 +94,10 @@ export const ReferenceBallScene = forwardRef<ReferenceBallSceneHandle>(function 
     scene.add(fillLight)
 
     const style = TENNIS_STYLES.wimbledon
-    const geom = new THREE.SphereGeometry(1, 96, 64)
-    const { diffuseMap, bumpMap, roughnessMap } = createTennisBallTextures(style)
+    const geom = new THREE.SphereGeometry(1, compact ? 40 : 72, compact ? 28 : 48)
+    const { diffuseMap, bumpMap, roughnessMap } = createTennisBallTextures(style, compact
+      ? { width: 256, height: 128, seamPoints: 180 }
+      : { width: 512, height: 256, seamPoints: 360 })
     const mat = new THREE.MeshPhysicalMaterial({
       map: diffuseMap,
       bumpMap,
@@ -107,7 +114,7 @@ export const ReferenceBallScene = forwardRef<ReferenceBallSceneHandle>(function 
     ballGroup.add(ballMesh)
     ballMeshRef.current = ballMesh
 
-    const fuzzGeom = new THREE.SphereGeometry(1.025, 48, 36)
+    const fuzzGeom = new THREE.SphereGeometry(1.025, compact ? 24 : 40, compact ? 18 : 28)
     const fuzzMat = new THREE.ShaderMaterial({
       transparent: true,
       depthWrite: false,
@@ -141,10 +148,10 @@ export const ReferenceBallScene = forwardRef<ReferenceBallSceneHandle>(function 
     ballGroup.add(fuzzShell)
     fuzzShellRef.current = fuzzShell
 
-    const trailPositions = new Float32Array(TRAIL_COUNT * 3)
-    for (let index = 0; index < TRAIL_COUNT; index += 1) trailPositions[index * 3 + 2] = -999
+    const trailPositions = new Float32Array(trailCount * 3)
+    for (let index = 0; index < trailCount; index += 1) trailPositions[index * 3 + 2] = -999
     const trailGeom = new THREE.BufferGeometry()
-    trailGeom.setAttribute('position', new THREE.BufferAttribute(trailPositions, 3))
+    trailGeom.setAttribute('position', new THREE.BufferAttribute(trailPositions, 3).setUsage(THREE.DynamicDrawUsage))
     const trailMat = new THREE.PointsMaterial({
       color: new THREE.Color(style.rimColor),
       size: 0.12,
@@ -172,7 +179,10 @@ export const ReferenceBallScene = forwardRef<ReferenceBallSceneHandle>(function 
           historyRef.current = []
           ballGroup.visible = false
           trailPoints.visible = false
+          delete container.dataset.flightActive
+          delete container.dataset.flightProgress
         } else {
+          container.dataset.flightProgress = progress.toFixed(3)
           ballGroup.visible = true
           trailPoints.visible = true
           const position = evaluateReferenceTrajectory(activeFlight.trajectory, progress)
@@ -182,9 +192,12 @@ export const ReferenceBallScene = forwardRef<ReferenceBallSceneHandle>(function 
           ballMeshRef.current.rotation.set(spin.x * angle, spin.y * angle, spin.z * angle)
           fuzzShell.rotation.copy(ballMeshRef.current.rotation)
 
-          historyRef.current.unshift(new THREE.Vector3(position.x, position.y, position.z))
-          if (historyRef.current.length > 50) historyRef.current.pop()
-          for (let index = 0; index < 50; index += 1) {
+          const historyPoint = historyRef.current.length >= trailCount
+            ? historyRef.current.pop()!
+            : new THREE.Vector3()
+          historyPoint.set(position.x, position.y, position.z)
+          historyRef.current.unshift(historyPoint)
+          for (let index = 0; index < trailCount; index += 1) {
             if (index < historyRef.current.length) {
               const point = historyRef.current[index]
               const spread = index * 0.015
