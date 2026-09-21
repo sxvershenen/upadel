@@ -15,49 +15,6 @@ function isInternalNavigableLink(target: EventTarget | null): boolean {
   }
 }
 
-function scheduleAfterMainReady(run: () => void) {
-  let stopped = false
-  let scheduled = false
-  let firstFrame = 0
-  let secondFrame = 0
-  let idle: number | undefined
-  let timer: number | undefined
-
-  const eligible = () => document.readyState === 'complete' && document.visibilityState === 'visible' && Boolean(document.querySelector('#swup'))
-  const attempt = () => {
-    if (stopped || scheduled || !eligible()) return
-    scheduled = true
-    firstFrame = window.requestAnimationFrame(() => {
-      secondFrame = window.requestAnimationFrame(() => {
-        const finish = () => {
-          if (stopped) return
-          if (!eligible()) { scheduled = false; return }
-          stop()
-          run()
-        }
-        if (typeof window.requestIdleCallback === 'function') idle = window.requestIdleCallback(finish, { timeout: 2000 })
-        else timer = window.setTimeout(finish, 100)
-      })
-    })
-  }
-  function stop() {
-    stopped = true
-    window.removeEventListener('load', attempt)
-    document.removeEventListener('unlim:main-ready', attempt)
-    document.removeEventListener('visibilitychange', attempt)
-    window.cancelAnimationFrame(firstFrame)
-    window.cancelAnimationFrame(secondFrame)
-    if (idle !== undefined && typeof window.cancelIdleCallback === 'function') window.cancelIdleCallback(idle)
-    if (timer !== undefined) window.clearTimeout(timer)
-  }
-
-  window.addEventListener('load', attempt)
-  document.addEventListener('unlim:main-ready', attempt)
-  document.addEventListener('visibilitychange', attempt)
-  attempt()
-  return stop
-}
-
 export function GlobalPageTransition() {
   const [Runtime, setRuntime] = useState<TransitionRuntime | null>(null)
   const importRef = useRef<Promise<void> | null>(null)
@@ -82,14 +39,12 @@ export function GlobalPageTransition() {
       if (isInternalNavigableLink(event.target)) void loadRuntime()
     }
 
-    const cancel = scheduleAfterMainReady(() => { void loadRuntime() })
     document.addEventListener('pointerover', primeOnIntent, { passive: true })
     document.addEventListener('focusin', primeOnIntent)
     document.addEventListener('touchstart', primeOnIntent, { passive: true })
 
     return () => {
       disposed = true
-      cancel()
       document.removeEventListener('pointerover', primeOnIntent)
       document.removeEventListener('focusin', primeOnIntent)
       document.removeEventListener('touchstart', primeOnIntent)

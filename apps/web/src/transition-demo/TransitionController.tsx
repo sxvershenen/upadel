@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import { ReferenceBallScene, type ReferenceBallSceneHandle } from './ReferenceBallScene'
 import { computeReferenceTrajectory, type ReferenceTrajectory } from './referenceTrajectories'
 import type { TransitionPageKey } from './TransitionDemoData'
-import { transitionAudio } from './transitionAudio'
+import { playTransitionWhoosh } from './transitionAudioLoader'
 
 const transitionDuration = 1000
 const swupClasses = ['swup-enabled', 'is-changing', 'is-rendering', 'is-popstate', 'is-animating', 'is-leaving', 'to-']
@@ -91,7 +91,7 @@ export function TransitionController({ initialPage }: { initialPage: TransitionP
           const trajectory = pickFlight(flightRef.current?.preset)
           flightRef.current = trajectory
           ballSceneRef.current?.startFlight(trajectory, transitionDuration)
-          transitionAudio.playWhoosh(transitionDuration / 1000)
+          playTransitionWhoosh(transitionDuration / 1000)
           setBusy(true)
         },
         'page:view': (visit) => {

@@ -11,7 +11,7 @@ All fixed public routes are CMS-backed, including catalog/detail pages, mobile p
 - `apps/web` — Astro public site with React islands.
 - `apps/cms` — Next.js + Payload CMS, API, admin UI and analytics.
 - PostgreSQL — content, business entities, leads and analytics.
-- Media storage — Payload-managed images/video; provider is not selected yet.
+- Media storage — Payload-managed images/video; seed-critical Pexels assets are versioned under `apps/cms/seed-media/pexels`, while the runtime upload directory stays deployment-managed.
 
 Create a shared package only when real cross-app code appears. Do not add abstractions in advance.
 

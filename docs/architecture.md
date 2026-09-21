@@ -47,7 +47,7 @@ Article bodies use a collection-specific Payload Lexical editor with H2–H4, fi
 ## Delivery rules
 
 - Published content is read by server-rendered Astro routes on the next request; Payload contains a live preview of secure Astro draft URLs.
-- `npm run seed:cms` idempotently seeds the prototype demo data/media and rehydrates seed-owned media files missing from the local Payload media directory. Production web reads only the versioned `/api/public/homepage` projection.
+- `npm run seed:cms` idempotently seeds the prototype demo data/media, uses versioned local assets for Pexels sources, and rehydrates seed-owned media files missing from the local Payload media directory. Production web reads only the versioned `/api/public/homepage` projection.
 - Convert uploaded raster images to WebP quality 80 before storage and generate responsive derivatives; inputs are capped at 25 MiB. MP4/WebM inputs are capped at 100 MiB and stored without transcoding until production storage is selected.
 - Booking buttons call one adapter; provider configuration is global and validated before publish.
 - The shared code route registry drives the authenticated page map and public SEO index. Redirects are loaded once when Astro starts and require restart/deploy to change.

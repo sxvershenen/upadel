@@ -14,6 +14,7 @@ const seedVersion = 'prototype-v2'
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const webPublicDir = path.resolve(dirname, '../../web/public')
 const mediaDir = path.resolve(dirname, '../media')
+const seedMediaDir = path.resolve(dirname, '../seed-media')
 
 const stats = {
   created: 0,
@@ -70,41 +71,41 @@ const images = {
 }
 
 const localMedia = {
-  autoSpa: 'images/benefits/auto-spa.png',
-  bookingPhone: 'booking-phone.png',
-  foodDrinks: 'images/benefits/food-drinks.png',
-  methodistCompass: 'methodist-compass.png',
-  padelBall: 'padel-ball.png',
-  padelRacket: 'padel-racket.png',
-  parkingSign: 'parking-sign.png',
-  varlionEquipment: 'images/benefits/varlion-equipment.png',
-  articleTechniqueReady: 'images/articles/technique-ready.png',
-  articleTechniqueGlass: 'images/articles/technique-glass.png',
-  articleTechniqueOverhead: 'images/articles/technique-overhead.png',
-  articleTechniquePreview: 'images/articles/technique-preview.png',
-  articleTechniqueCoverV2: 'images/articles/technique-cover-v2.png',
-  articleVarlionShapes: 'images/articles/varlion-shapes.png',
-  articleVarlionSummum: 'images/articles/varlion-summum.png',
-  articleVarlionBalance: 'images/articles/varlion-balance.png',
-  articleVarlionPreview: 'images/articles/varlion-preview.png',
-  articleVarlionCover: 'images/articles/varlion-cover.png',
-  articleBeginnerCourt: 'images/articles/beginner-court.png',
-  articleBeginnerKit: 'images/articles/beginner-kit.png',
-  articleBeginnerDrill: 'images/articles/beginner-drill.png',
-  articleBeginnerKitV2: 'images/articles/beginner-kit-v2.png',
-  articleBeginnerPreview: 'images/articles/beginner-preview.png',
-  articleBeginnerCoverV2: 'images/articles/beginner-cover-v2.png',
-  articlePadelTennisSplit: 'images/articles/padel-tennis-split.png',
-  articleJuboGlass: 'images/articles/jubo-glass.png',
-  articlePadelTennisTactics: 'images/articles/padel-tennis-tactics.png',
-  articlePadelTennisPreview: 'images/articles/padel-tennis-preview.png',
-  articlePadelTennisCoverV2: 'images/articles/tennis-cover-v2.png',
-  articleLevelsMatch: 'images/articles/levels-match.png',
-  articleLevelsCoach: 'images/articles/levels-coach.png',
-  articleLevelsScale: 'images/articles/levels-scale.png',
-  articleLevelsCoachV2: 'images/articles/levels-coach-v2.png',
-  articleLevelsPreview: 'images/articles/levels-preview.png',
-  articleLevelsCover: 'images/articles/levels-cover.png',
+  autoSpa: 'images/benefits/auto-spa.webp',
+  bookingPhone: 'booking-phone.webp',
+  foodDrinks: 'images/benefits/food-drinks.webp',
+  methodistCompass: 'methodist-compass.webp',
+  padelBall: 'padel-ball.webp',
+  padelRacket: 'padel-racket.webp',
+  parkingSign: 'parking-sign.webp',
+  varlionEquipment: 'images/benefits/varlion-equipment.webp',
+  articleTechniqueReady: 'images/articles/technique-ready.webp',
+  articleTechniqueGlass: 'images/articles/technique-glass.webp',
+  articleTechniqueOverhead: 'images/articles/technique-overhead.webp',
+  articleTechniquePreview: 'images/articles/technique-preview.webp',
+  articleTechniqueCoverV2: 'images/articles/technique-cover-v2.webp',
+  articleVarlionShapes: 'images/articles/varlion-shapes.webp',
+  articleVarlionSummum: 'images/articles/varlion-summum.webp',
+  articleVarlionBalance: 'images/articles/varlion-balance.webp',
+  articleVarlionPreview: 'images/articles/varlion-preview.webp',
+  articleVarlionCover: 'images/articles/varlion-cover.webp',
+  articleBeginnerCourt: 'images/articles/beginner-court.webp',
+  articleBeginnerKit: 'images/articles/beginner-kit.webp',
+  articleBeginnerDrill: 'images/articles/beginner-drill.webp',
+  articleBeginnerKitV2: 'images/articles/beginner-kit-v2.webp',
+  articleBeginnerPreview: 'images/articles/beginner-preview.webp',
+  articleBeginnerCoverV2: 'images/articles/beginner-cover-v2.webp',
+  articlePadelTennisSplit: 'images/articles/padel-tennis-split.webp',
+  articleJuboGlass: 'images/articles/jubo-glass.webp',
+  articlePadelTennisTactics: 'images/articles/padel-tennis-tactics.webp',
+  articlePadelTennisPreview: 'images/articles/padel-tennis-preview.webp',
+  articlePadelTennisCoverV2: 'images/articles/tennis-cover-v2.webp',
+  articleLevelsMatch: 'images/articles/levels-match.webp',
+  articleLevelsCoach: 'images/articles/levels-coach.webp',
+  articleLevelsScale: 'images/articles/levels-scale.webp',
+  articleLevelsCoachV2: 'images/articles/levels-coach-v2.webp',
+  articleLevelsPreview: 'images/articles/levels-preview.webp',
+  articleLevelsCover: 'images/articles/levels-cover.webp',
   giftBox: 'images/gift/box.jpg',
   giftCard: 'images/gift/card.jpg',
 } as const
@@ -475,15 +476,45 @@ async function createMedia(
 
 async function ensureRemoteMedia(payload: Payload, sourceURL: string, alt: string): Promise<SeededRecord> {
   const seedKey = `prototype-media:${hash(sourceURL)}`
+  const isPexelsSource = sourceURL.startsWith('https://images.pexels.com/')
   const existing = await findBySeedKey(payload, 'media', seedKey)
   if (existing && await storedMediaFilesExist(existing)) {
     stats.skipped += 1
     return existing
   }
 
+  const useBundledPexelsMedia = async (): Promise<SeededRecord | null> => {
+    let source: URL
+    try { source = new URL(sourceURL) } catch { return null }
+    if (source.hostname !== 'images.pexels.com') return null
+
+    const filename = `pexels-${hash(sourceURL)}.webp`
+    const filePath = path.join(seedMediaDir, filename)
+    try { await stat(filePath) } catch { return null }
+    return createMedia(
+      payload,
+      sourceURL,
+      { data: await readFile(filePath), mimetype: 'image/webp', name: filename },
+      alt,
+      'Bundled project media downloaded from the approved prototype Pexels source.',
+      'Pexels source URL retained for attribution and provenance; the deployed seed uses the versioned local asset.',
+    )
+  }
+
+  const bundledPexelsMedia = await useBundledPexelsMedia()
+  if (bundledPexelsMedia) return bundledPexelsMedia
+  if (isPexelsSource) {
+    throw new Error(`Bundled Pexels seed media is missing for ${sourceURL}. Add the matching file to apps/cms/seed-media/pexels.`)
+  }
+
   const useLocalFallback = async (): Promise<SeededRecord | null> => {
     const prefix = hash(sourceURL)
-    const names = (await readdir(mediaDir)).filter((name) => name.startsWith(`remote-${prefix}`) || name.startsWith(`pexels-${prefix}`))
+    let names: string[] = []
+    try {
+      names = (await readdir(mediaDir)).filter((name) => name.startsWith(`remote-${prefix}`) || name.startsWith(`pexels-${prefix}`))
+    } catch {
+      // A fresh deployment may not have a local Payload upload directory yet.
+    }
     const name = names.find((candidate) => !/-\d+x\d+\./.test(candidate)) ?? names[0] ?? 'page-heroes/courts.webp'
     const filePath = names.length > 0 ? path.join(mediaDir, name) : path.join(webPublicDir, name)
     try { await stat(filePath) } catch { return null }
@@ -534,6 +565,24 @@ async function ensureLocalMedia(payload: Payload, filename: string, alt: string)
 
   const data = await readFile(path.join(webPublicDir, filename))
   const mimetype = filename.endsWith('.webp') ? 'image/webp' : 'image/png'
+
+  if (filename.endsWith('.webp')) {
+    const legacySource = `apps/web/public/${filename.slice(0, -'.webp'.length)}.png`
+    const legacy = await findBySeedKey(payload, 'media', `prototype-media:${hash(legacySource)}`)
+    if (legacy) {
+      const migrated = await payload.update({
+        collection: 'media',
+        id: legacy.id,
+        data: { seedKey, sourceURL: source },
+        file: { data, mimetype, name: filename, size: data.byteLength },
+        depth: 0,
+        overrideAccess: true,
+      } as never) as unknown as SeededRecord
+      stats.mediaRehydrated += 1
+      return migrated
+    }
+  }
+
   return createMedia(
     payload,
     source,

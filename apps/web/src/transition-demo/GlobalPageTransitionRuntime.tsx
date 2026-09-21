@@ -7,7 +7,7 @@ import { useEffect, useRef } from 'react'
 import { ReferenceBallScene, type ReferenceBallSceneHandle } from './ReferenceBallScene'
 import { waitForGsapAnimation } from './animationLifecycle'
 import { computeReferenceTrajectory } from './referenceTrajectories'
-import { transitionAudio } from './transitionAudio'
+import { playTransitionWhoosh } from './transitionAudioLoader'
 
 const duration = 1000
 
@@ -82,7 +82,7 @@ export function GlobalPageTransitionRuntime() {
           if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
             const trajectory = computeReferenceTrajectory()
             ballRef.current?.startFlight(trajectory, duration)
-            transitionAudio.playWhoosh(duration / 1000)
+            playTransitionWhoosh(duration / 1000)
           }
         },
         'page:view': () => {
