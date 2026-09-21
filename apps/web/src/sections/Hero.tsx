@@ -55,25 +55,28 @@ export function Hero() {
   const replaceBrand = Boolean(site.brandLogo) && site.brandLogoMode === "replace";
   const [brandLogoFailed, setBrandLogoFailed] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
-  const mediaRef = useRef<HTMLImageElement | HTMLVideoElement>(null);
+  const desktopMediaRef = useRef<HTMLImageElement | HTMLVideoElement>(null);
+  const mobileMediaRef = useRef<HTMLImageElement | HTMLVideoElement>(null);
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const touchViewport = window.matchMedia("(max-width: 767px)").matches;
-    if (reduce || touchViewport || !sectionRef.current || !mediaRef.current) return;
+    const mediaRef = touchViewport ? mobileMediaRef : desktopMediaRef;
+    if (reduce || !sectionRef.current || !mediaRef.current) return;
 
     const ctx = gsap.context(() => {
       gsap.fromTo(
         mediaRef.current,
         { scale: 1.08 },
         {
-          scale: 1.28,
+          scale: touchViewport ? 1.16 : 1.28,
           ease: "none",
           scrollTrigger: {
             trigger: sectionRef.current,
             start: "top top",
             end: "bottom top",
-            scrub: 0.6,
+            scrub: touchViewport ? 0.35 : 0.6,
+            invalidateOnRefresh: true,
           },
         },
       );
@@ -84,8 +87,8 @@ export function Hero() {
 
   return (
     <section id="top" ref={sectionRef} className="relative isolate h-[100svh] min-h-[720px] w-full overflow-hidden bg-ink">
-      {hero.desktopMedia && <HeroBackgroundMedia media={hero.desktopMedia} poster={hero.desktopPoster} setRef={(node) => { mediaRef.current = node; }} className={hero.mobileMedia ? "hidden md:block" : undefined} />}
-      {hero.mobileMedia && <HeroBackgroundMedia media={hero.mobileMedia} poster={hero.mobilePoster} className="md:hidden" />}
+      {hero.desktopMedia && <HeroBackgroundMedia media={hero.desktopMedia} poster={hero.desktopPoster} setRef={(node) => { desktopMediaRef.current = node; }} className={hero.mobileMedia ? "hidden md:block" : undefined} />}
+      {hero.mobileMedia && <HeroBackgroundMedia media={hero.mobileMedia} poster={hero.mobilePoster} setRef={(node) => { mobileMediaRef.current = node; }} className="md:hidden" />}
       <div
         className="absolute inset-0"
         style={{

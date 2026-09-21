@@ -1,7 +1,7 @@
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { ChevronDown } from 'lucide-react'
 import { createPortal } from 'react-dom'
-import { useEffect, useId, useRef, useState, type KeyboardEvent, type Ref } from 'react'
+import { useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent, type Ref } from 'react'
 
 import { cn } from '../../utils/cn'
 
@@ -53,21 +53,28 @@ export function Select({
     return () => document.removeEventListener('pointerdown', closeOnOutsidePointer)
   }, [open])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!open) return
     const updateMenuPosition = () => {
       const rect = rootRef.current?.getBoundingClientRect()
       if (!rect) return
-      setMenuPosition({ top: rect.bottom + 6, left: rect.left, width: rect.width })
+      const contentWidth = menuRef.current?.scrollWidth ?? rect.width
+      const width = Math.min(Math.max(rect.width, contentWidth), window.innerWidth - 16)
+      const left = Math.max(8, Math.min(rect.left, window.innerWidth - width - 8))
+      setMenuPosition((current) => current && current.top === rect.bottom + 6 && current.left === left && current.width === width
+        ? current
+        : { top: rect.bottom + 6, left, width })
     }
     updateMenuPosition()
+    const frame = window.requestAnimationFrame(updateMenuPosition)
     window.addEventListener('resize', updateMenuPosition)
     window.addEventListener('scroll', updateMenuPosition, true)
     return () => {
+      window.cancelAnimationFrame(frame)
       window.removeEventListener('resize', updateMenuPosition)
       window.removeEventListener('scroll', updateMenuPosition, true)
     }
-  }, [open])
+  }, [open, options.length])
 
   const choose = (next: SelectOption) => {
     onChange(next.value)

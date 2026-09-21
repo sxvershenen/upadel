@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { BadgeCheck, Star } from "lucide-react";
 import type { HomepageDTO } from "@unlim/content-contract";
@@ -17,6 +17,7 @@ export type Coach = HomepageDTO["entities"]["coaches"][number];
 
 export function CoachCard({ coach, loading = "eager", reveal = true }: { coach: Coach; loading?: "eager" | "lazy"; reveal?: RevealConfig }) {
   const [open, setOpen] = useState(false);
+  const closeDialog = useCallback(() => setOpen(false), []);
   const photoRef = useRef<HTMLDivElement>(null);
   const photoY = useImageParallax(photoRef);
 
@@ -38,7 +39,7 @@ export function CoachCard({ coach, loading = "eager", reveal = true }: { coach: 
       </WhiteCard>
     </button>
 
-    <Dialog open={open} onClose={() => setOpen(false)} title={coach.name}>
+    <Dialog open={open} onClose={closeDialog} title={coach.name}>
       <div className="grid gap-6 md:grid-cols-[240px_1fr]">
         <img src={coach.photo.url} alt={coach.photo.alt} className="se-3 aspect-[4/5] h-full max-h-[360px] w-full object-cover" />
         <div className="flex flex-col">
@@ -49,7 +50,7 @@ export function CoachCard({ coach, loading = "eager", reveal = true }: { coach: 
             <div className="flex justify-between gap-4"><dt className="text-ink-soft">Опыт</dt><dd className="text-right text-ink">{coach.experience}</dd></div>
             <div className="flex justify-between gap-4"><dt className="text-ink-soft">Языки</dt><dd className="text-right text-ink">{coach.languages}</dd></div>
           </dl>
-          <div className="mt-5 flex flex-wrap items-center justify-between gap-4"><Price label="тренировка от" value={coach.priceFrom} /><div className="flex gap-2"><ButtonLink href={`/coaches/${coach.slug}`} variant="neutral">Подробнее</ButtonLink><Button onClick={() => setOpen(false)}>{coach.action.label ?? "Выбрать тренера"}</Button></div></div>
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-4"><Price label="тренировка от" value={coach.priceFrom} /><div className="flex gap-2"><ButtonLink href={`/coaches/${coach.slug}`} variant="neutral">Подробнее</ButtonLink><Button onClick={closeDialog}>{coach.action.label ?? "Выбрать тренера"}</Button></div></div>
         </div>
       </div>
     </Dialog>
