@@ -1,0 +1,14 @@
+[Unit]
+Description=UNLIM analytics aggregation and retention
+After=unlim-cms.service
+
+[Service]
+Type=oneshot
+User=unlim
+Group=unlim
+WorkingDirectory=/srv/unlim/current
+Environment=NODE_ENV=production
+EnvironmentFile=/srv/unlim/shared/.env.production
+ExecStart=/usr/bin/npm run analytics:maintain
+NoNewPrivileges=true
+PrivateTmp=true

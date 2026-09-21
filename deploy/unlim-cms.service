@@ -1,0 +1,23 @@
+[Unit]
+Description=UNLIM Payload CMS
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=unlim
+Group=unlim
+WorkingDirectory=/srv/unlim/current/apps/cms
+Environment=NODE_ENV=production
+Environment=HOSTNAME=127.0.0.1
+Environment=PORT=3000
+EnvironmentFile=/srv/unlim/shared/.env.production
+ExecStart=/usr/bin/npm run start
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

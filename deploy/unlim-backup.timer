@@ -1,0 +1,10 @@
+[Unit]
+Description=Weekly UNLIM production backup
+
+[Timer]
+OnCalendar=Sun *-*-* 04:15:00
+Persistent=true
+RandomizedDelaySec=10min
+
+[Install]
+WantedBy=timers.target

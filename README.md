@@ -36,6 +36,8 @@ Production admin uses `PAYLOAD_ADMIN_ROUTE` and `ADMIN_USERNAME` from the server
 
 Production backup uses [`deploy/backup.sh`](deploy/backup.sh): one weekly archive plus a pre-migration archive, retaining only `unlim-backup-latest.tar.gz` and `unlim-backup-previous.tar.gz`. The archive contains PostgreSQL, Payload media, production environment and release metadata; source/build dependencies remain reproducible from GitHub.
 
+Clean-server bootstrap, Nginx, systemd and release instructions are in [`deploy/README.md`](deploy/README.md). Copy [`deploy/env.production.example`](deploy/env.production.example) to `/srv/unlim/shared/.env.production`, replace every placeholder and keep the resulting file at mode `600`.
+
 ## Product surface
 
 Public routes: `/`, `/blog`, `/prices`, `/training`, `/coaches`, `/courts`, `/tournaments`, `/about`, `/contacts`, `/policy`, `/oferta`, `/padel-court-zakaz` (with `/padel-courts` redirect), plus article and entity detail pages.

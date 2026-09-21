@@ -1,0 +1,23 @@
+[Unit]
+Description=UNLIM Astro public web
+After=network.target unlim-cms.service
+Wants=unlim-cms.service
+
+[Service]
+Type=simple
+User=unlim
+Group=unlim
+WorkingDirectory=/srv/unlim/current
+Environment=NODE_ENV=production
+Environment=HOST=127.0.0.1
+Environment=PORT=4321
+EnvironmentFile=/srv/unlim/shared/.env.production
+ExecStart=/usr/bin/node apps/web/dist/server/entry.mjs
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
