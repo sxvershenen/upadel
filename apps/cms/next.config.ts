@@ -17,7 +17,10 @@ const nextConfig: NextConfig = {
     if (process.env.NODE_ENV === 'production') {
       headers.push({ key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' })
     }
-    return [{ source: '/:path*', headers }]
+    return [
+      { source: '/api/media/file/:path*', headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }] },
+      { source: '/:path*', headers },
+    ]
   },
   images: {
     localPatterns: [

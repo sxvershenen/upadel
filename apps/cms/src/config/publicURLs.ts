@@ -23,3 +23,7 @@ export function payloadPublicURLConfig(env: { PUBLIC_CMS_URL?: string; PUBLIC_WE
     csrf,
   }
 }
+
+export function publicContentOrigin(requestOrigin: string, configured = process.env.PUBLIC_CONTENT_URL): string {
+  return httpOrigin(configured) ?? requestOrigin
+}

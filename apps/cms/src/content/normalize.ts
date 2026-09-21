@@ -9,11 +9,17 @@ function isMedia(value: unknown): value is Media {
   return typeof value === 'object' && value !== null && 'url' in value && 'mimeType' in value
 }
 
+function publicMediaURL(value: string, origin: string): string {
+  const resolved = new URL(value, origin)
+  if (resolved.pathname.startsWith('/api/media/file/')) return new URL(resolved.pathname + resolved.search, origin).toString()
+  return resolved.toString()
+}
+
 export function mediaDTO(value: unknown, origin: string, variant: MediaVariant = 'card'): MediaDTO | null {
   if (!isMedia(value) || !value.url || !value.mimeType) return null
   const selected = value.mimeType.startsWith('image/') && variant !== 'original' ? value.sizes?.[variant] : null
   const url = selected?.url ?? value.url
-  return { alt: value.alt, height: selected?.height ?? value.height, mimeType: selected?.mimeType ?? value.mimeType, url: new URL(url, origin).toString(), width: selected?.width ?? value.width }
+  return { alt: value.alt, height: selected?.height ?? value.height, mimeType: selected?.mimeType ?? value.mimeType, url: publicMediaURL(url, origin), width: selected?.width ?? value.width }
 }
 
 export function requiredMedia(value: unknown, origin: string, variant: MediaVariant = 'card'): MediaDTO {
@@ -73,7 +79,7 @@ export function siteDTO(site: SiteSetting, origin: string, partners: Array<Recor
       navigation: (site.footerNavigation ?? []).map(({ label, href, column }) => ({ label, href, column })), socialLinks: (site.socialLinks ?? []).map(({ provider, label, url }) => ({ provider, label, url })), legalLinks: (site.legalLinks ?? []).map(({ label, href }) => ({ label, href })), copyright: site.copyright ?? '', cookieNotice: { text: site.cookieNotice?.text ?? '', acceptLabel: site.cookieNotice?.acceptLabel ?? 'Принять', rejectLabel: site.cookieNotice?.rejectLabel ?? 'Отклонить', manageLabel: site.cookieNotice?.manageLabel ?? 'Настроить cookies' },
     },
     analytics: {
-      mode: site.analytics?.mode ?? 'consent-required', endpoint: new URL('/api/public/analytics', process.env.PUBLIC_CMS_URL ?? origin).toString(), schemaVersion: 1,
+      mode: site.analytics?.mode ?? 'consent-required', endpoint: new URL('/api/public/analytics', process.env.PUBLIC_CONTENT_URL ?? process.env.PUBLIC_CMS_URL ?? origin).toString(), schemaVersion: 1,
       vendors: {
         yandexMetrica: { enabled: externalAnalyticsAllowed && site.analytics?.yandexMetricaEnabled === true && Boolean(site.analytics?.yandexMetricaCounterID), counterId: site.analytics?.yandexMetricaCounterID, webvisor: site.analytics?.yandexMetricaWebvisor === true },
         ga4: { enabled: externalAnalyticsAllowed && site.analytics?.ga4Enabled === true && Boolean(site.analytics?.ga4MeasurementID), measurementId: site.analytics?.ga4MeasurementID },
@@ -87,7 +93,7 @@ export function siteDTO(site: SiteSetting, origin: string, partners: Array<Recor
     },
     contactConfirmation: {
       avatar: mediaDTO(confirmation?.avatar, origin, 'thumbnail'), dialogTitle: confirmation?.dialogTitle ?? 'Связаться с клубом', cancelLabel: confirmation?.cancelLabel ?? 'Отмена', continueLabel: confirmation?.continueLabel ?? 'Продолжить',
-      formTitle: confirmation?.formTitle ?? 'Оставить заявку', submitLabel: confirmation?.submitLabel ?? 'Отправить', successTitle: confirmation?.successTitle ?? 'Заявка отправлена', successText: confirmation?.successText ?? '', consentLabel: confirmation?.consentLabel ?? '', leadEndpoint: new URL('/api/public/leads', process.env.PUBLIC_CMS_URL ?? origin).toString(), policyHref: confirmation?.policyHref ?? '/policy',
+      formTitle: confirmation?.formTitle ?? 'Оставить заявку', submitLabel: confirmation?.submitLabel ?? 'Отправить', successTitle: confirmation?.successTitle ?? 'Заявка отправлена', successText: confirmation?.successText ?? '', consentLabel: confirmation?.consentLabel ?? '', leadEndpoint: new URL('/api/public/leads', process.env.PUBLIC_CONTENT_URL ?? process.env.PUBLIC_CMS_URL ?? origin).toString(), policyHref: confirmation?.policyHref ?? '/policy',
       channels: [
         { channel: 'phone', enabled: confirmation?.phoneEnabled !== false, label: 'Телефон', displayValue: site.phoneDisplay ?? '', destination: `tel:${site.phoneValue ?? ''}` },
         { channel: 'email', enabled: confirmation?.emailEnabled !== false, label: 'Email', displayValue: site.email ?? '', destination: `mailto:${site.email ?? ''}` },

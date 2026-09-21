@@ -6,6 +6,7 @@ import { getPayload } from 'payload'
 import { createPadelCourtZakazProjection } from '@/content/padelCourtZakazProjection'
 import { createThematicPageProjection } from '@/content/thematicPageProjection'
 import type { ThematicPageKind } from '@/globals/ThematicPages'
+import { publicContentOrigin } from '@/config/publicURLs'
 
 export const dynamic = 'force-dynamic'
 const kinds = new Set<ThematicPageKind>(['prices', 'training', 'gift', 'courts', 'gallery', 'about', 'contacts', 'policy', 'oferta'])
@@ -25,8 +26,8 @@ export async function GET(request: Request, context: { params: Promise<{ type: s
   try {
     const payload = await getPayload({ config })
     const result = type === padelCourtZakazKind
-      ? await createPadelCourtZakazProjection(payload, { origin: url.origin, preview })
-      : await createThematicPageProjection(payload, { kind: type as ThematicPageKind, origin: url.origin, preview })
+      ? await createPadelCourtZakazProjection(payload, { origin: publicContentOrigin(url.origin, process.env.PUBLIC_CONTENT_URL), preview })
+      : await createThematicPageProjection(payload, { kind: type as ThematicPageKind, origin: publicContentOrigin(url.origin, process.env.PUBLIC_CONTENT_URL), preview })
     return Response.json(result, { headers: { 'Cache-Control': preview ? 'no-store' : 'public, max-age=0, s-maxage=60, stale-while-revalidate=300' } })
   } catch (error) {
     return Response.json({ error: error instanceof Error ? error.message : 'Unable to build page projection.' }, { status: 500, headers: { 'Cache-Control': 'no-store' } })

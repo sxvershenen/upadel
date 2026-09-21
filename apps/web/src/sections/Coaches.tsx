@@ -67,12 +67,12 @@ export function Coaches() {
               1024: { slidesPerView: 4 },
               1280: { slidesPerView: 4 },
             }}
-            className="swiper-breathe !px-5 md:!px-0"
+            className="coaches-swiper swiper-breathe !px-5 md:!px-0"
           >
             {entities.coaches.map((coach) => (
               <SwiperSlide key={coach.id} className="!h-auto">
                 <div>
-                  <CoachCard coach={coach} />
+                  <CoachCard coach={coach} loading="lazy" />
                 </div>
               </SwiperSlide>
             ))}

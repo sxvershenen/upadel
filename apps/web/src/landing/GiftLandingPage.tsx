@@ -436,7 +436,7 @@ export function GiftLandingPage({ dto, publicOrigin = 'https://unlimriga.ru' }: 
 
       {/* 1. HERO ШАПКА ВИДОМ КАК У PAGE-VIEW (БЕЗ БЕЙДЖЕЙ, БЕЗ КНОПОК И МЕТРИК) */}
       <header className="page-hero relative isolate overflow-hidden bg-ink py-12 text-white md:pb-12 md:pt-24">
-        <ProgressiveImage src={giftPage?.page.hero.media.url ?? '/images/gift/card.jpg'} alt={giftPage?.page.hero.media.alt ?? ''} className="absolute inset-0 -z-20 h-full w-full object-cover grayscale" />
+        <ProgressiveImage src={giftPage?.page.hero.media.url ?? '/images/gift/card.jpg'} alt={giftPage?.page.hero.media.alt ?? ''} loading="eager" fetchPriority="high" decoding="async" className="absolute inset-0 -z-20 h-full w-full object-cover grayscale" />
         <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(3,5,8,.95)_0%,rgba(3,5,8,.84)_52%,rgba(3,5,8,.62)_100%)]" />
 
         <div className="container-page relative z-10">

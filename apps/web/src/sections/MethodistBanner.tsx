@@ -20,6 +20,7 @@ export function MethodistBanner() {
       <Reveal>
         <motion.div initial="rest" whileHover="hover" variants={{ rest: { y: 0, scale: 1 }, hover: { y: -5, scale: 1.012 } }} transition={springSoft} className={`se-4 ${meshClasses[banner.meshTone] ?? "mesh-lavender"} relative isolate flex flex-col overflow-hidden p-6 text-white md:p-8`}>
           <ProgressiveImage
+            skeleton={false}
             src={banner.decorativeMedia?.url}
             alt=""
             aria-hidden="true"

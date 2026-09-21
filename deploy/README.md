@@ -103,3 +103,25 @@ When systemd is unavailable, source `/srv/unlim/shared/.env.production`, then ru
 cd /srv/unlim/current/apps/cms && NODE_ENV=production PORT=3000 npm run start
 cd /srv/unlim/current && NODE_ENV=production HOST=127.0.0.1 PORT=4321 node apps/web/dist/server/entry.mjs
 ```
+
+## Local phone preview
+
+For a phone on the same Wi‑Fi, bind both dev servers to all interfaces and project browser-facing media/forms through the web same-origin proxy. Replace `192.168.1.20` with the computer's LAN address:
+
+```sh
+cd apps/cms
+PUBLIC_CMS_URL=http://192.168.1.20:3000 \
+PUBLIC_CONTENT_URL=http://192.168.1.20:4321 \
+PUBLIC_WEB_URL=http://192.168.1.20:4321 \
+LEAD_ALLOWED_ORIGINS=http://192.168.1.20:4321 \
+ANALYTICS_ALLOWED_ORIGINS=http://192.168.1.20:4321 \
+npm run dev -- --hostname 0.0.0.0
+
+cd apps/web
+CMS_URL=http://127.0.0.1:3000 \
+CMS_PROXY_URL=http://127.0.0.1:3000 \
+PUBLIC_SITE_URL=http://192.168.1.20:4321 \
+npx astro dev --host 0.0.0.0 --force
+```
+
+Open `http://192.168.1.20:4321` on the phone. Only the web port is needed for pages, media, analytics and lead forms. Allow incoming Node.js connections in the computer firewall and disable Wi‑Fi client isolation if the router enables it.

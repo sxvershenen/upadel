@@ -4,6 +4,7 @@ import config from '@payload-config'
 import { getPayload } from 'payload'
 
 import { createCatalogProjection, createDetailProjection, type CatalogKind } from '@/content/catalogProjection'
+import { publicContentOrigin } from '@/config/publicURLs'
 
 export const dynamic = 'force-dynamic'
 const kinds = new Set<CatalogKind>(['blog', 'coaches', 'tournaments'])
@@ -26,8 +27,8 @@ export async function GET(request: Request, context: { params: Promise<{ type: s
   try {
     const payload = await getPayload({ config })
     const result = slug
-      ? await createDetailProjection(payload, { kind, origin: url.origin, preview, slug })
-      : await createCatalogProjection(payload, { kind, origin: url.origin, preview })
+      ? await createDetailProjection(payload, { kind, origin: publicContentOrigin(url.origin, process.env.PUBLIC_CONTENT_URL), preview, slug })
+      : await createCatalogProjection(payload, { kind, origin: publicContentOrigin(url.origin, process.env.PUBLIC_CONTENT_URL), preview })
     if (!result) return Response.json({ error: 'Not found.' }, { status: 404, headers: { 'Cache-Control': 'no-store' } })
     return Response.json(result, { headers: { 'Cache-Control': preview ? 'no-store' : 'public, max-age=0, s-maxage=60, stale-while-revalidate=300' } })
   } catch (error) {

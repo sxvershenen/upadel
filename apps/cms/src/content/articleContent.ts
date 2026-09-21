@@ -61,7 +61,9 @@ function safeMediaURL(value: unknown, origin: string): string | null {
   if (typeof value !== 'string' || !value.trim()) return null
   try {
     const url = new URL(value, origin)
-    return url.protocol === 'https:' || url.protocol === 'http:' ? url.toString() : null
+    if (url.protocol !== 'https:' && url.protocol !== 'http:') return null
+    if (url.pathname.startsWith('/api/media/file/')) return new URL(url.pathname + url.search, origin).toString()
+    return url.toString()
   } catch {
     return null
   }

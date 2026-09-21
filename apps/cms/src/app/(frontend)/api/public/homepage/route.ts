@@ -4,6 +4,7 @@ import config from '@payload-config'
 import { getPayload } from 'payload'
 
 import { createHomepageProjection } from '@/content/homepageProjection'
+import { publicContentOrigin } from '@/config/publicURLs'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,7 +25,7 @@ export async function GET(request: Request): Promise<Response> {
 
   try {
     const payload = await getPayload({ config })
-    const dto = await createHomepageProjection(payload, { origin: url.origin, preview: previewRequested })
+    const dto = await createHomepageProjection(payload, { origin: publicContentOrigin(url.origin, process.env.PUBLIC_CONTENT_URL), preview: previewRequested })
     return Response.json(dto, {
       headers: {
         'Cache-Control': previewRequested ? 'no-store' : 'public, max-age=0, s-maxage=60, stale-while-revalidate=300',
