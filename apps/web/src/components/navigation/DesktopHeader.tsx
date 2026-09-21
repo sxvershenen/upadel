@@ -1,7 +1,7 @@
 import type { DesktopNavigationChild, DesktopNavigationItem } from '@unlim/content-contract'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
-import { ArrowUpRight, CalendarCheck, ChevronDown, Dumbbell, Gift, Home, Info, LayoutGrid, Newspaper, Tag, Trophy, UsersRound, type LucideIcon } from 'lucide-react'
-import { useEffect, useId, useLayoutEffect, useRef, useState, type FocusEvent, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
+import { ArrowUpRight, CalendarCheck, ChevronDown, Dumbbell, Home, Info, LayoutGrid, Newspaper, Tag, UsersRound } from 'lucide-react'
+import { useEffect, useId, useLayoutEffect, useRef, useState, type ComponentType, type FocusEvent, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 
 import { useActionLayer } from '../../actions/ActionLayer'
 import { useHomeHref, useSite } from '../../content/ContentContext'
@@ -11,17 +11,33 @@ import { VkIcon } from '../ui/VkIcon'
 import { PhoneIcon, TelegramIcon } from '../ui/ContactIcons'
 import { bindHeaderScroll, desktopSubmenuKeyAction, HEADER_MORPH_LOCK_MS, HEADER_TOP_THRESHOLD, initialHeaderScrollState, navigationIconPreset, nextHeaderScrollState, type HeaderScrollState, type NavigationIconPreset } from './desktopHeaderState'
 
-const navigationIcons: Record<NavigationIconPreset, LucideIcon> = {
+type NavigationGlyphProps = { size?: number; strokeWidth?: number }
+
+function TournamentNavigationIcon({ size = 16, strokeWidth = 1.9 }: NavigationGlyphProps) {
+  return <svg data-navigation-glyph="tournaments" aria-hidden="true" width={size} height={size} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3.7 1.7h12.6v3.1c0 4.05-2.6 6.9-6.3 6.9S3.7 8.85 3.7 4.8V1.7Z" />
+    <path d="M3.7 4.5h-2v1.4c0 2.25 1.35 3.9 3.4 4.35m11.2-5.75h2v1.4c0 2.25-1.35 3.9-3.4 4.35M10 11.7v5.1M5 18.3h10" />
+  </svg>
+}
+
+function GiftNavigationIcon({ size = 16, strokeWidth = 1.9 }: NavigationGlyphProps) {
+  return <svg data-navigation-glyph="gift" aria-hidden="true" width={size} height={size} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+    <path d="M2.2 7.8h15.6v10.5H2.2zM1.7 5.6h16.6v2.2H1.7zM10 5.6v12.7" />
+    <path d="M10 5.6c-2 0-5-.35-5-2.15 0-1.05.82-1.75 1.8-1.75 1.75 0 3.2 1.95 3.2 3.9Zm0 0c2 0 5-.35 5-2.15 0-1.05-.82-1.75-1.8-1.75-1.75 0-3.2 1.95-3.2 3.9Z" />
+  </svg>
+}
+
+const navigationIcons: Record<NavigationIconPreset, ComponentType<NavigationGlyphProps>> = {
   about: Info,
   article: Newspaper,
   coaches: UsersRound,
   courts: LayoutGrid,
   default: LayoutGrid,
-  gift: Gift,
+  gift: GiftNavigationIcon,
   home: Home,
   prices: Tag,
   training: Dumbbell,
-  tournaments: Trophy,
+  tournaments: TournamentNavigationIcon,
 }
 
 const iconHover = { scale: 1.08, y: -1 }

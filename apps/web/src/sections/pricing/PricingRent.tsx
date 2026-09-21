@@ -13,7 +13,7 @@ export function PricingRent({ onSwiperChange }: { onSwiperChange?: (swiper: Swip
   const trial = entities.rentalRates.find(({ cardVariant }) => cardVariant === "trial");
   const standards = entities.rentalRates.find(({ cardVariant }) => cardVariant === "standards");
   const swiperRef = useRef<SwiperType | null>(null);
-  const swipeHintRef = useMobileSwipeHint(swiperRef);
+  const swipeHintRef = useMobileSwipeHint(swiperRef, "home-pricing");
   return <div className="grid gap-4 lg:grid-cols-12 lg:grid-rows-[minmax(320px,1fr)_minmax(190px,auto)]">
     {standardRates.map((rate, index) => <Reveal key={rate.id} delay={index * 0.06} className="hidden lg:col-span-4 lg:row-start-1 lg:block"><RentalRateCard rate={rate} /></Reveal>)}
     {trial && <Reveal delay={0.1} className="hidden lg:col-span-8 lg:row-start-2 lg:block"><RentalRateCard rate={trial} layout="wide" /></Reveal>}

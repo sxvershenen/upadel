@@ -14,7 +14,7 @@ export function Tournaments() {
   const swiperRef = useRef<SwiperType | null>(null);
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
-  const swipeHintRef = useMobileSwipeHint(swiperRef);
+  const swipeHintRef = useMobileSwipeHint(swiperRef, "home-tournaments");
   return <section id="tournaments" className="container-page py-20 md:py-28">
     <Reveal><SectionHeader eyebrow={home.tournamentsSection.eyebrow} title={home.tournamentsSection.title} titleClassName="max-w-[150px] md:max-w-none" action={<div className="flex shrink-0 flex-col items-end gap-2"><SectionAction action={{ mode: 'internal-link', href: '/tournaments', label: 'Все' }} className="w-[88px] justify-between">Все</SectionAction><MobileSwiperNav className="md:hidden" atStart={atStart} atEnd={atEnd} onPrev={() => swiperRef.current?.slidePrev()} onNext={() => swiperRef.current?.slideNext()} /></div>} className="mb-10 !flex-nowrap items-start gap-3" /></Reveal>
     <Reveal className="hidden gap-4 md:grid md:grid-cols-3">{entities.tournaments.map((tournament, index) => <Reveal key={tournament.id} delay={index * 0.08}><TournamentCard tournament={tournament} loading="lazy" /></Reveal>)}</Reveal>

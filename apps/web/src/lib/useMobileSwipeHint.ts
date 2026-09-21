@@ -1,12 +1,14 @@
 import { useEffect, useRef } from "react";
 import type { Swiper as SwiperType } from "swiper";
 
-export function useMobileSwipeHint(swiperRef: { current: SwiperType | null }) {
+const playedSwipeHints = new Set<string>();
+
+export function useMobileSwipeHint(swiperRef: { current: SwiperType | null }, hintKey: string) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container || !window.matchMedia("(max-width: 1023px)").matches || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!container || playedSwipeHints.has(hintKey) || !window.matchMedia("(max-width: 1023px)").matches || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     let played = false;
     let forwardTimer: number | undefined;
@@ -42,6 +44,7 @@ export function useMobileSwipeHint(swiperRef: { current: SwiperType | null }) {
       swiper.updateSlidesClasses();
       swiper.allowClick = true;
       played = true;
+      playedSwipeHints.add(hintKey);
     };
 
     const play = () => {
@@ -56,6 +59,7 @@ export function useMobileSwipeHint(swiperRef: { current: SwiperType | null }) {
       }
 
       played = true;
+      playedSwipeHints.add(hintKey);
       const startTranslate = swiper.getTranslate();
       const hintDistance = Math.min(180, Math.max(130, swiper.width * 0.45));
       forwardTimer = window.setTimeout(() => {
@@ -85,7 +89,7 @@ export function useMobileSwipeHint(swiperRef: { current: SwiperType | null }) {
       container.removeEventListener('pointerdown', stopHintForInteraction);
       clearHintTimers();
     };
-  }, [swiperRef]);
+  }, [hintKey, swiperRef]);
 
   return containerRef;
 }

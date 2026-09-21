@@ -44,12 +44,12 @@ export function TrainingPage({ dto }: { dto: TrainingPageDTO }) {
   ]
 
   const formatSwiperRef = useRef<SwiperType | null>(null)
-  const formatSwipeHintRef = useMobileSwipeHint(formatSwiperRef)
+  const formatSwipeHintRef = useMobileSwipeHint(formatSwiperRef, 'training-formats')
 
   const coachesSwiperRef = useRef<SwiperType | null>(null)
   const [coachesAtStart, setCoachesAtStart] = useState(true)
   const [coachesAtEnd, setCoachesAtEnd] = useState(false)
-  const coachesSwipeHintRef = useMobileSwipeHint(coachesSwiperRef)
+  const coachesSwipeHintRef = useMobileSwipeHint(coachesSwiperRef, 'training-coaches')
 
   const coaches = dto.coaches ?? []
 
@@ -89,7 +89,7 @@ export function TrainingPage({ dto }: { dto: TrainingPageDTO }) {
       </section>
 
       {/* 2. Training Formats */}
-      <section className="mt-16 md:mt-24" aria-labelledby="training-formats-title">
+      <section className="mt-20 md:mt-24" aria-labelledby="training-formats-title">
         <SectionHeader
           titleId="training-formats-title"
           eyebrow={dto.programsEyebrow}
@@ -130,7 +130,7 @@ export function TrainingPage({ dto }: { dto: TrainingPageDTO }) {
               <SwiperSlide key={`${entry.kind}-${entry.item.id}`} className="!h-auto">
                 <div className="h-full min-h-[500px]">
                   {entry.kind === 'program' ? (
-                    <TrainingCard training={entry.item} />
+                    <TrainingCard training={entry.item} interactive={false} />
                   ) : (
                     <RentalRateCard
                       rate={entry.item}
@@ -148,7 +148,7 @@ export function TrainingPage({ dto }: { dto: TrainingPageDTO }) {
 
       {/* 3. Coaches Section - Swiss Swiper matching homepage style */}
       {coaches.length > 0 && (
-        <section className="mt-16 md:mt-24" aria-labelledby="coaches-title">
+        <section className="mt-20 md:mt-24" aria-labelledby="coaches-title">
           <SectionHeader
             titleId="coaches-title"
             eyebrow={dto.coachesEyebrow}
@@ -225,14 +225,7 @@ export function TrainingPage({ dto }: { dto: TrainingPageDTO }) {
       )}
 
       {/* 4. Knowledge base: first visit on the left, FAQ on the right */}
-      <section className="mt-16 md:mt-24" aria-labelledby="training-guide-title">
-        <SectionHeader
-          titleId="training-guide-title"
-          eyebrow={dto.knowledgeEyebrow}
-          title={dto.knowledgeTitle}
-          className="mb-8"
-        />
-
+      <section className="mt-20 md:mt-24" aria-label={dto.knowledgeTitle}>
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-0 lg:divide-x lg:divide-ink/10">
           <div className="lg:pr-16">
             <Typography as="h2" role="section" className="font-semibold text-ink">{typograph(dto.firstVisitTitle)}</Typography>

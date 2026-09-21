@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import type { Swiper as SwiperType } from "swiper";
 import { SectionHeader } from "../components/ui/SectionHeader";
 import { Tabs } from "../components/ui/Tabs";
@@ -68,30 +67,19 @@ export function Pricing() {
         <Tabs fullWidth layoutId="pricing-tabs-mobile" tabs={pricingTabs} value={active} onChange={changeTab} />
       </div>
 
-      <motion.div
+      <div
         id="pricing-panel"
         data-gsap-reveal-boundary="true"
         role="tabpanel"
         tabIndex={0}
-        layout="size"
-        transition={{ layout: { duration: 0.3, ease: [0.2, 0.8, 0.2, 1] } }}
         className="relative grid overflow-visible"
       >
-        <AnimatePresence initial={false} mode="wait">
-          <motion.div
-            key={active}
-            className="col-start-1 row-start-1 w-full"
-            initial={{ y: 8 }}
-            animate={{ y: 0 }}
-            exit={{ y: -6 }}
-            transition={{ duration: 0.18, ease: [0.2, 0.8, 0.2, 1] }}
-          >
-            {active === "rent" && <PricingRent onSwiperChange={syncPricingSwiper} />}
-            {active === "training" && <PricingTraining onSwiperChange={syncPricingSwiper} />}
-            {active === "memberships" && <PricingMemberships onSwiperChange={syncPricingSwiper} />}
-          </motion.div>
-        </AnimatePresence>
-      </motion.div>
+        <div key={active} className="col-start-1 row-start-1 w-full">
+          {active === "rent" && <PricingRent onSwiperChange={syncPricingSwiper} />}
+          {active === "training" && <PricingTraining onSwiperChange={syncPricingSwiper} />}
+          {active === "memberships" && <PricingMemberships onSwiperChange={syncPricingSwiper} />}
+        </div>
+      </div>
     </section>
   );
 }

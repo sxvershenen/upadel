@@ -146,8 +146,8 @@ test('TrainingPage renders Swiss layout with methodology pillars, formats, coach
   assert.match(html, /aria-label="Предыдущие тренеры"/)
   assert.match(html, /aria-label="Следующие тренеры"/)
 
-  // Knowledge base / guide accordion
-  assert.match(plainText, /Перед первой тренировкой/)
+  // Knowledge base goes straight to its two useful columns without a duplicate section title.
+  assert.doesNotMatch(plainText, /Перед первой тренировкой/)
   assert.match(plainText, /Как проходят тренировки по паделу/)
   assert.match(plainText, /Как выбрать формат занятий/)
 

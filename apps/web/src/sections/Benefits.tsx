@@ -15,7 +15,7 @@ export function Benefits() {
   const swiperRef = useRef<SwiperType | null>(null);
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
-  const swipeHintRef = useMobileSwipeHint(swiperRef);
+  const swipeHintRef = useMobileSwipeHint(swiperRef, "home-benefits");
 
   return <section className="container-page py-20 md:py-28">
     <Reveal><div className="mb-10 max-w-[760px] md:mb-12"><SectionHeader eyebrow={home.benefits.eyebrow} title={home.benefits.title} titleClassName="max-w-[240px] md:max-w-none" action={<MobileSwiperNav className="lg:hidden" atStart={atStart} atEnd={atEnd} onPrev={() => swiperRef.current?.slidePrev()} onNext={() => swiperRef.current?.slideNext()} />} /></div></Reveal>

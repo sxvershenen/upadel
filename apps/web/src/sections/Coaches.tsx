@@ -15,7 +15,7 @@ export function Coaches() {
   const swiperRef = useRef<SwiperType | null>(null);
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
-  const swipeHintRef = useMobileSwipeHint(swiperRef);
+  const swipeHintRef = useMobileSwipeHint(swiperRef, "home-coaches");
 
   return (
     <section id="coaches" className="container-page py-20 md:py-28">

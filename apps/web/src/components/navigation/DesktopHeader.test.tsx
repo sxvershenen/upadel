@@ -63,4 +63,6 @@ test('tournament and gift icons use the same centered wrapper as every navigatio
     assert.match(icon, /class="relative block h-5 w-5 shrink-0"/)
     assert.doesNotMatch(icon, /translate-/)
   })
+  assert.match(html, /data-navigation-glyph="tournaments"/)
+  assert.match(html, /data-navigation-glyph="gift"/)
 })

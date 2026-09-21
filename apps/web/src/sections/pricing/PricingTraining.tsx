@@ -11,9 +11,9 @@ export function PricingTraining({ onSwiperChange }: { onSwiperChange?: (swiper: 
   const { entities } = useContent();
   const trainings = entities.trainingPrograms;
   const swiperRef = useRef<SwiperType | null>(null);
-  const swipeHintRef = useMobileSwipeHint(swiperRef);
+  const swipeHintRef = useMobileSwipeHint(swiperRef, "home-pricing");
   return <div>
     <Reveal className="hidden gap-4 md:grid md:grid-cols-3">{trainings.map((training, index) => <Reveal key={training.id} delay={index * 0.08}><TrainingCard training={training} /></Reveal>)}</Reveal>
-    <div ref={swipeHintRef} className="-mx-5 md:hidden"><Swiper {...horizontalSwiperProps} onSwiper={(swiper) => { swiperRef.current = swiper; onSwiperChange?.(swiper); }} onSlideChange={(swiper) => onSwiperChange?.(swiper)} onResize={(swiper) => onSwiperChange?.(swiper)} slidesPerView={1} spaceBetween={12} className="swiper-breathe !px-5">{trainings.map((training) => <SwiperSlide key={training.id} className="!h-auto"><TrainingCard training={training} /></SwiperSlide>)}</Swiper></div>
+    <div ref={swipeHintRef} className="-mx-5 md:hidden"><Swiper {...horizontalSwiperProps} onSwiper={(swiper) => { swiperRef.current = swiper; onSwiperChange?.(swiper); }} onSlideChange={(swiper) => onSwiperChange?.(swiper)} onResize={(swiper) => onSwiperChange?.(swiper)} slidesPerView={1} spaceBetween={12} className="swiper-breathe !px-5">{trainings.map((training) => <SwiperSlide key={training.id} className="!h-auto"><TrainingCard training={training} interactive={false} /></SwiperSlide>)}</Swiper></div>
   </div>;
 }

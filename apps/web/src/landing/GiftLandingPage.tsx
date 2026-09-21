@@ -222,7 +222,7 @@ export function GiftLandingPage({ dto, publicOrigin = 'https://unlimriga.ru' }: 
   const swiperRef = useRef<SwiperType | null>(null)
   const [atStart, setAtStart] = useState(true)
   const [atEnd, setAtEnd] = useState(false)
-  const swipeHintRef = useMobileSwipeHint(swiperRef)
+  const swipeHintRef = useMobileSwipeHint(swiperRef, 'gift-delivery-formats')
 
   const handleFormFocus = () => {
     if (!started.current) {
