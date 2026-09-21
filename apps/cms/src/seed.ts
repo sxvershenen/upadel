@@ -1311,10 +1311,10 @@ async function seed() {
       { text: 'Доп. бонусы в системе лояльности' },
     ]
     const memberships = [
-      { key: 'rental-hours-s', title: '8 часов', badge: '[S]', badgeTone: 'muted', description: 'Только для аренды корта', cardVariant: 'package', priceLabel: '5%', benefits: membershipBenefits(20) },
-      { key: 'rental-hours-m', title: '12 часов', badge: '[M]', badgeTone: 'muted', description: 'Только для аренды корта', cardVariant: 'package', priceLabel: '7%', benefits: membershipBenefits(30) },
-      { key: 'rental-hours-l', title: '16 часов', badge: '[L]', badgeTone: 'lime-soft', description: 'Только для аренды корта', cardVariant: 'featured-package', priceLabel: '10%', benefits: membershipBenefits(40) },
-      { key: 'rental-hours-xl', title: '24 часа', badge: '[XL]', badgeTone: 'gold', description: 'Только для аренды корта', cardVariant: 'resident', meshTone: 'dark', priceLabel: '12%', benefits: membershipBenefits(60) },
+      { key: 'rental-hours-s', title: '8 часов', badge: 'S', badgeTone: 'muted', description: 'Только для аренды корта', cardVariant: 'package', priceLabel: '5%', benefits: membershipBenefits(20) },
+      { key: 'rental-hours-m', title: '12 часов', badge: 'M', badgeTone: 'muted', description: 'Только для аренды корта', cardVariant: 'package', priceLabel: '7%', benefits: membershipBenefits(30) },
+      { key: 'rental-hours-l', title: '16 часов', badge: 'L', badgeTone: 'lime-soft', description: 'Только для аренды корта', cardVariant: 'featured-package', priceLabel: '10%', benefits: membershipBenefits(40) },
+      { key: 'rental-hours-xl', title: '24 часа', badge: 'XL', badgeTone: 'gold', description: 'Только для аренды корта', cardVariant: 'resident', meshTone: 'dark', priceLabel: '12%', benefits: membershipBenefits(60) },
     ]
     for (const legacyKey of ['gift', 's', 'm', 'resident']) {
       const legacy = await findBySeedKey(payload, 'memberships', `prototype:membership:${legacyKey}`)
@@ -1331,6 +1331,7 @@ async function seed() {
       const legacyTitle = { 'rental-hours-s': '[S] 8 часов', 'rental-hours-m': '[M] 12 часов', 'rental-hours-l': '[L] 16 часов', 'rental-hours-xl': '[XL] 24 часа' }[key]
       if (legacyTitle) await migrateSeededField(payload, 'memberships', seededMembership.id, 'title', legacyTitle, data.title)
       await migrateSeededField(payload, 'memberships', seededMembership.id, 'badge', null, data.badge)
+      await migrateSeededField(payload, 'memberships', seededMembership.id, 'badge', `[${data.badge}]`, data.badge)
       await migrateSeededField(payload, 'memberships', seededMembership.id, 'badgeTone', null, data.badgeTone)
       await migrateSeededMembershipAction(payload, seededMembership.id, action)
     }
