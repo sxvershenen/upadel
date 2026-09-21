@@ -39,6 +39,7 @@ test('desktop navigation keeps a local fallback icon while a CMS icon loads', ()
   const html = renderToStaticMarkup(<SiteProvider site={{ ...site, desktopNavigation: [{ label: 'Цены', href: '/prices', icon: { url: '/media/prices.svg' }, children: [] }] }} captureContacts={false}><DesktopHeader /></SiteProvider>)
   assert.match(html, /data-navigation-icon="prices"/)
   assert.match(html, /src="\/media\/prices\.svg"/)
+  assert.match(html, /absolute inset-0 m-auto h-4 w-4/)
   assert.match(html, /lucide-tag|<svg/)
 })
 

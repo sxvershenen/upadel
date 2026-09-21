@@ -36,6 +36,7 @@ import { SplitTextReveal } from '../components/ui/SplitTextReveal'
 import { cn } from '../utils/cn'
 import { analyticsServerContext, trackAnalytics } from '../analytics/AnalyticsTracker'
 import { useActionLayer } from '../actions/ActionLayer'
+import { ProgressiveImage } from '../components/ui/ProgressiveImage'
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger)
@@ -144,7 +145,7 @@ export function CourtModelTabs({ badge, models, onSelectModel }: { badge: string
               >
                 <div className="grid gap-8 lg:grid-cols-[1.15fr_.85fr] lg:gap-12 lg:items-start">
                   <div className="relative aspect-[16/9] w-full overflow-hidden bg-white flex items-center justify-center">
-                    <img
+                    <ProgressiveImage
                       src={model.image.url}
                       alt={model.image.alt}
                       width={model.image.width ?? undefined}
@@ -790,13 +791,7 @@ export function PadelCourtZakazPage({ dto, publicOrigin }: { dto: PadelCourtZaka
 
         {/* 5. ИНФОГРАФИКА ТЕХНОЛОГИЙ JUBO (НЕТ БЛЮРА НА КАРТИНКЕ, НЕТ ОБВОДОК У ПЛАШЕК, АНИМАЦИЯ БЕЗ 0 OPACITY) */}
         <section className="relative isolate overflow-hidden py-16 text-white md:py-24 bg-ink" aria-labelledby="tech-title">
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{
-              backgroundImage:
-                `url('${dto.technology.background.url}')`,
-            }}
-          />
+          <ProgressiveImage src={dto.technology.background.url} alt={dto.technology.background.alt} className="absolute inset-0 h-full w-full object-cover" />
           {/* Чистое затемнение без размытия/блюра фонового изображения */}
           <div className="absolute inset-0 bg-ink/80" />
 
@@ -860,7 +855,7 @@ export function PadelCourtZakazPage({ dto, publicOrigin }: { dto: PadelCourtZaka
                 <SurfaceCard tone="white" interactive={false} className="p-3 overflow-hidden">
                   <figure className="group">
                     <div className="se-3 aspect-[16/9] overflow-hidden bg-control">
-                      <img
+                      <ProgressiveImage
                         src={image.media.url}
                         alt={image.media.alt}
                         width={image.media.width ?? undefined}

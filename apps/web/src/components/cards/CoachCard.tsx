@@ -6,11 +6,13 @@ import { springSoft } from "../../lib/motion";
 import { useImageParallax } from "../../lib/useImageParallax";
 import { ArrowAction } from "../ui/ArrowAction";
 import { Badge } from "../ui/Badge";
-import { Button, ButtonLink } from "../ui/Button";
+import { ButtonLink } from "../ui/Button";
+import { ContentAction } from "../ContentAction";
 import { WhiteCard } from "../ui/Card";
 import { Dialog } from "../ui/Dialog";
 import { Price } from "../ui/Price";
 import { Typography } from "../ui/Typography";
+import { ProgressiveImage } from "../ui/ProgressiveImage";
 import type { RevealConfig } from "../ui/revealAttributes";
 
 export type Coach = HomepageDTO["entities"]["coaches"][number];
@@ -26,7 +28,7 @@ export function CoachCard({ coach, loading = "eager", reveal = true }: { coach: 
       <WhiteCard reveal={reveal} className="flex h-full flex-col overflow-hidden p-4">
         <div ref={photoRef} data-parallax-viewport className="parallax-viewport se-2 relative aspect-[4/5] w-full">
           <motion.div data-parallax-layer style={{ y: photoY }} className="parallax-layer overflow-hidden">
-            <motion.img src={coach.photo.url} alt={coach.photo.alt} loading={loading} className="h-full w-full object-cover" variants={{ rest: { scale: 1.04 }, hover: { scale: 1.095 } }} transition={springSoft} />
+            <ProgressiveImage src={coach.photo.url} alt={coach.photo.alt} loading={loading} className="h-full w-full object-cover" variants={{ rest: { scale: 1.04 }, hover: { scale: 1.095 } }} transition={springSoft} />
           </motion.div>
           <div className="absolute left-3 top-3"><Badge tone="glass" className="image-glass px-2.5"><Star size={12} className="fill-lime text-lime" /> {coach.rating} · {coach.reviewsCount}</Badge></div>
           <div className="absolute right-3 top-3 flex flex-col items-end gap-1.5">{coach.certificates.slice(0, 2).map((certificate) => <span key={certificate} className="se-1 type-micro image-glass flex items-center gap-1 px-2 py-1 text-white"><BadgeCheck size={11} /> {certificate}</span>)}</div>
@@ -41,7 +43,7 @@ export function CoachCard({ coach, loading = "eager", reveal = true }: { coach: 
 
     <Dialog open={open} onClose={closeDialog} title={coach.name}>
       <div className="grid grid-cols-[140px_minmax(0,1fr)] gap-x-4 gap-y-5 md:grid-cols-[240px_minmax(0,1fr)] md:gap-6">
-        <img src={coach.photo.url} alt={coach.photo.alt} className="se-3 h-[175px] w-[140px] object-cover md:h-auto md:max-h-[360px] md:w-full" />
+        <ProgressiveImage src={coach.photo.url} alt={coach.photo.alt} className="se-3 h-[175px] w-[140px] object-cover md:h-auto md:max-h-[360px] md:w-full" />
         <div className="flex flex-col">
           <Badge tone="lime">{coach.specialization}</Badge>
           <Typography role="body" tone="muted" className="mt-4">{coach.bio}</Typography>
@@ -51,7 +53,7 @@ export function CoachCard({ coach, loading = "eager", reveal = true }: { coach: 
           <div className="flex justify-between gap-4"><dt className="text-ink-soft">Опыт</dt><dd className="text-right text-ink">{coach.experience}</dd></div>
           <div className="flex justify-between gap-4"><dt className="text-ink-soft">Языки</dt><dd className="text-right text-ink">{coach.languages}</dd></div>
         </dl>
-        <div className="col-span-2 flex flex-wrap items-center justify-between gap-4"><Price label="тренировка от" value={coach.priceFrom} /><div className="flex gap-2"><ButtonLink href={`/coaches/${coach.slug}`} variant="neutral">Подробнее</ButtonLink><Button onClick={closeDialog}>{coach.action.label ?? "Выбрать тренера"}</Button></div></div>
+        <div className="col-span-2 flex items-end gap-4"><Price label="тренировка от" value={coach.priceFrom} /><div className="ml-auto flex shrink-0 gap-2"><ButtonLink href={`/coaches/${coach.slug}`} variant="neutral" onClick={closeDialog}>Подробнее</ButtonLink><ContentAction action={coach.action} sourcePage="/coaches" sourceEntity={coach.name} onAction={closeDialog}>Выбрать</ContentAction></div></div>
       </div>
     </Dialog>
   </>;

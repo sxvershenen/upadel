@@ -1,6 +1,6 @@
 import type { DesktopNavigationChild, DesktopNavigationItem } from '@unlim/content-contract'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
-import { CalendarCheck, ChevronDown, Dumbbell, Gift, Home, Info, LayoutGrid, Newspaper, Tag, Trophy, UsersRound, type LucideIcon } from 'lucide-react'
+import { ArrowUpRight, CalendarCheck, ChevronDown, Dumbbell, Gift, Home, Info, LayoutGrid, Newspaper, Tag, Trophy, UsersRound, type LucideIcon } from 'lucide-react'
 import { useEffect, useId, useLayoutEffect, useRef, useState, type FocusEvent, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 
 import { useActionLayer } from '../../actions/ActionLayer'
@@ -9,6 +9,7 @@ import { springSnappy, tapScaleSm } from '../../lib/motion'
 import { ContentAction } from '../ContentAction'
 import { VkIcon } from '../ui/VkIcon'
 import { PhoneIcon, TelegramIcon } from '../ui/ContactIcons'
+import { ProgressiveImage } from '../ui/ProgressiveImage'
 import { bindHeaderScroll, desktopSubmenuKeyAction, HEADER_MORPH_LOCK_MS, HEADER_TOP_THRESHOLD, initialHeaderScrollState, navigationIconPreset, nextHeaderScrollState, type HeaderScrollState, type NavigationIconPreset } from './desktopHeaderState'
 
 const navigationIcons: Record<NavigationIconPreset, LucideIcon> = {
@@ -32,9 +33,9 @@ function NavigationIcon({ href, icon, size = 16 }: { href: string; icon?: { url:
   const preset = navigationIconPreset(href)
   const [customIconLoaded, setCustomIconLoaded] = useState(false)
   const Icon = navigationIcons[preset]
-  return <span data-navigation-icon={preset} className="relative block h-5 w-5 shrink-0">
+  return <span data-navigation-icon={preset} className={`relative block h-5 w-5 shrink-0 ${preset === 'tournaments' || preset === 'gift' ? 'translate-y-px' : ''}`}>
     <span className={`absolute inset-0 flex items-center justify-center leading-none transition-opacity duration-100 [&>img]:block [&>svg]:block ${icon && customIconLoaded ? 'opacity-0' : 'opacity-100'}`} aria-hidden="true"><Icon size={size} strokeWidth={1.9} /></span>
-    {icon && <img src={icon.url} alt="" aria-hidden="true" onLoad={() => setCustomIconLoaded(true)} onError={() => setCustomIconLoaded(false)} className="relative h-4 w-4 object-contain" />}
+    {icon && <ProgressiveImage src={icon.url} alt="" aria-hidden="true" onLoad={() => setCustomIconLoaded(true)} onError={() => setCustomIconLoaded(false)} className="absolute inset-0 m-auto h-4 w-4 object-contain" />}
   </span>
 }
 
@@ -138,7 +139,7 @@ function MegaMenuPanel({ children, id, label, reduceMotion, triggerWidth, onNavi
         className="se-2 flex min-h-[92px] flex-col justify-between gap-4 bg-white/8 p-3 type-caption font-medium text-white/65 transition-colors hover:bg-white/12 hover:text-white focus-visible:bg-white/12 focus-visible:text-white focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2"
       >
         <span className="inline-flex text-current" aria-hidden="true"><NavigationIcon href={child.href} icon={child.icon} size={17} /></span>
-        <span className="flex items-center justify-between gap-2 text-current"><span>{child.label}</span><span aria-hidden="true">↗</span></span>
+        <span className="flex items-center justify-between gap-2 text-current"><span>{child.label}</span><ArrowUpRight aria-hidden="true" size={13} /></span>
       </motion.a>)}
     </motion.div>
   </motion.div>
@@ -254,7 +255,7 @@ function HeaderBrand({ compact, filterId, homeHref, logo, logoMode, name, reduce
       <span data-header-brand-mode={compact ? 'compact' : 'expanded'} className="desktop-header-brand-content grid place-items-center">
         <span data-header-brand-icon className="col-start-1 row-start-1 inline-flex items-center justify-center" style={{ opacity: compact ? 1 : 0 }} aria-hidden={!compact}><Home aria-hidden="true" size={17} strokeWidth={1.9} /></span>
         <span data-header-brand-label className="col-start-1 row-start-1 flex items-center gap-2.5" style={{ opacity: compact ? 0 : 1 }} aria-hidden={compact}>
-          {showLogo ? <img src={logo?.url} alt="" aria-hidden="true" className={replaceBrand ? 'h-9 max-w-[150px] object-contain' : 'h-7 w-7 object-contain'} /> : <span className="h-2.5 w-2.5 shrink-0 rounded-[3px] bg-lime" />}
+          {showLogo ? <ProgressiveImage src={logo?.url} alt="" aria-hidden="true" className={replaceBrand ? 'h-9 max-w-[150px] object-contain' : 'h-7 w-7 object-contain'} /> : <span className="h-2.5 w-2.5 shrink-0 rounded-[3px] bg-lime" />}
           {!replaceBrand && <span className="flex flex-col"><span className="text-[14px] font-semibold tracking-[0] text-white">{name}</span><span className="desktop-header-subtitle type-micro text-white/50">{subtitle}</span></span>}
         </span>
       </span>

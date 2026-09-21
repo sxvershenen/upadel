@@ -14,6 +14,7 @@ import * as migration_20260917_201823_add_padel_court_zakaz_page from './2026091
 import * as migration_20260920_181150_add_admin_username from './20260920_181150_add_admin_username';
 import * as migration_20260920_184128_tournament_cms from './20260920_184128_tournament_cms';
 import * as migration_20260921_011600_gift_page_fields from './20260921_011600_gift_page_fields';
+import * as migration_20260921_134500_training_page_content from './20260921_134500_training_page_content';
 
 export const migrations = [
   {
@@ -95,5 +96,10 @@ export const migrations = [
     up: migration_20260921_011600_gift_page_fields.up,
     down: migration_20260921_011600_gift_page_fields.down,
     name: '20260921_011600_gift_page_fields'
+  },
+  {
+    up: migration_20260921_134500_training_page_content.up,
+    down: migration_20260921_134500_training_page_content.down,
+    name: '20260921_134500_training_page_content'
   },
 ];

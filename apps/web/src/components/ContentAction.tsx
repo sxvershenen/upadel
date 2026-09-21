@@ -24,11 +24,12 @@ type Props = {
   sourcePage?: string
   title?: string
   layout?: boolean | 'position' | 'size' | 'preserve-aspect'
+  onAction?: () => void
   transition?: Transition
   variant?: ButtonVariant
 }
 
-export function ContentAction({ action, children, sourceEntity, sourcePage, ...buttonProps }: Props) {
+export function ContentAction({ action, children, sourceEntity, sourcePage, onAction, ...buttonProps }: Props) {
   const site = useSite()
   const { requestContact, requestExternal, requestLead } = useActionLayer()
   const label = children ?? action.label ?? site.booking.buttonLabel
@@ -42,18 +43,18 @@ export function ContentAction({ action, children, sourceEntity, sourcePage, ...b
 
   const analyticsObject = action.mode === 'lead-form' ? 'form' : sourcePage?.startsWith('/coaches') ? 'coach' : sourcePage?.startsWith('/tournaments') ? 'tournament' : sourcePage?.startsWith('/blog') ? 'article' : undefined
   const analyticsProps = { 'data-analytics-action': action.mode === 'booking' || action.mode === 'trial-booking' ? 'booking' : action.mode === 'phone' ? 'phone' : action.mode === 'email' ? 'email' : action.mode === 'lead-form' ? 'lead' : action.mode === 'external-link' ? 'external' : action.mode === 'internal-link' ? 'internal' : undefined, 'data-analytics-object-type': analyticsObject, 'data-analytics-object-id': sourceEntity }
-  if (action.mode === 'phone' || action.mode === 'email') { const contactMode = action.mode; return <Button {...buttonProps} {...analyticsProps} onClick={() => requestContact(contactMode)}>{label}</Button> }
+  if (action.mode === 'phone' || action.mode === 'email') { const contactMode = action.mode; return <Button {...buttonProps} {...analyticsProps} onClick={() => { onAction?.(); requestContact(contactMode) }}>{label}</Button> }
   const leadType = action.mode === 'lead-form' ? action.leadType ?? 'other' : action.mode === 'trial-booking' && !href ? 'trial' : action.mode === 'booking' && !site.booking.ready ? 'consultation' : null
-  if (leadType) return <Button {...buttonProps} {...analyticsProps} onClick={() => requestLead({ type: leadType, sourcePage: sourcePage ?? window.location.pathname, sourceEntity })}>{label}</Button>
+  if (leadType) return <Button {...buttonProps} {...analyticsProps} onClick={() => { onAction?.(); requestLead({ type: leadType, sourcePage: sourcePage ?? window.location.pathname, sourceEntity }) }}>{label}</Button>
 
   if (action.mode === 'external-link' && href) {
-    return <Button {...buttonProps} {...analyticsProps} onClick={() => requestExternal({ href, label: typeof label === 'string' ? label : action.label })}>{label}</Button>
+    return <Button {...buttonProps} {...analyticsProps} onClick={() => { onAction?.(); requestExternal({ href, label: typeof label === 'string' ? label : action.label }) }}>{label}</Button>
   }
 
   if (href) {
     const external = href.startsWith('https://')
-    return <ButtonLink {...buttonProps} {...analyticsProps} href={href} target={external ? '_blank' : undefined} rel={external ? 'noreferrer' : undefined}>{label}</ButtonLink>
+    return <ButtonLink {...buttonProps} {...analyticsProps} href={href} target={external ? '_blank' : undefined} rel={external ? 'noreferrer' : undefined} onClick={onAction}>{label}</ButtonLink>
   }
 
-  return <Button {...buttonProps} {...analyticsProps}>{label}</Button>
+  return <Button {...buttonProps} {...analyticsProps} onClick={onAction}>{label}</Button>
 }

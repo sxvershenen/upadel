@@ -34,6 +34,7 @@ import { VkIcon } from '../components/ui/VkIcon'
 import { horizontalSwiperProps } from '../lib/swiper'
 import { useMobileSwipeHint } from '../lib/useMobileSwipeHint'
 import { cn } from '../utils/cn'
+import { ProgressiveImage } from '../components/ui/ProgressiveImage'
 
 // Неразрывные пробелы для предлогов и союзов по правилам русской типографики
 export function typograph(text: string): string {
@@ -204,7 +205,7 @@ export function GiftLandingPage({ dto, publicOrigin = 'https://unlimriga.ru' }: 
     ? giftPage.faq.map((item) => ({ q: item.question, a: item.answer }))
     : faqItems
   const pageForm = giftPage?.form ?? giftFormDefaults
-  const [selectedFormat, setSelectedFormat] = useState<'box' | 'digital'>('box')
+  const [selectedFormat, setSelectedFormat] = useState<'box' | 'digital' | ''>('')
   const [selectedPurpose, setSelectedPurpose] = useState<string>('match')
   const [preferredChannel, setPreferredChannel] = useState<'telegram' | 'phone' | 'vk'>('telegram')
   const [formState, setFormState] = useState<'idle' | 'submitting' | 'success'>('idle')
@@ -246,6 +247,13 @@ export function GiftLandingPage({ dto, publicOrigin = 'https://unlimriga.ru' }: 
     const contactValue = String(formData.get('contactValue') ?? '').trim()
     const recipientName = String(formData.get('recipientName') ?? '').trim()
     const comment = String(formData.get('comment') ?? '').trim()
+
+    if (!selectedFormat) {
+      setErrorMessage('Выберите формат сертификата')
+      setFormState('idle')
+      trackAnalytics({ name: 'form_error', formType: 'gift', objectType: 'form', objectId: 'gift:unselected' })
+      return
+    }
 
     if (!name) {
       setErrorMessage('Укажите ваше имя')
@@ -317,7 +325,7 @@ export function GiftLandingPage({ dto, publicOrigin = 'https://unlimriga.ru' }: 
     return (
       <SurfaceCard
         tone="white"
-        interactive={false}
+        interactive
         className={cn(
           'flex h-full flex-col overflow-hidden p-6 transition-all duration-300 md:p-8',
         )}
@@ -329,7 +337,7 @@ export function GiftLandingPage({ dto, publicOrigin = 'https://unlimriga.ru' }: 
               {typograph(format.badge)}
             </Badge>
           </div>
-          <img
+          <ProgressiveImage
             src={format.image}
             alt={format.title}
             loading="lazy"
@@ -343,7 +351,7 @@ export function GiftLandingPage({ dto, publicOrigin = 'https://unlimriga.ru' }: 
             {typograph(format.title)}
           </Typography>
 
-          <ul className="mt-6 space-y-2.5 border-t border-ink/10 pt-5">
+          <ul className="mt-5 space-y-2.5">
             {format.features.map((feat) => (
               <li key={feat} className="flex items-start gap-2.5 text-sm text-ink-soft">
                 <span className="se-1 mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center bg-lime text-lime-ink">
@@ -355,11 +363,12 @@ export function GiftLandingPage({ dto, publicOrigin = 'https://unlimriga.ru' }: 
           </ul>
         </div>
 
-        <div className="mt-8 pt-4">
+        <div className="mt-6">
           <Button
             variant={isChosen ? 'primary' : 'neutral'}
             size="md"
             fullWidth
+            aria-pressed={isChosen}
             onClick={() => {
               setSelectedFormat(format.id as 'box' | 'digital')
               const ctaSection = document.getElementById('order-section')
@@ -427,10 +436,7 @@ export function GiftLandingPage({ dto, publicOrigin = 'https://unlimriga.ru' }: 
 
       {/* 1. HERO ШАПКА ВИДОМ КАК У PAGE-VIEW (БЕЗ БЕЙДЖЕЙ, БЕЗ КНОПОК И МЕТРИК) */}
       <header className="page-hero relative isolate overflow-hidden bg-ink py-12 text-white md:pb-12 md:pt-24">
-        <div
-          className="absolute inset-0 -z-20 bg-cover bg-center grayscale"
-          style={{ backgroundImage: `url(${giftPage?.page.hero.media.url ?? '/images/gift/card.jpg'})` }}
-        />
+        <ProgressiveImage src={giftPage?.page.hero.media.url ?? '/images/gift/card.jpg'} alt={giftPage?.page.hero.media.alt ?? ''} className="absolute inset-0 -z-20 h-full w-full object-cover grayscale" />
         <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(3,5,8,.95)_0%,rgba(3,5,8,.84)_52%,rgba(3,5,8,.62)_100%)]" />
 
         <div className="container-page relative z-10">
@@ -466,11 +472,10 @@ export function GiftLandingPage({ dto, publicOrigin = 'https://unlimriga.ru' }: 
               <Reveal key={item.title} delay={idx * 0.08} className="h-full">
                 <SurfaceCard tone="white" interactive={false} className="flex h-full flex-col justify-between p-6">
                   <div>
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center">
                       <span className="se-2 flex h-10 w-10 items-center justify-center bg-surface-muted text-ink">
                         <Icon size={20} />
                       </span>
-                      <Badge tone="light">{item.badge}</Badge>
                     </div>
 
                     <Typography as="h3" role="title-card" className="mt-5 font-semibold text-ink">
@@ -732,48 +737,42 @@ export function GiftLandingPage({ dto, publicOrigin = 'https://unlimriga.ru' }: 
                       <div>
                         <span className="type-caption mb-2 block text-ink-muted">{typograph(pageForm.channelLabel)}</span>
                         <div className="flex flex-wrap items-center gap-2">
-                          <button
-                            type="button"
+                          <Button
                             aria-label="В Telegram"
                             onClick={() => setPreferredChannel('telegram')}
-                            className={cn(
-                              'se-2 flex h-[var(--control-md)] px-3 items-center gap-1.5 transition-colors cursor-pointer text-sm font-medium',
-                              preferredChannel === 'telegram'
-                                ? 'bg-ink text-white'
-                                : 'bg-control text-ink-soft hover:bg-control-hover'
-                            )}
+                            variant={preferredChannel === 'telegram' ? 'dark' : 'neutral'}
+                            size="md"
+                            icon={<TelegramIcon size={15} />}
+                            iconPosition="left"
+                            iconDivider={false}
+                            className="px-3"
                           >
-                            <TelegramIcon size={15} />
-                            <span>{pageForm.telegramLabel}</span>
-                          </button>
-                          <button
-                            type="button"
+                            {pageForm.telegramLabel}
+                          </Button>
+                          <Button
                             aria-label="По телефону"
                             onClick={() => setPreferredChannel('phone')}
-                            className={cn(
-                              'se-2 flex h-[var(--control-md)] px-3 items-center gap-1.5 transition-colors cursor-pointer text-sm font-medium',
-                              preferredChannel === 'phone'
-                                ? 'bg-ink text-white'
-                                : 'bg-control text-ink-soft hover:bg-control-hover'
-                            )}
+                            variant={preferredChannel === 'phone' ? 'dark' : 'neutral'}
+                            size="md"
+                            icon={<PhoneIcon size={14} />}
+                            iconPosition="left"
+                            iconDivider={false}
+                            className="px-3"
                           >
-                            <PhoneIcon size={14} />
-                            <span>{pageForm.phoneLabel}</span>
-                          </button>
-                          <button
-                            type="button"
+                            {pageForm.phoneLabel}
+                          </Button>
+                          <Button
                             aria-label="Во ВКонтакте"
                             onClick={() => setPreferredChannel('vk')}
-                            className={cn(
-                              'se-2 flex h-[var(--control-md)] px-3 items-center gap-1.5 transition-colors cursor-pointer text-sm font-medium',
-                              preferredChannel === 'vk'
-                                ? 'bg-ink text-white'
-                                : 'bg-control text-ink-soft hover:bg-control-hover'
-                            )}
+                            variant={preferredChannel === 'vk' ? 'dark' : 'neutral'}
+                            size="md"
+                            icon={<VkIcon size={15} />}
+                            iconPosition="left"
+                            iconDivider={false}
+                            className="px-3"
                           >
-                            <VkIcon size={15} />
-                            <span>{pageForm.vkLabel}</span>
-                          </button>
+                            {pageForm.vkLabel}
+                          </Button>
                         </div>
                       </div>
 
@@ -783,8 +782,9 @@ export function GiftLandingPage({ dto, publicOrigin = 'https://unlimriga.ru' }: 
                           label={pageForm.formatLabel}
                           labelVisibility="sr-only"
                           value={selectedFormat}
-                          onChange={(e) => setSelectedFormat(e.target.value as 'box' | 'digital')}
+                          onChange={(e) => setSelectedFormat(e.target.value as 'box' | 'digital' | '')}
                           options={[
+                            { value: '', label: pageForm.formatLabel },
                             { value: 'box', label: 'Подарочный бокс (кейс + карта)' },
                             { value: 'digital', label: 'Электронный сертификат (PDF)' },
                           ]}

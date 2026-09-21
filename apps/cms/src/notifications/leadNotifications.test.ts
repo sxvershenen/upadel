@@ -50,4 +50,7 @@ test('notification message preserves lead type, page and useful source entity', 
   })
   assert.equal(messages.length, 2)
   assert.equal(messages.every((message) => message.includes('/tournaments/summer-open') && message.includes('Summer Open — регистрация')), true)
+
+  const membershipLead = { ...lead, type: 'gift', sourceEntity: 'Подарочный сертификат — сумма 12 500 ₽' } as Lead
+  assert.match(formatLeadNotificationMessage(membershipLead), /Форма: Подарочный сертификат — сумма 12 500 ₽/)
 })

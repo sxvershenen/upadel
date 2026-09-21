@@ -134,7 +134,7 @@ function renderUpload(node: RichNode, media: Map<string, PublicMedia>, origin: s
   const source = cardURL
     ? `<source media="(max-width: ${positiveDimension(card?.width) ?? 1200}px)" srcset="${escapeArticleHTML(cardURL)}"${typeof card?.mimeType === 'string' ? ` type="${escapeArticleHTML(card.mimeType)}"` : ''}>`
     : ''
-  const picture = `<picture>${source}<img src="${escapeArticleHTML(imageURL)}" alt="${escapeArticleHTML(alt)}"${dimensions} loading="lazy" decoding="async"></picture>`
+  const picture = `<picture>${source}<img data-progressive-native="loading" src="${escapeArticleHTML(imageURL)}" alt="${escapeArticleHTML(alt)}"${dimensions} loading="lazy" decoding="async"></picture>`
   return `<figure class="article-prose__media">${picture}${caption ? `<figcaption class="type-body-sm">${escapeArticleHTML(caption)}</figcaption>` : ''}</figure>`
 }
 

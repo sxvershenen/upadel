@@ -8,7 +8,7 @@ const content = transitionPages[page]
 
 <article class="transition-demo-page min-h-screen overflow-hidden bg-page text-ink">
   <header class="transition-element transition-hero transition-demo-hero relative isolate overflow-hidden bg-ink text-white">
-    <img src={content.image} alt={content.imageAlt} class="absolute inset-0 -z-20 h-full w-full object-cover" />
+    <img data-progressive-native="loading" src={content.image} alt={content.imageAlt} class="absolute inset-0 -z-20 h-full w-full object-cover" />
     <div class="absolute inset-0 -z-10 bg-[linear-gradient(110deg,rgba(12,14,18,.97)_0%,rgba(12,14,18,.75)_42%,rgba(12,14,18,.2)_100%)]"></div>
     <div class="absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-t from-ink to-transparent"></div>
 

@@ -27,7 +27,7 @@ const mockSite = {
 }
 
 const mockDTO: TrainingPageDTO = {
-  version: 11 as any,
+  version: 12,
   preview: false,
   generatedAt: new Date().toISOString(),
   kind: 'training',
@@ -41,14 +41,31 @@ const mockDTO: TrainingPageDTO = {
   site: mockSite as any,
   infographicEyebrow: 'Методика UNLIM',
   infographicTitle: 'Понятный путь от первого удара до уверенной игры',
-  infographicCopy: 'Подбираем формат занятий под цель, темп и текущий уровень — без перегруза и случайных упражнений.',
+  programsEyebrow: 'Программы',
   programsTitle: 'Форматы тренировок',
   blocks: [
     { title: 'Программа под ваш уровень', body: 'Тренер оценивает технику и формирует понятный план развития.', icon: 'Target' },
     { title: 'Удобное расписание', body: 'Индивидуальные и групповые занятия доступны в разные часы клуба.', icon: 'Calendar' },
     { title: 'Измеримый прогресс', body: 'Работаем над техникой, тактикой пары и уверенностью в игре.', icon: 'TrendingUp' },
   ],
-  articleHTML: '<h2>Как проходят тренировки по паделу</h2><p>Занятие строится вокруг практики на корте.</p><h2>Как выбрать формат занятий</h2><p>Индивидуальная тренировка позволяет сосредоточиться на задачах.</p>',
+  coachesEyebrow: 'Команда наставников',
+  coachesTitle: 'Тренеры клуба',
+  coachesDesktopActionLabel: 'Все',
+  coachesMobileActionLabel: 'Все тренеры',
+  knowledgeEyebrow: 'База знаний',
+  knowledgeTitle: 'Перед первой тренировкой',
+  firstVisitTitle: 'Что нужно для первого визита',
+  firstVisitCopy: 'Основное уже есть в клубе.',
+  firstVisitItems: [
+    { title: 'Ракетка и мячи', body: 'Инвентарь предоставит клуб.', icon: 'Dumbbell' },
+    { title: 'Обувь для корта', body: 'Нужна чистая сменная обувь.', icon: 'Footprints' },
+  ],
+  faqTitle: 'Частые вопросы',
+  faqCopy: 'Ответы перед первым занятием.',
+  faq: [
+    { question: 'Как проходят тренировки по паделу?', answer: 'Занятие строится вокруг практики на корте.' },
+    { question: 'Как выбрать формат занятий?', answer: 'Начните с пробного занятия.' },
+  ],
   action: { label: 'Подобрать тренировку', mode: 'trial-booking' },
   programs: [
     {
@@ -111,9 +128,7 @@ test('TrainingPage renders Swiss layout with methodology pillars, formats, coach
 
   // Methodology section
   assert.match(plainText, /Методика UNLIM/)
-  assert.match(plainText, /01/)
-  assert.match(plainText, /02/)
-  assert.match(plainText, /03/)
+  assert.doesNotMatch(plainText, /\b0[123]\b/)
 
   // Formats section
   assert.match(plainText, /Форматы тренировок/)
@@ -132,7 +147,7 @@ test('TrainingPage renders Swiss layout with methodology pillars, formats, coach
   assert.match(html, /aria-label="Следующие тренеры"/)
 
   // Knowledge base / guide accordion
-  assert.match(plainText, /Как устроены тренировки/)
+  assert.match(plainText, /Перед первой тренировкой/)
   assert.match(plainText, /Как проходят тренировки по паделу/)
   assert.match(plainText, /Как выбрать формат занятий/)
 
@@ -156,9 +171,10 @@ test('RentalRateCard renders compact layout with unboxed eyebrow, bottom-edge ba
   assert.match(html, /<span class="type-eyebrow text-white\/65">Специальное предложение<\/span>/)
   // Standard button label
   assert.match(html, /<span>Записаться на пробную<\/span>/)
-  // Images positioned along bottom edge as background
-  assert.match(html, /-bottom-16 -right-6/)
-  assert.match(html, /-bottom-8 -right-2/)
+  // Compact card keeps only one enlarged ball and a full-width action.
+  assert.doesNotMatch(html, /padel-racket\.webp/)
+  assert.match(html, /bottom-20 -right-36/)
+  assert.match(html, /w-full/)
 })
 
 test('RentalRateCard preserves wide layout for homepage with 2-column text and large images', () => {

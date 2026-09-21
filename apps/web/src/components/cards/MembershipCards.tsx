@@ -9,9 +9,13 @@ import { ContentAction } from '../ContentAction'
 import { Badge, type BadgeTone } from '../ui/Badge'
 import { MeshCard, WhiteCard, type MeshTone } from '../ui/Card'
 import { Field } from '../ui/Field'
-import { Price } from '../ui/Price'
+import { formatRub, Price } from '../ui/Price'
 
 type Membership = HomepageDTO['entities']['memberships'][number]
+
+export function membershipAmountSource(title: string, amount: number) {
+  return `${title} — сумма ${formatRub(amount)}`
+}
 
 function CheckItem({ children, featured, inverse }: { children: React.ReactNode; featured?: boolean; inverse?: boolean }) {
   return <li className={cn("type-body-sm flex items-center gap-3 leading-snug", inverse ? "text-white/80" : "text-ink-soft")}><span className={cn("se-1 flex h-7 w-7 shrink-0 items-center justify-center", inverse ? "bg-gold text-gold-ink" : featured ? "bg-lime text-[#244500]" : "bg-[#f1f1f1] text-ink")}><Check size={15} strokeWidth={2.4} /></span><span>{children}</span></li>
@@ -29,7 +33,7 @@ export function MembershipCard({ membership }: { membership: Membership }) {
     const minimum = membership.giftAmountLimits?.minimum ?? 1000
     const maximum = membership.giftAmountLimits?.maximum ?? 100000
     const invalid = numeric > 0 && (numeric < minimum || numeric > maximum)
-    return <MeshCard reveal={false} tone={(membership.meshTone ?? 'lavender') as MeshTone} className="flex h-[500px] min-h-[500px] flex-col justify-between p-6 text-white md:p-7"><div className="flex items-start justify-between"><span className="se-2 flex h-11 w-11 items-center justify-center bg-white/15 text-white"><Gift size={20} /></span></div><div className="mt-7"><h3 className="type-title-card text-white">{membership.title}</h3><p className="type-body-sm mt-2 max-w-[300px] text-white/75">{membership.description}</p></div><div className="mt-6"><Field label="Введите сумму" tone="dark" inputMode="numeric" pattern="[0-9]*" value={amount} onChange={(event) => setAmount(event.target.value.replace(/\D/g, "").slice(0, 6))} placeholder="0" suffix="₽" error={invalid ? `Сумма от ${minimum.toLocaleString('ru-RU')} до ${maximum.toLocaleString('ru-RU')} ₽` : undefined} /><ContentAction action={membership.action} sourceEntity={`${membership.title}: ${amount || 0} ₽`} variant="secondary" size="md" fullWidth className="mt-4" disabled={invalid}>{membership.action.label}</ContentAction></div></MeshCard>
+    return <MeshCard reveal={false} tone={(membership.meshTone ?? 'lavender') as MeshTone} className="flex h-[500px] min-h-[500px] flex-col justify-between p-6 text-white md:p-7"><div className="flex items-start justify-between"><span className="se-2 flex h-11 w-11 items-center justify-center bg-white/15 text-white"><Gift size={20} /></span></div><div className="mt-7"><h3 className="type-title-card text-white">{membership.title}</h3><p className="type-body-sm mt-2 max-w-[300px] text-white/75">{membership.description}</p></div><div className="mt-6"><Field label="Введите сумму" tone="dark" inputMode="numeric" pattern="[0-9]*" value={amount} onChange={(event) => setAmount(event.target.value.replace(/\D/g, "").slice(0, 6))} placeholder="0" suffix="₽" error={invalid ? `Сумма от ${minimum.toLocaleString('ru-RU')} до ${maximum.toLocaleString('ru-RU')} ₽` : undefined} /><ContentAction action={membership.action} sourceEntity={membershipAmountSource(membership.title, numeric || 0)} variant="secondary" size="md" fullWidth className="mt-4" disabled={invalid}>{membership.action.label}</ContentAction></div></MeshCard>
   }
 
   const resident = membership.cardVariant === 'resident'

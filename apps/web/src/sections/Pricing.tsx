@@ -68,23 +68,31 @@ export function Pricing() {
         <Tabs fullWidth layoutId="pricing-tabs-mobile" tabs={pricingTabs} value={active} onChange={changeTab} />
       </div>
 
-      <AnimatePresence initial={false} mode="sync">
-        <motion.div
-          id="pricing-panel"
-          data-gsap-reveal-boundary="true"
-          role="tabpanel"
-          tabIndex={0}
-          key={active}
-          initial={{ opacity: 0, y: 4 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -4 }}
-          transition={{ duration: 0.12, ease: "easeOut" }}
-        >
-          {active === "rent" && <PricingRent onSwiperChange={syncPricingSwiper} />}
-          {active === "training" && <PricingTraining onSwiperChange={syncPricingSwiper} />}
-          {active === "memberships" && <PricingMemberships onSwiperChange={syncPricingSwiper} />}
-        </motion.div>
-      </AnimatePresence>
+      <motion.div
+        id="pricing-panel"
+        data-gsap-reveal-boundary="true"
+        role="tabpanel"
+        tabIndex={0}
+        layout="size"
+        transition={{ layout: { duration: 0.3, ease: [0.2, 0.8, 0.2, 1] } }}
+        className="relative grid overflow-hidden"
+      >
+        <AnimatePresence initial={false} mode="popLayout">
+          <motion.div
+            key={active}
+            layout="position"
+            className="col-start-1 row-start-1 w-full"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}
+          >
+            {active === "rent" && <PricingRent onSwiperChange={syncPricingSwiper} />}
+            {active === "training" && <PricingTraining onSwiperChange={syncPricingSwiper} />}
+            {active === "memberships" && <PricingMemberships onSwiperChange={syncPricingSwiper} />}
+          </motion.div>
+        </AnimatePresence>
+      </motion.div>
     </section>
   );
 }

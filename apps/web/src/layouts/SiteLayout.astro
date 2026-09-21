@@ -221,10 +221,24 @@ const pageEntrance = Astro.url.pathname === '/gift'
         if ('requestIdleCallback' in window) window.requestIdleCallback(flushTypography, { timeout: 250 })
         else window.setTimeout(flushTypography, 0)
       }
+      const prepareNativeImage = (image) => {
+        if (!(image instanceof HTMLImageElement) || image.dataset.progressiveNative !== 'loading') return
+        const settle = () => { image.dataset.progressiveNative = 'loaded' }
+        if (image.complete) settle()
+        else {
+          image.addEventListener('load', settle, { once: true })
+          image.addEventListener('error', settle, { once: true })
+        }
+      }
+      document.querySelectorAll('img[data-progressive-native]').forEach(prepareNativeImage)
       new MutationObserver((mutations) => {
         if (mutations.some((mutation) => mutation.addedNodes.length > 0)) scheduleScrollReveals()
         mutations.forEach((mutation) => {
-          mutation.addedNodes.forEach((node) => pending.add(node))
+          mutation.addedNodes.forEach((node) => {
+            pending.add(node)
+            if (node instanceof HTMLImageElement) prepareNativeImage(node)
+            else if (node instanceof Element) node.querySelectorAll('img[data-progressive-native]').forEach(prepareNativeImage)
+          })
           if (mutation.type === 'characterData') pending.add(mutation.target)
         })
         scheduleTypography()

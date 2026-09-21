@@ -4,6 +4,7 @@ import { cn } from "../../utils/cn";
 import { springSoft } from "../../lib/motion";
 import { useImageParallax } from "../../lib/useImageParallax";
 import { revealAttributes, type RevealConfig } from "./revealAttributes";
+import { ProgressiveImage } from "./ProgressiveImage";
 
 const cardVariants = { rest: { y: 0, scale: 1 }, hover: { y: -5, scale: 1.012 } };
 const imageVariants = { rest: { scale: 1.04 }, hover: { scale: 1.095 } };
@@ -92,7 +93,7 @@ export function ImageCard({ src, alt, overlay, className, children, imgClassName
         data-parallax-layer
         className="parallax-layer overflow-hidden"
       >
-        <motion.img src={src} alt={alt} loading={loading} className={cn("h-full w-full object-cover", imgClassName)} variants={interactive ? imageVariants : undefined} transition={springSoft} />
+        <ProgressiveImage src={src} alt={alt} loading={loading} className={cn("h-full w-full object-cover", imgClassName)} variants={interactive ? imageVariants : undefined} transition={springSoft} />
       </motion.div>
     </div>
     <div className="relative z-10 flex h-full flex-col">{children}</div>

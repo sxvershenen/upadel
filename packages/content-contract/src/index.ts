@@ -1,4 +1,4 @@
-export const homepageDTOversion = 11 as const
+export const homepageDTOversion = 12 as const
 
 export const publicRouteRegistry = [
   { path: '/', parent: null, template: 'homepage', globalSlug: 'homepage' },
@@ -212,10 +212,21 @@ export type TrainingPageDTO = ThematicPageBase & {
   kind: 'training'
   infographicEyebrow: string
   infographicTitle: string
-  infographicCopy: string
+  programsEyebrow: string
   programsTitle: string
   blocks: Array<{ title: string; body: string; icon: 'Target' | 'Calendar' | 'TrendingUp' | 'Users' }>
-  articleHTML: string
+  coachesEyebrow: string
+  coachesTitle: string
+  coachesDesktopActionLabel: string
+  coachesMobileActionLabel: string
+  knowledgeEyebrow: string
+  knowledgeTitle: string
+  firstVisitTitle: string
+  firstVisitCopy: string
+  firstVisitItems: Array<{ title: string; body: string; icon: 'Dumbbell' | 'Footprints' | 'ShowerHead' | 'Timer' }>
+  faqTitle: string
+  faqCopy: string
+  faq: Array<{ question: string; answer: string }>
   action: ActionDTO
   programs: HomepageDTO['entities']['trainingPrograms']
   trial: HomepageDTO['entities']['rentalRates'][number] | null

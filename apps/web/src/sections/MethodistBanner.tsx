@@ -5,6 +5,7 @@ import { ContentAction } from "../components/ContentAction";
 import { useContent } from "../content/ContentContext";
 import { ArrowAction } from "../components/ui/ArrowAction";
 import { springSoft } from "../lib/motion";
+import { ProgressiveImage } from "../components/ui/ProgressiveImage";
 
 const meshClasses: Record<string, string> = {
   indigo: "mesh-indigo", "deep-blue": "mesh-deep-blue", dark: "mesh-dark", lime: "mesh-lime",
@@ -18,7 +19,7 @@ export function MethodistBanner() {
     <section className="container-page pb-20 md:pb-28">
       <Reveal>
         <motion.div initial="rest" whileHover="hover" variants={{ rest: { y: 0, scale: 1 }, hover: { y: -5, scale: 1.012 } }} transition={springSoft} className={`se-4 ${meshClasses[banner.meshTone] ?? "mesh-lavender"} relative isolate flex flex-col overflow-hidden p-6 text-white md:p-8`}>
-          <motion.img
+          <ProgressiveImage
             src={banner.decorativeMedia?.url}
             alt=""
             aria-hidden="true"

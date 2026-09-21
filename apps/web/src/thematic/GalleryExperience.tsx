@@ -8,12 +8,13 @@ import 'swiper/css'
 import { Dialog } from '../components/ui/Dialog'
 import { IconButton } from '../components/ui/Button'
 import { horizontalSwiperProps } from '../lib/swiper'
+import { ProgressiveImage } from '../components/ui/ProgressiveImage'
 
 type GalleryItem = HomepageDTO['entities']['gallery'][number]
 
 function GalleryButton({ item, onOpen, className = '' }: { item: GalleryItem; onOpen: () => void; className?: string }) {
   return <button type="button" onClick={onOpen} className={`se-3 group relative block w-full overflow-hidden bg-surface-muted text-left focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2 ${className}`} aria-label={`Открыть изображение: ${item.title}`}>
-    <img src={item.media.url} alt={item.media.alt} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03] motion-reduce:transition-none" />
+    <ProgressiveImage src={item.media.url} alt={item.media.alt} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03] motion-reduce:transition-none" />
     {(item.caption || item.title) && <span className="type-caption absolute bottom-3 left-3 w-fit max-w-[calc(100%-1.5rem)] rounded-xl bg-white/15 px-4 py-3 text-white backdrop-blur">{item.caption || item.title}</span>}
   </button>
 }
@@ -37,7 +38,7 @@ export function GalleryExperience({ items }: { items: GalleryItem[] }) {
       <div className="mt-4 flex items-center justify-between"><span className="type-caption text-ink-soft">Свайпните, чтобы увидеть больше</span><div className="flex gap-2"><IconButton aria-label="Предыдущее фото" variant="neutral" size="sm" disabled={edge.start} onClick={() => swiper.current?.slidePrev()}><ChevronLeft size={17} /></IconButton><IconButton aria-label="Следующее фото" variant="neutral" size="sm" disabled={edge.end} onClick={() => swiper.current?.slideNext()}><ChevronRight size={17} /></IconButton></div></div>
     </div>
     <Dialog open={current !== null} onClose={() => setActive(null)} title={current?.title ?? 'Галерея'}>
-      {current && <div><img src={current.media.url} alt={current.media.alt} className="max-h-[68svh] w-full object-contain" /><p className="type-body-sm mt-4 text-ink-soft">{current.caption || current.title}</p>{items.length > 1 && <div className="mt-5 flex justify-end gap-2"><IconButton aria-label="Предыдущее изображение" variant="neutral" onClick={() => move(-1)}><ChevronLeft /></IconButton><IconButton aria-label="Следующее изображение" variant="neutral" onClick={() => move(1)}><ChevronRight /></IconButton></div>}</div>}
+      {current && <div><ProgressiveImage src={current.media.url} alt={current.media.alt} className="max-h-[68svh] w-full object-contain" /><p className="type-body-sm mt-4 text-ink-soft">{current.caption || current.title}</p>{items.length > 1 && <div className="mt-5 flex justify-end gap-2"><IconButton aria-label="Предыдущее изображение" variant="neutral" onClick={() => move(-1)}><ChevronLeft /></IconButton><IconButton aria-label="Следующее изображение" variant="neutral" onClick={() => move(1)}><ChevronRight /></IconButton></div>}</div>}
     </Dialog>
   </>
 }

@@ -1477,23 +1477,29 @@ async function seed() {
           eyebrow: 'Обучение', title: 'Тренировки по паделу', intro: 'Программы для первого знакомства с паделом, регулярного прогресса и подготовки к турнирам.',
           infographicEyebrow: 'Методика UNLIM',
           infographicTitle: 'Понятный путь от первого удара до уверенной игры',
-          infographicCopy: 'Подбираем формат занятий под цель, темп и текущий уровень — без перегруза и случайных упражнений.',
+          programsEyebrow: 'Программы',
           programsTitle: 'Форматы тренировок',
           blocks: [
             { title: 'Программа под ваш уровень', body: 'Тренер оценивает технику и формирует понятный план развития.', icon: 'Target' },
             { title: 'Удобное расписание', body: 'Индивидуальные и групповые занятия доступны в разные часы клуба.', icon: 'Calendar' },
             { title: 'Измеримый прогресс', body: 'Работаем над техникой, тактикой пары и уверенностью в игре.', icon: 'TrendingUp' },
           ],
-          article: richTextArticle([
-            { type: 'heading', text: 'Как проходят тренировки по паделу' },
-            { type: 'paragraph', text: 'Занятие строится вокруг практики на корте: разминки, работы с базовыми ударами, игровых ситуаций и короткого разбора. Содержание тренировки зависит от опыта игрока, выбранного формата и цели — познакомиться с игрой, заниматься регулярно или подготовиться к соревнованию.' },
-            { type: 'heading', text: 'Как выбрать формат занятий' },
-            { type: 'paragraph', text: 'Индивидуальная тренировка позволяет сосредоточиться на персональных задачах и получить больше повторений. Групповой формат добавляет игровые ситуации с разными партнёрами, а детские занятия учитывают возраст, координацию и комфортный темп обучения. Если формат пока не очевиден, начать можно с пробного занятия и обсудить дальнейший план с тренером.' },
-            { type: 'heading', text: 'Что развивает системная практика' },
-            { type: 'paragraph', text: 'Регулярные занятия помогают последовательно развивать контроль мяча, перемещение, выбор позиции и взаимодействие в паре. Прогресс зависит от исходного уровня, частоты тренировок и самостоятельной игровой практики, поэтому программа остаётся гибкой и корректируется по мере развития навыков.' },
-            { type: 'heading', text: 'Что подготовить к первому занятию' },
-            { type: 'paragraph', text: 'Для старта нужна удобная спортивная форма и обувь, подходящая для корта. Условия предоставления инвентаря, доступное время и состав занятия лучше подтвердить у администратора при записи.' },
-          ]),
+          coachesEyebrow: 'Команда наставников', coachesTitle: 'Тренеры клуба', coachesDesktopActionLabel: 'Все', coachesMobileActionLabel: 'Все тренеры',
+          knowledgeEyebrow: 'База знаний', knowledgeTitle: 'Перед первой тренировкой',
+          firstVisitTitle: 'Что нужно для первого визита', firstVisitCopy: 'Подготовьтесь без лишних покупок — основное уже есть в клубе.',
+          firstVisitItems: [
+            { title: 'Ракетка и мячи', body: 'Премиальные испанские ракетки Varlion и мячи включены в каждый визит — приносить свои не обязательно.', icon: 'Dumbbell' },
+            { title: 'Обувь для корта', body: 'Возьмите сменные чистые кроссовки с нескользящей подошвой для падела или тенниса.', icon: 'Footprints' },
+            { title: 'Раздевалки и душ', body: 'Шкафчики, полотенца, душевые и фены доступны каждому игроку без доплат.', icon: 'ShowerHead' },
+            { title: 'Время прибытия', body: 'Приезжайте за 10–15 минут до занятия, чтобы спокойно переодеться и выйти на корт вовремя.', icon: 'Timer' },
+          ],
+          faqTitle: 'Частые вопросы', faqCopy: 'Коротко о формате занятий, прогрессе и первом визите.',
+          faq: [
+            { question: 'Как проходят тренировки по паделу?', answer: 'Занятие строится вокруг практики: разминки, базовых ударов, игровых ситуаций и короткого разбора с тренером.' },
+            { question: 'Как выбрать формат занятий?', answer: 'Индивидуальный формат даёт больше повторений, групповой — больше игровых ситуаций. Если сомневаетесь, начните с пробного занятия.' },
+            { question: 'Когда будет заметен прогресс?', answer: 'Темп зависит от исходного уровня и регулярности. Тренер корректирует программу по мере развития техники, перемещения и тактики.' },
+            { question: 'Нужна ли своя экипировка?', answer: 'Нет. Для первого визита достаточно спортивной формы и чистой сменной обуви; ракетки и мячи предоставит клуб.' },
+          ],
           action: { label: 'Подобрать тренировку', mode: 'trial-booking' },
           seo: { title: 'Падел тренировки в Москве — групповые, индивидуальные и для детей', description: 'Падел-тренировки в Москве и Красногорске: индивидуальные и групповые занятия, детские секции от 5 лет, пробная тренировка и подготовка к турнирам.', robots: 'index-follow' },
         },
@@ -1597,7 +1603,7 @@ async function seed() {
         stats.globalsPublished += 1
       }
       if (current.seedVersion === seedVersion && page.slug === 'training-page') {
-        const additions = Object.fromEntries(['infographicEyebrow', 'infographicTitle', 'infographicCopy', 'programsTitle', 'article'].filter((key) => current[key] == null).map((key) => [key, (page.data as Record<string, unknown>)[key]]))
+        const additions = Object.fromEntries(['infographicEyebrow', 'infographicTitle', 'programsEyebrow', 'programsTitle', 'coachesEyebrow', 'coachesTitle', 'coachesDesktopActionLabel', 'coachesMobileActionLabel', 'knowledgeEyebrow', 'knowledgeTitle', 'firstVisitTitle', 'firstVisitCopy', 'firstVisitItems', 'faqTitle', 'faqCopy', 'faq'].filter((key) => current[key] == null || Array.isArray(current[key]) && current[key].length === 0).map((key) => [key, (page.data as Record<string, unknown>)[key]]))
         if (Object.keys(additions).length > 0) {
           await payload.updateGlobal({ slug: page.slug, draft: false, overrideAccess: true, data: { ...additions, _status: 'published' } as never })
           stats.globalsPublished += 1

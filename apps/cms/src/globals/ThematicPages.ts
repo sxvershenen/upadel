@@ -82,24 +82,51 @@ export const PricesPage = createThematicPage({
 })
 
 export const TrainingPage = createThematicPage({
-  slug: 'training-page', label: 'Тренировки', kind: 'training', fields: [
-    { name: 'infographicEyebrow', type: 'text', label: 'Надзаголовок инфографики' },
-    { name: 'infographicTitle', type: 'text', label: 'Заголовок инфографики' },
-    { name: 'infographicCopy', type: 'textarea', label: 'Вводный текст инфографики' },
-    { name: 'programsTitle', type: 'text', label: 'Заголовок программ' },
-    {
-      name: 'blocks', type: 'array', label: 'Поясняющие блоки', minRows: 1, maxRows: 6,
-      fields: [
+  slug: 'training-page', label: 'Тренировки', kind: 'training', contentTabs: [
+    { label: 'Методика', fields: [
+      { name: 'infographicEyebrow', type: 'text', label: 'Надзаголовок', required: true, defaultValue: 'Методика UNLIM' },
+      { name: 'infographicTitle', type: 'text', label: 'Заголовок', required: true, defaultValue: 'Понятный путь от первого удара до уверенной игры' },
+      {
+        name: 'blocks', type: 'array', label: 'Поясняющие блоки', minRows: 1, maxRows: 6, required: true,
+        fields: [
+          { name: 'title', type: 'text', label: 'Заголовок', required: true },
+          { name: 'body', type: 'textarea', label: 'Описание', required: true },
+          { name: 'icon', type: 'select', label: 'Иконка', required: true, options: [
+            { label: 'Программа', value: 'Target' }, { label: 'Расписание', value: 'Calendar' },
+            { label: 'Прогресс', value: 'TrendingUp' }, { label: 'Команда', value: 'Users' },
+          ] },
+        ],
+      },
+    ] },
+    { label: 'Программы и тренеры', fields: [
+      { name: 'programsEyebrow', type: 'text', label: 'Надзаголовок программ', required: true, defaultValue: 'Программы' },
+      { name: 'programsTitle', type: 'text', label: 'Заголовок программ', required: true, defaultValue: 'Форматы тренировок' },
+      { name: 'coachesEyebrow', type: 'text', label: 'Надзаголовок тренеров', required: true, defaultValue: 'Команда наставников' },
+      { name: 'coachesTitle', type: 'text', label: 'Заголовок тренеров', required: true, defaultValue: 'Тренеры клуба' },
+      { name: 'coachesDesktopActionLabel', type: 'text', label: 'Кнопка тренеров на ПК', required: true, defaultValue: 'Все' },
+      { name: 'coachesMobileActionLabel', type: 'text', label: 'Кнопка тренеров на телефоне', required: true, defaultValue: 'Все тренеры' },
+    ] },
+    { label: 'База знаний', fields: [
+      { name: 'knowledgeEyebrow', type: 'text', label: 'Надзаголовок раздела', required: true, defaultValue: 'База знаний' },
+      { name: 'knowledgeTitle', type: 'text', label: 'Заголовок раздела', required: true, defaultValue: 'Перед первой тренировкой' },
+      { name: 'firstVisitTitle', type: 'text', label: 'Заголовок первого визита', required: true, defaultValue: 'Что нужно для первого визита' },
+      { name: 'firstVisitCopy', type: 'textarea', label: 'Описание первого визита', required: true, defaultValue: 'Подготовьтесь без лишних покупок — основное уже есть в клубе.' },
+      { name: 'firstVisitItems', type: 'array', label: 'Пункты первого визита', minRows: 1, maxRows: 6, required: true, fields: [
         { name: 'title', type: 'text', label: 'Заголовок', required: true },
         { name: 'body', type: 'textarea', label: 'Описание', required: true },
         { name: 'icon', type: 'select', label: 'Иконка', required: true, options: [
-          { label: 'Программа', value: 'Target' }, { label: 'Расписание', value: 'Calendar' },
-          { label: 'Прогресс', value: 'TrendingUp' }, { label: 'Команда', value: 'Users' },
+          { label: 'Ракетка', value: 'Dumbbell' }, { label: 'Обувь', value: 'Footprints' },
+          { label: 'Душ', value: 'ShowerHead' }, { label: 'Время', value: 'Timer' },
         ] },
-      ],
-    },
-    { name: 'article', type: 'richText', label: 'SEO-статья о тренировках' },
-    createActionField('action', 'Основное действие'),
+      ] },
+      { name: 'faqTitle', type: 'text', label: 'Заголовок FAQ', required: true, defaultValue: 'Частые вопросы' },
+      { name: 'faqCopy', type: 'textarea', label: 'Описание FAQ', required: true, defaultValue: 'Коротко о формате занятий, прогрессе и первом визите.' },
+      { name: 'faq', type: 'array', label: 'Частые вопросы', minRows: 2, maxRows: 8, required: true, fields: [
+        { name: 'question', type: 'text', label: 'Вопрос', required: true },
+        { name: 'answer', type: 'textarea', label: 'Ответ', required: true },
+      ] },
+      createActionField('action', 'Основное действие'),
+    ] },
   ],
 })
 

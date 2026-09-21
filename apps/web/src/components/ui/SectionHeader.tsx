@@ -8,6 +8,7 @@ export function SectionHeader({
   action,
   className,
   titleClassName,
+  titleId,
   light,
   actionClassName,
 }: {
@@ -16,6 +17,7 @@ export function SectionHeader({
   action?: ReactNode;
   className?: string;
   titleClassName?: string;
+  titleId?: string;
   light?: boolean;
   actionClassName?: string;
 }) {
@@ -33,6 +35,7 @@ export function SectionHeader({
           </span>
         )}
         <h2
+          id={titleId}
           className={cn(
             "type-section font-semibold",
             light ? "text-white" : "text-ink",

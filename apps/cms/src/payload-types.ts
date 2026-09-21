@@ -2829,33 +2829,37 @@ export interface TrainingPage {
   eyebrow: string;
   title: string;
   intro: string;
-  infographicEyebrow?: string | null;
-  infographicTitle?: string | null;
-  infographicCopy?: string | null;
-  programsTitle?: string | null;
-  blocks?:
-    | {
-        title: string;
-        body: string;
-        icon: 'Target' | 'Calendar' | 'TrendingUp' | 'Users';
-        id?: string | null;
-      }[]
-    | null;
-  article?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
+  infographicEyebrow: string;
+  infographicTitle: string;
+  blocks: {
+    title: string;
+    body: string;
+    icon: 'Target' | 'Calendar' | 'TrendingUp' | 'Users';
+    id?: string | null;
+  }[];
+  programsEyebrow: string;
+  programsTitle: string;
+  coachesEyebrow: string;
+  coachesTitle: string;
+  coachesDesktopActionLabel: string;
+  coachesMobileActionLabel: string;
+  knowledgeEyebrow: string;
+  knowledgeTitle: string;
+  firstVisitTitle: string;
+  firstVisitCopy: string;
+  firstVisitItems: {
+    title: string;
+    body: string;
+    icon: 'Dumbbell' | 'Footprints' | 'ShowerHead' | 'Timer';
+    id?: string | null;
+  }[];
+  faqTitle: string;
+  faqCopy: string;
+  faq: {
+    question: string;
+    answer: string;
+    id?: string | null;
+  }[];
   action: {
     label?: string | null;
     mode: 'none' | 'booking' | 'trial-booking' | 'internal-link' | 'external-link' | 'phone' | 'email' | 'lead-form';
@@ -4061,8 +4065,6 @@ export interface TrainingPageSelect<T extends boolean = true> {
   intro?: T;
   infographicEyebrow?: T;
   infographicTitle?: T;
-  infographicCopy?: T;
-  programsTitle?: T;
   blocks?:
     | T
     | {
@@ -4071,7 +4073,33 @@ export interface TrainingPageSelect<T extends boolean = true> {
         icon?: T;
         id?: T;
       };
-  article?: T;
+  programsEyebrow?: T;
+  programsTitle?: T;
+  coachesEyebrow?: T;
+  coachesTitle?: T;
+  coachesDesktopActionLabel?: T;
+  coachesMobileActionLabel?: T;
+  knowledgeEyebrow?: T;
+  knowledgeTitle?: T;
+  firstVisitTitle?: T;
+  firstVisitCopy?: T;
+  firstVisitItems?:
+    | T
+    | {
+        title?: T;
+        body?: T;
+        icon?: T;
+        id?: T;
+      };
+  faqTitle?: T;
+  faqCopy?: T;
+  faq?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
   action?:
     | T
     | {

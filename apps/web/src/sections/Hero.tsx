@@ -7,6 +7,7 @@ import { useContent } from "../content/ContentContext";
 import { SplitTextReveal } from "../components/ui/SplitTextReveal";
 import { cn } from "../utils/cn";
 import type { MediaDTO } from "@unlim/content-contract";
+import { ProgressiveImage } from "../components/ui/ProgressiveImage";
 
 gsap.registerPlugin(ScrollTrigger);
 const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
@@ -19,7 +20,7 @@ function HeroBackgroundMedia({ media, poster, className, setRef }: { media: Medi
   const classes = cn("absolute inset-0 h-full w-full object-cover", className);
   return media.mimeType.startsWith("video/")
     ? <video ref={setRef} data-hero-parallax-media={setRef ? "" : undefined} autoPlay muted loop playsInline poster={poster?.url} className={classes}><source src={media.url} type={media.mimeType} /></video>
-    : <img ref={setRef} data-hero-parallax-media={setRef ? "" : undefined} src={media.url} alt={media.alt} className={classes} />;
+    : <ProgressiveImage ref={setRef} data-hero-parallax-media={setRef ? "" : undefined} src={media.url} alt={media.alt} className={classes} />;
 }
 
 function SocialProof({ className }: { className?: string }) {
@@ -31,7 +32,7 @@ function SocialProof({ className }: { className?: string }) {
     >
       <div className="flex -space-x-2.5">
         {home.hero.socialProof.coachPhotos.map((media) => (
-          <img key={media.url} src={media.url} alt="" className="h-8 w-8 rounded-full object-cover" />
+          <ProgressiveImage key={media.url} src={media.url} alt="" className="h-8 w-8 rounded-full object-cover" />
         ))}
       </div>
       <div className="h-7 w-px bg-white/20" />
@@ -82,7 +83,7 @@ export function Hero() {
         target,
         { scale: 1.08 },
         {
-          scale: mobile ? 1.16 : 1.28,
+          scale: mobile ? 1.24 : 1.28,
           ease: "none",
           scrollTrigger: {
             trigger: section,
@@ -129,7 +130,7 @@ export function Hero() {
 
       <div className="container-page absolute inset-x-0 top-5 z-10 md:hidden">
         <a href="#top" className="flex items-center gap-2.5 leading-none text-white">
-          {site.brandLogo && site.brandLogoMode !== "text" && !brandLogoFailed ? <img src={site.brandLogo.url} alt={site.brandName} onError={() => setBrandLogoFailed(true)} className={replaceBrand ? "h-9 max-w-[150px] object-contain" : "h-7 w-7 object-contain"} /> : <span className="h-2.5 w-2.5 shrink-0 rounded-[3px] bg-lime" />}
+          {site.brandLogo && site.brandLogoMode !== "text" && !brandLogoFailed ? <ProgressiveImage src={site.brandLogo.url} alt={site.brandName} onError={() => setBrandLogoFailed(true)} className={replaceBrand ? "h-9 max-w-[150px] object-contain" : "h-7 w-7 object-contain"} /> : <span className="h-2.5 w-2.5 shrink-0 rounded-[3px] bg-lime" />}
           {(!replaceBrand || !site.brandLogo || brandLogoFailed) && <span className="flex flex-col">
             <span className="text-[14px] font-semibold tracking-[0] text-white">{site.brandName}</span>
             <span className="type-micro text-white/55">{site.headerSubtitle}</span>

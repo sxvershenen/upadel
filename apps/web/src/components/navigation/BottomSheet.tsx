@@ -72,15 +72,15 @@ export function BottomSheet({
   }
 
   return (
-    <AnimatePresence>
+    <AnimatePresence initial={false}>
       {open && (
         <>
           <motion.div
             aria-hidden="true"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            exit={{ opacity: 0, transition: { duration: 0.14 } }}
+            transition={{ duration: 0.18 }}
             onClick={onClose}
             className="fixed inset-0 z-[70] bg-ink/45 backdrop-blur-[2px] md:hidden"
           />
@@ -95,13 +95,13 @@ export function BottomSheet({
             onTouchEnd={handleTouchEnd}
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
-            exit={{ y: "100%" }}
+            exit={{ y: "100%", transition: { duration: 0.22, ease: [0.4, 0, 1, 1] } }}
             transition={springSheet}
             className="se-sheet fixed inset-x-0 bottom-0 z-[80] max-h-[82svh] overflow-y-auto bg-white pb-[calc(24px+env(safe-area-inset-bottom))] pt-3 md:hidden"
           >
             <div className="mx-auto mb-2 h-1.5 w-10 rounded-full bg-ink/15" />
             <div className="flex items-center justify-between px-6 pb-2 pt-2">
-              <span id={title ? titleId : undefined} className="type-body font-semibold text-ink">{title}</span>
+              <span id={title ? titleId : undefined} className="type-title-card font-semibold text-ink">{title}</span>
               <motion.button
                 ref={closeRef}
                 type="button"

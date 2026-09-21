@@ -1,4 +1,4 @@
-import { Camera } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useContent } from "../content/ContentContext";
 import { SectionHeader } from "../components/ui/SectionHeader";
 import { Reveal } from "../components/ui/Reveal";
@@ -17,7 +17,7 @@ export function Gallery() {
             eyebrow={home.gallerySection.eyebrow}
             title={home.gallerySection.title}
             action={
-              <ContentAction action={home.gallerySection.action} variant="neutral" size="sm" icon={<Camera size={15} />} iconPosition="left" iconDivider={false}>Смотреть</ContentAction>
+              <ContentAction action={home.gallerySection.action} variant="neutral" size="sm" icon={<ArrowRight size={15} />}>Смотреть</ContentAction>
             }
             className="mb-10"
           />
