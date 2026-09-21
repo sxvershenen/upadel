@@ -50,7 +50,7 @@ export function Dialog({ open, onClose, title, children }: { open: boolean; onCl
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 20, scale: 0.985 }}
           transition={{ type: "spring", stiffness: 260, damping: 28 }}
-          className="dialog-surface relative z-10 flex max-h-[92svh] w-full flex-col overflow-hidden bg-white p-5 md:max-w-[780px] md:p-7"
+          className="dialog-surface relative z-10 flex max-h-[92svh] w-full flex-col overflow-hidden bg-white p-5 md:max-h-[96svh] md:max-w-[780px] md:p-6"
         >
           <div className="mb-5 flex shrink-0 items-start justify-between gap-4">
             <h2 id={titleId} className="type-title-card text-ink">{title}</h2>

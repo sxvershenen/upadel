@@ -155,8 +155,8 @@ html[data-reveal-ready] [data-reveal-visible="true"] [data-reveal-word] { --reve
 
 .desktop-header {
   --header-expanded-width: min(960px, calc(100% - 2rem));
-  --header-expanded-opacity: clamp(0, calc(1 - var(--header-progress, 0) * 2.5), 1);
-  --header-compact-opacity: clamp(0, calc(var(--header-progress, 0) * 2.5 - 1.5), 1);
+  --header-expanded-opacity: clamp(0, calc(1 - var(--header-progress, 0)), 1);
+  --header-compact-opacity: clamp(0, var(--header-progress, 0), 1);
 }
 .desktop-header-island { width: var(--header-expanded-width); }
 .desktop-header-brand, .desktop-header-nav, .desktop-header-utilities { flex: 0 0 auto; }

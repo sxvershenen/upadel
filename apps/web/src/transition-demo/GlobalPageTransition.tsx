@@ -23,6 +23,8 @@ export function GlobalPageTransition() {
     let disposed = false
 
     const loadRuntime = () => {
+      // Warm the tiny audio module on intent, so visit:start never waits for it.
+      void import('./transitionAudio').catch(() => {})
       if (!importRef.current) {
         importRef.current = import('./GlobalPageTransitionRuntime')
           .then(({ GlobalPageTransitionRuntime: runtime }) => {
