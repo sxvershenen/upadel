@@ -17,7 +17,7 @@ const surfaceVariants = {
   open: { opacity: 1, y: 0, transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] as const } },
 };
 
-export function Dialog({ open, onClose, title, children, scrollable = true }: { open: boolean; onClose: () => void; title: string; children: ReactNode; scrollable?: boolean }) {
+export function Dialog({ open, onClose, title, children, scrollable = true, mobileTall = false }: { open: boolean; onClose: () => void; title: string; children: ReactNode; scrollable?: boolean; mobileTall?: boolean }) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
@@ -79,10 +79,10 @@ export function Dialog({ open, onClose, title, children, scrollable = true }: { 
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
           variants={surfaceVariants}
-          className={`dialog-surface relative z-10 flex w-full flex-col overflow-hidden bg-white p-5 md:max-w-[780px] md:p-6 ${scrollable ? 'max-h-[92svh] md:max-h-[96svh]' : 'max-h-none'}`}
+          className={`dialog-surface relative z-10 flex w-full flex-col overflow-hidden bg-white md:max-w-[780px] md:p-6 ${mobileTall ? 'max-h-[100svh] p-4 pt-3 md:max-h-[96svh]' : scrollable ? 'max-h-[92svh] p-5 md:max-h-[96svh]' : 'max-h-none p-5'}`}
         >
           <div className="mx-auto mb-2 h-1.5 w-10 shrink-0 rounded-full bg-ink/15 md:hidden" />
-          <div className="mb-4 flex shrink-0 items-start justify-between gap-4 md:mb-5">
+          <div className={`${mobileTall ? 'mb-3' : 'mb-4'} flex shrink-0 items-start justify-between gap-4 md:mb-5`}>
             <h2 id={titleId} className="type-title-card text-ink">{title}</h2>
             <IconButton ref={closeRef} data-cool-mode="off" size="sm" aria-label="Закрыть" onClick={onClose}><X size={17} /></IconButton>
           </div>

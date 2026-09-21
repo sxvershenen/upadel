@@ -77,15 +77,14 @@ export function Pricing() {
         transition={{ layout: { duration: 0.3, ease: [0.2, 0.8, 0.2, 1] } }}
         className="relative grid overflow-visible"
       >
-        <AnimatePresence initial={false} mode="popLayout">
+        <AnimatePresence initial={false} mode="wait">
           <motion.div
             key={active}
-            layout="position"
             className="col-start-1 row-start-1 w-full"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}
+            initial={{ y: 8 }}
+            animate={{ y: 0 }}
+            exit={{ y: -6 }}
+            transition={{ duration: 0.18, ease: [0.2, 0.8, 0.2, 1] }}
           >
             {active === "rent" && <PricingRent onSwiperChange={syncPricingSwiper} />}
             {active === "training" && <PricingTraining onSwiperChange={syncPricingSwiper} />}

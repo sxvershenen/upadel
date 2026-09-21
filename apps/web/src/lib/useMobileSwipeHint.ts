@@ -16,6 +16,34 @@ export function useMobileSwipeHint(swiperRef: { current: SwiperType | null }) {
     let retries = 0;
     let visible = false;
 
+    const clearHintTimers = () => {
+      if (forwardTimer) window.clearTimeout(forwardTimer);
+      if (returnTimer) window.clearTimeout(returnTimer);
+      if (transitionResetTimer) window.clearTimeout(transitionResetTimer);
+      if (retryTimer) window.clearTimeout(retryTimer);
+      forwardTimer = undefined;
+      returnTimer = undefined;
+      transitionResetTimer = undefined;
+      retryTimer = undefined;
+    };
+
+    const stopHintForInteraction = () => {
+      clearHintTimers();
+      const swiper = swiperRef.current;
+      if (!swiper) return;
+      const transform = getComputedStyle(swiper.wrapperEl).transform;
+      const match = transform.match(/^matrix(3d)?\((.+)\)$/);
+      const values = match?.[2]?.split(',').map(Number);
+      const renderedTranslate = values ? values[match?.[1] ? 12 : 4] : swiper.getTranslate();
+      swiper.setTransition(0);
+      swiper.setTranslate(Number.isFinite(renderedTranslate) ? renderedTranslate : swiper.getTranslate());
+      swiper.updateProgress();
+      swiper.updateActiveIndex();
+      swiper.updateSlidesClasses();
+      swiper.allowClick = true;
+      played = true;
+    };
+
     const play = () => {
       const swiper = swiperRef.current;
       if (!visible || played) return;
@@ -50,13 +78,12 @@ export function useMobileSwipeHint(swiperRef: { current: SwiperType | null }) {
     );
 
     observer.observe(container);
+    container.addEventListener('pointerdown', stopHintForInteraction, { passive: true });
 
     return () => {
       observer.disconnect();
-      if (forwardTimer) window.clearTimeout(forwardTimer);
-      if (returnTimer) window.clearTimeout(returnTimer);
-      if (transitionResetTimer) window.clearTimeout(transitionResetTimer);
-      if (retryTimer) window.clearTimeout(retryTimer);
+      container.removeEventListener('pointerdown', stopHintForInteraction);
+      clearHintTimers();
     };
   }, [swiperRef]);
 

@@ -54,19 +54,19 @@ function LeadForm({ site, lead, onClose, onContact }: { site: SiteDTO; lead: Lea
     } finally { window.clearTimeout(timeout) }
   }
   if (state === 'success') return <div role="status"><h3 className="type-title-card text-ink">{site.contactConfirmation.successTitle}</h3><p className="type-body mt-3 text-ink-soft">{site.contactConfirmation.successText}</p><Button className="mt-6" onClick={onClose}>Закрыть</Button></div>
-  return <form onSubmit={submit} onFocusCapture={start} noValidate className="grid gap-4">
+  return <form onSubmit={submit} onFocusCapture={start} noValidate className="grid gap-3 md:gap-4">
     <Field label="Имя" labelVisibility="sr-only" name="name" autoComplete="name" required minLength={2} maxLength={120} placeholder="Ваше имя" />
-    <fieldset className="grid gap-3"><legend className="type-caption mb-1">Как с вами связаться? Заполните любое одно поле</legend>
+    <fieldset className="grid gap-2 md:gap-3"><legend className="type-caption mb-0.5 md:mb-1">Как с вами связаться? Заполните любое одно поле</legend>
       <Field label="Телефон" labelVisibility="sr-only" name="phone" autoComplete="tel" inputMode="tel" maxLength={40} placeholder="Телефон — например +7 999 000-00-00" />
       <Field label="Telegram / логин" labelVisibility="sr-only" name="telegram" autoComplete="off" placeholder="Telegram — например @username" maxLength={80} />
       <Field label="VK / логин" labelVisibility="sr-only" name="vk" autoComplete="off" placeholder="VK — id или @username" maxLength={80} />
     </fieldset>
-    <TextareaField label="Комментарий" labelVisibility="sr-only" name="comment" maxLength={2000} placeholder="Например, удобный день и время" />
+    <TextareaField label="Комментарий" labelVisibility="sr-only" name="comment" maxLength={2000} placeholder="Например, удобный день и время" className="min-h-16 resize-none md:min-h-24 md:resize-y" />
     <label className="absolute -left-[10000px]" aria-hidden="true">Сайт<input name="website" tabIndex={-1} autoComplete="off" /></label>
     <CheckboxField name="consent" required label={<>{site.contactConfirmation.consentLabel} · <a href={site.contactConfirmation.policyHref} target="_blank" rel="noreferrer" className="underline">политика</a></>} />
     {error && <p role="alert" className="type-body-sm text-red-700">{error}</p>}
     <Button type="submit" loading={state === 'sending'} fullWidth>{site.contactConfirmation.submitLabel}</Button>
-    <div className="border-t border-ink/10 pt-4"><p className="type-caption mb-3 text-ink-soft">Или свяжитесь напрямую</p><div className="flex flex-wrap gap-2">{site.contactConfirmation.channels.filter(({ enabled, channel }) => enabled && channel !== 'email').map((channel) => <Button key={channel.channel} variant="neutral" size="sm" onClick={() => onContact(channel.channel)}>{channel.label}</Button>)}</div></div>
+    <div className="border-t border-ink/10 pt-3 md:pt-4"><p className="type-caption mb-2 text-ink-soft md:mb-3">Или свяжитесь напрямую</p><div className="flex flex-wrap gap-2">{site.contactConfirmation.channels.filter(({ enabled, channel }) => enabled && channel !== 'email').map((channel) => <Button key={channel.channel} variant="neutral" size="sm" onClick={() => onContact(channel.channel)}>{channel.label}</Button>)}</div></div>
   </form>
 }
 
@@ -94,7 +94,7 @@ export function ActionLayerProvider({ site, children, captureContacts = true }: 
   }, [captureContacts, site.contactConfirmation.channels])
   return <ActionLayerContext.Provider value={{ requestContact, requestLead, requestExternal }}>{children}
     <Dialog open={channel !== null} onClose={() => setChannel(null)} title={site.contactConfirmation.dialogTitle}>{channel && <div className="text-center">{site.contactConfirmation.avatar ? <ProgressiveImage src={site.contactConfirmation.avatar.url} alt={site.contactConfirmation.avatar.alt} className="mx-auto h-20 w-20 rounded-full object-cover" /> : <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-lime-soft text-ink">{channel.channel === 'phone' ? <Phone /> : channel.channel === 'email' ? <Mail /> : <Send />}</span>}<p className="type-caption mt-5 text-ink-soft">{channel.label}</p><p className="type-title-card mt-1 break-all text-ink">{channel.displayValue}</p><div className="mt-7 flex justify-center gap-3"><Button variant="neutral" onClick={() => setChannel(null)}>{site.contactConfirmation.cancelLabel}</Button><ButtonLink data-contact-confirmed data-analytics-ignore href={channel.destination} target={channel.destination.startsWith('http') ? '_blank' : undefined} rel={channel.destination.startsWith('http') ? 'noreferrer' : undefined}>{channel.channel === 'phone' ? 'Позвонить' : site.contactConfirmation.continueLabel}</ButtonLink></div></div>}</Dialog>
-    <Dialog open={lead !== null} onClose={() => setLead(null)} title={site.contactConfirmation.formTitle}>{lead && <LeadForm site={site} lead={lead} onClose={() => setLead(null)} onContact={(kind) => { requestContact(kind) }} />}</Dialog>
+    <Dialog open={lead !== null} onClose={() => setLead(null)} title={site.contactConfirmation.formTitle} mobileTall>{lead && <LeadForm site={site} lead={lead} onClose={() => setLead(null)} onContact={(kind) => { requestContact(kind) }} />}</Dialog>
     <Dialog open={external !== null} onClose={() => setExternal(null)} title="Перейти на внешний сайт?">
       {external && <div className="text-center">
         <p className="type-body text-ink-soft">Вы переходите на сайт{external.label ? ` «${external.label}»` : ''}, который находится за пределами UNLIM RIGA PADEL.</p>
