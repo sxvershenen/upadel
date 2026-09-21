@@ -13,8 +13,9 @@ const program = (item: Row, origin: string): HomepageDTO['entities']['trainingPr
 const membership = (item: Row): HomepageDTO['entities']['memberships'][number] => ({ id: String(item.id), title: String(item.title), badge: item.badge, badgeTone: item.badgeTone, description: String(item.description), cardVariant: item.cardVariant, meshTone: item.meshTone, price: item.price, oldPrice: item.oldPrice, priceLabel: item.priceLabel, benefits: (item.benefits ?? []).map(({ text }: Row) => String(text)), giftAmountLimits: item.giftAmountLimits, action: actionDTO(item.action) })
 const court = (item: Row): HomepageDTO['entities']['courts'][number] => ({ id: String(item.id), slug: String(item.slug), title: String(item.title), eyebrow: item.eyebrow, description: item.description, cardVariant: item.cardVariant, metrics: item.metrics })
 const galleryItem = (item: Row, origin: string): HomepageDTO['entities']['gallery'][number] => ({ id: String(item.id), title: String(item.title), media: requiredMedia(item.media, origin, 'original'), caption: item.caption })
+const coachItem = (coach: Row, origin: string): HomepageDTO['entities']['coaches'][number] => ({ id: String(coach.id), name: String(coach.name), slug: String(coach.slug), photo: requiredMedia(coach.photo, origin), specialization: String(coach.specialization), bio: String(coach.bio), level: String(coach.level), experience: String(coach.experience), languages: String(coach.languages), rating: Number(coach.rating), reviewsCount: Number(coach.reviewsCount), certificates: Array.isArray(coach.certificates) ? coach.certificates.map((item) => String((item as { title: unknown }).title)) : [], priceFrom: Number(coach.priceFrom), action: actionDTO(coach.action) })
 
-async function publishedCollection(payload: Payload, collection: 'partners' | 'rental-rates' | 'training-programs' | 'memberships' | 'courts' | 'gallery-items', preview: boolean, extraWhere?: Row, sort: string | string[] = 'homepageOrder') {
+async function publishedCollection(payload: Payload, collection: 'partners' | 'rental-rates' | 'training-programs' | 'memberships' | 'courts' | 'gallery-items' | 'coaches', preview: boolean, extraWhere?: Row, sort: string | string[] = 'homepageOrder') {
   const conditions: Row[] = preview ? [] : [{ _status: { equals: 'published' } }, { isActive: { equals: true } }]
   if (extraWhere) conditions.push(extraWhere)
   return payload.find({ collection, depth: 2, draft: preview, pagination: false, overrideAccess: true, sort, where: conditions.length ? { and: conditions } : undefined } as never) as unknown as Promise<{ docs: Row[] }>
@@ -41,9 +42,26 @@ export async function createThematicPageProjection(payload: Payload, options: { 
     return parseThematicPageDTO({ ...base, kind, tabs: { rent: page.rentTabLabel, training: page.trainingTabLabel, memberships: page.membershipsTabLabel }, rules: (page.rules ?? []).map((item: Row) => ({ title: String(item.title), contentHTML: richContentHTML(item.content) })), rentalRates: rates.docs.map(rentalRate), trainingPrograms: programs.docs.map((item) => program(item, origin)), memberships: memberships.docs.map(membership) })
   }
   if (kind === 'training') {
-    const [programs, rates] = await Promise.all([publishedCollection(payload, 'training-programs', preview), publishedCollection(payload, 'rental-rates', preview)])
+    const [programs, rates, coachesDocs] = await Promise.all([
+      publishedCollection(payload, 'training-programs', preview),
+      publishedCollection(payload, 'rental-rates', preview),
+      publishedCollection(payload, 'coaches', preview, undefined, 'homepageOrder'),
+    ])
     const trial = rates.docs.find((item) => item.cardVariant === 'trial')
-    return parseThematicPageDTO({ ...base, kind, infographicEyebrow: String(page.infographicEyebrow ?? ''), infographicTitle: String(page.infographicTitle ?? ''), infographicCopy: String(page.infographicCopy ?? ''), programsTitle: String(page.programsTitle ?? ''), blocks: (page.blocks ?? []).map(({ title, body, icon }: Row) => ({ title, body, icon })), articleHTML: richContentHTML(page.article ?? {}), action: actionDTO(page.action), programs: programs.docs.map((item) => program(item, origin)), trial: trial ? rentalRate(trial) : null })
+    return parseThematicPageDTO({
+      ...base,
+      kind,
+      infographicEyebrow: String(page.infographicEyebrow ?? ''),
+      infographicTitle: String(page.infographicTitle ?? ''),
+      infographicCopy: String(page.infographicCopy ?? ''),
+      programsTitle: String(page.programsTitle ?? ''),
+      blocks: (page.blocks ?? []).map(({ title, body, icon }: Row) => ({ title, body, icon })),
+      articleHTML: richContentHTML(page.article ?? {}),
+      action: actionDTO(page.action),
+      programs: programs.docs.map((item) => program(item, origin)),
+      trial: trial ? rentalRate(trial) : null,
+      coaches: coachesDocs.docs.map((item) => coachItem(item, origin)),
+    })
   }
   if (kind === 'gift') return parseThematicPageDTO({
     ...base,

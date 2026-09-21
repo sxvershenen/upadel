@@ -20,3 +20,6 @@ media/
 .vercel/
 .idea/
 .vscode/
+
+# Local SEO analysis cache
+.seo-cache/

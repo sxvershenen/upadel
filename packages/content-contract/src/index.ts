@@ -219,6 +219,7 @@ export type TrainingPageDTO = ThematicPageBase & {
   action: ActionDTO
   programs: HomepageDTO['entities']['trainingPrograms']
   trial: HomepageDTO['entities']['rentalRates'][number] | null
+  coaches?: HomepageDTO['entities']['coaches']
 }
 export type GiftPageDTO = ThematicPageBase & {
   kind: 'gift'

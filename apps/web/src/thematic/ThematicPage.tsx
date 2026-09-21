@@ -1,21 +1,14 @@
-import type { PricesPageDTO, ThematicPageDTO, TrainingPageDTO } from '@unlim/content-contract'
-import { Calendar, CalendarCheck, Car, Clock, Layers3, Lightbulb, MapPin, PanelTop, RefreshCw, Target, Thermometer, Train, TrendingUp, Users } from 'lucide-react'
+import type { PricesPageDTO, ThematicPageDTO } from '@unlim/content-contract'
+import { CalendarCheck, Car, Clock, Layers3, Lightbulb, MapPin, PanelTop, RefreshCw, Thermometer, Train } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useRef, useState, type CSSProperties, type KeyboardEvent } from 'react'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import type { Swiper as SwiperType } from 'swiper'
-import 'swiper/css'
 
 import { MembershipCard } from '../components/cards/MembershipCards'
 import { RentalRateCard } from '../components/cards/RentPricingCards'
 import { TrainingCard } from '../components/cards/TrainingCard'
 import { CourtCard } from '../components/cards/CourtCards'
-import { ContentAction } from '../components/ContentAction'
 import { SiteFrame } from '../components/SiteFrame'
-import { MobileSwiperNav } from '../components/ui/MobileSwiperNav'
-import { horizontalSwiperProps } from '../lib/swiper'
 import { springLayout } from '../lib/motion'
-import { useMobileSwipeHint } from '../lib/useMobileSwipeHint'
 import { GalleryExperience } from './GalleryExperience'
 import { PageHeader } from './PageHeader'
 
@@ -48,55 +41,11 @@ function Prices({ dto }: { dto: PricesPageDTO }) {
   </>
 }
 
-const trainingIcons = { Target, Calendar, TrendingUp, Users }
+import { GiftLandingPage } from '../landing/GiftLandingPage'
+import { TrainingPage } from './TrainingPage'
+
 const metricIcons = { Layers3, PanelTop, Lightbulb, Thermometer }
 const arrivalIcons = { Car, Train, Clock, MapPin }
-
-function TrainingFormats({ dto }: { dto: TrainingPageDTO }) {
-  const items = [...dto.programs.map((program) => ({ kind: 'program' as const, item: program })), ...(dto.trial ? [{ kind: 'trial' as const, item: dto.trial }] : [])]
-  const swiperRef = useRef<SwiperType | null>(null)
-  const [atStart, setAtStart] = useState(true)
-  const [atEnd, setAtEnd] = useState(false)
-  const swipeHintRef = useMobileSwipeHint(swiperRef)
-  const card = (entry: (typeof items)[number]) => entry.kind === 'program'
-    ? <TrainingCard training={entry.item} />
-    : <RentalRateCard rate={entry.item} sourcePage="/training" sourceEntity={entry.item.title} />
-
-  return <section className="mt-14" aria-labelledby="training-programs-title">
-    <div className="mb-7 flex items-end justify-between gap-5">
-      <h2 id="training-programs-title" className="type-section text-ink">{dto.programsTitle}</h2>
-      <MobileSwiperNav className="lg:hidden" atStart={atStart} atEnd={atEnd} onPrev={() => swiperRef.current?.slidePrev()} onNext={() => swiperRef.current?.slideNext()} />
-    </div>
-    <div className="hidden gap-4 lg:grid lg:grid-cols-4">{items.map((entry) => <div key={`${entry.kind}-${entry.item.id}`} className="h-full">{card(entry)}</div>)}</div>
-    <div ref={swipeHintRef} className="-mx-5 lg:hidden">
-      <Swiper {...horizontalSwiperProps} onSwiper={(swiper) => { swiperRef.current = swiper; setAtStart(swiper.isBeginning); setAtEnd(swiper.isEnd) }} onSlideChange={(swiper) => { setAtStart(swiper.isBeginning); setAtEnd(swiper.isEnd) }} slidesPerView={1} spaceBetween={12} className="swiper-breathe !px-5">
-        {items.map((entry) => <SwiperSlide key={`${entry.kind}-${entry.item.id}`} className="!h-auto"><div className="h-full min-h-[500px]">{card(entry)}</div></SwiperSlide>)}
-      </Swiper>
-    </div>
-  </section>
-}
-
-function EditorialArticle({ html, eyebrow, title, label }: { html: string; eyebrow: string; title: string; label: string }) {
-  if (!html) return null
-  const headingId = `${label}-editorial-title`
-  return <section className="mt-16 grid gap-6 lg:grid-cols-[.42fr_1.58fr] lg:gap-10" aria-labelledby={headingId}>
-    <div className="lg:pt-3"><p className="type-eyebrow text-ink-muted">{eyebrow}</p><h2 id={headingId} className="type-title-large mt-3 text-ink">{title}</h2><div className="mt-6 h-px w-16 bg-ink/20" /></div>
-    <div className="article-content se-4 bg-white p-6 text-ink-soft md:p-9 [&_h2]:border-t [&_h2]:border-ink/10 [&_h2]:pt-8 [&_h2:first-child]:border-0 [&_h2:first-child]:pt-0 [&_h3]:text-ink [&_li]:marker:text-ink-muted [&>*:last-child]:mb-0" dangerouslySetInnerHTML={{ __html: html }} />
-  </section>
-}
-
-function TrainingPage({ dto }: { dto: TrainingPageDTO }) {
-  return <article className="container-page pb-12 pt-10 md:pb-16 md:pt-14">
-    <section className="grid gap-8 lg:grid-cols-[.72fr_1.28fr] lg:items-start" aria-labelledby="training-infographic-title">
-      <div className="se-4 bg-white p-6 md:p-8"><span className="type-eyebrow text-ink-muted">{dto.infographicEyebrow}</span><h2 id="training-infographic-title" className="type-section mt-3 text-ink">{dto.infographicTitle}</h2><p className="type-body mt-4 max-w-[560px] text-ink-soft">{dto.infographicCopy}</p><div className="mt-7"><ContentAction action={dto.action} sourcePage="/training" sourceEntity={dto.infographicTitle} /></div></div>
-      <ol className="grid gap-3 sm:grid-cols-2">{dto.blocks.map((block, index) => { const Icon = trainingIcons[block.icon]; return <li key={block.title} className="se-3 bg-white p-5 md:p-6"><div className="flex items-center justify-between"><span className="se-2 flex h-10 w-10 items-center justify-center bg-surface-muted text-ink-soft"><Icon aria-hidden="true" size={19} /></span><span className="type-caption text-ink-muted">0{index + 1}</span></div><h3 className="type-title-card mt-5 text-ink">{block.title}</h3><p className="type-body-sm mt-2 text-ink-soft">{block.body}</p></li> })}</ol>
-    </section>
-    <TrainingFormats dto={dto} />
-    <EditorialArticle html={dto.articleHTML} eyebrow="Методика" title="Как устроены тренировки" label="training" />
-  </article>
-}
-
-import { GiftLandingPage } from '../landing/GiftLandingPage'
 
 function PageBody({ dto }: { dto: Exclude<ThematicPageDTO, PricesPageDTO> }) {
   if (dto.kind === 'training') return <TrainingPage dto={dto} />

@@ -2314,9 +2314,21 @@ export interface SiteSetting {
     successText: string;
     consentLabel: string;
     policyHref: string;
+    /**
+     * Это не проверка номера: перед переходом на звонок посетитель увидит номер и подтвердит действие.
+     */
     phoneEnabled?: boolean | null;
+    /**
+     * Это не подтверждение адреса: перед открытием почты посетитель увидит адрес и подтвердит переход.
+     */
     emailEnabled?: boolean | null;
+    /**
+     * Это не проверка аккаунта: перед переходом в Telegram посетитель подтвердит действие.
+     */
     telegramEnabled?: boolean | null;
+    /**
+     * Это не проверка аккаунта: перед переходом в VK посетитель подтвердит действие.
+     */
     vkEnabled?: boolean | null;
   };
   /**
