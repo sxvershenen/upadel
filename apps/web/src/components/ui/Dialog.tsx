@@ -37,7 +37,7 @@ export function Dialog({ open, onClose, title, children }: { open: boolean; onCl
 
   if (typeof document === "undefined") return null;
   return createPortal(
-    <AnimatePresence>
+    <AnimatePresence initial={false}>
       {open && <div className="fixed inset-0 z-[100] flex items-end justify-center p-0 md:items-center md:p-6">
         <motion.button data-cool-mode="off" type="button" aria-label="Закрыть диалог" onClick={onClose} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-ink/55 backdrop-blur-[3px]" />
         <motion.div
@@ -46,10 +46,10 @@ export function Dialog({ open, onClose, title, children }: { open: boolean; onCl
           aria-modal="true"
           aria-labelledby={titleId}
           onKeyDown={trapFocus}
-          initial={{ opacity: 0, y: 28, scale: 0.985 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 20, scale: 0.985 }}
-          transition={{ type: "spring", stiffness: 260, damping: 28 }}
+          initial={{ y: 20 }}
+          animate={{ y: 0 }}
+          exit={{ y: 16 }}
+          transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}
           className="dialog-surface relative z-10 flex max-h-[92svh] w-full flex-col overflow-hidden bg-white p-5 md:max-h-[96svh] md:max-w-[780px] md:p-6"
         >
           <div className="mb-5 flex shrink-0 items-start justify-between gap-4">

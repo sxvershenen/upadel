@@ -1,4 +1,4 @@
-import { useRef, useState, type CSSProperties } from "react";
+import { useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import type { Swiper as SwiperType } from "swiper";
 import "swiper/css";
@@ -69,9 +69,9 @@ export function Coaches() {
             }}
             className="swiper-breathe !px-5 md:!px-0"
           >
-            {entities.coaches.map((coach, index) => (
+            {entities.coaches.map((coach) => (
               <SwiperSlide key={coach.id} className="!h-auto">
-                <div data-reveal style={{ "--reveal-delay": `${index * 0.06}s`, "--reveal-y": "18px" } as CSSProperties}>
+                <div>
                   <CoachCard coach={coach} />
                 </div>
               </SwiperSlide>

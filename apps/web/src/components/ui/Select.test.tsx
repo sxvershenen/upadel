@@ -4,7 +4,7 @@ import test from 'node:test'
 import React from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 
-import { Select } from './Select'
+import { Select, selectMenuWidth } from './Select'
 import { SelectField } from './SelectField'
 
 const options = [
@@ -26,4 +26,9 @@ test('SelectField replaces native select while preserving form submission', () =
   assert.doesNotMatch(html, /<select/)
   assert.match(html, /aria-haspopup="listbox"/)
   assert.match(html, /type="hidden" name="format" value="box"/)
+})
+
+test('Select menu width includes its chrome and remains inside the viewport', () => {
+  assert.equal(selectMenuWidth(104, [278], 360), 300)
+  assert.equal(selectMenuWidth(104, [420], 360), 344)
 })

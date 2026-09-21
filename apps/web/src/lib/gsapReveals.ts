@@ -62,11 +62,11 @@ export function selectRevealTargets(allTargets: RevealTarget[]) {
   return allTargets.filter((target) => {
     if (target.parentElement?.closest('[data-page-enter-owner="true"]')) return false
     if (target.parentElement?.closest('[data-page-enter="content"]')) return false
+    const hasBoundaryAncestor = Boolean(target.parentElement?.closest('[data-gsap-reveal-boundary="true"]'))
+    if (hasBoundaryAncestor) return false
     const hasScopeAncestor = Boolean(target.parentElement?.closest('[data-gsap-reveal-scope="true"]'))
     if (hasScopeAncestor) return selectedScopes.has(target)
 
-    const hasBoundaryAncestor = Boolean(target.parentElement?.closest('[data-gsap-reveal-boundary="true"]'))
-    if (hasBoundaryAncestor) return false
     if (selectedScopes.has(target) || target.dataset.gsapRevealBoundary === 'true') return true
     return !target.querySelector('[data-gsap-reveal-boundary="true"], [data-gsap-reveal]')
   })
@@ -133,8 +133,8 @@ export async function startGsapReveals() {
   if (runGeneration !== generation || !root.isConnected) return
   document.documentElement.removeAttribute('data-gsap-reveal-prepared')
   document.documentElement.setAttribute('data-gsap-reveal-ready', 'true')
-  let autoDelays = new Map<RevealTarget, number>()
   let initialCssEntranceSettled = false
+  let initialRefresh = true
 
   const show = (target: RevealTarget) => {
     if (target.dataset.gsapRevealVisible === 'true' || originalStyles.has(target)) return
@@ -154,7 +154,7 @@ export async function startGsapReveals() {
     const common = {
       '--gsap-reveal-offset': '0px',
       duration: 0.68,
-      delay: autoDelays.get(target) ?? Number.parseFloat(target.style.getPropertyValue('--gsap-reveal-delay') || '0'),
+      delay: Number.parseFloat(target.style.getPropertyValue('--gsap-reveal-delay') || '0'),
       ease: 'power3.out',
       onComplete: settle,
       onInterrupt: settle,
@@ -175,12 +175,6 @@ export async function startGsapReveals() {
       })
       initialCssEntranceSettled = true
     }
-    const laidOutTargets = targets.filter((target) => target.getClientRects().length > 0)
-    autoDelays = new Map(
-      laidOutTargets
-        .filter((target) => target.dataset.gsapRevealDelayExplicit !== 'true' && Number.parseFloat(target.style.getPropertyValue('--gsap-reveal-delay') || '0') === 0)
-        .map((target, index) => [target, Math.min(index, 5) * 0.08]),
-    )
     const targetSet = new Set(targets)
     allTargets.forEach((target) => {
       const ownsReveal = targetSet.has(target) && shouldOwnRevealTarget(target.dataset.gsapRevealVisible === 'true', originalStyles.has(target))
@@ -193,11 +187,17 @@ export async function startGsapReveals() {
       }
     })
     observer?.disconnect()
+    const settleVisibleAfterLateStart = initialRefresh && window.scrollY > 1
     targets.forEach((target) => {
       if (target.dataset.gsapRevealVisible === 'true') return
-      if (isInRevealViewport(target)) show(target)
+      if (isInRevealViewport(target) && settleVisibleAfterLateStart) {
+        target.dataset.gsapRevealVisible = 'true'
+        delete target.dataset.gsapRevealOwner
+        ownedTargets.delete(target)
+      } else if (isInRevealViewport(target)) show(target)
       else observer?.observe(target)
     })
+    initialRefresh = false
   }
 
   const scheduleRefresh = () => {

@@ -105,7 +105,6 @@ const pageEntrance = Astro.url.pathname === '/gift'
         window.scrollTo(0, 0)
         window.requestAnimationFrame(() => window.scrollTo(0, 0))
       }
-      if (pageEntrance !== 'gift' && pageEntrance !== 'detail' && document.querySelector('#swup [data-gsap-reveal]')) document.documentElement.setAttribute('data-gsap-reveal-prepared', 'true')
       document.documentElement.setAttribute('data-unlim-enhancements', 'true')
       if (window.__unlimSiteEnhancements) return
       window.__unlimSiteEnhancements = true

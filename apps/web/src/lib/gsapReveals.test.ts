@@ -99,3 +99,18 @@ test('leaf Reveal scopes take ownership over atomic targets inside them', () => 
 
   assert.deepEqual(selectRevealTargets([section, nested, nestedButton] as unknown as RevealTarget[]), [nested])
 })
+
+test('a non-animated card boundary suppresses independent child reveals', () => {
+  const root = fakeTarget()
+  const card = fakeTarget({ boundary: true, parent: root })
+  const badge = fakeTarget({ parent: card })
+  assert.deepEqual(selectRevealTargets([badge] as unknown as RevealTarget[]), [])
+})
+
+test('a boundary suppresses nested Reveal scopes before scope ownership is resolved', () => {
+  const root = fakeTarget()
+  const panel = fakeTarget({ boundary: true, parent: root })
+  const outer = fakeTarget({ scope: true, parent: panel })
+  const inner = fakeTarget({ scope: true, parent: outer })
+  assert.deepEqual(selectRevealTargets([outer, inner] as unknown as RevealTarget[]), [])
+})

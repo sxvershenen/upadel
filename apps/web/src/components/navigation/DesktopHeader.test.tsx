@@ -41,3 +41,11 @@ test('desktop navigation keeps a local fallback icon while a CMS icon loads', ()
   assert.match(html, /src="\/media\/prices\.svg"/)
   assert.match(html, /lucide-tag|<svg/)
 })
+
+test('desktop navigation labels keep one grid-aligned box before and after measurement', () => {
+  const html = renderToStaticMarkup(<SiteProvider site={site} captureContacts={false}><DesktopHeader /></SiteProvider>)
+  const contents = tagWithClass(html, 'desktop-header-nav-content')
+  const label = html.match(/<span[^>]*data-header-nav-label="true"[^>]*>/)?.[0] ?? ''
+  assert.match(contents, /\bgrid\b/)
+  assert.doesNotMatch(label, /\babsolute\b|\binset-0\b/)
+})

@@ -30,6 +30,7 @@ export function SurfaceCard({ tone = "white", interactive = true, reveal = true,
   return <motion.div
     {...props}
     {...revealProps}
+    data-gsap-reveal-boundary="true"
     initial={interactive ? "rest" : undefined}
     whileHover={interactive ? "hover" : undefined}
     variants={interactive ? cardVariants : undefined}
@@ -74,6 +75,7 @@ export function ImageCard({ src, alt, overlay, className, children, imgClassName
   return <motion.div
     {...props}
     {...revealProps}
+    data-gsap-reveal-boundary="true"
     initial={interactive ? "rest" : undefined}
     whileHover={interactive ? "hover" : undefined}
     variants={interactive ? cardVariants : undefined}

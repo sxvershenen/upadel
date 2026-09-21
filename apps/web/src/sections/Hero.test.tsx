@@ -3,7 +3,7 @@ import test from 'node:test'
 import React from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { ContentProvider } from '../content/ContentContext'
-import { Hero } from './Hero'
+import { Hero, resolveHeroParallaxTarget } from './Hero'
 
 const content = {
   site: {
@@ -29,4 +29,12 @@ test('hero CTAs have one SSR entrance owner and no nested GSAP reveal', () => {
   })
   assert.match(actions[0], /Забронировать/)
   assert.match(actions[1], /Попробовать/)
+})
+
+test('mobile hero parallax falls back to desktop media when no mobile asset is configured', () => {
+  const desktop = { id: 'desktop' }
+  const mobile = { id: 'mobile' }
+  assert.equal(resolveHeroParallaxTarget(true, desktop, null), desktop)
+  assert.equal(resolveHeroParallaxTarget(true, desktop, mobile), mobile)
+  assert.equal(resolveHeroParallaxTarget(false, desktop, mobile), desktop)
 })

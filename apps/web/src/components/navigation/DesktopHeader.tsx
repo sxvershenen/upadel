@@ -39,7 +39,10 @@ function NavigationIcon({ href, icon, size = 16 }: { href: string; icon?: { url:
 }
 
 function useWideHeader() {
-  const [wide, setWide] = useState(() => typeof window === 'undefined' ? true : window.matchMedia('(min-width: 1200px)').matches)
+  // Keep the first client render identical to SSR. The layout effect applies
+  // the real media state before paint, avoiding both hydration replacement
+  // and a visible text-to-icon jump on narrower desktop widths.
+  const [wide, setWide] = useState(true)
   useIsomorphicLayoutEffect(() => {
     const query = window.matchMedia('(min-width: 1200px)')
     const update = () => setWide(query.matches)
@@ -74,9 +77,9 @@ function CompactTooltip({ children, filterId, reduceMotion }: { children: ReactN
 }
 
 function AnimatedNavigationContents({ expanded, item }: { expanded: boolean; item: DesktopNavigationChild }) {
-  return <span data-header-nav-mode={expanded ? 'expanded' : 'compact'} className="desktop-header-nav-content relative block h-full w-full overflow-hidden">
-    <span aria-hidden={!expanded} data-header-nav-label className="desktop-header-nav-label absolute inset-0 flex items-center justify-center" style={{ opacity: expanded ? 1 : 0 }}>{item.label}</span>
-    <span aria-hidden={expanded} data-header-nav-icon className="desktop-header-nav-icon absolute inset-0 flex items-center justify-center" style={{ opacity: expanded ? 0 : 1 }}><NavigationIcon href={item.href} icon={item.icon} /></span>
+  return <span data-header-nav-mode={expanded ? 'expanded' : 'compact'} className="desktop-header-nav-content relative grid h-full w-full place-items-center overflow-hidden">
+    <span aria-hidden={!expanded} data-header-nav-label className="desktop-header-nav-label col-start-1 row-start-1 flex items-center justify-center" style={{ opacity: expanded ? 1 : 0 }}>{item.label}</span>
+    <span aria-hidden={expanded} data-header-nav-icon className="desktop-header-nav-icon col-start-1 row-start-1 flex items-center justify-center" style={{ opacity: expanded ? 0 : 1 }}><NavigationIcon href={item.href} icon={item.icon} /></span>
   </span>
 }
 
@@ -319,7 +322,7 @@ export function DesktopHeader() {
     }
   }, [site.brandName, site.brandLogo?.url, site.desktopNavigation])
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const suppressTooltips = () => setTooltipSuppressed(true)
     const disposeScroll = bindHeaderScroll({
       scrollTarget: window,

@@ -7,6 +7,13 @@ import { cn } from '../../utils/cn'
 
 export type SelectOption = { value: string; label: string }
 
+export function selectMenuWidth(triggerWidth: number, optionWidths: number[], viewportWidth: number) {
+  // 16px menu padding + 2px border + 4px subpixel/font safety.
+  const menuChromeWidth = 22
+  const contentWidth = Math.max(triggerWidth, ...optionWidths.map((width) => width + menuChromeWidth))
+  return Math.min(contentWidth, viewportWidth - 16)
+}
+
 export interface SelectProps {
   value: string
   options: SelectOption[]
@@ -35,7 +42,7 @@ export function Select({
   'aria-required': ariaRequired,
 }: SelectProps) {
   const [open, setOpen] = useState(false)
-  const [menuPosition, setMenuPosition] = useState<{ top: number; left: number; width: number } | null>(null)
+  const [menuPosition, setMenuPosition] = useState<{ top: number; left: number; width: number; placement: 'above' | 'below' } | null>(null)
   const rootRef = useRef<HTMLDivElement>(null)
   const menuRef = useRef<HTMLDivElement>(null)
   const listId = useId()
@@ -58,13 +65,18 @@ export function Select({
     const updateMenuPosition = () => {
       const rect = rootRef.current?.getBoundingClientRect()
       if (!rect) return
-      const optionWidths = Array.from(menuRef.current?.querySelectorAll<HTMLElement>('.ui-select-option') ?? [], (option) => option.scrollWidth)
-      const contentWidth = Math.max(rect.width, ...optionWidths)
-      const width = Math.min(Math.max(rect.width, contentWidth), window.innerWidth - 16)
+      const optionWidths = Array.from(menuRef.current?.querySelectorAll<HTMLElement>('.ui-select-measure-option') ?? [], (option) => option.scrollWidth)
+      const width = selectMenuWidth(rect.width, optionWidths, window.innerWidth)
       const left = Math.max(8, Math.min(rect.left, window.innerWidth - width - 8))
-      setMenuPosition((current) => current && current.top === rect.bottom + 6 && current.left === left && current.width === width
+      const menuHeight = menuRef.current?.offsetHeight ?? 0
+      const belowTop = rect.bottom + 6
+      const aboveTop = rect.top - menuHeight - 6
+      const placement = menuHeight > 0 && belowTop + menuHeight > window.innerHeight - 8 && aboveTop >= 8 ? 'above' : 'below'
+      const preferredTop = placement === 'above' ? aboveTop : belowTop
+      const top = menuHeight > 0 ? Math.max(8, Math.min(preferredTop, window.innerHeight - menuHeight - 8)) : preferredTop
+      setMenuPosition((current) => current && current.top === top && current.left === left && current.width === width && current.placement === placement
         ? current
-        : { top: rect.bottom + 6, left, width })
+        : { top, left, width, placement })
     }
     updateMenuPosition()
     const frame = window.requestAnimationFrame(updateMenuPosition)
@@ -138,13 +150,16 @@ export function Select({
           id={listId}
           role="listbox"
           aria-label={ariaLabel}
-          initial={reduceMotion ? false : { opacity: 0, y: -6, scale: 0.98 }}
+          initial={reduceMotion ? false : { opacity: 0, y: menuPosition.placement === 'above' ? 6 : -6, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -4, scale: 0.985 }}
+          exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: menuPosition.placement === 'above' ? 4 : -4, scale: 0.985 }}
           transition={reduceMotion ? { duration: 0.01 } : { duration: 0.2, ease: [0.2, 0.8, 0.2, 1] }}
-          style={{ position: 'fixed', top: menuPosition.top, left: menuPosition.left, width: 'max-content', minWidth: menuPosition.width }}
-          className="ui-select-menu z-[100] origin-top type-ui font-medium"
+          style={{ position: 'fixed', top: menuPosition.top, left: menuPosition.left, width: menuPosition.width, transformOrigin: menuPosition.placement === 'above' ? 'bottom' : 'top' }}
+          className="ui-select-menu z-[100] type-ui font-medium"
         >
+          <span aria-hidden="true" className="ui-select-measurer">
+            {options.map((option) => <span key={option.value} className="ui-select-measure-option">{option.label}</span>)}
+          </span>
           {options.map((option) => <button
             key={option.value}
             type="button"

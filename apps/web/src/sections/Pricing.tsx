@@ -68,16 +68,17 @@ export function Pricing() {
         <Tabs fullWidth layoutId="pricing-tabs-mobile" tabs={pricingTabs} value={active} onChange={changeTab} />
       </div>
 
-      <AnimatePresence initial={false} mode="wait">
+      <AnimatePresence initial={false} mode="sync">
         <motion.div
           id="pricing-panel"
+          data-gsap-reveal-boundary="true"
           role="tabpanel"
           tabIndex={0}
           key={active}
           initial={{ opacity: 0, y: 4 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -4 }}
-          transition={{ duration: 0.14, ease: "easeOut" }}
+          transition={{ duration: 0.12, ease: "easeOut" }}
         >
           {active === "rent" && <PricingRent onSwiperChange={syncPricingSwiper} />}
           {active === "training" && <PricingTraining onSwiperChange={syncPricingSwiper} />}

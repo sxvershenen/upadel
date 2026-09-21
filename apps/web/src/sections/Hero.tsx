@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CalendarCheck, MapPin, Play, Star, Users } from "lucide-react";
@@ -9,6 +9,11 @@ import { cn } from "../utils/cn";
 import type { MediaDTO } from "@unlim/content-contract";
 
 gsap.registerPlugin(ScrollTrigger);
+const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
+
+export function resolveHeroParallaxTarget<T>(mobile: boolean, desktopTarget: T | null, mobileTarget: T | null) {
+  return mobile ? mobileTarget ?? desktopTarget : desktopTarget ?? mobileTarget;
+}
 
 function HeroBackgroundMedia({ media, poster, className, setRef }: { media: MediaDTO; poster?: MediaDTO | null; className?: string; setRef?: (node: HTMLImageElement | HTMLVideoElement | null) => void }) {
   const classes = cn("absolute inset-0 h-full w-full object-cover", className);
@@ -58,42 +63,51 @@ export function Hero() {
   const desktopMediaRef = useRef<HTMLImageElement | HTMLVideoElement>(null);
   const mobileMediaRef = useRef<HTMLImageElement | HTMLVideoElement>(null);
 
-  useEffect(() => {
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const touchViewport = window.matchMedia("(max-width: 767px)").matches;
-    const mediaRef = touchViewport ? mobileMediaRef : desktopMediaRef;
-    if (reduce || !sectionRef.current || !mediaRef.current) return;
+  useIsomorphicLayoutEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
 
-    const target = mediaRef.current;
-    const refresh = () => ScrollTrigger.refresh();
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
+    const mediaQueries = gsap.matchMedia();
+    mediaQueries.add({ mobile: "(max-width: 767px)", reduce: "(prefers-reduced-motion: reduce)" }, (context) => {
+      if (context.conditions?.reduce) return;
+      const mobile = Boolean(context.conditions?.mobile);
+      const target = resolveHeroParallaxTarget(mobile, desktopMediaRef.current, mobileMediaRef.current);
+      if (!target) return;
+
+      const sync = () => {
+        ScrollTrigger.refresh();
+        ScrollTrigger.update();
+      };
+      const animation = gsap.fromTo(
         target,
         { scale: 1.08 },
         {
-          scale: touchViewport ? 1.16 : 1.28,
+          scale: mobile ? 1.16 : 1.28,
           ease: "none",
           scrollTrigger: {
-            trigger: sectionRef.current,
+            trigger: section,
             start: "top top",
             end: "bottom top",
-            scrub: touchViewport ? 0.35 : 0.6,
+            scrub: true,
             invalidateOnRefresh: true,
           },
         },
       );
-    }, sectionRef);
-    target.addEventListener("load", refresh);
-    target.addEventListener("loadeddata", refresh);
-    const frame = window.requestAnimationFrame(refresh);
+      target.addEventListener("load", sync);
+      target.addEventListener("loadeddata", sync);
+      const frame = window.requestAnimationFrame(sync);
 
-    return () => {
-      window.cancelAnimationFrame(frame);
-      target.removeEventListener("load", refresh);
-      target.removeEventListener("loadeddata", refresh);
-      ctx.revert();
-    };
-  }, []);
+      return () => {
+        window.cancelAnimationFrame(frame);
+        target.removeEventListener("load", sync);
+        target.removeEventListener("loadeddata", sync);
+        animation.scrollTrigger?.kill();
+        animation.kill();
+      };
+    });
+
+    return () => mediaQueries.revert();
+  }, [hero.desktopMedia?.url, hero.mobileMedia?.url]);
 
   return (
     <section id="top" ref={sectionRef} className="relative isolate h-[100svh] min-h-[720px] w-full overflow-hidden bg-ink">
