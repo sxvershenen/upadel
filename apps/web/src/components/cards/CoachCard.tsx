@@ -40,18 +40,18 @@ export function CoachCard({ coach, loading = "eager", reveal = true }: { coach: 
     </button>
 
     <Dialog open={open} onClose={closeDialog} title={coach.name}>
-      <div className="grid gap-6 md:grid-cols-[240px_1fr]">
-        <img src={coach.photo.url} alt={coach.photo.alt} className="se-3 aspect-[4/5] h-full max-h-[360px] w-full object-cover" />
+      <div className="grid grid-cols-[140px_minmax(0,1fr)] gap-x-4 gap-y-5 md:grid-cols-[240px_minmax(0,1fr)] md:gap-6">
+        <img src={coach.photo.url} alt={coach.photo.alt} className="se-3 h-[175px] w-[140px] object-cover md:h-auto md:max-h-[360px] md:w-full" />
         <div className="flex flex-col">
           <Badge tone="lime">{coach.specialization}</Badge>
           <Typography role="body" tone="muted" className="mt-4">{coach.bio}</Typography>
-          <dl className="type-body-sm mt-6 grid gap-3 border-y border-ink/10 py-5">
-            <div className="flex justify-between gap-4"><dt className="text-ink-soft">Уровень</dt><dd className="text-right text-ink">{coach.level}</dd></div>
-            <div className="flex justify-between gap-4"><dt className="text-ink-soft">Опыт</dt><dd className="text-right text-ink">{coach.experience}</dd></div>
-            <div className="flex justify-between gap-4"><dt className="text-ink-soft">Языки</dt><dd className="text-right text-ink">{coach.languages}</dd></div>
-          </dl>
-          <div className="mt-5 flex flex-wrap items-center justify-between gap-4"><Price label="тренировка от" value={coach.priceFrom} /><div className="flex gap-2"><ButtonLink href={`/coaches/${coach.slug}`} variant="neutral">Подробнее</ButtonLink><Button onClick={closeDialog}>{coach.action.label ?? "Выбрать тренера"}</Button></div></div>
         </div>
+        <dl className="type-body-sm col-span-2 grid gap-3 border-y border-ink/10 py-4">
+          <div className="flex justify-between gap-4"><dt className="text-ink-soft">Уровень</dt><dd className="text-right text-ink">{coach.level}</dd></div>
+          <div className="flex justify-between gap-4"><dt className="text-ink-soft">Опыт</dt><dd className="text-right text-ink">{coach.experience}</dd></div>
+          <div className="flex justify-between gap-4"><dt className="text-ink-soft">Языки</dt><dd className="text-right text-ink">{coach.languages}</dd></div>
+        </dl>
+        <div className="col-span-2 flex flex-wrap items-center justify-between gap-4"><Price label="тренировка от" value={coach.priceFrom} /><div className="flex gap-2"><ButtonLink href={`/coaches/${coach.slug}`} variant="neutral">Подробнее</ButtonLink><Button onClick={closeDialog}>{coach.action.label ?? "Выбрать тренера"}</Button></div></div>
       </div>
     </Dialog>
   </>;

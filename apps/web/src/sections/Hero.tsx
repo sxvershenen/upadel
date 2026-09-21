@@ -64,9 +64,11 @@ export function Hero() {
     const mediaRef = touchViewport ? mobileMediaRef : desktopMediaRef;
     if (reduce || !sectionRef.current || !mediaRef.current) return;
 
+    const target = mediaRef.current;
+    const refresh = () => ScrollTrigger.refresh();
     const ctx = gsap.context(() => {
       gsap.fromTo(
-        mediaRef.current,
+        target,
         { scale: 1.08 },
         {
           scale: touchViewport ? 1.16 : 1.28,
@@ -81,8 +83,16 @@ export function Hero() {
         },
       );
     }, sectionRef);
+    target.addEventListener("load", refresh);
+    target.addEventListener("loadeddata", refresh);
+    const frame = window.requestAnimationFrame(refresh);
 
-    return () => ctx.revert();
+    return () => {
+      window.cancelAnimationFrame(frame);
+      target.removeEventListener("load", refresh);
+      target.removeEventListener("loadeddata", refresh);
+      ctx.revert();
+    };
   }, []);
 
   return (
@@ -132,11 +142,11 @@ export function Hero() {
           <p data-hero-description="" className="type-hero-lead mt-7 max-w-[900px] text-white/75">
             {hero.description}
           </p>
-          <div className="mt-8 flex flex-nowrap items-center gap-2 sm:gap-3">
-            <div data-hero-cta="primary" className="flex-1 sm:flex-none">
+          <div data-hide-icons-narrow className="mt-8 flex flex-nowrap items-center gap-2 sm:gap-3">
+            <div data-hero-cta="primary" className="min-w-0 flex-1 sm:flex-none">
               <ContentAction reveal={false} action={hero.primaryAction} variant="primary" size="lg" icon={<CalendarCheck size={17} />} className="w-full min-w-0 whitespace-nowrap px-4 !leading-none text-[14px] sm:w-auto sm:px-5 sm:text-base" />
             </div>
-            <div data-hero-cta="secondary" className="flex-1 sm:flex-none">
+            <div data-hero-cta="secondary" className="min-w-0 flex-1 sm:flex-none">
               <ContentAction reveal={false} action={hero.secondaryAction} variant="glass" size="lg" icon={<Play size={17} />} className="w-full min-w-0 whitespace-nowrap px-4 !leading-none text-[14px] sm:w-auto sm:px-5 sm:text-base">Попробовать</ContentAction>
             </div>
             <SocialProof className="hidden md:flex" />

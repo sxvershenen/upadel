@@ -42,9 +42,9 @@ function ButtonContents({ children, icon, iconPosition = "right", iconDivider = 
   const renderedIcon = loading ? <LoaderCircle aria-hidden="true" size={17} className="animate-spin" /> : icon;
   if (iconOnly) return <span className="inline-flex shrink-0 items-center justify-center">{renderedIcon}</span>;
   return <>
-    {renderedIcon && iconPosition === "left" && <><span className="inline-flex shrink-0 items-center justify-center">{renderedIcon}</span>{iconDivider && <span aria-hidden="true" className="h-5 w-px shrink-0 bg-current/25" />}</>}
+    {renderedIcon && iconPosition === "left" && <span data-button-decoration className="inline-flex shrink-0 items-center gap-2.5"><span className="inline-flex shrink-0 items-center justify-center">{renderedIcon}</span>{iconDivider && <span aria-hidden="true" className="h-5 w-px shrink-0 bg-current/25" />}</span>}
     <span>{children}</span>
-    {renderedIcon && iconPosition === "right" && <span className="inline-flex shrink-0 items-center gap-2.5">{iconDivider && <span aria-hidden="true" className="h-5 w-px shrink-0 bg-current/25" />}<span className="inline-flex shrink-0 items-center justify-center">{renderedIcon}</span></span>}
+    {renderedIcon && iconPosition === "right" && <span data-button-decoration className="inline-flex shrink-0 items-center gap-2.5">{iconDivider && <span aria-hidden="true" className="h-5 w-px shrink-0 bg-current/25" />}<span className="inline-flex shrink-0 items-center justify-center">{renderedIcon}</span></span>}
   </>;
 }
 

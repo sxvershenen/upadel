@@ -1,7 +1,7 @@
 import type { DesktopNavigationChild, DesktopNavigationItem } from '@unlim/content-contract'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { CalendarCheck, ChevronDown, Dumbbell, Gift, Home, Info, LayoutGrid, Newspaper, Tag, Trophy, UsersRound, type LucideIcon } from 'lucide-react'
-import { useEffect, useId, useRef, useState, type FocusEvent, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
+import { useEffect, useId, useLayoutEffect, useRef, useState, type FocusEvent, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 
 import { useActionLayer } from '../../actions/ActionLayer'
 import { useHomeHref, useSite } from '../../content/ContentContext'
@@ -26,6 +26,7 @@ const navigationIcons: Record<NavigationIconPreset, LucideIcon> = {
 
 const iconHover = { scale: 1.08, y: -1 }
 const headerMorphTransition = { duration: 0.32, ease: [0.4, 0, 0.2, 1] as const }
+const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 function NavigationIcon({ href, icon, size = 16 }: { href: string; icon?: { url: string } | null; size?: number }) {
   const preset = navigationIconPreset(href)
@@ -38,8 +39,8 @@ function NavigationIcon({ href, icon, size = 16 }: { href: string; icon?: { url:
 }
 
 function useWideHeader() {
-  const [wide, setWide] = useState(true)
-  useEffect(() => {
+  const [wide, setWide] = useState(() => typeof window === 'undefined' ? true : window.matchMedia('(min-width: 1200px)').matches)
+  useIsomorphicLayoutEffect(() => {
     const query = window.matchMedia('(min-width: 1200px)')
     const update = () => setWide(query.matches)
     update()
@@ -181,7 +182,7 @@ function DesktopNavigationLink({ compact, filterId, item, wide }: { compact: boo
   }
 
   useEffect(() => () => cancelTimers(), [])
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (!open) return
     const outsidePointer = (event: globalThis.PointerEvent) => {
       if (event.target instanceof Node && !rootRef.current?.contains(event.target)) closeMenu()
@@ -289,7 +290,7 @@ export function DesktopHeader() {
   const reduceMotion = useReducedMotion() ?? false
   const tooltipFilterId = `header-tooltip-goo-${useId().replaceAll(':', '')}`
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const header = headerRef.current
     if (!header) return
     const brand = header.querySelector<HTMLElement>('[data-header-brand-label]')!
