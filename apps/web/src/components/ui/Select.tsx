@@ -58,7 +58,8 @@ export function Select({
     const updateMenuPosition = () => {
       const rect = rootRef.current?.getBoundingClientRect()
       if (!rect) return
-      const contentWidth = menuRef.current?.scrollWidth ?? rect.width
+      const optionWidths = Array.from(menuRef.current?.querySelectorAll<HTMLElement>('.ui-select-option') ?? [], (option) => option.scrollWidth)
+      const contentWidth = Math.max(rect.width, ...optionWidths)
       const width = Math.min(Math.max(rect.width, contentWidth), window.innerWidth - 16)
       const left = Math.max(8, Math.min(rect.left, window.innerWidth - width - 8))
       setMenuPosition((current) => current && current.top === rect.bottom + 6 && current.left === left && current.width === width
@@ -141,7 +142,7 @@ export function Select({
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -4, scale: 0.985 }}
           transition={reduceMotion ? { duration: 0.01 } : { duration: 0.2, ease: [0.2, 0.8, 0.2, 1] }}
-          style={{ position: 'fixed', top: menuPosition.top, left: menuPosition.left, width: menuPosition.width }}
+          style={{ position: 'fixed', top: menuPosition.top, left: menuPosition.left, width: 'max-content', minWidth: menuPosition.width }}
           className="ui-select-menu z-[100] origin-top type-ui font-medium"
         >
           {options.map((option) => <button
