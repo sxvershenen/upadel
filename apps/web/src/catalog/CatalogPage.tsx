@@ -13,7 +13,7 @@ function entranceDelay(milliseconds: number) {
 }
 
 function Header({ page }: { page: CatalogDTO['page'] }) {
-  return <header className="page-hero relative overflow-hidden pb-8 pt-12 text-white md:pb-12 md:pt-24"><ProgressiveImage src={page.hero.media.url} alt={page.hero.media.alt} loading="eager" fetchPriority="high" decoding="async" className={`absolute inset-0 h-full w-full object-cover ${page.hero.grayscale ? 'grayscale' : ''}`} /><div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,5,8,.48)_0%,rgba(3,5,8,.78)_70%,rgba(3,5,8,.96)_100%)]" /><div className="container-page relative z-10"><h1 data-page-enter="title" className="type-section max-w-[900px] text-white">{page.title}</h1><p data-page-enter="intro" className="type-editorial mt-4 max-w-[820px] text-white/65">{page.intro}</p></div></header>
+  return <header className="page-hero relative overflow-hidden pb-6 pt-12 text-white"><ProgressiveImage src={page.hero.media.url} alt={page.hero.media.alt} loading="eager" fetchPriority="high" decoding="async" className={`absolute inset-0 h-full w-full object-cover ${page.hero.grayscale ? 'grayscale' : ''}`} /><div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,5,8,.48)_0%,rgba(3,5,8,.78)_70%,rgba(3,5,8,.96)_100%)]" /><div className="container-page relative z-10"><h1 data-page-enter="title" className="type-section max-w-[900px] text-white">{page.title}</h1><p data-page-enter="intro" className="type-editorial mt-4 max-w-[820px] text-white/65">{page.intro}</p></div></header>
 }
 
 const selectClass = 'ui-select se-2 h-[var(--control-md)] bg-white px-4 type-ui text-ink focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2'

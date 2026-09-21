@@ -80,7 +80,7 @@ function ExpandedNav() {
     <div className="dynamic-island-actions">
       <a href="https://t.me" target="_blank" rel="noreferrer" aria-label="Telegram"><TelegramIcon size={17} /></a>
       <a href="https://vk.com" target="_blank" rel="noreferrer" aria-label="VK"><VkIcon size={18} /></a>
-      <a href="tel:+79990000000" aria-label="Позвонить"><PhoneIcon size={17} /></a>
+      <a href="tel:+79858350055" aria-label="Позвонить"><PhoneIcon size={17} /></a>
       <a href="#header-playground-content" className="dynamic-island-booking"><span>Забронировать</span><CalendarCheck aria-hidden="true" size={17} strokeWidth={1.9} /></a>
     </div>
   </motion.div>
@@ -99,7 +99,7 @@ function CompactNav() {
     {navItems.map(({ href, label, icon: Icon }) => <a key={href} href={href} aria-label={label}><Icon aria-hidden="true" size={17} strokeWidth={1.9} /></a>)}
     <a href="https://t.me" target="_blank" rel="noreferrer" aria-label="Telegram"><TelegramIcon size={17} /></a>
     <a href="https://vk.com" target="_blank" rel="noreferrer" aria-label="VK"><VkIcon size={18} /></a>
-    <a href="tel:+79990000000" aria-label="Позвонить"><PhoneIcon size={17} /></a>
+    <a href="tel:+79858350055" aria-label="Позвонить"><PhoneIcon size={17} /></a>
     <a href="#header-playground-content" className="dynamic-island-compact-booking" aria-label="Забронировать"><CalendarCheck aria-hidden="true" size={18} strokeWidth={1.9} /></a>
   </motion.div>
 }

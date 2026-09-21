@@ -22,8 +22,11 @@ function CheckItem({ children, featured, inverse }: { children: React.ReactNode;
 }
 
 function MembershipFooter({ membership, resident }: { membership: Membership; resident?: boolean }) {
-  if (membership.price == null) return null
-  return <div className={cn("mt-auto flex items-end justify-between gap-3 border-t pt-5", resident ? "border-white/10" : "border-ink/10")}><Price label={membership.priceLabel ?? "месяц за"} value={membership.price} oldValue={membership.oldPrice ?? undefined} tone={resident ? "light" : "dark"} /><ContentAction action={membership.action} sourceEntity={membership.title} icon={<ArrowUpRight size={18} />} iconOnly aria-label={membership.action.label ?? membership.title} variant={resident ? "glass" : "neutral"} size="sm" className={cn("!h-[var(--control-sm)] !w-[var(--control-sm)] !p-0 hover:!bg-lime hover:!text-ink group-hover/card:!bg-lime group-hover/card:!text-ink", resident ? "!bg-white !text-ink hover:!bg-gold hover:!text-gold-ink group-hover/card:!bg-gold group-hover/card:!text-gold-ink" : "!bg-control !text-ink")} /></div>
+  if (membership.price == null && !membership.priceLabel) return null
+  const value = membership.price == null
+    ? <div className="flex flex-col gap-0.5"><span className={cn("type-caption", resident ? "text-white/60" : "text-ink-soft")}>скидка на аренду</span><strong className={cn("type-price font-semibold", resident ? "text-white" : "text-ink")}>{membership.priceLabel}</strong></div>
+    : <Price label={membership.priceLabel ?? "месяц за"} value={membership.price} oldValue={membership.oldPrice ?? undefined} tone={resident ? "light" : "dark"} />
+  return <div className={cn("mt-auto flex items-end justify-between gap-3 border-t pt-5", resident ? "border-white/10" : "border-ink/10")}>{value}<ContentAction action={membership.action} sourceEntity={membership.title} icon={<ArrowUpRight size={18} />} iconOnly aria-label={membership.action.label ?? membership.title} variant={resident ? "glass" : "neutral"} size="sm" className={cn("!h-[var(--control-sm)] !w-[var(--control-sm)] !p-0 hover:!bg-lime hover:!text-ink group-hover/card:!bg-lime group-hover/card:!text-ink", resident ? "!bg-white !text-ink hover:!bg-gold hover:!text-gold-ink group-hover/card:!bg-gold group-hover/card:!text-gold-ink" : "!bg-control !text-ink")} /></div>
 }
 
 export function MembershipCard({ membership }: { membership: Membership }) {

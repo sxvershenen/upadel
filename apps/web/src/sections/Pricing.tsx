@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { Swiper as SwiperType } from "swiper";
 import { SectionHeader } from "../components/ui/SectionHeader";
 import { Tabs } from "../components/ui/Tabs";
@@ -22,6 +22,8 @@ export function Pricing() {
   const [pricingSwiper, setPricingSwiper] = useState<SwiperType | null>(null);
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const panelContentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (window.location.hash === "#training") setActive("training");
@@ -33,7 +35,32 @@ export function Pricing() {
     setAtEnd(swiper.isEnd);
   }, []);
 
+  useLayoutEffect(() => {
+    const panel = panelRef.current;
+    const content = panelContentRef.current;
+    if (!panel || !content || panel.dataset.tabTransition !== "true") return;
+
+    const nextHeight = content.getBoundingClientRect().height;
+    const frame = requestAnimationFrame(() => {
+      panel.style.height = `${nextHeight}px`;
+    });
+    const timeout = window.setTimeout(() => {
+      panel.style.height = "auto";
+      delete panel.dataset.tabTransition;
+    }, 300);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearTimeout(timeout);
+    };
+  }, [active]);
+
   const changeTab = (next: TabId) => {
+    if (next === active) return;
+    const panel = panelRef.current;
+    if (panel) {
+      panel.style.height = `${panel.getBoundingClientRect().height}px`;
+      panel.dataset.tabTransition = "true";
+    }
     setPricingSwiper(null);
     setAtStart(true);
     setAtEnd(false);
@@ -68,13 +95,14 @@ export function Pricing() {
       </div>
 
       <div
+        ref={panelRef}
         id="pricing-panel"
         data-gsap-reveal-boundary="true"
         role="tabpanel"
         tabIndex={0}
-        className="relative grid overflow-visible"
+        className="pricing-tab-panel relative grid overflow-visible"
       >
-        <div key={active} className="col-start-1 row-start-1 w-full">
+        <div ref={panelContentRef} key={active} className="pricing-tab-panel-content col-start-1 row-start-1 w-full">
           {active === "rent" && <PricingRent onSwiperChange={syncPricingSwiper} />}
           {active === "training" && <PricingTraining onSwiperChange={syncPricingSwiper} />}
           {active === "memberships" && <PricingMemberships onSwiperChange={syncPricingSwiper} />}

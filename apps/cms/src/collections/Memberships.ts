@@ -42,7 +42,7 @@ export const Memberships: CollectionConfig = {
     { name: 'meshTone', type: 'select', label: 'Mesh-тон', options: [...meshToneOptions] },
     { name: 'price', type: 'number', label: 'Цена, ₽', min: 0 },
     { name: 'oldPrice', type: 'number', label: 'Старая цена, ₽', min: 0 },
-    { name: 'priceLabel', type: 'text', label: 'Подпись цены' },
+    { name: 'priceLabel', type: 'text', label: 'Подпись цены или размер скидки' },
     {
       name: 'benefits',
       type: 'array',

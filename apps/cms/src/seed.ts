@@ -1236,14 +1236,14 @@ async function seed() {
 
     const rentalRates = [
       {
-        key: 'day', title: 'Будни', eyebrow: 'Дневные часы', timeLabel: '08:00–17:00',
-        description: 'Идеальное время для спокойной тренировки, отработки подачи и игры в светлое время суток без лишней суеты.',
+        key: 'day', title: 'Утро и поздний вечер', eyebrow: 'Выгодные часы', timeLabel: '07:00–09:00 / 21:00–23:00',
+        description: 'Спокойные часы для самостоятельной игры, отработки техники и матчей вне основного времени клуба.',
         price: 3500, priceLabel: 'стоимость', priceSuffix: '/ час', badge: 'Выгодно', badgeTone: 'lime', cardVariant: 'rate',
       },
       {
-        key: 'prime', title: 'Вечер и выходные', eyebrow: 'Прайм-тайм', timeLabel: '17:00–23:00, Сб–Вс целый день',
-        description: 'Самая клубная атмосфера, музыка, открытый лаунж-бар и динамичные матчи с резидентами клуба.',
-        price: 5500, priceLabel: 'стоимость', priceSuffix: '/ час', badge: 'Популярно', badgeTone: 'sunset', cardVariant: 'rate',
+        key: 'prime', title: 'Прайм-тайм', eyebrow: 'Основное время', timeLabel: '09:00–21:00',
+        description: 'Основное время клуба для игр с друзьями, регулярных матчей и самой насыщенной клубной атмосферы.',
+        price: 5000, priceLabel: 'стоимость', priceSuffix: '/ час', badge: 'Популярно', badgeTone: 'sunset', cardVariant: 'rate',
       },
       {
         key: 'trial', title: 'Пробная тренировка за 1 990 ₽', eyebrow: 'Специальное предложение',
@@ -1264,9 +1264,22 @@ async function seed() {
     ]
     for (const [index, rate] of rentalRates.entries()) {
       const { key, ...data } = rate
-      await ensureSeeded(payload, 'rental-rates', `prototype:rental-rate:${key}`, {
+      const seededRate = await ensureSeeded(payload, 'rental-rates', `prototype:rental-rate:${key}`, {
         ...data, isActive: true, showOnHomepage: true, homepageOrder: index + 1,
       })
+      if (key === 'day') {
+        await migrateSeededField(payload, 'rental-rates', seededRate.id, 'title', 'Будни', data.title)
+        await migrateSeededField(payload, 'rental-rates', seededRate.id, 'eyebrow', 'Дневные часы', data.eyebrow)
+        await migrateSeededField(payload, 'rental-rates', seededRate.id, 'timeLabel', '08:00–17:00', data.timeLabel)
+        await migrateSeededField(payload, 'rental-rates', seededRate.id, 'description', 'Идеальное время для спокойной тренировки, отработки подачи и игры в светлое время суток без лишней суеты.', data.description)
+      }
+      if (key === 'prime') {
+        await migrateSeededField(payload, 'rental-rates', seededRate.id, 'title', 'Вечер и выходные', data.title)
+        await migrateSeededField(payload, 'rental-rates', seededRate.id, 'eyebrow', 'Прайм-тайм', data.eyebrow)
+        await migrateSeededField(payload, 'rental-rates', seededRate.id, 'timeLabel', '17:00–23:00, Сб–Вс целый день', data.timeLabel)
+        await migrateSeededField(payload, 'rental-rates', seededRate.id, 'description', 'Самая клубная атмосфера, музыка, открытый лаунж-бар и динамичные матчи с резидентами клуба.', data.description)
+        await migrateSeededField(payload, 'rental-rates', seededRate.id, 'price', 5500, data.price)
+      }
     }
 
     const trainingPrograms = [
@@ -1290,28 +1303,25 @@ async function seed() {
       })
     }
 
-    const memberships = [
-      {
-        key: 'gift', title: 'Подарочный сертификат', description: 'Можно использовать для оплаты аренды корта или тренировок.',
-        cardVariant: 'gift', meshTone: 'lavender', giftAmountLimits: { minimum: 1000, maximum: 100000 },
-        action: { label: 'Подарить онлайн', mode: 'internal-link', href: '#memberships' },
-      },
-      {
-        key: 's', title: 'Карта на 5 игр', badge: 'Пакет S', badgeTone: 'muted', description: 'Удобный старт для регулярной игры',
-        cardVariant: 'package', price: 7900, priceLabel: '1 580 ₽ за одну игру',
-        benefits: [{ text: 'Любой открытый корт' }, { text: 'Перенос игр без сгорания' }, { text: 'Срок действия — 60 дней' }, { text: 'Бесплатные мячи и полотенца' }],
-      },
-      {
-        key: 'm', title: 'Карта на 10 игр', badge: 'Пакет M', badgeTone: 'lime-soft', description: 'Оптимально для активных игроков',
-        cardVariant: 'featured-package', price: 11900, priceLabel: '1 190 ₽ за одну игру',
-        benefits: [{ text: 'Приоритетная бронь корта за 14 дней' }, { text: 'Бесплатные ракетки Varlion Maxima' }, { text: '1 гостевой визит в подарок' }, { text: 'Срок действия — 90 дней' }, { text: 'Заморозка до 14 дней' }],
-      },
-      {
-        key: 'resident', title: 'Резидент клуба', badge: 'VIP Статус', badgeTone: 'gold', description: 'Полный безлимит и персональный сервис',
-        cardVariant: 'resident', meshTone: 'dark', price: 40900, priceLabel: 'в месяц / полный доступ',
-        benefits: [{ text: 'Скидка 5% на бар и магазин' }, { text: 'Безлимит на все корты клуба' }, { text: 'Именной шкафчик в раздевалке' }, { text: 'Групповые тренировки включены' }, { text: 'Участие во всех турнирах Americano' }],
-      },
+    const membershipBenefits = (validityDays: number) => [
+      { text: 'Любой открытый корт' },
+      { text: `Срок действия — ${validityDays} дней` },
+      { text: 'Перенос игр без сгорания' },
+      { text: 'Заморозка до 14 дней' },
+      { text: 'Доп. бонусы в системе лояльности' },
     ]
+    const memberships = [
+      { key: 'rental-hours-s', title: '[S] 8 часов', description: 'Только для аренды корта', cardVariant: 'package', priceLabel: '5%', benefits: membershipBenefits(20) },
+      { key: 'rental-hours-m', title: '[M] 12 часов', description: 'Только для аренды корта', cardVariant: 'package', priceLabel: '7%', benefits: membershipBenefits(30) },
+      { key: 'rental-hours-l', title: '[L] 16 часов', description: 'Только для аренды корта', cardVariant: 'featured-package', badgeTone: 'lime-soft', priceLabel: '10%', benefits: membershipBenefits(40) },
+      { key: 'rental-hours-xl', title: '[XL] 24 часа', description: 'Только для аренды корта', cardVariant: 'resident', meshTone: 'dark', priceLabel: '12%', benefits: membershipBenefits(60) },
+    ]
+    for (const legacyKey of ['gift', 's', 'm', 'resident']) {
+      const legacy = await findBySeedKey(payload, 'memberships', `prototype:membership:${legacyKey}`)
+      if (legacy && (legacy.isActive !== false || legacy.showOnHomepage !== false || legacy.homepageOrder != null)) {
+        await payload.update({ collection: 'memberships', id: legacy.id, data: { isActive: false, showOnHomepage: false, homepageOrder: null, _status: 'published' }, draft: false, depth: 0, overrideAccess: true } as never)
+      }
+    }
     for (const [index, membership] of memberships.entries()) {
       const { key, ...data } = membership
       const action = { href: null, label: key === 'gift' ? 'Оформить сертификат' : 'Оставить заявку', mode: 'lead-form', leadType: key === 'gift' ? 'gift' : 'membership' }
@@ -1352,16 +1362,17 @@ async function seed() {
       ['Нужен ли опыт для первого визита?', 'Нет. Пробная тренировка рассчитана на новичков: тренер объясняет базовые правила, хватку и безопасность на корте перед первой игрой.'],
       ['Нужна ли своя экипировка?', 'Нет, ракетка и мячи включены в стоимость аренды и тренировок. Достаточно прийти в удобной спортивной обуви без чёрной подошвы.'],
       ['Можно ли арендовать ракетку отдельно?', 'Да, на ресепшене есть парк ракеток разного баланса — от лёгких для новичков до турнирных моделей Varlion.'],
-      ['Как отменить или перенести бронирование?', 'Бесплатная отмена возможна за 6 часов до начала слота через личный кабинет или по телефону клуба. Позже — списывается 50% стоимости.'],
+      ['Как отменить или перенести бронирование?', 'Отмена или перенос бронирования возможны не позднее чем за 12 часов до начала занятия.'],
       ['С какого возраста дети могут заниматься?', 'Детские группы работают с 5 лет. Тренер оценивает уровень на первом занятии и подбирает подходящую группу.'],
       ['Можно ли выбрать конкретного тренера?', 'Да, при бронировании тренировки можно указать тренера. Если он занят, методист поможет подобрать замену со схожей специализацией.'],
       ['Есть ли парковка у клуба?', 'Да, бесплатная парковка на 40 машиномест прямо у входа, дополнительно — стойки для велосипедов.'],
       ['Как попасть на турниры клуба?', 'Регистрация открывается за 2–3 недели до старта в разделе «Турниры» и в клубном чате. Количество пар ограничено.'],
     ] as const
     for (const [index, [question, answer]] of faqs.entries()) {
-      await ensureSeeded(payload, 'faqs', `prototype:faq:${index + 1}`, {
+      const seededFaq = await ensureSeeded(payload, 'faqs', `prototype:faq:${index + 1}`, {
         question, answer, isActive: true, showOnHomepage: true, homepageOrder: index + 1,
       })
+      if (index === 3) await migrateSeededField(payload, 'faqs', seededFaq.id, 'answer', 'Бесплатная отмена возможна за 6 часов до начала слота через личный кабинет или по телефону клуба. Позже — списывается 50% стоимости.', answer)
     }
 
     for (const [index, name] of ['Varlion', 'Head Padel', 'Wilson', 'Babolat', 'Mondo', 'Jubo', 'Adidas Padel', 'Nox'].entries()) {
@@ -1463,13 +1474,13 @@ async function seed() {
     const thematicGlobals = [
       {
         slug: 'prices-page' as const, data: {
-          eyebrow: 'Тарифы', title: 'Цены и абонементы', intro: 'Выберите формат игры и тренировок: аренда корта, занятия с тренером или клубный абонемент.',
+          eyebrow: 'Тарифы', title: 'Цены и абонементы', intro: 'Выберите формат игры: разовая аренда корта или абонемент на нужное количество часов.',
           rentTabLabel: 'Аренда', trainingTabLabel: 'Тренировки', membershipsTabLabel: 'Абонементы',
           rules: [
             { title: 'Бронирование', content: richText('Стоимость фиксируется при бронировании. Инвентарь и базовый клубный сервис включены согласно выбранному тарифу.') },
-            { title: 'Отмена и перенос', content: richText('Условия отмены и переноса уточняйте у администратора клуба до подтверждения бронирования.') },
+            { title: 'Отмена и перенос', content: richText('Отмена или перенос бронирования возможны не позднее чем за 12 часов до начала занятия.') },
           ],
-          seo: { title: 'Цены на падел корт — Москва, Красногорск, Новая Рига', description: 'Цены на падел в Москве, Красногорске и на Новой Риге: аренда панорамного корта, тренировки с тренером, пробное занятие и абонементы.', robots: 'index-follow' },
+          seo: { title: 'Цены на падел корт — Москва, Красногорск, Новая Рига', description: 'Цены на падел в Москве, Красногорске и на Новой Риге: аренда панорамного корта в обычные и выгодные часы, а также клубные абонементы.', robots: 'index-follow' },
         },
       },
       {
@@ -1609,6 +1620,23 @@ async function seed() {
           stats.globalsPublished += 1
         }
       }
+      if (current.seedVersion === seedVersion && page.slug === 'prices-page') {
+        const cancellationCopy = 'Отмена или перенос бронирования возможны не позднее чем за 12 часов до начала занятия.'
+        const legacyCancellation = richText('Условия отмены и переноса уточняйте у администратора клуба до подтверждения бронирования.')
+        const additions: Record<string, unknown> = {}
+        if (current.intro === 'Выберите формат игры и тренировок: аренда корта, занятия с тренером или клубный абонемент.') {
+          additions.intro = 'Выберите формат игры: разовая аренда корта или абонемент на нужное количество часов.'
+        }
+        if (current.seo?.description === 'Цены на падел в Москве, Красногорске и на Новой Риге: аренда панорамного корта, тренировки с тренером, пробное занятие и абонементы.') {
+          additions.seo = { ...current.seo, description: 'Цены на падел в Москве, Красногорске и на Новой Риге: аренда панорамного корта в обычные и выгодные часы, а также клубные абонементы.' }
+        }
+        const rules = (current.rules ?? []).map((rule: Record<string, unknown>) => rule.title === 'Отмена и перенос' && JSON.stringify(rule.content) === JSON.stringify(legacyCancellation) ? { ...rule, content: richText(cancellationCopy) } : rule)
+        if (JSON.stringify(rules) !== JSON.stringify(current.rules ?? [])) additions.rules = rules
+        if (Object.keys(additions).length > 0) {
+          await payload.updateGlobal({ slug: page.slug, draft: false, overrideAccess: true, data: { ...additions, _status: 'published' } as never })
+          stats.globalsPublished += 1
+        }
+      }
       if (current.seedVersion === seedVersion && page.slug === 'gift-page') {
         const giftData = page.data as Record<string, unknown>
         const seededBenefits = Array.isArray(current.benefits) && current.benefits[0] && typeof current.benefits[0] === 'object'
@@ -1621,7 +1649,7 @@ async function seed() {
           additions.title = giftData.title
           additions.intro = giftData.intro
         }
-        additions.heroImage = giftMedia.card.id
+        if (String(current.heroImage ?? '') !== String(giftMedia.card.id)) additions.heroImage = giftMedia.card.id
         if (Object.keys(additions).length > 0) {
           await payload.updateGlobal({ slug: page.slug, draft: false, overrideAccess: true, data: { ...additions, _status: 'published' } as never })
           stats.globalsPublished += 1
@@ -1847,6 +1875,14 @@ async function seed() {
         await payload.updateGlobal({ slug: 'site-settings', draft: false, overrideAccess: true, data: { brandLogoMode: 'prefix', _status: 'published' } as never })
         stats.globalsPublished += 1
       }
+      const contactUpdates: Record<string, unknown> = {}
+      if (currentSettings.phoneDisplay === '+7 999 000-00-00') contactUpdates.phoneDisplay = '+7 985 835-00-55'
+      if (currentSettings.phoneValue === '+79990000000') contactUpdates.phoneValue = '+79858350055'
+      if (currentSettings.openingHours === 'Ежедневно 07:00–00:00') contactUpdates.openingHours = 'Ежедневно 07:00–23:00'
+      if (Object.keys(contactUpdates).length > 0) {
+        await payload.updateGlobal({ slug: 'site-settings', draft: false, overrideAccess: true, data: { ...contactUpdates, _status: 'published' } as never })
+        stats.globalsPublished += 1
+      }
     } else {
       assertGlobalCanBeSeeded('site-settings', currentSettings)
       await payload.updateGlobal({
@@ -1865,8 +1901,8 @@ async function seed() {
           mobileActions: { playLabel: 'Играть', menuLabel: 'Меню', menuTitle: 'Меню', quickActionsTitle: 'Быстрые действия', bookCourtLabel: 'Забронировать корт', callLabel: 'Позвонить в клуб', directionsLabel: 'Проложить маршрут' },
           address: 'Новорижское шоссе, 3к1', directionsURL: 'https://yandex.ru/maps/?text=Новорижское%20шоссе%203к1',
           addressLabel: 'Адрес', transitLabel: 'Ближайшее метро', parkingLabel: 'Парковка', openingHoursLabel: 'Режим работы', phoneFieldLabel: 'Телефон', emailFieldLabel: 'Email',
-          phoneDisplay: '+7 999 000-00-00', phoneValue: '+79990000000', email: 'hello@unlimriga.club', transit: 'Мякинино · 12 мин пешком',
-          parking: '40 бесплатных мест у входа', openingHours: 'Ежедневно 07:00–00:00', map: { latitude: 55.8, longitude: 37.15, zoom: 14 },
+          phoneDisplay: '+7 985 835-00-55', phoneValue: '+79858350055', email: 'hello@unlimriga.club', transit: 'Мякинино · 12 мин пешком',
+          parking: '40 бесплатных мест у входа', openingHours: 'Ежедневно 07:00–23:00', map: { latitude: 55.8, longitude: 37.15, zoom: 14 },
           footerImage: mediaID(images.footerClub),
           footerAbout: 'Unlim Riga Padel — клуб для тех, кто хочет играть на кортах уровня мировых турниров рядом с домом. Мы строили пространство вокруг трёх вещей: качества покрытия, работы тренеров и атмосферы, в которую хочется возвращаться. Здесь одинаково комфортно и новичку на первой тренировке, и резиденту клуба перед финалом лиги.',
           footerStats: [
