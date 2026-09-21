@@ -6,7 +6,7 @@ export function useMobileSwipeHint(swiperRef: { current: SwiperType | null }) {
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container || !window.matchMedia("(max-width: 1023px)").matches) return;
+    if (!container || !window.matchMedia("(max-width: 1023px)").matches || navigator.maxTouchPoints > 0) return;
 
     let played = false;
     let forwardTimer: number | undefined;

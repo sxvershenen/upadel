@@ -24,8 +24,8 @@ export function ArticleCard({ post, mobilePlain = false, loading = "eager", reve
 }
 
 export function ArticleRow({ post, delay = 0 }: { post: ArticleSummary; delay?: number }) {
-  return <motion.a {...revealAttributes({ delay, y: 14 }, undefined, true)} href={`/blog/${post.slug}`} initial={false} whileHover="hover" variants={{ hover: { x: 4 } }} transition={springSoft} className="card-spring group group/card flex cursor-pointer items-center justify-between gap-4 border-b border-ink/10 px-3 py-5 first:pt-0">
-    <div><h4 className="type-body text-ink transition-colors group-hover/card:text-ink-hover">{post.title}</h4><p className="type-body-sm mt-1 text-ink-soft">{post.excerpt}</p></div>
+  return <motion.a {...revealAttributes({ delay, y: 14 }, undefined, true)} href={`/blog/${post.slug}`} initial={false} whileHover="hover" variants={{ hover: { x: 4 } }} transition={springSoft} className="card-spring group group/card flex cursor-pointer items-center justify-between gap-3 border-b border-ink/10 px-0 py-5 first:pt-0">
+    <div><h4 className="type-title-compact font-semibold text-ink transition-colors group-hover/card:text-ink-hover md:type-body md:font-medium">{post.title}</h4><p className="type-body-sm mt-2 text-ink-soft">{post.excerpt}</p></div>
     <ArrowAction tone="light" size="sm" cardHover className="shrink-0 !bg-control !text-ink transition-colors group-hover/card:!bg-lime group-hover/card:!text-ink" />
   </motion.a>;
 }

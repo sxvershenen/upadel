@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CalendarCheck, MapPin, Play, Star, Users } from "lucide-react";
@@ -53,12 +53,14 @@ export function Hero() {
   const { home, site } = useContent();
   const hero = home.hero;
   const replaceBrand = Boolean(site.brandLogo) && site.brandLogoMode === "replace";
+  const [brandLogoFailed, setBrandLogoFailed] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
   const mediaRef = useRef<HTMLImageElement | HTMLVideoElement>(null);
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce || !sectionRef.current || !mediaRef.current) return;
+    const touchViewport = window.matchMedia("(max-width: 767px)").matches;
+    if (reduce || touchViewport || !sectionRef.current || !mediaRef.current) return;
 
     const ctx = gsap.context(() => {
       gsap.fromTo(
@@ -81,7 +83,7 @@ export function Hero() {
   }, []);
 
   return (
-    <section id="top" ref={sectionRef} className="relative h-[100svh] min-h-[720px] w-full overflow-hidden bg-ink">
+    <section id="top" ref={sectionRef} className="relative isolate h-[100svh] min-h-[720px] w-full overflow-hidden bg-ink">
       {hero.desktopMedia && <HeroBackgroundMedia media={hero.desktopMedia} poster={hero.desktopPoster} setRef={(node) => { mediaRef.current = node; }} className={hero.mobileMedia ? "hidden md:block" : undefined} />}
       {hero.mobileMedia && <HeroBackgroundMedia media={hero.mobileMedia} poster={hero.mobilePoster} className="md:hidden" />}
       <div
@@ -100,8 +102,8 @@ export function Hero() {
 
       <div className="container-page absolute inset-x-0 top-5 z-10 md:hidden">
         <a href="#top" className="flex items-center gap-2.5 leading-none text-white">
-          {site.brandLogo && site.brandLogoMode !== "text" ? <img src={site.brandLogo.url} alt={site.brandName} className={replaceBrand ? "h-9 max-w-[150px] object-contain" : "h-7 w-7 object-contain"} /> : <span className="h-2.5 w-2.5 shrink-0 rounded-[3px] bg-lime" />}
-          {(!replaceBrand || !site.brandLogo) && <span className="flex flex-col">
+          {site.brandLogo && site.brandLogoMode !== "text" && !brandLogoFailed ? <img src={site.brandLogo.url} alt={site.brandName} onError={() => setBrandLogoFailed(true)} className={replaceBrand ? "h-9 max-w-[150px] object-contain" : "h-7 w-7 object-contain"} /> : <span className="h-2.5 w-2.5 shrink-0 rounded-[3px] bg-lime" />}
+          {(!replaceBrand || !site.brandLogo || brandLogoFailed) && <span className="flex flex-col">
             <span className="text-[14px] font-semibold tracking-[0] text-white">{site.brandName}</span>
             <span className="type-micro text-white/55">{site.headerSubtitle}</span>
           </span>}

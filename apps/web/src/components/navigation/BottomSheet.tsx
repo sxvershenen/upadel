@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useId, useRef, type KeyboardEvent, type ReactNode, type TouchEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { springSheet } from "../../lib/motion";
@@ -16,6 +16,7 @@ export function BottomSheet({
 }) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const titleId = useId();
 
   useEffect(() => {
@@ -55,6 +56,21 @@ export function BottomSheet({
     }
   }
 
+  function handleTouchStart(event: TouchEvent<HTMLDivElement>) {
+    const touch = event.touches[0];
+    touchStartRef.current = touch ? { x: touch.clientX, y: touch.clientY } : null;
+  }
+
+  function handleTouchEnd(event: TouchEvent<HTMLDivElement>) {
+    const start = touchStartRef.current;
+    touchStartRef.current = null;
+    const touch = event.changedTouches[0];
+    if (!start || !touch || dialogRef.current?.scrollTop !== 0) return;
+    const deltaX = touch.clientX - start.x;
+    const deltaY = touch.clientY - start.y;
+    if (deltaY > 64 && deltaY > Math.abs(deltaX) * 1.25) onClose();
+  }
+
   return (
     <AnimatePresence>
       {open && (
@@ -75,6 +91,8 @@ export function BottomSheet({
             aria-labelledby={title ? titleId : undefined}
             aria-label={title ? undefined : "Диалог"}
             onKeyDown={trapFocus}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
