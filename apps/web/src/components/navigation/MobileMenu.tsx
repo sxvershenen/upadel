@@ -18,6 +18,6 @@ export function MobileMenu({ open, onClose }: { open: boolean; onClose: () => vo
       <a href={`mailto:${site.contacts.email}`} data-contact-confirmed data-analytics-action="email" onClick={(event) => { event.preventDefault(); onClose(); window.setTimeout(() => requestContact('email'), 300) }} className="flex items-center gap-2.5"><Mail size={16} className="shrink-0" /> {site.contacts.email}</a>
       {telegram && <a href={telegram.url} data-contact-confirmed data-analytics-action="telegram" onClick={(event) => { event.preventDefault(); onClose(); window.setTimeout(() => requestContact('telegram'), 300) }} target="_blank" rel="noreferrer" className="flex items-center gap-2.5"><TelegramIcon size={16} className="shrink-0" /> {telegram.label}</a>}
     </div>
-    <div className="mt-4"><ContentAction action={{ mode: 'booking', label: site.mobileActions.bookCourtLabel }} onAction={onClose} variant="primary" size="lg" fullWidth /></div>
+    <div className="mt-4"><ContentAction action={{ mode: 'booking', label: site.mobileActions.bookCourtLabel }} onAction={onClose} modalDelayMs={300} variant="primary" size="lg" fullWidth /></div>
   </BottomSheet>
 }

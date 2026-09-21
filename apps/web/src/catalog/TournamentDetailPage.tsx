@@ -8,7 +8,6 @@ import {
   Check,
   CheckCircle2,
   ChevronDown,
-  ChevronRight,
   Droplets,
   FileText,
   Gauge,
@@ -30,7 +29,7 @@ import { TournamentCard } from '../components/cards/TournamentCard'
 import { Badge } from '../components/ui/Badge'
 import { ButtonLink } from '../components/ui/Button'
 import { ImageCard, MeshCard, type ImageOverlay, type MeshTone } from '../components/ui/Card'
-import { SectionHeader } from '../components/ui/SectionHeader'
+import { SectionAction, SectionHeader } from '../components/ui/SectionHeader'
 import { Reveal } from '../components/ui/Reveal'
 import { cn } from '../utils/cn'
 
@@ -970,14 +969,9 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
             <SectionHeader
               title={typograph('Другие турниры и лиги')}
               action={
-                <ButtonLink
-                  href="/tournaments"
-                  variant="neutral"
-                  size="sm"
-                  icon={<ChevronRight size={15} />}
-                >
+                <SectionAction action={{ mode: 'internal-link', href: '/tournaments', label: 'Все события' }}>
                   Все события
-                </ButtonLink>
+                </SectionAction>
               }
               className="mb-5 sm:mb-6"
             />

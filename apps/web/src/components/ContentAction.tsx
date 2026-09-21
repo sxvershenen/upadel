@@ -1,6 +1,6 @@
 import type { ActionDTO } from '@unlim/content-contract'
 import type { Transition } from 'framer-motion'
-import type { ReactNode } from 'react'
+import React, { type ReactNode } from 'react'
 
 import { useSite } from '../content/ContentContext'
 import { useActionLayer } from '../actions/ActionLayer'
@@ -24,12 +24,13 @@ type Props = {
   sourcePage?: string
   title?: string
   layout?: boolean | 'position' | 'size' | 'preserve-aspect'
+  modalDelayMs?: number
   onAction?: () => void
   transition?: Transition
   variant?: ButtonVariant
 }
 
-export function ContentAction({ action, children, sourceEntity, sourcePage, onAction, ...buttonProps }: Props) {
+export function ContentAction({ action, children, sourceEntity, sourcePage, onAction, modalDelayMs = 0, ...buttonProps }: Props) {
   const site = useSite()
   const { requestContact, requestExternal, requestLead } = useActionLayer()
   const label = children ?? action.label ?? site.booking.buttonLabel
@@ -43,12 +44,17 @@ export function ContentAction({ action, children, sourceEntity, sourcePage, onAc
 
   const analyticsObject = action.mode === 'lead-form' ? 'form' : sourcePage?.startsWith('/coaches') ? 'coach' : sourcePage?.startsWith('/tournaments') ? 'tournament' : sourcePage?.startsWith('/blog') ? 'article' : undefined
   const analyticsProps = { 'data-analytics-action': action.mode === 'booking' || action.mode === 'trial-booking' ? 'booking' : action.mode === 'phone' ? 'phone' : action.mode === 'email' ? 'email' : action.mode === 'lead-form' ? 'lead' : action.mode === 'external-link' ? 'external' : action.mode === 'internal-link' ? 'internal' : undefined, 'data-analytics-object-type': analyticsObject, 'data-analytics-object-id': sourceEntity }
-  if (action.mode === 'phone' || action.mode === 'email') { const contactMode = action.mode; return <Button {...buttonProps} {...analyticsProps} onClick={() => { onAction?.(); requestContact(contactMode) }}>{label}</Button> }
+  const openAfterCurrentSurfaceCloses = (open: () => void) => {
+    onAction?.()
+    if (modalDelayMs > 0) window.setTimeout(open, modalDelayMs)
+    else open()
+  }
+  if (action.mode === 'phone' || action.mode === 'email') { const contactMode = action.mode; return <Button {...buttonProps} {...analyticsProps} onClick={() => openAfterCurrentSurfaceCloses(() => requestContact(contactMode))}>{label}</Button> }
   const leadType = action.mode === 'lead-form' ? action.leadType ?? 'other' : action.mode === 'trial-booking' && !href ? 'trial' : action.mode === 'booking' && !site.booking.ready ? 'consultation' : null
-  if (leadType) return <Button {...buttonProps} {...analyticsProps} onClick={() => { onAction?.(); requestLead({ type: leadType, sourcePage: sourcePage ?? window.location.pathname, sourceEntity }) }}>{label}</Button>
+  if (leadType) return <Button {...buttonProps} {...analyticsProps} onClick={() => openAfterCurrentSurfaceCloses(() => requestLead({ type: leadType, sourcePage: sourcePage ?? window.location.pathname, sourceEntity }))}>{label}</Button>
 
   if (action.mode === 'external-link' && href) {
-    return <Button {...buttonProps} {...analyticsProps} onClick={() => { onAction?.(); requestExternal({ href, label: typeof label === 'string' ? label : action.label }) }}>{label}</Button>
+    return <Button {...buttonProps} {...analyticsProps} onClick={() => openAfterCurrentSurfaceCloses(() => requestExternal({ href, label: typeof label === 'string' ? label : action.label }))}>{label}</Button>
   }
 
   if (href) {

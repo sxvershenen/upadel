@@ -2,12 +2,13 @@ import gsap from 'gsap'
 import Swup from 'swup'
 import SwupHeadPlugin from '@swup/head-plugin'
 import SwupScriptsPlugin from '@swup/scripts-plugin'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState, type ForwardRefExoticComponent, type RefAttributes } from 'react'
 
-import { ReferenceBallScene, type ReferenceBallSceneHandle } from './ReferenceBallScene'
+import type { ReferenceBallSceneHandle } from './ReferenceBallScene'
 import { waitForGsapAnimation } from './animationLifecycle'
 import { computeReferenceTrajectory } from './referenceTrajectories'
 import { transitionAudio } from './transitionAudio'
+import { beginTransitionProgress, completeTransitionProgress } from './transitionProgress'
 
 const duration = 980
 
@@ -63,10 +64,21 @@ function animateIn() {
   }))
 }
 
-export function GlobalPageTransitionRuntime() {
+type BallSceneComponent = ForwardRefExoticComponent<RefAttributes<ReferenceBallSceneHandle>>
+
+export function GlobalPageTransitionRuntime({ initialNavigation, onReady }: { initialNavigation?: string | null; onReady?: () => void }) {
   const ballRef = useRef<ReferenceBallSceneHandle | null>(null)
+  const swupRef = useRef<Swup | null>(null)
+  const [BallScene, setBallScene] = useState<BallSceneComponent | null>(null)
 
   useEffect(() => {
+    let mounted = true
+    void import('./ReferenceBallScene').then(({ ReferenceBallScene }) => {
+      if (mounted) setBallScene(() => ReferenceBallScene)
+    }).catch(() => {
+      // The lightweight Swup transition remains available without WebGL.
+    })
+
     const swup = new Swup({
       containers: ['#swup'],
       linkSelector: 'a[href]:not([data-transition-link])',
@@ -78,6 +90,7 @@ export function GlobalPageTransitionRuntime() {
       },
       hooks: {
         'visit:start': (visit) => {
+          beginTransitionProgress()
           // Keep the current page stable until the next document is ready.
           // The visual transition can then run as one uninterrupted timeline.
           visit.animation.wait = true
@@ -87,8 +100,10 @@ export function GlobalPageTransitionRuntime() {
           if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
             const portrait = window.matchMedia('(max-width: 767px) and (orientation: portrait)').matches
             const trajectory = computeReferenceTrajectory({ portrait })
-            ballRef.current?.startFlight(trajectory, duration)
-            transitionAudio.playWhoosh(duration / 1000)
+            if (ballRef.current) {
+              ballRef.current.startFlight(trajectory, duration)
+              transitionAudio.playWhoosh(duration / 1000)
+            }
           }
         },
         'page:view': () => {
@@ -96,29 +111,43 @@ export function GlobalPageTransitionRuntime() {
           document.dispatchEvent(new Event('astro:after-swap'))
         },
         'visit:abort': () => {
+          completeTransitionProgress()
           ballRef.current?.cancel()
           resetTransitionStyles()
           resumeCurrentPage()
         },
         'visit:fail': () => {
+          completeTransitionProgress()
           ballRef.current?.cancel()
           resetTransitionStyles()
           resumeCurrentPage()
         },
+        'visit:end': () => completeTransitionProgress(),
       },
     })
+    swupRef.current = swup
+    onReady?.()
 
     swup.hooks.replace('animation:out:await', () => animateOut())
     swup.hooks.replace('animation:in:await', () => animateIn())
 
     return () => {
+      mounted = false
+      swupRef.current = null
       ballRef.current?.cancel()
       resetTransitionStyles()
       void swup.destroy()
     }
-  }, [])
+  }, [onReady])
 
-  return <ReferenceBallScene ref={ballRef} />
+  useEffect(() => {
+    const swup = swupRef.current
+    if (!swup || !initialNavigation) return
+    if (`${window.location.pathname}${window.location.search}${window.location.hash}` === initialNavigation) return
+    void swup.navigate(initialNavigation)
+  }, [initialNavigation])
+
+  return BallScene ? <BallScene ref={ballRef} /> : <div className="transition-demo-reference-ball" aria-hidden="true" />
 }
 
 GlobalPageTransitionRuntime.displayName = 'GlobalPageTransitionRuntime'

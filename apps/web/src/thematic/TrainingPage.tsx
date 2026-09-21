@@ -23,7 +23,7 @@ import { ContentAction } from '../components/ContentAction'
 import { ButtonLink, IconButton } from '../components/ui/Button'
 import { Accordion } from '../components/ui/Accordion'
 import { SurfaceCard } from '../components/ui/Card'
-import { SectionHeader } from '../components/ui/SectionHeader'
+import { SectionAction, SectionHeader } from '../components/ui/SectionHeader'
 import { Typography } from '../components/ui/Typography'
 import { horizontalSwiperProps } from '../lib/swiper'
 import { useMobileSwipeHint } from '../lib/useMobileSwipeHint'
@@ -155,15 +155,9 @@ export function TrainingPage({ dto }: { dto: TrainingPageDTO }) {
             title={dto.coachesTitle}
             action={
               <div className="flex items-center gap-2">
-                <ButtonLink
-                  href="/coaches"
-                  variant="neutral"
-                  size="sm"
-                  icon={<ArrowRight size={15} />}
-                  className="hidden sm:inline-flex"
-                >
+                <SectionAction action={{ mode: 'internal-link', href: '/coaches', label: dto.coachesDesktopActionLabel }} className="hidden sm:inline-flex">
                   {dto.coachesDesktopActionLabel}
-                </ButtonLink>
+                </SectionAction>
                 <IconButton
                   variant="neutral"
                   size="sm"

@@ -69,6 +69,7 @@ const pageEntrance = Astro.url.pathname === '/gift'
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <link rel="icon" type="image/svg+xml" href={site?.brandLogo?.url ?? '/api/media/file/logo-unlim.svg'} />
     <meta name="description" content={description} />
     {robotsContent && <meta name="robots" content={robotsContent} />}
     <link rel="canonical" href={resolvedCanonical} />
@@ -245,6 +246,19 @@ const pageEntrance = Astro.url.pathname === '/gift'
       document.addEventListener('pointerover', onIntent, { passive: true })
       document.addEventListener('focusin', onIntent)
       document.addEventListener('touchstart', onIntent, { passive: true })
+      document.addEventListener('click', (event) => {
+        if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+        const target = getIntentTarget(event.target)
+        const rawHref = target?.getAttribute('href')
+        if (!rawHref || rawHref.startsWith('#') || target?.hasAttribute('download') || target?.getAttribute('target') === '_blank') return
+        try {
+          const url = new URL(rawHref, document.baseURI)
+          if (url.origin !== location.origin || (url.pathname === location.pathname && url.search === location.search)) return
+          document.documentElement.dataset.routeTransition = 'loading'
+        } catch {
+          // Invalid links keep native browser behavior without an indicator.
+        }
+      }, true)
 
       const shortWordPattern = /(^|[ \t\r\n])((?:а|и|в|во|не|но|да|к|ко|с|со|у|о|об|от|до|из|за|на|по|под|над|при|без|для|про|через|между|как|так|что|это|же|ли|бы|то))([ \t\r\n]+)(?=\S)/giu
       const skipTypography = 'astro-island,script,style,noscript,textarea,input,select,option,code,pre,[contenteditable="true"],[data-no-typography]'

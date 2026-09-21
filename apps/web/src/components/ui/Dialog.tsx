@@ -4,7 +4,20 @@ import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { IconButton } from "./Button";
 
-export function Dialog({ open, onClose, title, children }: { open: boolean; onClose: () => void; title: string; children: ReactNode }) {
+const presenceVariants = {
+  closed: { opacity: 0.999, transition: { when: "afterChildren" as const, duration: 0.01 } },
+  open: { opacity: 1, transition: { when: "beforeChildren" as const, duration: 0.01 } },
+};
+const backdropVariants = {
+  closed: { opacity: 0, transition: { duration: 0.22 } },
+  open: { opacity: 1, transition: { duration: 0.2 } },
+};
+const surfaceVariants = {
+  closed: { opacity: 0, y: 28, transition: { duration: 0.26, ease: [0.4, 0, 1, 1] as const } },
+  open: { opacity: 1, y: 0, transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] as const } },
+};
+
+export function Dialog({ open, onClose, title, children, scrollable = true }: { open: boolean; onClose: () => void; title: string; children: ReactNode; scrollable?: boolean }) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
@@ -55,8 +68,8 @@ export function Dialog({ open, onClose, title, children }: { open: boolean; onCl
   if (typeof document === "undefined") return null;
   return createPortal(
     <AnimatePresence initial={false}>
-      {open && <div className="fixed inset-0 z-[100] flex items-end justify-center p-0 md:items-center md:p-6">
-        <motion.button data-cool-mode="off" type="button" aria-label="Закрыть диалог" onClick={onClose} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-ink/55 backdrop-blur-[3px]" />
+      {open && <motion.div initial="closed" animate="open" exit="closed" variants={presenceVariants} className="fixed inset-0 z-[100] flex items-end justify-center p-0 md:items-center md:p-6">
+        <motion.button data-cool-mode="off" type="button" aria-label="Закрыть диалог" onClick={onClose} variants={backdropVariants} className="absolute inset-0 bg-ink/55 backdrop-blur-[3px]" />
         <motion.div
           ref={dialogRef}
           role="dialog"
@@ -65,20 +78,17 @@ export function Dialog({ open, onClose, title, children }: { open: boolean; onCl
           onKeyDown={trapFocus}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
-          initial={{ y: 20 }}
-          animate={{ y: 0 }}
-          exit={{ y: 16 }}
-          transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}
-          className="dialog-surface relative z-10 flex max-h-[92svh] w-full flex-col overflow-hidden bg-white p-5 md:max-h-[96svh] md:max-w-[780px] md:p-6"
+          variants={surfaceVariants}
+          className={`dialog-surface relative z-10 flex w-full flex-col overflow-hidden bg-white p-5 md:max-w-[780px] md:p-6 ${scrollable ? 'max-h-[92svh] md:max-h-[96svh]' : 'max-h-none'}`}
         >
           <div className="mx-auto mb-2 h-1.5 w-10 shrink-0 rounded-full bg-ink/15 md:hidden" />
           <div className="mb-4 flex shrink-0 items-start justify-between gap-4 md:mb-5">
             <h2 id={titleId} className="type-title-card text-ink">{title}</h2>
             <IconButton ref={closeRef} data-cool-mode="off" size="sm" aria-label="Закрыть" onClick={onClose}><X size={17} /></IconButton>
           </div>
-          <div className="dialog-scroll min-h-0 flex-1 overflow-y-auto pr-1">{children}</div>
+          <div className={scrollable ? "dialog-scroll min-h-0 flex-1 overflow-x-hidden overflow-y-auto pr-1" : "overflow-visible"}>{children}</div>
         </motion.div>
-      </div>}
+      </motion.div>}
     </AnimatePresence>,
     document.body,
   );

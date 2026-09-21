@@ -75,7 +75,7 @@ export function Pricing() {
         tabIndex={0}
         layout="size"
         transition={{ layout: { duration: 0.3, ease: [0.2, 0.8, 0.2, 1] } }}
-        className="relative grid overflow-hidden"
+        className="relative grid overflow-visible"
       >
         <AnimatePresence initial={false} mode="popLayout">
           <motion.div

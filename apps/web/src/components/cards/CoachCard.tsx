@@ -41,11 +41,11 @@ export function CoachCard({ coach, loading = "lazy", reveal = true }: { coach: C
       </WhiteCard>
     </button>
 
-    <Dialog open={open} onClose={closeDialog} title={coach.name}>
+    <Dialog open={open} onClose={closeDialog} title={coach.name} scrollable={false}>
       <div className="grid grid-cols-[140px_minmax(0,1fr)] gap-x-4 gap-y-5 md:grid-cols-[240px_minmax(0,1fr)] md:gap-6">
         <ProgressiveImage src={coach.photo.url} alt={coach.photo.alt} className="se-3 h-[175px] w-[140px] object-cover md:h-auto md:max-h-[360px] md:w-full" />
         <div className="flex flex-col">
-          <Badge tone="lime">{coach.specialization}</Badge>
+          <Badge tone="lime" className="max-w-full whitespace-normal text-left !leading-snug">{coach.specialization}</Badge>
           <Typography role="body" tone="muted" className="mt-4">{coach.bio}</Typography>
         </div>
         <dl className="type-body-sm col-span-2 grid gap-3 border-y border-ink/10 py-4">
@@ -53,7 +53,7 @@ export function CoachCard({ coach, loading = "lazy", reveal = true }: { coach: C
           <div className="flex justify-between gap-4"><dt className="text-ink-soft">Опыт</dt><dd className="text-right text-ink">{coach.experience}</dd></div>
           <div className="flex justify-between gap-4"><dt className="text-ink-soft">Языки</dt><dd className="text-right text-ink">{coach.languages}</dd></div>
         </dl>
-        <div className="col-span-2 flex items-end gap-4"><Price label="тренировка от" value={coach.priceFrom} /><div className="ml-auto flex shrink-0 gap-2"><ButtonLink href={`/coaches/${coach.slug}`} variant="neutral" onClick={closeDialog}>Подробнее</ButtonLink><ContentAction action={coach.action} sourcePage="/coaches" sourceEntity={coach.name} onAction={closeDialog}>Выбрать</ContentAction></div></div>
+        <div className="col-span-2 flex items-end gap-3"><Price label="тренировка от" value={coach.priceFrom} size="compact" className="shrink-0" /><div className="ml-auto flex shrink-0 gap-2"><ButtonLink href={`/coaches/${coach.slug}`} variant="neutral" onClick={closeDialog}>Подробнее</ButtonLink><ContentAction action={coach.action} sourcePage="/coaches" sourceEntity={coach.name} onAction={closeDialog} modalDelayMs={300}>Выбрать</ContentAction></div></div>
       </div>
     </Dialog>
   </>;

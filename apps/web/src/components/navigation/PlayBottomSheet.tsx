@@ -12,7 +12,7 @@ export function PlayBottomSheet({ open, onClose }: { open: boolean; onClose: () 
   return (
     <BottomSheet open={open} onClose={onClose} title={site.mobileActions.quickActionsTitle}>
       <div className="flex flex-col gap-3">
-        <ContentAction action={{ mode: "booking", label: site.mobileActions.bookCourtLabel }} onAction={onClose} variant="primary" size="lg" fullWidth icon={<CalendarCheck size={18} />} className="px-5 text-left" />
+        <ContentAction action={{ mode: "booking", label: site.mobileActions.bookCourtLabel }} onAction={onClose} modalDelayMs={300} variant="primary" size="lg" fullWidth icon={<CalendarCheck size={18} />} className="px-5 text-left" />
         <Button data-analytics-action="phone" onClick={() => { onClose(); window.setTimeout(() => requestContact('phone'), 300) }} variant="neutral" size="lg" fullWidth icon={<PhoneIcon size={18} />} className="justify-between px-5 text-left">{site.mobileActions.callLabel}</Button>
         <ButtonLink
           href={site.contacts.directionsURL ?? undefined}

@@ -1,7 +1,19 @@
 import { useEffect, useId, useRef, type KeyboardEvent, type ReactNode, type TouchEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
-import { springSheet } from "../../lib/motion";
+
+const presenceVariants = {
+  closed: { opacity: 0.999, transition: { when: "afterChildren" as const, duration: 0.01 } },
+  open: { opacity: 1, transition: { when: "beforeChildren" as const, duration: 0.01 } },
+};
+const backdropVariants = {
+  closed: { opacity: 0, transition: { duration: 0.2 } },
+  open: { opacity: 1, transition: { duration: 0.2 } },
+};
+const sheetVariants = {
+  closed: { y: "100%", transition: { duration: 0.28, ease: [0.4, 0, 1, 1] as const } },
+  open: { y: 0, transition: { duration: 0.34, ease: [0.22, 1, 0.36, 1] as const } },
+};
 
 export function BottomSheet({
   open,
@@ -74,15 +86,20 @@ export function BottomSheet({
   return (
     <AnimatePresence initial={false}>
       {open && (
-        <>
-          <motion.div
-            aria-hidden="true"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: { duration: 0.14 } }}
-            transition={{ duration: 0.18 }}
+        <motion.div
+          initial="closed"
+          animate="open"
+          exit="closed"
+          variants={presenceVariants}
+          className="fixed inset-0 z-[70] md:hidden"
+        >
+          <motion.button
+            data-cool-mode="off"
+            type="button"
+            aria-label="Закрыть"
+            variants={backdropVariants}
             onClick={onClose}
-            className="fixed inset-0 z-[70] bg-ink/45 backdrop-blur-[2px] md:hidden"
+            className="absolute inset-0 bg-ink/45 backdrop-blur-[2px]"
           />
           <motion.div
             ref={dialogRef}
@@ -93,11 +110,8 @@ export function BottomSheet({
             onKeyDown={trapFocus}
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "100%", transition: { duration: 0.22, ease: [0.4, 0, 1, 1] } }}
-            transition={springSheet}
-            className="se-sheet fixed inset-x-0 bottom-0 z-[80] max-h-[82svh] overflow-y-auto bg-white pb-[calc(24px+env(safe-area-inset-bottom))] pt-3 md:hidden"
+            variants={sheetVariants}
+            className="se-sheet absolute inset-x-0 bottom-0 z-10 max-h-[82svh] overflow-x-hidden overflow-y-auto bg-white pb-[calc(24px+env(safe-area-inset-bottom))] pt-3"
           >
             <div className="mx-auto mb-2 h-1.5 w-10 rounded-full bg-ink/15" />
             <div className="flex items-center justify-between px-6 pb-2 pt-2">
@@ -115,7 +129,7 @@ export function BottomSheet({
             </div>
             <div className="px-6 pt-2">{children}</div>
           </motion.div>
-        </>
+        </motion.div>
       )}
     </AnimatePresence>
   );

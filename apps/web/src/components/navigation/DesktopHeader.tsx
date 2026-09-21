@@ -32,7 +32,7 @@ function NavigationIcon({ href, icon, size = 16 }: { href: string; icon?: { url:
   const preset = navigationIconPreset(href)
   const [customIconLoaded, setCustomIconLoaded] = useState(false)
   const Icon = navigationIcons[preset]
-  return <span data-navigation-icon={preset} className={`relative block h-5 w-5 shrink-0 ${preset === 'tournaments' || preset === 'gift' ? 'translate-y-px' : ''}`}>
+  return <span data-navigation-icon={preset} className="relative block h-5 w-5 shrink-0">
     <span className={`absolute inset-0 flex items-center justify-center leading-none transition-opacity duration-100 [&>img]:block [&>svg]:block ${icon && customIconLoaded ? 'opacity-0' : 'opacity-100'}`} aria-hidden="true"><Icon size={size} strokeWidth={1.9} /></span>
     {icon && <img src={icon.url} alt="" aria-hidden="true" onLoad={() => setCustomIconLoaded(true)} onError={() => setCustomIconLoaded(false)} className="absolute inset-0 m-auto h-4 w-4 object-contain" />}
   </span>

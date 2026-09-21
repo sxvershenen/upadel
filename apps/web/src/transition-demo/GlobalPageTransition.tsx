@@ -1,23 +1,31 @@
-import { useEffect, useRef, useState, type ComponentType } from 'react'
+import { useCallback, useEffect, useRef, useState, type ComponentType } from 'react'
 
-type TransitionRuntime = ComponentType
+import { beginTransitionProgress, completeTransitionProgress } from './transitionProgress'
 
-function isInternalNavigableLink(target: EventTarget | null): boolean {
-  if (!(target instanceof Element)) return false
+type TransitionRuntime = ComponentType<{ initialNavigation?: string | null; onReady?: () => void }>
+
+function internalNavigableLink(target: EventTarget | null): HTMLAnchorElement | null {
+  if (!(target instanceof Element)) return null
   const link = target.closest<HTMLAnchorElement>('a[href]')
-  if (!link || link.hasAttribute('data-no-swup') || link.target === '_blank' || link.hasAttribute('download')) return false
+  if (!link || link.hasAttribute('data-no-swup') || link.target === '_blank' || link.hasAttribute('download')) return null
 
   try {
     const url = new URL(link.href, window.location.href)
-    return url.origin === window.location.origin && !url.pathname.startsWith('/transitions/')
+    if (url.origin !== window.location.origin || url.pathname.startsWith('/transitions/')) return null
+    if (url.pathname === window.location.pathname && url.search === window.location.search) return null
+    return link
   } catch {
-    return false
+    return null
   }
 }
 
 export function GlobalPageTransition() {
   const [Runtime, setRuntime] = useState<TransitionRuntime | null>(null)
+  const [pendingHref, setPendingHref] = useState<string | null>(null)
   const importRef = useRef<Promise<void> | null>(null)
+  const runtimeReadyRef = useRef(false)
+  const pendingHrefRef = useRef<string | null>(null)
+  const handleRuntimeReady = useCallback(() => { runtimeReadyRef.current = true }, [])
 
   useEffect(() => {
     let disposed = false
@@ -31,7 +39,9 @@ export function GlobalPageTransition() {
             if (!disposed) setRuntime(() => runtime)
           })
           .catch(() => {
-            // Native navigation remains available when the optional transition runtime fails to load.
+            const href = pendingHrefRef.current
+            completeTransitionProgress()
+            if (href) window.location.assign(href)
           })
       }
       return importRef.current
@@ -53,9 +63,25 @@ export function GlobalPageTransition() {
     }
 
     const primeOnIntent = (event: Event) => {
-      if (isInternalNavigableLink(event.target)) void loadRuntime()
+      if (internalNavigableLink(event.target)) void loadRuntime()
     }
 
+    const startNavigation = (event: MouseEvent) => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+      const link = internalNavigableLink(event.target)
+      if (!link) return
+      beginTransitionProgress()
+      if (runtimeReadyRef.current) return
+
+      event.preventDefault()
+      const url = new URL(link.href, window.location.href)
+      const href = `${url.pathname}${url.search}${url.hash}`
+      pendingHrefRef.current = href
+      setPendingHref(href)
+      void loadRuntime()
+    }
+
+    document.addEventListener('click', startNavigation, true)
     document.addEventListener('pointerover', primeOnIntent, { passive: true })
     document.addEventListener('focusin', primeOnIntent)
     document.addEventListener('touchstart', primeOnIntent, { passive: true })
@@ -70,10 +96,16 @@ export function GlobalPageTransition() {
       document.removeEventListener('pointerover', primeOnIntent)
       document.removeEventListener('focusin', primeOnIntent)
       document.removeEventListener('touchstart', primeOnIntent)
+      document.removeEventListener('click', startNavigation, true)
       document.removeEventListener('unlim:main-ready', scheduleRuntime)
       window.removeEventListener('DOMContentLoaded', scheduleRuntime)
     }
   }, [])
 
-  return Runtime ? <Runtime /> : <div className="transition-demo-reference-ball" aria-hidden="true" />
+  return <>
+    <div className="route-transition-progress" aria-hidden="true"><span /></div>
+    {Runtime
+      ? <Runtime initialNavigation={pendingHref} onReady={handleRuntimeReady} />
+      : <div className="transition-demo-reference-ball" aria-hidden="true" />}
+  </>
 }

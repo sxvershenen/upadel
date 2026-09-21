@@ -50,3 +50,17 @@ test('desktop navigation labels keep one grid-aligned box before and after measu
   assert.match(contents, /\bgrid\b/)
   assert.doesNotMatch(label, /\babsolute\b|\binset-0\b/)
 })
+
+test('tournament and gift icons use the same centered wrapper as every navigation icon', () => {
+  const html = renderToStaticMarkup(<SiteProvider site={{ ...site, desktopNavigation: [
+    { label: 'Турниры', href: '/tournaments', children: [] },
+    { label: 'Подарить', href: '/gift', children: [] },
+  ] }} captureContacts={false}><DesktopHeader /></SiteProvider>)
+  const icons = html.match(/<span data-navigation-icon="(?:tournaments|gift)" class="[^"]+">/g) ?? []
+
+  assert.equal(icons.length, 2)
+  icons.forEach((icon) => {
+    assert.match(icon, /class="relative block h-5 w-5 shrink-0"/)
+    assert.doesNotMatch(icon, /translate-/)
+  })
+})

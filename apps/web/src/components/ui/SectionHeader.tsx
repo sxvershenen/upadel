@@ -1,6 +1,13 @@
-import type { ReactNode } from "react";
+import React, { type ReactNode } from "react";
+import type { ActionDTO } from "@unlim/content-contract";
+import { ArrowUpRight } from "lucide-react";
 import { cn } from "../../utils/cn";
+import { ContentAction } from "../ContentAction";
 import { SplitTextReveal } from "./SplitTextReveal";
+
+export function SectionAction({ action, children, className }: { action: ActionDTO; children?: ReactNode; className?: string }) {
+  return <ContentAction action={action} variant="neutral" size="sm" icon={<ArrowUpRight size={15} />} iconDivider={false} className={cn("text-ink-soft hover:text-ink", className)}>{children ?? action.label}</ContentAction>;
+}
 
 export function SectionHeader({
   eyebrow,

@@ -26,6 +26,18 @@ body {
 * { min-width: 0; }
 small { line-height: 1.35; }
 button:not(:disabled), a[href], [role="button"] { cursor: pointer; }
+
+@keyframes route-progress-loading {
+  0% { transform: scaleX(.04); }
+  45% { transform: scaleX(.58); }
+  100% { transform: scaleX(.9); }
+}
+.route-transition-progress { position: fixed; inset: 0 0 auto; z-index: 220; height: 4px; overflow: hidden; background: rgb(0 0 0 / 72%); opacity: 0; pointer-events: none; transition: opacity 120ms ease; }
+.route-transition-progress > span { display: block; width: 100%; height: 100%; transform: scaleX(0); transform-origin: 0 50%; background: var(--color-lime); box-shadow: 0 0 12px rgb(194 245 66 / 65%); }
+html[data-route-transition="loading"] .route-transition-progress { opacity: 1; }
+html[data-route-transition="loading"] .route-transition-progress > span { animation: route-progress-loading 8s cubic-bezier(.1,.65,.2,1) forwards; }
+html[data-route-transition="done"] .route-transition-progress { opacity: 1; }
+html[data-route-transition="done"] .route-transition-progress > span { transform: scaleX(1); transition: transform 180ms cubic-bezier(.2,.8,.2,1); }
 ::selection { background: var(--color-lime); color: var(--color-lime-ink); }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
