@@ -187,6 +187,9 @@ html[data-reveal-ready] [data-reveal-visible="true"] [data-reveal-word] { --reve
 .desktop-header[data-header-geometry-ready] .desktop-header-utilities { gap: calc(6px * (1 - var(--header-progress, 0))); }
 .desktop-header[data-header-geometry-ready] .desktop-header-utilities > .desktop-header-compact-control:last-child { margin-left: calc(4px * var(--header-progress, 0)); }
 .desktop-header[data-header-compact="true"] .desktop-header-utility-link { background: transparent; }
+/* Before ResizeObserver measures the labels, keep expanded links in normal flow so SSR cannot collapse them to chevrons only. */
+.desktop-header:not([data-header-geometry-ready]) .desktop-header-nav-content[data-header-nav-mode="expanded"] { width: max-content; }
+.desktop-header:not([data-header-geometry-ready]) .desktop-header-nav-content[data-header-nav-mode="expanded"] > [data-header-nav-label] { position: static; }
 .desktop-header-nav-content > [data-header-nav-label],
 .desktop-header-brand-content > [data-header-brand-label],
 .desktop-header-booking-control [data-booking-label] { opacity: var(--header-expanded-opacity); }
