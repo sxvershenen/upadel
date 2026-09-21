@@ -203,6 +203,21 @@ html[data-reveal-ready] [data-reveal-visible="true"] [data-reveal-word] { --reve
   .desktop-header-nav-content > [data-header-nav-label] { opacity: 0; }
   .desktop-header-nav-content > [data-header-nav-icon] { opacity: 1; }
 }
+/* Keep content visible during the width morph: only the settled header mode controls the swap. */
+@media (min-width: 1200px) {
+  .desktop-header-nav-content[data-header-nav-mode="expanded"] > [data-header-nav-label],
+  .desktop-header-brand-content[data-header-brand-mode="expanded"] > [data-header-brand-label],
+  .desktop-header-booking-control[data-booking-mode="expanded"] [data-booking-label] { opacity: 1; }
+  .desktop-header-nav-content[data-header-nav-mode="expanded"] > [data-header-nav-icon],
+  .desktop-header-brand-content[data-header-brand-mode="expanded"] > [data-header-brand-icon],
+  .desktop-header-booking-control[data-booking-mode="expanded"] [data-booking-icon] { opacity: 0; }
+  .desktop-header-nav-content[data-header-nav-mode="compact"] > [data-header-nav-label],
+  .desktop-header-brand-content[data-header-brand-mode="compact"] > [data-header-brand-label],
+  .desktop-header-booking-control[data-booking-mode="compact"] [data-booking-label] { opacity: 0; }
+  .desktop-header-nav-content[data-header-nav-mode="compact"] > [data-header-nav-icon],
+  .desktop-header-brand-content[data-header-brand-mode="compact"] > [data-header-brand-icon],
+  .desktop-header-booking-control[data-booking-mode="compact"] [data-booking-icon] { opacity: 1; }
+}
 .desktop-header-tooltip {
   position: absolute;
   top: calc(100% + .5rem);
