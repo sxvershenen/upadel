@@ -74,8 +74,8 @@ function CompactTooltip({ children, filterId, reduceMotion }: { children: ReactN
 
 function AnimatedNavigationContents({ expanded, item }: { expanded: boolean; item: DesktopNavigationChild }) {
   return <span data-header-nav-mode={expanded ? 'expanded' : 'compact'} className="desktop-header-nav-content relative block h-full w-full overflow-hidden">
-    <span aria-hidden={!expanded} data-header-nav-label className="desktop-header-nav-label absolute inset-0 flex items-center justify-center">{item.label}</span>
-    <span aria-hidden={expanded} data-header-nav-icon className="desktop-header-nav-icon absolute inset-0 flex items-center justify-center"><NavigationIcon href={item.href} icon={item.icon} /></span>
+    <span aria-hidden={!expanded} data-header-nav-label className="desktop-header-nav-label absolute inset-0 flex items-center justify-center" style={{ opacity: expanded ? 1 : 0 }}>{item.label}</span>
+    <span aria-hidden={expanded} data-header-nav-icon className="desktop-header-nav-icon absolute inset-0 flex items-center justify-center" style={{ opacity: expanded ? 0 : 1 }}><NavigationIcon href={item.href} icon={item.icon} /></span>
   </span>
 }
 
@@ -248,8 +248,8 @@ function HeaderBrand({ compact, filterId, homeHref, logo, logoMode, name, reduce
   return <div className="desktop-header-brand desktop-header-compact-control relative shrink-0">
     <motion.a href={homeHref} aria-label={name} whileHover={compact && !reduceMotion ? iconHover : undefined} whileTap={compact && !reduceMotion ? tapScaleSm : undefined} transition={springSnappy} className={`flex h-[var(--control-sm)] shrink-0 items-center justify-center overflow-hidden leading-none focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2 ${compact ? 'w-[var(--control-sm)] text-white/70 hover:text-white' : 'text-white'}`}>
       <span data-header-brand-mode={compact ? 'compact' : 'expanded'} className="desktop-header-brand-content grid place-items-center">
-        <span data-header-brand-icon className="col-start-1 row-start-1 inline-flex items-center justify-center" aria-hidden={!compact}><Home aria-hidden="true" size={17} strokeWidth={1.9} /></span>
-        <span data-header-brand-label className="col-start-1 row-start-1 flex items-center gap-2.5" aria-hidden={compact}>
+        <span data-header-brand-icon className="col-start-1 row-start-1 inline-flex items-center justify-center" style={{ opacity: compact ? 1 : 0 }} aria-hidden={!compact}><Home aria-hidden="true" size={17} strokeWidth={1.9} /></span>
+        <span data-header-brand-label className="col-start-1 row-start-1 flex items-center gap-2.5" style={{ opacity: compact ? 0 : 1 }} aria-hidden={compact}>
           {showLogo ? <img src={logo?.url} alt="" aria-hidden="true" className={replaceBrand ? 'h-9 max-w-[150px] object-contain' : 'h-7 w-7 object-contain'} /> : <span className="h-2.5 w-2.5 shrink-0 rounded-[3px] bg-lime" />}
           {!replaceBrand && <span className="flex flex-col"><span className="text-[14px] font-semibold tracking-[0] text-white">{name}</span><span className="desktop-header-subtitle type-micro text-white/50">{subtitle}</span></span>}
         </span>
@@ -267,8 +267,8 @@ function BookingControl({ compact, label }: { compact: boolean; label: string })
   return <div data-booking-mode={compact ? 'compact' : 'expanded'} className="desktop-header-booking-control relative h-[var(--control-sm)] shrink-0">
     <ContentAction reveal={false} action={{ mode: 'booking', label }} variant="primary" size="sm" aria-label={label} className="h-[var(--control-sm)] w-full overflow-hidden px-0">
       <span className="grid place-items-center">
-        <span data-booking-icon className="col-start-1 row-start-1 inline-flex items-center justify-center" aria-hidden={!compact}><CalendarCheck aria-hidden="true" size={17} strokeWidth={1.9} /></span>
-        <span data-booking-label className="col-start-1 row-start-1 block" aria-hidden={compact}>{label}</span>
+        <span data-booking-icon className="col-start-1 row-start-1 inline-flex items-center justify-center" style={{ opacity: compact ? 1 : 0 }} aria-hidden={!compact}><CalendarCheck aria-hidden="true" size={17} strokeWidth={1.9} /></span>
+        <span data-booking-label className="col-start-1 row-start-1 block" style={{ opacity: compact ? 0 : 1 }} aria-hidden={compact}>{label}</span>
       </span>
     </ContentAction>
   </div>
