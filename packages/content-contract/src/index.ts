@@ -78,10 +78,10 @@ export const defaultHeroTint: HeroTintDTO = {
   },
   mobile: {
     centerX: 50,
-    centerY: 35,
+    centerY: 30,
     stop1: { opacity: 0, position: 30 },
-    stop2: { opacity: 64, position: 70 },
-    stop3: { opacity: 79, position: 154 },
+    stop2: { opacity: 39, position: 50 },
+    stop3: { opacity: 84, position: 90 },
   },
 }
 

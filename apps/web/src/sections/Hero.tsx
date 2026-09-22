@@ -20,11 +20,12 @@ function blackAlpha(opacity: number): string {
   return alpha === "00" ? "rgb(0 0 0 / 0%)" : `#000000${alpha}`;
 }
 
-export function heroTintGradient(device: HeroTintDeviceDTO): string {
+export function heroTintGradient(device: HeroTintDeviceDTO, mobile = false): string {
   const stops = [device.stop1, device.stop2, device.stop3]
     .map(({ opacity, position }) => `${blackAlpha(opacity)} ${clamp(position, 0, 200)}%`)
     .join(", ");
-  return `radial-gradient(ellipse 80% 60% at ${clamp(device.centerX, 0, 100)}% ${clamp(device.centerY, 0, 100)}%, ${stops})`;
+  const shape = mobile ? "ellipse 130% 50%" : "ellipse 80% 60%";
+  return `radial-gradient(${shape} at ${clamp(device.centerX, 0, 100)}% ${clamp(device.centerY, 0, 100)}%, ${stops})`;
 }
 
 function HeroBackgroundMedia({ media, poster, className }: { media: MediaDTO; poster?: MediaDTO | null; className?: string }) {
@@ -91,7 +92,7 @@ export function Hero() {
     <section id="top" data-hero-parallax-root="" className="relative isolate h-[100svh] min-h-[720px] w-full overflow-hidden bg-ink">
       <HeroBackground desktop={hero.desktopMedia} mobile={hero.mobileMedia} desktopPoster={hero.desktopPoster} mobilePoster={hero.mobilePoster} />
       <div data-hero-tint="desktop" className="absolute inset-0 hidden md:block" style={{ background: heroTintGradient(tint.desktop) }} />
-      <div data-hero-tint="mobile" className="absolute inset-0 md:hidden" style={{ background: heroTintGradient(tint.mobile) }} />
+      <div data-hero-tint="mobile" className="absolute inset-0 md:hidden" style={{ background: heroTintGradient(tint.mobile, true) }} />
 
       <div className="container-page absolute inset-x-0 top-8 z-10 md:hidden">
         <a href="#top" className="flex items-center gap-2.5 leading-none text-white">
@@ -126,10 +127,10 @@ export function Hero() {
               {hero.titleAccent}
             </span>
           </div>
-          <div data-hero-description="" className="type-hero-lead mt-7 max-w-[900px] text-white/75">
+          <div data-hero-description="" className="type-hero-lead mt-5 max-w-[900px] text-white/75 sm:mt-7">
             <h1 className="inline">{hero.seoHeading}</h1>{hero.description ? <>{" "}<span>{hero.description}</span></> : null}
           </div>
-          <div data-hide-icons-narrow className="mt-8 flex flex-nowrap items-center gap-2 sm:gap-3">
+          <div data-hide-icons-narrow className="mt-6 flex flex-nowrap items-center gap-2 sm:mt-8 sm:gap-3">
             <div data-hero-cta="primary" className="min-w-0 flex-1 sm:flex-none">
               <ContentAction reveal={false} action={hero.primaryAction} variant="primary" size="lg" icon={<CalendarCheck size={17} />} className="w-full min-w-0 whitespace-nowrap px-4 !leading-none text-[14px] sm:w-auto sm:px-5 sm:text-base" />
             </div>

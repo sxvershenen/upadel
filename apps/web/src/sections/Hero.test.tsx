@@ -63,8 +63,8 @@ test('hero renders separate desktop and mobile three-point black tints and keeps
       stop1: { opacity: 0, position: 30 }, stop2: { opacity: 64, position: 70 }, stop3: { opacity: 79, position: 154 },
     },
     mobile: {
-      centerX: 50, centerY: 35,
-      stop1: { opacity: 0, position: 30 }, stop2: { opacity: 64, position: 70 }, stop3: { opacity: 79, position: 154 },
+      centerX: 50, centerY: 30,
+      stop1: { opacity: 0, position: 30 }, stop2: { opacity: 39, position: 50 }, stop3: { opacity: 84, position: 90 },
     },
   }
   responsiveContent.home.hero.titleFontSize = { mobile: 42, desktop: 96 }
@@ -73,7 +73,9 @@ test('hero renders separate desktop and mobile three-point black tints and keeps
   assert.match(html, /data-hero-tint="desktop"/)
   assert.match(html, /data-hero-tint="mobile"/)
   assert.match(html, /radial-gradient\(ellipse 80% 60% at 11% 22%, rgb\(0 0 0 \/ 0%\) 30%, #000000a3 70%, #000000c9 154%\)/)
-  assert.match(html, /radial-gradient\(ellipse 80% 60% at 50% 35%, rgb\(0 0 0 \/ 0%\) 30%, #000000a3 70%, #000000c9 154%\)/)
+  assert.match(html, /radial-gradient\(ellipse 130% 50% at 50% 30%, rgb\(0 0 0 \/ 0%\) 30%, #00000063 50%, #000000d6 90%\)/)
+  assert.match(html, /data-hero-description="" class="type-hero-lead mt-5 max-w-\[900px\] text-white\/75 sm:mt-7"/)
+  assert.match(html, /data-hide-icons-narrow="true" class="mt-6 flex flex-nowrap items-center gap-2 sm:mt-8 sm:gap-3"/)
   assert.match(html, /container-page absolute inset-x-0 top-8 z-10 md:hidden/)
   assert.match(html, /data-hero-title=""[^>]*style="--hero-title-font-size-mobile:42px;--hero-title-font-size-desktop:96px"/)
   assert.equal(desktopTint, 'radial-gradient(ellipse 80% 60% at 11% 22%, rgb(0 0 0 / 0%) 30%, #000000a3 70%, #000000c9 154%)')
