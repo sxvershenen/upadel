@@ -130,6 +130,9 @@ test('TrainingPage renders Swiss layout with methodology pillars, formats, coach
   // Methodology section
   assert.match(plainText, /Методика UNLIM/)
   assert.doesNotMatch(plainText, /\b0[123]\b/)
+  assert.match(html, /data-mobile-compact-list="true"[^>]*class="[^"]*border-y border-ink\/10[^"]*sm:grid-cols-3[^"]*sm:border-y-0[^"]*"/)
+  assert.match(html, /class="[^"]*bg-transparent[^"]*sm:bg-white[^"]*"/)
+  assert.match(html, /class="[^"]*border-b border-ink\/10[^"]*last:border-b-0[^"]*sm:border-b-0[^"]*"/)
 
   // Formats section
   assert.match(plainText, /Форматы тренировок/)

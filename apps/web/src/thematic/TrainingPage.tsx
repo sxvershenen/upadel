@@ -59,7 +59,7 @@ export function TrainingPage({ dto }: { dto: TrainingPageDTO }) {
       <section aria-labelledby="methodology-title">
         <SectionHeader titleId="methodology-title" eyebrow={dto.infographicEyebrow} title={dto.infographicTitle} />
 
-        <div className="mt-8 grid gap-4 sm:grid-cols-3">
+        <div data-mobile-compact-list className="mt-8 border-y border-ink/10 sm:grid sm:grid-cols-3 sm:gap-4 sm:border-y-0">
           {dto.blocks.map((block) => {
             const Icon = methodIcons[block.icon] ?? Target
             return (
@@ -67,15 +67,13 @@ export function TrainingPage({ dto }: { dto: TrainingPageDTO }) {
                 interactive={false}
                 reveal={false}
                 key={block.title}
-                className="se-3 flex flex-col justify-between bg-white p-6"
+                className="flex items-start gap-4 border-b border-ink/10 bg-transparent px-0 py-5 last:border-b-0 sm:block sm:border-b-0 sm:bg-white sm:p-6"
               >
-                <div>
-                  <div className="flex items-center">
-                    <span className="se-2 flex h-9 w-9 items-center justify-center bg-surface-muted text-ink">
-                      <Icon size={18} />
-                    </span>
-                  </div>
-                  <h3 className="type-title-card mt-4 text-ink">
+                <span className="se-2 flex h-9 w-9 shrink-0 items-center justify-center bg-surface-muted text-ink">
+                  <Icon size={18} />
+                </span>
+                <div className="min-w-0">
+                  <h3 className="type-title-card text-ink sm:mt-4">
                     {typograph(block.title)}
                   </h3>
                   <p className="type-body-sm mt-2 text-ink-soft">

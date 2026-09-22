@@ -420,20 +420,17 @@ export function GiftLandingPage({ dto, publicOrigin: _publicOrigin = 'https://un
           </Typography>
         </Reveal>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div data-mobile-compact-list className="grid border-y border-ink/10 sm:grid-cols-2 sm:gap-4 sm:border-y-0 lg:grid-cols-4">
           {pageUseCases.map((item, idx) => {
             const Icon = item.icon
             return (
-              <Reveal key={item.title} delay={idx * 0.08} className="h-full">
-                <SurfaceCard tone="white" interactive={false} className="flex h-full flex-col justify-between p-6">
-                  <div>
-                    <div className="flex items-center">
-                      <span className="se-2 flex h-10 w-10 items-center justify-center bg-surface-muted text-ink">
-                        <Icon size={20} />
-                      </span>
-                    </div>
-
-                    <Typography as="h3" role="title-card" className="mt-5 font-semibold text-ink">
+              <Reveal key={item.title} delay={idx * 0.08} className="h-full border-b border-ink/10 last:border-b-0 sm:border-b-0">
+                <SurfaceCard tone="white" interactive={false} className="flex h-full items-start gap-4 bg-transparent px-0 py-5 sm:block sm:bg-white sm:p-6">
+                  <span className="se-2 flex h-10 w-10 shrink-0 items-center justify-center bg-surface-muted text-ink">
+                    <Icon size={20} />
+                  </span>
+                  <div className="min-w-0">
+                    <Typography as="h3" role="title-card" className="font-semibold text-ink sm:mt-5">
                       {typograph(item.title)}
                     </Typography>
 

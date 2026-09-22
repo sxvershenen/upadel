@@ -21,7 +21,7 @@ export function Marquee({
         className="flex w-max min-w-max shrink-0 animate-marquee"
         style={reverse ? { animationDirection: "reverse" } : undefined}
       >
-        {copies.map((_, index) => <div key={index} aria-hidden={index > 0} className={cn("flex shrink-0 items-center", gap, trackPadding)}>{children}</div>)}
+        {copies.map((_, index) => <div key={index} aria-hidden={index > 0} inert={index > 0 ? true : undefined} className={cn("flex shrink-0 items-center", gap, trackPadding)}>{children}</div>)}
       </div>
     </div>
   );

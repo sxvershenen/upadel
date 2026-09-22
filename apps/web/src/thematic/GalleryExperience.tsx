@@ -4,10 +4,10 @@ import { useRef, useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import type { Swiper as SwiperType } from 'swiper'
 
-import { Dialog } from '../components/ui/Dialog'
 import { IconButton } from '../components/ui/Button'
 import { horizontalSwiperProps } from '../lib/swiper'
 import { ProgressiveImage } from '../components/ui/ProgressiveImage'
+import { GalleryLightbox } from './GalleryLightbox'
 
 type GalleryItem = HomepageDTO['entities']['gallery'][number]
 
@@ -23,9 +23,6 @@ export function GalleryExperience({ items }: { items: GalleryItem[] }) {
   const swiper = useRef<SwiperType | null>(null)
   const [edge, setEdge] = useState({ start: true, end: items.length < 2 })
   const update = (instance: SwiperType) => setEdge({ start: instance.isBeginning, end: instance.isEnd })
-  const current = active == null ? null : items[active]
-  const move = (step: number) => setActive((value) => value == null ? value : (value + step + items.length) % items.length)
-
   if (items.length === 0) return <p role="status" className="se-2 bg-white p-6 type-body text-ink-soft">В галерее пока нет опубликованных изображений.</p>
 
   return <>
@@ -36,8 +33,6 @@ export function GalleryExperience({ items }: { items: GalleryItem[] }) {
       </Swiper>
       <div className="mt-4 flex items-center justify-between"><span className="type-caption text-ink-soft">Свайпните, чтобы увидеть больше</span><div className="flex gap-2"><IconButton aria-label="Предыдущее фото" variant="neutral" size="sm" disabled={edge.start} onClick={() => swiper.current?.slidePrev()}><ChevronLeft size={17} /></IconButton><IconButton aria-label="Следующее фото" variant="neutral" size="sm" disabled={edge.end} onClick={() => swiper.current?.slideNext()}><ChevronRight size={17} /></IconButton></div></div>
     </div>
-    <Dialog open={current !== null} onClose={() => setActive(null)} title={current?.title ?? 'Галерея'}>
-      {current && <div><ProgressiveImage media={current.media} alt={current.media.alt} className="max-h-[68svh] w-full object-contain" /><p className="type-body-sm mt-4 text-ink-soft">{current.caption || current.title}</p>{items.length > 1 && <div className="mt-5 flex justify-end gap-2"><IconButton aria-label="Предыдущее изображение" variant="neutral" onClick={() => move(-1)}><ChevronLeft /></IconButton><IconButton aria-label="Следующее изображение" variant="neutral" onClick={() => move(1)}><ChevronRight /></IconButton></div>}</div>}
-    </Dialog>
+    <GalleryLightbox active={active} items={items} onChange={setActive} />
   </>
 }
