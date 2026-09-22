@@ -20,7 +20,7 @@ export function Prices({ dto }: { dto: PricesPageDTO }) {
   return <>
     <div aria-hidden="true" className="h-8 md:hidden" />
     <div className="container-page sticky top-[var(--page-gutter)] z-30 pb-8 md:static md:pb-12 md:pt-8">
-      <Tabs fullWidth reveal={false} layoutId="prices-tabs" aria-label="Разделы цен" tabs={tabs} value={active} onChange={setActive} />
+      <Tabs reveal={false} layoutId="prices-tabs" aria-label="Разделы цен" tabs={tabs} value={active} onChange={setActive} className="w-full [&>button]:flex-1 md:w-auto md:[&>button]:flex-none" />
     </div>
     <div className="container-page pb-8 md:pb-12">
       <section id="price-panel-rent" role="tabpanel" aria-label={dto.tabs.rent} hidden={active !== 'rent'}><div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">{standardRates.map((item) => <RentalRateCard key={item.id} rate={item} />)}</div></section>

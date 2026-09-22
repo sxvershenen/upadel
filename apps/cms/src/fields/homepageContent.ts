@@ -46,8 +46,8 @@ const heroTintField: Field = {
 const heroTitleFontSizeField: Field = {
   name: 'titleFontSize',
   type: 'group',
-  label: 'Размер офферного заголовка',
-  admin: { description: 'Размер крупного заголовка «Первая тренировка за …». Значения задаются в px отдельно для мобильного и desktop.' },
+  label: 'Размер заголовка hero',
+  admin: { description: 'Размер крупного заголовка hero. Значения задаются в px отдельно для мобильного и desktop.' },
   fields: [
     { name: 'mobile', type: 'number', label: 'Мобильный, px', min: 24, max: 160, defaultValue: defaultHeroTitleFontSize.mobile, admin: { width: '50%', step: 1 } },
     { name: 'desktop', type: 'number', label: 'Desktop, px', min: 24, max: 160, defaultValue: defaultHeroTitleFontSize.desktop, admin: { width: '50%', step: 1 } },
