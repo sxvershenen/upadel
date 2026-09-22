@@ -72,7 +72,7 @@ export const defaultHeroTint: HeroTintDTO = {
   desktop: {
     point1: { opacity: 98, x: 0, y: 100 },
     point2: { opacity: 72, x: 100, y: 100 },
-    point3: { opacity: 34, x: 50, y: 0 },
+    point3: { opacity: 34, x: 0, y: 0 },
   },
   mobile: {
     point1: { opacity: 98, x: 50, y: 100 },

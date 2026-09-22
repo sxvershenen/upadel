@@ -18,7 +18,7 @@ function clamp(value: number, min: number, max: number): number {
 export function heroTintGradient(points: HeroTintPointDTO[]): string {
   return points.map(({ opacity, x, y }) => {
     const alpha = clamp(opacity, 0, 100) / 100;
-    return `radial-gradient(ellipse 80% 72% at ${clamp(x, 0, 100)}% ${clamp(y, 0, 100)}%, rgba(0,0,0,${alpha}) 0%, rgba(0,0,0,${alpha * 0.72}) 28%, rgba(0,0,0,0) 74%)`;
+    return `radial-gradient(ellipse 80% 72% at ${clamp(x, 0, 100)}% ${clamp(y, 0, 100)}%, rgba(0,0,0,${alpha}) 0%, transparent 74%)`;
   }).join(", ");
 }
 

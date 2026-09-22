@@ -67,15 +67,18 @@ test('hero renders separate desktop and mobile three-point black tints and keeps
   }
   responsiveContent.home.hero.titleFontSize = { mobile: 42, desktop: 96 }
   const html = renderToStaticMarkup(<ContentProvider content={responsiveContent}><Hero /></ContentProvider>)
-  assert.match(html, /data-hero-tint="desktop"/)
-  assert.match(html, /data-hero-tint="mobile"/)
-  assert.match(html, /radial-gradient\(ellipse[^)]* at 11% 22%, rgba\(0,0,0,0\.81\) 0%/)
-  assert.match(html, /radial-gradient\(ellipse[^)]* at 17% 28%, rgba\(0,0,0,0\.71\) 0%/)
-  assert.match(html, /container-page absolute inset-x-0 top-8 z-10 md:hidden/)
-  assert.match(html, /data-hero-title=""[^>]*style="--hero-title-font-size-mobile:42px;--hero-title-font-size-desktop:96px"/)
-  assert.equal(heroTintGradient([
+  const desktopTint = heroTintGradient([
     responsiveContent.home.hero.tint.desktop.point1,
     responsiveContent.home.hero.tint.desktop.point2,
     responsiveContent.home.hero.tint.desktop.point3,
-  ]).match(/radial-gradient/g)?.length, 3)
+  ])
+  assert.match(html, /data-hero-tint="desktop"/)
+  assert.match(html, /data-hero-tint="mobile"/)
+  assert.match(html, /radial-gradient\(ellipse[^)]* at 11% 22%, rgba\(0,0,0,0\.81\) 0%, transparent 74%\)/)
+  assert.match(html, /radial-gradient\(ellipse[^)]* at 17% 28%, rgba\(0,0,0,0\.71\) 0%, transparent 74%\)/)
+  assert.match(html, /container-page absolute inset-x-0 top-8 z-10 md:hidden/)
+  assert.match(html, /data-hero-title=""[^>]*style="--hero-title-font-size-mobile:42px;--hero-title-font-size-desktop:96px"/)
+  assert.equal(desktopTint.match(/radial-gradient/g)?.length, 3)
+  assert.equal(desktopTint.match(/rgba\(/g)?.length, 3)
+  assert.doesNotMatch(desktopTint, /28%/)
 })
