@@ -56,7 +56,7 @@ function LeadForm({ site, lead, onClose, onContact }: { site: SiteDTO; lead: Lea
   if (state === 'success') return <div role="status"><h3 className="type-title-card text-ink">{site.contactConfirmation.successTitle}</h3><p className="type-body mt-3 text-ink-soft">{site.contactConfirmation.successText}</p><Button className="mt-6" onClick={onClose}>Закрыть</Button></div>
   return <form onSubmit={submit} onFocusCapture={start} noValidate className="grid gap-3 md:gap-4">
     <Field label="Имя" labelVisibility="sr-only" name="name" autoComplete="name" required minLength={2} maxLength={120} placeholder="Ваше имя" />
-    <fieldset className="grid gap-2 md:gap-3"><legend className="type-caption mb-0.5 md:mb-1">Как с вами связаться? Заполните любое одно поле</legend>
+    <fieldset className="grid gap-2 md:gap-3"><legend className="type-caption mb-3.5 md:mb-1">Как с вами связаться? Заполните любое одно поле</legend>
       <Field label="Телефон" labelVisibility="sr-only" name="phone" autoComplete="tel" inputMode="tel" maxLength={40} placeholder="Телефон — например +7 999 000-00-00" />
       <Field label="Telegram / логин" labelVisibility="sr-only" name="telegram" autoComplete="off" placeholder="Telegram — например @username" maxLength={80} />
       <Field label="VK / логин" labelVisibility="sr-only" name="vk" autoComplete="off" placeholder="VK — id или @username" maxLength={80} />
