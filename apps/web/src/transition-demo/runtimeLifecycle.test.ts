@@ -46,7 +46,7 @@ test('scene loads on idle only after the first completed visit destination is re
   })
 
   loader.destinationBecameReady()
-  assert.equal(idleCallbacks.length, 0, 'initial page readiness must not load Three.js')
+  assert.equal(idleCallbacks.length, 0, 'initial page readiness must not load WebGL2 scene code')
   loader.visitStarted()
   loader.destinationBecameReady()
   assert.equal(idleCallbacks.length, 0, 'destination hydration during the first visit must not delay that visit')
@@ -92,7 +92,7 @@ test('scene waits for destination readiness when visit completion arrives first'
   assert.equal(scheduled, 1)
 })
 
-test('a second visit before idle cancels warmup and stale idle cannot import Three.js', () => {
+test('a second visit before idle cancels warmup and stale idle cannot import the WebGL2 scene', () => {
   const idleCallbacks: Array<() => void> = []
   const cancelled: number[] = []
   let loads = 0

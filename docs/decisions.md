@@ -102,4 +102,4 @@ Published edits appear on the next public request without rebuild, restart or a 
 
 Homepage: preserve the large offer visually; render “Премиальный крытый падел-клуб” as the separate inline H1 beneath it, followed by editable descriptive text. The editor explains that the H1 is an SEO setting normally left unchanged. Owner-confirmed facts: 3 courts, 50 parking spaces, PRO TURF 240 and VK https://vk.ru/unlimpadel; unknown social profiles stay hidden. Coach fallback title: “Имя Фамилия - тренер по паделу | Москва, Новая Рига”. Gift certificates have no fixed price range in copy/schema.
 
-Three.js loads only during stable idle after the first completed Swup navigation. The first transition uses the lightweight animation and never waits for the scene.
+The native WebGL2 ball scene loads only during stable idle after the first completed Swup navigation. The first transition uses the lightweight animation and never waits for the scene.

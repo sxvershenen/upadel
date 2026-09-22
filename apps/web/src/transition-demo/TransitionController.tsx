@@ -135,7 +135,7 @@ export function TransitionController({ initialPage }: { initialPage: TransitionP
           </span>
         </div>
         <p className="mt-4 max-w-[240px] type-micro leading-relaxed text-white/45">
-          Сцена мяча и траектория перенесены из realistic-3d-tennis-ball-transitions. Swup меняет SSR-страницу на midpoint, затем она раскрывается вслед за мячом.
+          Процедурная WebGL2-сцена запускает полёт мяча поверх Swup-перехода. SSR-страница меняется на midpoint, затем раскрывается вслед за мячом.
         </p>
       </aside>
       <ReferenceBallScene ref={ballSceneRef} />
