@@ -23,15 +23,15 @@ void main() {
 }
 `
 
-export const ballFragmentShaderSource = `#version 300 es
-precision highp float;
-
+const ballFragmentInputs = `
 in vec3 vObjPosition;
 in vec3 vWorldPosition;
 in vec3 vNormal;
 in vec3 vViewDir;
 out vec4 fragColor;
+`
 
+const ballMaterialUniforms = `
 uniform float uNoiseScale;
 uniform float uNoiseDetail;
 uniform float uFuzzStrength;
@@ -57,7 +57,9 @@ uniform vec3 uRimLightDir;
 uniform float uRimIntensity;
 uniform float uRimSpread;
 uniform float uAmbientIntensity;
+`
 
+const proceduralMaterial = `
 vec4 permute(vec4 x) { return mod(((x * 34.0) + 1.0) * x, 289.0); }
 vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
 
@@ -136,21 +138,25 @@ float getSeamDistance(vec3 p) {
   }
   return sqrt(minDSq);
 }
+`
 
-float evaluateHeight(vec3 pNorm, float seamDist) {
+const ballLighting = `
+float evaluateHeight(float feltFibers, float seamDist) {
   float trenchWidth = uLineWidth * 1.45;
   float groove = 0.0;
   if (seamDist < trenchWidth) {
     float t = seamDist / trenchWidth;
     groove = -sin((1.0 - t) * 3.14159265 * 0.5) * 0.055;
   }
-  return groove + evaluateFeltFibers(pNorm, uNoiseDetail, uFiberCurl) * (uFuzzStrength * 0.024);
+  return groove + feltFibers * (uFuzzStrength * 0.024);
 }
 
 void main() {
   vec3 pObj = normalize(vObjPosition);
-  float seamDist = getSeamDistance(pObj);
-  float h = evaluateHeight(pObj, seamDist);
+  vec2 material = sampleMaterial(pObj);
+  float seamDist = material.x;
+  float feltFibers = material.y;
+  float h = evaluateHeight(feltFibers, seamDist);
   vec3 dPdx = dFdx(vWorldPosition);
   vec3 dPdy = dFdy(vWorldPosition);
   vec3 perturbedNormal = normalize(vNormal - (dPdx * dFdx(h) + dPdy * dFdy(h)) * (uNormalIntensity * 85.0));
@@ -158,7 +164,6 @@ void main() {
   float smoothEdge = max(0.003, uSmoothing);
   float seamMask = smoothstep(halfWidth + smoothEdge, halfWidth - smoothEdge, seamDist);
   float trenchMask = smoothstep(uLineWidth * 1.35 + smoothEdge, halfWidth, seamDist);
-  float feltFibers = evaluateFeltFibers(pObj, uNoiseDetail, uFiberCurl);
   float cavityAO = clamp(1.0 - (0.45 - feltFibers * 0.5) * uCavityDepth * 0.65, 0.25, 1.0);
   float fiberTip = clamp((feltFibers + 0.2) * 1.4, 0.0, 1.0);
   vec3 feltColor = mix(uBaseColor * 0.88, uBaseColor * 1.14, fiberTip);
@@ -191,6 +196,56 @@ void main() {
   vec3 finalColor = ambient + diffuse + vec3(specTerm) + sheen + rimLight + bounce;
   finalColor = clamp((finalColor * (2.51 * finalColor + 0.03)) / (finalColor * (2.43 * finalColor + 0.59) + 0.14), 0.0, 1.0);
   fragColor = vec4(finalColor, 1.0);
+}
+`
+
+export const ballFragmentShaderSource = `#version 300 es
+precision highp float;
+${ballFragmentInputs}
+${ballMaterialUniforms}
+${proceduralMaterial}
+vec2 sampleMaterial(vec3 p) {
+  return vec2(getSeamDistance(p), evaluateFeltFibers(p, uNoiseDetail, uFiberCurl));
+}
+${ballLighting}
+`
+
+// The compact flight shader contains no procedural noise or seam loop. Bake
+// those object-space values once; lighting and rotation still run every frame.
+export const compactBallFragmentShaderSource = `#version 300 es
+precision highp float;
+${ballFragmentInputs}
+${ballMaterialUniforms}
+uniform sampler2D uMaterial;
+vec2 sampleMaterial(vec3 p) {
+  vec2 uv = vec2(atan(p.z, p.x) / 6.28318530718 + 0.5, asin(clamp(p.y, -1.0, 1.0)) / 3.14159265359 + 0.5);
+  vec2 material = texture(uMaterial, uv).rg;
+  return vec2(material.r * 0.25, material.g * 2.5 - 1.25);
+}
+${ballLighting}
+`
+
+export const materialVertexShaderSource = `#version 300 es
+out vec2 vUV;
+void main() {
+  vUV = vec2(float((gl_VertexID << 1) & 2), float(gl_VertexID & 2));
+  gl_Position = vec4(vUV * 2.0 - 1.0, 0.0, 1.0);
+}
+`
+
+export const materialFragmentShaderSource = `#version 300 es
+precision highp float;
+in vec2 vUV;
+out vec4 fragColor;
+${ballMaterialUniforms}
+${proceduralMaterial}
+void main() {
+  float phi = (vUV.x - 0.5) * 6.28318530718;
+  float latitude = (vUV.y - 0.5) * 3.14159265359;
+  vec3 p = vec3(cos(latitude) * cos(phi), sin(latitude), cos(latitude) * sin(phi));
+  float seam = getSeamDistance(p);
+  float felt = evaluateFeltFibers(p, uNoiseDetail, uFiberCurl);
+  fragColor = vec4(clamp(seam / 0.25, 0.0, 1.0), clamp((felt + 1.25) / 2.5, 0.0, 1.0), 0.0, 1.0);
 }
 `
 

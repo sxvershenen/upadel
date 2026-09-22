@@ -13,6 +13,9 @@ import {
 import {
   ballFragmentShaderSource,
   ballVertexShaderSource,
+  compactBallFragmentShaderSource,
+  materialFragmentShaderSource,
+  materialVertexShaderSource,
   trailFragmentShaderSource,
   trailVertexShaderSource,
 } from './webgl2BallShaders'
@@ -77,6 +80,10 @@ export class WebGL2BallRenderer {
   private readonly buffers: WebGLBuffer[] = []
   private destroyed = false
   private readonly gl: WebGL2RenderingContext
+  private materialTexture: WebGLTexture | null = null
+  private lastFrameTime: number | null = null
+  private slowFrames = 0
+  private resolutionLevel = 0
   private readonly modelMatrix = mat4Create()
   private readonly normalMatrix = new Float32Array(9)
   private readonly projectionMatrix = mat4Create()
@@ -100,7 +107,7 @@ export class WebGL2BallRenderer {
     })
     if (!gl) throw new Error('WebGL2 is unavailable')
     this.gl = gl
-    this.ballProgram = this.createProgram(ballVertexShaderSource, ballFragmentShaderSource)
+    this.ballProgram = this.createProgram(ballVertexShaderSource, compact ? compactBallFragmentShaderSource : ballFragmentShaderSource)
     this.trailProgram = this.createProgram(trailVertexShaderSource, trailFragmentShaderSource)
 
     const sphere = createSphereGeometry(1, compact ? 40 : 64, compact ? 28 : 48)
@@ -120,6 +127,14 @@ export class WebGL2BallRenderer {
     gl.bindVertexArray(null)
     mat4LookAt(this.viewMatrix, [0, 0, 5], [0, 0, 0], [0, 1, 0])
     this.initializeUniforms()
+    if (compact) {
+      try {
+        this.materialTexture = this.bakeMaterial()
+      } catch (error) {
+        this.destroy()
+        throw error
+      }
+    }
     this.resize()
     this.clear()
   }
@@ -128,6 +143,7 @@ export class WebGL2BallRenderer {
     if (this.destroyed) return
     this.activeFlight = { duration, startedAt: performance.now(), trajectory }
     this.trailHistory.length = 0
+    this.resetFrameTiming()
     this.resize()
     if (this.animationFrame === null) this.animationFrame = requestAnimationFrame(this.tick)
   }
@@ -135,6 +151,7 @@ export class WebGL2BallRenderer {
   cancelFlight() {
     this.activeFlight = null
     this.trailHistory.length = 0
+    this.resetFrameTiming()
     if (this.animationFrame !== null) cancelAnimationFrame(this.animationFrame)
     this.animationFrame = null
     this.clear()
@@ -143,19 +160,22 @@ export class WebGL2BallRenderer {
   resize() {
     const width = Math.max(1, this.canvas.clientWidth || window.innerWidth)
     const height = Math.max(1, this.canvas.clientHeight || window.innerHeight)
-    const pixelRatio = Math.min(window.devicePixelRatio || 1, this.compact ? 1.25 : 1.75)
-    const renderWidth = Math.floor(width * pixelRatio)
-    const renderHeight = Math.floor(height * pixelRatio)
+    const scale = [1, 0.8, 0.6, 0.4][this.resolutionLevel]
+    const pixelRatio = Math.min(window.devicePixelRatio || 1, this.compact ? 1.25 : 1.75) * scale
+    const renderWidth = Math.max(1, Math.floor(width * pixelRatio))
+    const renderHeight = Math.max(1, Math.floor(height * pixelRatio))
     if (this.canvas.width !== renderWidth || this.canvas.height !== renderHeight) {
       this.canvas.width = renderWidth
       this.canvas.height = renderHeight
     }
     this.gl.viewport(0, 0, renderWidth, renderHeight)
-    mat4Perspective(this.projectionMatrix, Math.PI / 4, renderWidth / renderHeight, 0.1, 100)
+    // Backing-store rounding or quality changes must not shift the flight.
+    mat4Perspective(this.projectionMatrix, Math.PI / 4, width / height, 0.1, 100)
     for (const program of [this.ballProgram, this.trailProgram]) {
       this.gl.useProgram(program)
       this.uniformMatrix4(program, 'uProjectionMatrix', this.projectionMatrix)
     }
+    this.uniform1(this.trailProgram, 'uPointSize', (this.compact ? 12 : 16) * scale)
   }
 
   destroy() {
@@ -168,6 +188,7 @@ export class WebGL2BallRenderer {
     gl.deleteVertexArray(this.trailVAO)
     gl.deleteProgram(this.ballProgram)
     gl.deleteProgram(this.trailProgram)
+    if (this.materialTexture) gl.deleteTexture(this.materialTexture)
     this.uniformLocations.clear()
   }
 
@@ -179,14 +200,36 @@ export class WebGL2BallRenderer {
     if (progress >= 1) {
       this.activeFlight = null
       this.trailHistory.length = 0
+      this.resetFrameTiming()
       this.clear()
       this.onProgress?.(1)
       this.onComplete?.()
       return
     }
+    this.adaptResolution(now)
     this.renderFlight(flight.trajectory, progress)
     this.onProgress?.(progress)
     this.animationFrame = requestAnimationFrame(this.tick)
+  }
+
+  private resetFrameTiming() {
+    this.lastFrameTime = null
+    this.slowFrames = 0
+  }
+
+  private adaptResolution(now: number) {
+    if (!this.compact) return
+    const elapsed = this.lastFrameTime === null ? 0 : now - this.lastFrameTime
+    this.lastFrameTime = now
+    // RAF measures delivered cadence, including GPU pressure. Ignore startup
+    // and background pauses; never oscillate quality during a short flight.
+    if (elapsed > 22 && elapsed <= 250) this.slowFrames += elapsed > 50 ? 2 : 1
+    else this.slowFrames = 0
+    if (this.slowFrames >= 3 && this.resolutionLevel < 3) {
+      this.resolutionLevel += 1
+      this.slowFrames = 0
+      this.resize()
+    }
   }
 
   private renderFlight(trajectory: ReferenceTrajectory, progress: number) {
@@ -200,6 +243,10 @@ export class WebGL2BallRenderer {
     this.renderTrail()
     gl.enable(gl.DEPTH_TEST)
     gl.depthFunc(gl.LEQUAL)
+    if (this.compact) {
+      gl.enable(gl.CULL_FACE)
+      gl.cullFace(gl.BACK)
+    }
     mat4Identity(this.modelMatrix)
     mat4Translate(this.modelMatrix, this.modelMatrix, position)
     const spin = trajectory.spinVector
@@ -216,37 +263,77 @@ export class WebGL2BallRenderer {
   }
 
   private initializeUniforms() {
+    this.initializeBallUniforms(this.ballProgram)
     const gl = this.gl
-    gl.useProgram(this.ballProgram)
-    this.uniformLocation(this.ballProgram, 'uModelMatrix')
-    this.uniformLocation(this.ballProgram, 'uNormalMatrix')
-    this.uniformMatrix4(this.ballProgram, 'uViewMatrix', this.viewMatrix)
-    this.uniform1(this.ballProgram, 'uNoiseScale', ballConfig.noiseScale)
-    this.uniform1(this.ballProgram, 'uNoiseDetail', ballConfig.noiseDetail)
-    this.uniform1(this.ballProgram, 'uFuzzStrength', ballConfig.fuzzStrength)
-    this.uniform1(this.ballProgram, 'uBumpCount', ballConfig.bumpCount)
-    this.uniform1(this.ballProgram, 'uFiberCurl', ballConfig.fiberCurl)
-    this.uniform1(this.ballProgram, 'uCavityDepth', ballConfig.cavityDepth)
-    this.uniform1(this.ballProgram, 'uSeed', ballConfig.seed)
-    this.uniform1(this.ballProgram, 'uLineWidth', ballConfig.lineWidth)
-    this.uniform1(this.ballProgram, 'uContrast', ballConfig.contrast)
-    this.uniform1(this.ballProgram, 'uSmoothing', ballConfig.smoothing)
-    gl.uniform3fv(this.uniformLocation(this.ballProgram, 'uSeamPoints'), this.seamPoints)
-    this.uniform3(this.ballProgram, 'uBaseColor', ballConfig.baseColor)
-    this.uniform3(this.ballProgram, 'uRimColor', ballConfig.rimColor)
-    this.uniform3(this.ballProgram, 'uSeamColor', ballConfig.seamColor)
-    this.uniform1(this.ballProgram, 'uRoughness', ballConfig.roughness)
-    this.uniform1(this.ballProgram, 'uSpecularIntensity', ballConfig.specular)
-    this.uniform1(this.ballProgram, 'uNormalIntensity', ballConfig.normalIntensity)
-    this.uniform1(this.ballProgram, 'uFuzzWrap', ballConfig.fuzzWrap)
-    this.uniform1(this.ballProgram, 'uSheenIntensity', ballConfig.sheenIntensity)
-    this.uniformLighting()
-
     gl.useProgram(this.trailProgram)
     this.uniformMatrix4(this.trailProgram, 'uViewMatrix', this.viewMatrix)
     this.uniform3(this.trailProgram, 'uTrailColor', ballConfig.rimColor)
     this.uniform1(this.trailProgram, 'uTrailIntensity', ballConfig.trailIntensity)
-    this.uniform1(this.trailProgram, 'uPointSize', this.compact ? 12 : 16)
+  }
+
+  private initializeBallUniforms(program: WebGLProgram) {
+    const gl = this.gl
+    gl.useProgram(program)
+    this.uniformLocation(program, 'uModelMatrix')
+    this.uniformLocation(program, 'uNormalMatrix')
+    this.uniformMatrix4(program, 'uViewMatrix', this.viewMatrix)
+    this.uniform1(program, 'uNoiseScale', ballConfig.noiseScale)
+    this.uniform1(program, 'uNoiseDetail', ballConfig.noiseDetail)
+    this.uniform1(program, 'uFuzzStrength', ballConfig.fuzzStrength)
+    this.uniform1(program, 'uBumpCount', ballConfig.bumpCount)
+    this.uniform1(program, 'uFiberCurl', ballConfig.fiberCurl)
+    this.uniform1(program, 'uCavityDepth', ballConfig.cavityDepth)
+    this.uniform1(program, 'uSeed', ballConfig.seed)
+    this.uniform1(program, 'uLineWidth', ballConfig.lineWidth)
+    this.uniform1(program, 'uContrast', ballConfig.contrast)
+    this.uniform1(program, 'uSmoothing', ballConfig.smoothing)
+    gl.uniform3fv(this.uniformLocation(program, 'uSeamPoints'), this.seamPoints)
+    this.uniform3(program, 'uBaseColor', ballConfig.baseColor)
+    this.uniform3(program, 'uRimColor', ballConfig.rimColor)
+    this.uniform3(program, 'uSeamColor', ballConfig.seamColor)
+    this.uniform1(program, 'uRoughness', ballConfig.roughness)
+    this.uniform1(program, 'uSpecularIntensity', ballConfig.specular)
+    this.uniform1(program, 'uNormalIntensity', ballConfig.normalIntensity)
+    this.uniform1(program, 'uFuzzWrap', ballConfig.fuzzWrap)
+    this.uniform1(program, 'uSheenIntensity', ballConfig.sheenIntensity)
+    this.uniformLighting(program)
+  }
+
+  private bakeMaterial(): WebGLTexture {
+    const gl = this.gl
+    const texture = gl.createTexture()
+    const framebuffer = gl.createFramebuffer()
+    let program: WebGLProgram | null = null
+    try {
+      if (!texture || !framebuffer) throw new Error('Unable to allocate ball material')
+      program = this.createProgram(materialVertexShaderSource, materialFragmentShaderSource)
+      gl.activeTexture(gl.TEXTURE0)
+      gl.bindTexture(gl.TEXTURE_2D, texture)
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, 512, 256, 0, gl.RGBA, gl.UNSIGNED_BYTE, null)
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT)
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+      gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer)
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0)
+      if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) throw new Error('Incomplete ball material framebuffer')
+      gl.viewport(0, 0, 512, 256)
+      this.initializeBallUniforms(program)
+      gl.drawArrays(gl.TRIANGLES, 0, 3)
+      gl.useProgram(this.ballProgram)
+      gl.uniform1i(this.uniformLocation(this.ballProgram, 'uMaterial'), 0)
+      return texture
+    } catch (error) {
+      if (texture) gl.deleteTexture(texture)
+      throw error
+    } finally {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null)
+      if (framebuffer) gl.deleteFramebuffer(framebuffer)
+      if (program) {
+        gl.deleteProgram(program)
+        this.uniformLocations.delete(program)
+      }
+    }
   }
 
   private renderTrail() {
@@ -279,19 +366,19 @@ export class WebGL2BallRenderer {
     gl.disable(gl.BLEND)
   }
 
-  private uniformLighting() {
+  private uniformLighting(program: WebGLProgram) {
     const keyAzimuth = ballConfig.lightAzimuth * Math.PI / 180
     const keyElevation = ballConfig.lightElevation * Math.PI / 180
     const rimAzimuth = ballConfig.rimAzimuth * Math.PI / 180
     const rimElevation = ballConfig.rimElevation * Math.PI / 180
     const key: Vec3 = [Math.cos(keyElevation) * Math.sin(keyAzimuth), Math.sin(keyElevation), Math.cos(keyElevation) * Math.cos(keyAzimuth)]
     const rim: Vec3 = [Math.cos(rimElevation) * Math.sin(rimAzimuth), Math.sin(rimElevation), Math.cos(rimElevation) * Math.cos(rimAzimuth)]
-    this.uniform3(this.ballProgram, 'uLightDir', key)
-    this.uniform1(this.ballProgram, 'uLightIntensity', ballConfig.lightIntensity)
-    this.uniform3(this.ballProgram, 'uRimLightDir', rim)
-    this.uniform1(this.ballProgram, 'uRimIntensity', ballConfig.rimIntensity)
-    this.uniform1(this.ballProgram, 'uRimSpread', ballConfig.rimSpread)
-    this.uniform1(this.ballProgram, 'uAmbientIntensity', ballConfig.ambient)
+    this.uniform3(program, 'uLightDir', key)
+    this.uniform1(program, 'uLightIntensity', ballConfig.lightIntensity)
+    this.uniform3(program, 'uRimLightDir', rim)
+    this.uniform1(program, 'uRimIntensity', ballConfig.rimIntensity)
+    this.uniform1(program, 'uRimSpread', ballConfig.rimSpread)
+    this.uniform1(program, 'uAmbientIntensity', ballConfig.ambient)
   }
 
   private clear() {
@@ -313,21 +400,26 @@ export class WebGL2BallRenderer {
   }
 
   private createProgram(vertexSource: string, fragmentSource: string) {
-    const vertex = this.createShader(this.gl.VERTEX_SHADER, vertexSource)
-    const fragment = this.createShader(this.gl.FRAGMENT_SHADER, fragmentSource)
-    const program = this.gl.createProgram()
-    if (!program) throw new Error('Unable to allocate a WebGL2 program')
-    this.gl.attachShader(program, vertex)
-    this.gl.attachShader(program, fragment)
-    this.gl.linkProgram(program)
-    this.gl.deleteShader(vertex)
-    this.gl.deleteShader(fragment)
-    if (!this.gl.getProgramParameter(program, this.gl.LINK_STATUS)) {
-      const message = this.gl.getProgramInfoLog(program) ?? 'Unknown WebGL2 program link error'
-      this.gl.deleteProgram(program)
-      throw new Error(message)
+    const gl = this.gl
+    const vertex = this.createShader(gl.VERTEX_SHADER, vertexSource)
+    let fragment: WebGLShader | null = null
+    let program: WebGLProgram | null = null
+    try {
+      fragment = this.createShader(gl.FRAGMENT_SHADER, fragmentSource)
+      program = gl.createProgram()
+      if (!program) throw new Error('Unable to allocate a WebGL2 program')
+      gl.attachShader(program, vertex)
+      gl.attachShader(program, fragment)
+      gl.linkProgram(program)
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program) ?? 'Unknown WebGL2 program link error')
+      return program
+    } catch (error) {
+      if (program) gl.deleteProgram(program)
+      throw error
+    } finally {
+      gl.deleteShader(vertex)
+      if (fragment) gl.deleteShader(fragment)
     }
-    return program
   }
 
   private createVAO() {
