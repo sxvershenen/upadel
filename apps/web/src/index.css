@@ -218,12 +218,12 @@ html[data-reveal-ready] [data-reveal-visible="true"] [data-reveal-word] { --reve
 .benefits-swiper:not(.swiper-initialized) .swiper-slide { width: 100%; }
 .training-formats-swiper:not(.swiper-initialized) .swiper-slide { width: 100%; }
 .training-formats-swiper [data-image-card="true"],
-.coaches-swiper [data-coach-surface="true"] {
+.benefits-swiper [data-image-card="true"] {
   -webkit-mask-image: none;
   contain: none;
-  will-change: auto;
+  will-change: transform;
 }
-.benefits-swiper [data-image-card="true"] {
+.coaches-swiper [data-coach-surface="true"] {
   -webkit-mask-image: none;
   contain: none;
   will-change: auto;
