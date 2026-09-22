@@ -82,11 +82,13 @@ export function useMobileSwipeHint(swiperRef: { current: SwiperType | null }, hi
     );
 
     observer.observe(container);
-    container.addEventListener('pointerdown', stopHintForInteraction, { passive: true });
+    // Cancel before Swiper handles the same pointer. In the bubble phase the
+    // hint transition and the user's drag can both write wrapper transforms.
+    container.addEventListener('pointerdown', stopHintForInteraction, { capture: true, passive: true });
 
     return () => {
       observer.disconnect();
-      container.removeEventListener('pointerdown', stopHintForInteraction);
+      container.removeEventListener('pointerdown', stopHintForInteraction, true);
       clearHintTimers();
     };
   }, [hintKey, swiperRef]);

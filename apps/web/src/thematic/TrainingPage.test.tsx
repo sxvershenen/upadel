@@ -1,5 +1,6 @@
 import { homepageDTOversion } from '@unlim/content-contract'
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import test from 'node:test'
 import React from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
@@ -140,6 +141,7 @@ test('TrainingPage renders Swiss layout with methodology pillars, formats, coach
   // Formats section
   assert.match(plainText, /Форматы тренировок/)
   assert.match(plainText, /Индивидуальная тренировка/)
+  assert.match(html, /training-formats-swiper/)
 
   // Special offer card (compact) with unboxed eyebrow and standard button
   assert.match(plainText, /Пробная тренировка за 1 990 ₽/)
@@ -152,6 +154,7 @@ test('TrainingPage renders Swiss layout with methodology pillars, formats, coach
   assert.match(html, /href="\/coaches"/)
   assert.match(html, /aria-label="Предыдущие тренеры"/)
   assert.match(html, /aria-label="Следующие тренеры"/)
+  assert.match(html, /training-coaches-swiper/)
 
   // Knowledge base goes straight to its two useful columns without a duplicate section title.
   assert.doesNotMatch(plainText, /Перед первой тренировкой/)
@@ -165,6 +168,28 @@ test('TrainingPage renders Swiss layout with methodology pillars, formats, coach
 
   // Redundant CTA banner removed completely
   assert.equal(plainText.includes('Готовы выйти на корт?'), false)
+})
+
+test('training swipers preserve their hydrated geometry and paint layers before initialization', () => {
+  const css = readFileSync(new URL('../index.css', import.meta.url), 'utf8')
+  const hintSource = readFileSync(new URL('../lib/useMobileSwipeHint.ts', import.meta.url), 'utf8')
+
+  assert.match(css, /\.training-formats-swiper:not\(\.swiper-initialized\) \.swiper-wrapper \{ gap: 12px; \}/)
+  assert.match(css, /\.training-formats-swiper:not\(\.swiper-initialized\) \.swiper-slide \{ width: calc\(\(100% - \.96px\) \/ 1\.08\); \}/)
+  assert.match(css, /\.training-coaches-swiper:not\(\.swiper-initialized\) \.swiper-slide \{ width: calc\(\(100% - 1\.28px\) \/ 1\.08\); \}/)
+  assert.match(css, /\.training-formats-swiper \.swiper-slide > div > \[data-gsap-reveal-boundary="true"\][\s\S]*?-webkit-mask-image: none/)
+  assert.match(hintSource, /addEventListener\('pointerdown', stopHintForInteraction, \{ capture: true, passive: true \}\)/)
+})
+
+test('coach dialog reuses the loaded photo without a second progressive reveal and fits the dynamic viewport', () => {
+  const coachCardSource = readFileSync(new URL('../components/cards/CoachCard.tsx', import.meta.url), 'utf8')
+  const dialogSource = readFileSync(new URL('../components/ui/Dialog.tsx', import.meta.url), 'utf8')
+  const dialogMarkup = coachCardSource.match(/<Dialog open=\{open\}[\s\S]*?<\/Dialog>/)?.[0] ?? ''
+
+  assert.match(dialogMarkup, /<img/)
+  assert.doesNotMatch(dialogMarkup, /<ProgressiveImage/)
+  assert.match(dialogSource, /h-\[100dvh\]/)
+  assert.match(dialogSource, /max-h-\[calc\(100dvh-12px\)\]/)
 })
 
 test('RentalRateCard renders compact layout with unboxed eyebrow, bottom-edge background images, and standard action button', () => {

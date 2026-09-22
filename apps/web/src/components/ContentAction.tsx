@@ -9,6 +9,7 @@ import { Button, ButtonLink, type ButtonSize, type ButtonVariant } from './ui/Bu
 
 type Props = {
   'aria-label'?: string
+  'data-hero-cta'?: 'primary' | 'secondary'
   action: ActionDTO
   children?: ReactNode
   className?: string

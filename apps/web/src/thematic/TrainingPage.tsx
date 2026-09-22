@@ -122,7 +122,7 @@ export function TrainingPage({ dto }: { dto: TrainingPageDTO }) {
             }}
             slidesPerView={1.08}
             spaceBetween={12}
-            className="swiper-breathe !px-5"
+            className="training-formats-swiper swiper-breathe !px-5"
           >
             {formats.map((entry) => (
               <SwiperSlide key={`${entry.kind}-${entry.item.id}`} className="!h-auto">
@@ -198,7 +198,7 @@ export function TrainingPage({ dto }: { dto: TrainingPageDTO }) {
                 1024: { slidesPerView: 4 },
                 1280: { slidesPerView: 4 },
               }}
-              className="coaches-swiper swiper-breathe !px-5 md:!px-0"
+              className="coaches-swiper training-coaches-swiper swiper-breathe !px-5 md:!px-0"
             >
               {coaches.map((coach) => (
                 <SwiperSlide key={coach.id} className="!h-auto">

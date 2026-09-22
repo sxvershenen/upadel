@@ -22,14 +22,24 @@ const content = {
 
 test('hero CTAs have one SSR entrance owner and no nested GSAP reveal', () => {
   const html = renderToStaticMarkup(<ContentProvider content={content}><Hero /></ContentProvider>)
-  const actions = html.match(/<div data-hero-cta="(?:primary|secondary)"[\s\S]*?<\/div>/g) ?? []
-  assert.equal(actions.length, 2)
-  actions.forEach((action) => {
-    assert.match(action, /<button/)
-    assert.doesNotMatch(action, /data-gsap-reveal/)
-  })
-  assert.match(actions[0], /Забронировать/)
-  assert.match(actions[1], /Попробовать/)
+  const primary = html.match(/<div data-hero-cta="primary"[\s\S]*?<\/div>/)?.[0] ?? ''
+  const secondary = html.match(/<button[^>]*data-hero-cta="secondary"[^>]*>[\s\S]*?Попробовать[\s\S]*?<\/button>/)?.[0] ?? ''
+  assert.match(primary, /<button/)
+  assert.match(primary, /Забронировать/)
+  assert.doesNotMatch(primary, /data-gsap-reveal/)
+  assert.match(secondary, /glass/)
+  assert.doesNotMatch(secondary, /data-gsap-reveal/)
+  assert.doesNotMatch(html, /<div data-hero-cta="secondary"/)
+})
+
+test('glass hero CTA animates its own backdrop-filter layer', () => {
+  const css = readFileSync(new URL('../index.css', import.meta.url), 'utf8')
+  const glassKeyframes = css.match(/@keyframes unlim-enter-glass \{([\s\S]*?)\n\}/)?.[1]
+  const secondaryRule = css.match(/\[data-hero-cta="secondary"\] \{([\s\S]*?)\n  \}/)?.[1]
+
+  assert.match(glassKeyframes ?? '', /translate3d\(0, 0, 0\)/)
+  assert.match(secondaryRule ?? '', /animation: unlim-enter-glass/)
+  assert.match(secondaryRule ?? '', /will-change: opacity, transform, backdrop-filter/)
 })
 
 test('mobile hero parallax falls back to desktop media when no mobile asset is configured', () => {

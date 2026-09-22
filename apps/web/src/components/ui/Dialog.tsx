@@ -68,7 +68,7 @@ export function Dialog({ open, onClose, title, children, scrollable = true, mobi
   if (typeof document === "undefined") return null;
   return createPortal(
     <AnimatePresence initial={false}>
-      {open && <motion.div initial="closed" animate="open" exit="closed" variants={presenceVariants} className="fixed inset-0 z-[100] flex items-end justify-center p-0 md:items-center md:p-6">
+      {open && <motion.div initial="closed" animate="open" exit="closed" variants={presenceVariants} className="fixed inset-x-0 top-0 z-[100] flex h-[100dvh] items-end justify-center p-0 md:items-center md:p-6">
         <motion.button data-cool-mode="off" type="button" aria-label="Закрыть диалог" onClick={onClose} variants={backdropVariants} className="absolute inset-0 bg-ink/55 backdrop-blur-[3px]" />
         <motion.div
           ref={dialogRef}
@@ -79,14 +79,14 @@ export function Dialog({ open, onClose, title, children, scrollable = true, mobi
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
           variants={surfaceVariants}
-          className={`dialog-surface relative z-10 flex w-full flex-col overflow-hidden bg-white md:max-w-[780px] md:p-6 ${mobileTall ? 'max-h-[100svh] p-4 pt-3 md:max-h-[96svh]' : scrollable ? 'max-h-[92svh] p-5 md:max-h-[96svh]' : 'max-h-none p-5'}`}
+          className={`dialog-surface relative z-10 flex w-full flex-col overflow-hidden bg-white md:max-w-[780px] md:p-6 ${mobileTall ? 'max-h-[100dvh] p-4 pt-3 md:max-h-[96dvh]' : scrollable ? 'max-h-[92dvh] p-5 md:max-h-[96dvh]' : 'max-h-[calc(100dvh-12px)] p-5 md:max-h-[96dvh]'}`}
         >
           <div className="mx-auto mb-2 h-1.5 w-10 shrink-0 rounded-full bg-ink/15 md:hidden" />
           <div className={`${mobileTall ? 'mb-3' : 'mb-4'} flex shrink-0 items-start justify-between gap-4 md:mb-5`}>
             <h2 id={titleId} className="type-title-card text-ink">{title}</h2>
             <IconButton ref={closeRef} data-cool-mode="off" size="sm" aria-label="Закрыть" onClick={onClose}><X size={17} /></IconButton>
           </div>
-          <div className={scrollable ? "dialog-scroll min-h-0 flex-1 overflow-x-hidden overflow-y-auto pr-1" : "overflow-visible"}>{children}</div>
+          <div className={scrollable ? "dialog-scroll min-h-0 flex-1 overflow-x-hidden overflow-y-auto pr-1" : "dialog-scroll min-h-0 overflow-x-hidden overflow-y-auto"}>{children}</div>
         </motion.div>
       </motion.div>}
     </AnimatePresence>,

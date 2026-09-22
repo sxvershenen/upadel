@@ -43,7 +43,17 @@ export function CoachCard({ coach, loading = "lazy", reveal = true }: { coach: C
 
     <Dialog open={open} onClose={closeDialog} title={coach.name} scrollable={false}>
       <div className="grid grid-cols-[140px_minmax(0,1fr)] gap-x-4 gap-y-5 md:grid-cols-[240px_minmax(0,1fr)] md:gap-6">
-        <ProgressiveImage media={coach.photo} sizes="(min-width: 768px) 480px, 140px" loading="eager" decoding="async" className="se-3 h-[175px] w-[140px] object-cover md:h-auto md:max-h-[360px] md:w-full" />
+        <img
+          src={coach.photo.url}
+          srcSet={coach.photo.srcSet}
+          sizes={coach.photo.srcSet ? "(min-width: 768px) 480px, 140px" : undefined}
+          width={coach.photo.width ?? undefined}
+          height={coach.photo.height ?? undefined}
+          alt={coach.photo.alt}
+          loading="eager"
+          decoding="async"
+          className="se-3 h-[175px] w-[140px] object-cover md:h-auto md:max-h-[360px] md:w-full"
+        />
         <div className="flex flex-col">
           <Typography role="body" tone="muted">{coach.bio}</Typography>
           <p className="type-caption mt-3 font-medium leading-snug text-lime-deep">{coach.specialization}</p>
