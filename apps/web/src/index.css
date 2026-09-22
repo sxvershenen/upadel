@@ -77,8 +77,11 @@ html[data-route-transition="done"] .route-transition-progress > span { transform
   to { filter: brightness(1); }
 }
 @keyframes unlim-hero-image-reveal {
-  from { filter: brightness(0); transform: scale(1.16); }
-  to { filter: brightness(1); transform: scale(var(--hero-parallax-scale, 1.08)); }
+  0% { filter: brightness(0); transform: scale(calc(var(--hero-parallax-scale, 1.08) + .08)); }
+  55% { filter: brightness(.94); transform: scale(calc(var(--hero-parallax-scale, 1.08) - .006)); }
+  72% { filter: brightness(1); transform: scale(calc(var(--hero-parallax-scale, 1.08) + .006)); }
+  86% { transform: scale(calc(var(--hero-parallax-scale, 1.08) - .002)); }
+  100% { filter: brightness(1); transform: scale(var(--hero-parallax-scale, 1.08)); }
 }
 img[data-progressive-image="loading"],
 img[data-progressive-native="loading"] {
@@ -94,7 +97,7 @@ img[data-progressive-image="fade-loading"] { opacity: 0; }
 img[data-progressive-image="fade-loaded"] { opacity: revert-layer; transition: opacity .4s cubic-bezier(.2,.8,.2,1); }
 @media (prefers-reduced-motion: no-preference) {
   [data-hero-parallax-media] { transform: scale(var(--hero-parallax-scale, 1.08)); transform-origin: 50% 50%; will-change: transform; }
-  [data-hero-parallax-media][data-progressive-image="loaded"] { animation: unlim-hero-image-reveal 1.3s ease-in-out both; }
+  [data-hero-parallax-media][data-progressive-image="loaded"] { animation: unlim-hero-image-reveal 1.3s linear both; }
   [data-hero-word] {
     animation: unlim-enter-word .7s cubic-bezier(.16, 1, .3, 1) backwards;
     animation-delay: calc(var(--hero-word-index, 0) * 45ms);
