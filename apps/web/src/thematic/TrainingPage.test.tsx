@@ -199,7 +199,9 @@ test('training swipers keep the mobile gutter and hint separate from Swiper stat
   assert.match(css, /\.swiper-hint-playing > \.swiper > \.swiper-wrapper \{ animation: swiper-swipe-hint/)
   assert.doesNotMatch(css, /\.training-formats-swiper[^\{]*\{[^}]*translateZ/)
   assert.doesNotMatch(coachSource, /useImageParallax|style=\{\{ y: photoY \}\}/)
-  assert.match(css, /\[data-coach-card="true"\] \[data-parallax-layer\][\s\S]*?transform: none !important/)
+  assert.doesNotMatch(coachSource, /data-parallax-viewport|data-parallax-layer/)
+  assert.match(coachSource, /<ProgressiveImage skeleton=\{false\} ref=\{photoImageRef\}/)
+  assert.match(css, /\[data-coach-card="true"\] img \{[\s\S]*?transform: none !important/)
 })
 
 test('coach dialog reuses the loaded photo without a second progressive reveal and fits the dynamic viewport', () => {

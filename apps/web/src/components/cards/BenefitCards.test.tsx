@@ -5,6 +5,7 @@ import React from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 
 import { BenefitCard } from './BenefitCards'
+import { ImageCard } from '../ui/Card'
 
 const baseBenefit = {
   id: 'benefit',
@@ -73,5 +74,32 @@ test('UI kit overlay previews use the production overlay element', () => {
   const kitSource = readFileSync(new URL('../../ui-kit/UiKitPage.tsx', import.meta.url), 'utf8')
   const overlays = readFileSync(new URL('../../styles/surfaces.css', import.meta.url), 'utf8')
   assert.match(kitSource, /overlayTones\.map\(\(overlay\) =>[\s\S]*?data-image-overlay=\{overlay\}/)
+  assert.match(kitSource, /overlayTones\.map\(\(overlay\) =>[\s\S]*?data-linear-overlay="true"/)
   assert.match(overlays, /\[data-image-overlay="overlay-blue"\] \{ background:/)
+})
+
+test('mobile photo benefits and training cards use a flat image and the scoped linear palette', () => {
+  const benefit = renderToStaticMarkup(<BenefitCard benefit={{
+    ...baseBenefit,
+    variant: 'chill',
+    title: 'Еда и напитки',
+    media: { url: '/food.webp', alt: 'Еда и напитки', mimeType: 'image/webp' },
+    overlay: 'overlay-sunset',
+  } as any} mobile />)
+  const flatCard = renderToStaticMarkup(<ImageCard src="/training.webp" alt="Тренировка" overlay="overlay-blue" staticMedia fadeImage reveal={false} interactive={false} data-linear-overlay="true" />)
+  const styles = readFileSync(new URL('../../styles/surfaces.css', import.meta.url), 'utf8')
+  const trainingSource = readFileSync(new URL('./TrainingCard.tsx', import.meta.url), 'utf8')
+  const sectionSource = readFileSync(new URL('../../sections/Benefits.tsx', import.meta.url), 'utf8')
+
+  for (const html of [benefit, flatCard]) {
+    assert.match(html, /data-linear-overlay="true"/)
+    assert.match(html, /data-progressive-image="fade-loading"/)
+    assert.doesNotMatch(html, /data-parallax-viewport|data-parallax-layer|data-gsap-reveal=/)
+  }
+  assert.match(trainingSource, /data-linear-overlay="true" fadeImage staticMedia=\{!interactive\}/)
+  assert.match(sectionSource, /<BenefitCard benefit=\{card\} mobile \/>/)
+  for (const tone of ['lime', 'blue', 'cyan', 'violet', 'sunset', 'emerald', 'dark']) {
+    assert.match(styles, new RegExp(`\\[data-linear-overlay="true"\\] \\[data-image-overlay="overlay-${tone}"\\] \\{ background: linear-gradient\\(to bottom, transparent 0%,`))
+  }
+  assert.match(styles, /\[data-linear-overlay="true"\] \[data-image-overlay="overlay-blue"\] \{ background: linear-gradient\(to bottom, transparent 0%, rgb\(8 18 30 \/ 12%\) 30%, rgb\(0 92 210 \/ 90%\) 70%, #0044dc 100%\)/)
 })

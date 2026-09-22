@@ -25,13 +25,13 @@ function InternalCardTarget({ href, label }: { href: string; label: string }) {
   return <a href={href} aria-label={`Открыть: ${label}`} data-analytics-action="internal" data-analytics-object-type="benefit" data-analytics-object-id={label} className="absolute inset-0 z-20 cursor-pointer rounded-[inherit] focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-[-3px]"><span className="sr-only">{label}</span></a>
 }
 
-export function BenefitCard({ benefit }: { benefit: Benefit }) {
+export function BenefitCard({ benefit, mobile = false }: { benefit: Benefit; mobile?: boolean }) {
   const Icon = iconMap[benefit.variant]
   if (benefit.variant === 'lockers' || benefit.variant === 'shower' || benefit.variant === 'chill') {
     if (!benefit.media) return null
     const objectPosition = benefit.variant === 'lockers' ? 'object-[68%_center]' : benefit.variant === 'shower' ? 'object-[68%_center]' : undefined
     const externalAction = benefit.action.mode === 'external-link' && benefit.action.href ? { href: benefit.action.href, label: benefit.title } : null
-    return <ImageCard media={benefit.media} src={benefit.media.url} alt={benefit.media.alt} overlay={benefit.overlay as ImageOverlay} imgClassName={objectPosition} interactive={Boolean(externalAction)} className="h-full min-h-[320px]">{externalAction && <><ExternalCardTarget {...externalAction} /><span className="pointer-events-none absolute bottom-6 right-6 z-20"><FeatureArrow /></span></>}<div className="flex h-full flex-col justify-between p-6 md:p-7"><Badge tone="outline-light" icon={<Icon size={13} />}>{benefit.eyebrow}</Badge><div className={benefit.variant === 'chill' ? 'max-w-[390px]' : externalAction ? 'max-w-[calc(100%-3.5rem)]' : undefined}><h3 className="type-title-card font-semibold text-white">{benefit.title}</h3><p className="type-body-sm mt-2 max-w-[360px] text-white">{benefit.description}</p></div></div></ImageCard>
+    return <ImageCard data-linear-overlay="true" fadeImage staticMedia={mobile} reveal={false} media={benefit.media} src={benefit.media.url} alt={benefit.media.alt} overlay={benefit.overlay as ImageOverlay} imgClassName={objectPosition} interactive={!mobile && Boolean(externalAction)} className="h-full min-h-[320px]">{externalAction && <><ExternalCardTarget {...externalAction} /><span className="pointer-events-none absolute bottom-6 right-6 z-20"><FeatureArrow /></span></>}<div className="flex h-full flex-col justify-between p-6 md:p-7"><Badge reveal={!mobile} tone="outline-light" icon={<Icon size={13} />}>{benefit.eyebrow}</Badge><div className={benefit.variant === 'chill' ? 'max-w-[390px]' : externalAction ? 'max-w-[calc(100%-3.5rem)]' : undefined}><h3 className="type-title-card font-semibold text-white">{benefit.title}</h3><p className="type-body-sm mt-2 max-w-[360px] text-white">{benefit.description}</p></div></div></ImageCard>
   }
 
   const tone = (benefit.meshTone ?? 'sky') as MeshTone

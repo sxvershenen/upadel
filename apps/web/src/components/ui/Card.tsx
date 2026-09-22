@@ -68,13 +68,31 @@ export interface ImageCardProps extends Omit<HTMLMotionProps<"div">, "children">
   imgClassName?: string;
   children?: ReactNode;
   interactive?: boolean;
+  staticMedia?: boolean;
+  fadeImage?: boolean;
   loading?: "eager" | "lazy";
 }
 
-/** Full-bleed image card with a mandatory colorized overlay. */
-export function ImageCard({ src, alt, media, sizes = "(min-width: 1024px) 50vw, 100vw", overlay, className, children, imgClassName, interactive = true, loading = "lazy", reveal = true, style, ...props }: ImageCardProps & { loading?: "eager" | "lazy"; reveal?: RevealConfig }) {
+function ParallaxCardMedia({ src, alt, media, sizes, imgClassName, interactive, loading, fadeImage }: Pick<ImageCardProps, 'src' | 'alt' | 'media' | 'sizes' | 'imgClassName' | 'interactive' | 'loading' | 'fadeImage'>) {
   const imageRef = useRef<HTMLDivElement>(null);
   const imageY = useImageParallax(imageRef, interactive ? 11 : 0);
+  return <div ref={imageRef} data-parallax-viewport className="parallax-viewport absolute inset-0 z-0">
+    <motion.div
+      initial={interactive ? { clipPath: "inset(0 0 12% 0)" } : undefined}
+      whileInView={interactive ? { clipPath: "inset(0 0 0% 0)" } : undefined}
+      viewport={interactive ? { once: true, amount: 0.2 } : undefined}
+      transition={interactive ? { duration: 0.9, ease: [0.22, 1, 0.36, 1] } : undefined}
+      style={interactive ? { y: imageY } : undefined}
+      data-parallax-layer
+      className="parallax-layer overflow-hidden"
+    >
+      <ProgressiveImage skeleton={!fadeImage} media={media} sizes={sizes} src={src} alt={alt} loading={loading} className={cn("h-full w-full object-cover", imgClassName)} variants={interactive ? imageVariants : undefined} transition={springSoft} />
+    </motion.div>
+  </div>;
+}
+
+/** Full-bleed image card with a mandatory colorized overlay. */
+export function ImageCard({ src, alt, media, sizes = "(min-width: 1024px) 50vw, 100vw", overlay, className, children, imgClassName, interactive = true, staticMedia = false, fadeImage = false, loading = "lazy", reveal = true, style, ...props }: ImageCardProps & { reveal?: RevealConfig }) {
   const revealProps = revealAttributes(reveal, style, true);
   return <motion.div
     {...props}
@@ -87,19 +105,9 @@ export function ImageCard({ src, alt, media, sizes = "(min-width: 1024px) 50vw, 
     transition={interactive ? springSoft : undefined}
     className={cn("group/card group se-3 relative isolate flex flex-col overflow-hidden text-white", interactive && "card-spring cursor-pointer", className)}
   >
-    <div ref={imageRef} data-parallax-viewport className="parallax-viewport absolute inset-0 z-0">
-      <motion.div
-        initial={interactive ? { clipPath: "inset(0 0 12% 0)" } : undefined}
-        whileInView={interactive ? { clipPath: "inset(0 0 0% 0)" } : undefined}
-        viewport={interactive ? { once: true, amount: 0.2 } : undefined}
-        transition={interactive ? { duration: 0.9, ease: [0.22, 1, 0.36, 1] } : undefined}
-        style={interactive ? { y: imageY } : undefined}
-        data-parallax-layer
-        className="parallax-layer overflow-hidden"
-      >
-        <ProgressiveImage media={media} sizes={sizes} src={src} alt={alt} loading={loading} className={cn("h-full w-full object-cover", imgClassName)} variants={interactive ? imageVariants : undefined} transition={springSoft} />
-      </motion.div>
-    </div>
+    {staticMedia
+      ? <ProgressiveImage skeleton={false} media={media} sizes={sizes} src={src} alt={alt} loading={loading} className={cn("absolute inset-0 z-0 h-full w-full object-cover", imgClassName)} />
+      : <ParallaxCardMedia src={src} alt={alt} media={media} sizes={sizes} imgClassName={imgClassName} interactive={interactive} loading={loading} fadeImage={fadeImage} />}
     <div data-image-overlay={overlay} className="pointer-events-none absolute inset-0 z-[1]" aria-hidden="true" />
     <div className="relative z-10 flex h-full flex-col">{children}</div>
   </motion.div>;

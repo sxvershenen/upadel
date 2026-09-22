@@ -223,18 +223,6 @@ html[data-reveal-ready] [data-reveal-visible="true"] [data-reveal-word] { --reve
   contain: none;
   will-change: auto;
 }
-.training-formats-swiper [data-parallax-layer] { will-change: auto; }
-.training-formats-swiper [data-image-overlay] {
-  --training-overlay-mid: rgb(8 22 40 / 70%);
-  --training-overlay-bottom: #051946;
-  background: linear-gradient(to bottom, transparent 0%, rgb(8 18 30 / 12%) 30%, var(--training-overlay-mid) 70%, var(--training-overlay-bottom) 100%);
-}
-.training-formats-swiper [data-image-overlay="overlay-lime"] { --training-overlay-mid: rgb(58 95 15 / 70%); --training-overlay-bottom: #203808; }
-.training-formats-swiper [data-image-overlay="overlay-cyan"] { --training-overlay-mid: rgb(8 70 85 / 70%); --training-overlay-bottom: #052f39; }
-.training-formats-swiper [data-image-overlay="overlay-violet"] { --training-overlay-mid: rgb(75 25 120 / 70%); --training-overlay-bottom: #2a0c46; }
-.training-formats-swiper [data-image-overlay="overlay-sunset"] { --training-overlay-mid: rgb(145 55 10 / 70%); --training-overlay-bottom: #5a1e05; }
-.training-formats-swiper [data-image-overlay="overlay-emerald"] { --training-overlay-mid: rgb(8 75 50 / 70%); --training-overlay-bottom: #052d20; }
-.training-formats-swiper [data-image-overlay="overlay-dark"] { --training-overlay-mid: rgb(2 5 9 / 78%); --training-overlay-bottom: #020509; }
 .benefits-swiper [data-image-card="true"] {
   -webkit-mask-image: none;
   contain: none;
@@ -243,7 +231,6 @@ html[data-reveal-ready] [data-reveal-visible="true"] [data-reveal-word] { --reve
 .benefits-swiper [data-image-overlay] { transform: none; }
 @media (hover: none), (pointer: coarse) {
   [data-coach-card="true"] [data-coach-surface="true"],
-  [data-coach-card="true"] [data-parallax-layer],
   [data-coach-card="true"] img {
     transform: none !important;
     will-change: auto !important;
