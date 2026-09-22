@@ -297,8 +297,8 @@ test('TournamentDetailPage renders level range and omits club address', () => {
   assert.doesNotMatch(passportHtml, /Новорижское шоссе/)
   assert.doesNotMatch(passportHtml, /Адрес/)
 
-  // 3. No horizontal scroll wrapper
-  assert.doesNotMatch(html, /overflow-x-auto/)
+  // 3. Only the shared Tabs atom may scroll; standings keep the mobile layout.
+  assert.equal(html.match(/overflow-x-auto/g)?.length, 1)
 })
 
 test('TournamentDetailPage renders pairs cleanly in participants and standings', () => {
@@ -338,6 +338,8 @@ test('TournamentDetailPage renders 3 competition tabs and 4 collapsible left sec
   )
 
   // 3 tabs in competition module
+  assert.match(html, /aria-label="Вкладки соревнования"/)
+  assert.match(html, /w-full sm:w-auto/)
   assert.match(html, /Участники/)
   assert.match(html, /Итоги/)
   assert.match(html, /Распределение призов/)

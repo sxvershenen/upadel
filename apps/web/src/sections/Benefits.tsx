@@ -24,6 +24,6 @@ export function Benefits() {
       {cards.map((card, index) => <Reveal key={card.id} delay={index * 0.05} className={card.variant === "kids-wide" ? "lg:col-span-2 lg:row-span-1" : "lg:col-span-1 lg:row-span-1"}><BenefitCard benefit={card} /></Reveal>)}
     </Reveal>
 
-    <div ref={swipeHintRef} className="-mx-5 lg:hidden"><Swiper {...horizontalSwiperProps} onSwiper={(swiper) => { swiperRef.current = swiper; setAtStart(swiper.isBeginning); setAtEnd(swiper.isEnd); }} onSlideChange={(swiper) => { setAtStart(swiper.isBeginning); setAtEnd(swiper.isEnd); }} onResize={(swiper) => { setAtStart(swiper.isBeginning); setAtEnd(swiper.isEnd); }} slidesPerView={1} spaceBetween={12} className="swiper-breathe !px-5">{cards.map((card) => <SwiperSlide key={card.id} className="!h-auto"><div className="h-full min-h-[320px]"><BenefitCard benefit={card} /></div></SwiperSlide>)}</Swiper></div>
+    <div ref={swipeHintRef} className="-mx-5 lg:hidden"><Swiper {...horizontalSwiperProps} onSwiper={(swiper) => { swiperRef.current = swiper; setAtStart(swiper.isBeginning); setAtEnd(swiper.isEnd); }} onSlideChange={(swiper) => { setAtStart(swiper.isBeginning); setAtEnd(swiper.isEnd); }} onResize={(swiper) => { setAtStart(swiper.isBeginning); setAtEnd(swiper.isEnd); }} slidesPerView={1} spaceBetween={12} className="benefits-swiper swiper-breathe !px-5">{cards.map((card) => <SwiperSlide key={card.id} className="!h-auto"><div className="h-full min-h-[320px]"><BenefitCard benefit={card} /></div></SwiperSlide>)}</Swiper></div>
   </section>;
 }

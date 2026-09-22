@@ -205,6 +205,23 @@ html[data-reveal-ready] [data-reveal-visible="true"] [data-reveal-word] { --reve
   transform: translateZ(0);
   -webkit-mask-image: none;
 }
+.benefits-swiper .swiper-slide,
+.benefits-swiper [data-gsap-reveal-boundary="true"] {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+}
+.benefits-swiper [data-gsap-reveal-boundary="true"] {
+  contain: paint;
+  -webkit-mask-image: none;
+}
+.benefits-swiper [data-gsap-reveal-boundary="true"]::after,
+.benefits-swiper [data-parallax-viewport],
+.benefits-swiper [data-parallax-layer] {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
 @media (min-width: 640px) { .coaches-swiper:not(.swiper-initialized) .swiper-slide { width: calc((100% - 19.2px) / 2.2); } }
 @media (min-width: 1024px) { .coaches-swiper:not(.swiper-initialized) .swiper-slide { width: calc((100% - 48px) / 4); } }
 

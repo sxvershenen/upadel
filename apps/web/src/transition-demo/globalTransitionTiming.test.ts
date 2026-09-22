@@ -16,7 +16,7 @@ function deferred() {
 function harness(context: TestContext, available = true, reduced = false) {
   const hooks = new Map<string, () => unknown>()
   const tweens: { duration: number; finish: () => void; interrupt: () => void }[] = []
-  const flights: ReturnType<typeof deferred>[] = []
+  const flights: { apex: ReturnType<typeof deferred>; complete: ReturnType<typeof deferred> }[] = []
   const durations: number[] = []
   let visible = false
   let cancelled = 0
@@ -24,15 +24,16 @@ function harness(context: TestContext, available = true, reduced = false) {
     startFlight(_trajectory, duration) {
       if (!available) return null
       durations.push(duration)
-      const flight = deferred()
+      const flight = { apex: deferred(), complete: deferred() }
       flights.push(flight)
       visible = true
-      return flight.promise
+      return { apex: flight.apex.promise, complete: flight.complete.promise }
     },
     cancel() {
       cancelled += 1
       visible = false
-      flights.at(-1)?.resolve()
+      flights.at(-1)?.apex.resolve()
+      flights.at(-1)?.complete.resolve()
     },
   }
   const surface = {}
@@ -73,7 +74,8 @@ function harness(context: TestContext, available = true, reduced = false) {
   context.after(dispose)
   return {
     emit: (name: string) => hooks.get(name)?.(), hooks, dispose, tweens, flights, durations, audio,
-    finishFlight() { visible = false; flights.at(-1)!.resolve() },
+    reachApex() { flights.at(-1)!.apex.resolve() },
+    finishFlight() { visible = false; flights.at(-1)!.apex.resolve(); flights.at(-1)!.complete.resolve() },
     isVisible: () => visible,
     cancellations: () => cancelled,
     removeScene: () => { currentScene = null },
@@ -82,26 +84,25 @@ function harness(context: TestContext, available = true, reduced = false) {
 
 const flush = async () => { await new Promise<void>((resolve) => queueMicrotask(resolve)) }
 
-test('DOM replacement waits past the 340ms surface exit until the 980ms ball has cleared', async (context) => {
+test('DOM replacement happens at the ball apex and the new page enters during the second half', async (context) => {
   const h = harness(context)
   h.emit('animation:out:start')
   let replaced = false
-  const out = Promise.resolve(h.emit('animation:out:await')).then(() => {
-    assert.equal(h.isVisible(), false, 'destination hydration must never start with a visible ball')
-    replaced = true
-  })
+  const out = Promise.resolve(h.emit('animation:out:await')).then(() => { replaced = true })
   assert.deepEqual(h.durations, [980])
-  assert.equal(h.tweens[0].duration, 0.34)
+  assert.equal(h.tweens[0].duration, 0.49)
   h.tweens[0].finish()
   await flush()
   assert.equal(replaced, false)
-  h.finishFlight()
+  h.reachApex()
   await out
   assert.equal(replaced, true)
+  assert.equal(h.isVisible(), true, 'the ball continues through the destination entrance')
   const enter = h.emit('animation:in:await')
-  assert.equal(h.tweens[1].duration, 0.2, 'flight plus reveal stays at 1180ms, excluding content work')
+  assert.equal(h.tweens[1].duration, 0.49)
   h.tweens[1].finish()
   await enter
+  h.finishFlight()
   assert.equal(h.audio.mock.callCount(), 1)
 })
 
@@ -165,10 +166,10 @@ for (const reason of ['visit:abort', 'visit:fail', 'dispose']) {
     let replaced = false
     const nextOut = Promise.resolve(h.emit('animation:out:await')).then(() => { replaced = true })
     h.tweens[1].finish()
-    h.flights[0].resolve() // a stale completion must not release the new flight
+    h.flights[0].apex.resolve() // a stale apex must not release the new flight
     await flush()
     assert.equal(replaced, false)
-    h.finishFlight()
+    h.reachApex()
     await nextOut
   })
 }

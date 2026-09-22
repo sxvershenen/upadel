@@ -12,6 +12,8 @@ import { beginTransitionProgress, completeTransitionProgress } from './transitio
 import { cancelBrowserIdle, createPostNavigationSceneLoader, scheduleBrowserIdle } from './postNavigationScene'
 
 const duration = 980
+const apexProgress = 0.5
+const surfacePhaseDuration = duration * apexProgress / 1000
 
 function getSurface() {
   const surface = document.querySelector<HTMLElement>('#swup')
@@ -44,7 +46,7 @@ function animateOut() {
     opacity: 0.2,
     y: -18,
     scale: 1.02,
-    duration: 0.34,
+    duration: surfacePhaseDuration,
     ease: 'power2.in',
     onInterrupt: () => clearTransitionStyles(surface),
   }))
@@ -58,8 +60,8 @@ function animateIn(flightPlayed = false) {
     opacity: 1,
     y: 0,
     scale: 1,
-    // The flight already provides the long visual beat; keep the reveal brief.
-    duration: flightPlayed ? 0.2 : 0.64,
+    // With a flight, the destination enters throughout the post-apex half.
+    duration: flightPlayed ? surfacePhaseDuration : 0.64,
     ease: 'power4.out',
     onComplete: () => clearTransitionStyles(surface),
     onInterrupt: () => clearTransitionStyles(surface),
@@ -69,7 +71,7 @@ function animateIn(flightPlayed = false) {
 type BallSceneComponent = ForwardRefExoticComponent<RefAttributes<ReferenceBallSceneHandle>>
 
 export function installPageTransitionAnimations(swup: Pick<Swup, 'hooks'>, getScene: () => ReferenceBallSceneHandle | null) {
-  let flight: Promise<void> | null = null
+  let flight: ReturnType<ReferenceBallSceneHandle['startFlight']> = null
   let flightPlayed = false
   const cancel = () => {
     getScene()?.cancel()
@@ -85,10 +87,10 @@ export function installPageTransitionAnimations(swup: Pick<Swup, 'hooks'>, getSc
       flightPlayed = flight !== null
       if (flightPlayed) transitionAudio.playWhoosh(duration / 1000)
     }),
-    // Swup awaits this before content:replace, including head/scripts plugins
-    // and Astro hydration. The renderer settles only after clearing the ball.
+    // Replace at the trajectory apex. The destination entrance then overlaps
+    // the post-apex half instead of appearing after the ball has disappeared.
     swup.hooks.replace('animation:out:await', async () => {
-      await Promise.all([flight, animateOut()])
+      await Promise.all([flight?.apex, animateOut()])
     }),
     swup.hooks.replace('animation:in:await', () => animateIn(flightPlayed)),
     swup.hooks.on('visit:abort', cancel),

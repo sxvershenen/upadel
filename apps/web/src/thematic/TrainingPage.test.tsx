@@ -188,6 +188,10 @@ test('coach dialog reuses the loaded photo without a second progressive reveal a
 
   assert.match(dialogMarkup, /<img/)
   assert.doesNotMatch(dialogMarkup, /<ProgressiveImage/)
+  assert.match(coachCardSource, /image\?\.currentSrc \|\| image\?\.src \|\| coach\.photo\.url/)
+  assert.doesNotMatch(dialogMarkup, /srcSet=/)
+  assert.match(dialogSource, /useLayoutEffect/)
+  assert.match(dialogSource, /focus\(\{ preventScroll: true \}\)/)
   assert.match(dialogSource, /h-\[100dvh\]/)
   assert.match(dialogSource, /max-h-\[calc\(100dvh-12px\)\]/)
 })

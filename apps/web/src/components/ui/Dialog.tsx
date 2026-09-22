@@ -1,12 +1,12 @@
-import { useEffect, useId, useRef, type KeyboardEvent, type ReactNode, type TouchEvent } from "react";
+import { useId, useLayoutEffect, useRef, type KeyboardEvent, type ReactNode, type TouchEvent } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { IconButton } from "./Button";
 
 const presenceVariants = {
-  closed: { opacity: 0.999, transition: { when: "afterChildren" as const, duration: 0.01 } },
-  open: { opacity: 1, transition: { when: "beforeChildren" as const, duration: 0.01 } },
+  closed: { transition: { when: "afterChildren" as const } },
+  open: { transition: { when: "beforeChildren" as const } },
 };
 const backdropVariants = {
   closed: { opacity: 0, transition: { duration: 0.22 } },
@@ -23,19 +23,21 @@ export function Dialog({ open, onClose, title, children, scrollable = true, mobi
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const titleId = useId();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!open) return;
     const previousFocus = document.activeElement as HTMLElement | null;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    const frame = requestAnimationFrame(() => closeRef.current?.focus());
+    document.documentElement.dataset.dialogOpen = "true";
+    const frame = requestAnimationFrame(() => closeRef.current?.focus({ preventScroll: true }));
     const escape = (event: globalThis.KeyboardEvent) => { if (event.key === "Escape") onClose(); };
     document.addEventListener("keydown", escape);
     return () => {
       cancelAnimationFrame(frame);
       document.removeEventListener("keydown", escape);
       document.body.style.overflow = previousOverflow;
-      previousFocus?.focus();
+      delete document.documentElement.dataset.dialogOpen;
+      previousFocus?.focus({ preventScroll: true });
     };
   }, [open, onClose]);
 
@@ -69,7 +71,7 @@ export function Dialog({ open, onClose, title, children, scrollable = true, mobi
   return createPortal(
     <AnimatePresence initial={false}>
       {open && <motion.div initial="closed" animate="open" exit="closed" variants={presenceVariants} className="fixed inset-x-0 top-0 z-[100] flex h-[100dvh] items-end justify-center p-0 md:items-center md:p-6">
-        <motion.button data-cool-mode="off" type="button" aria-label="Закрыть диалог" onClick={onClose} variants={backdropVariants} className="absolute inset-0 bg-ink/55 backdrop-blur-[3px]" />
+        <motion.button data-cool-mode="off" type="button" aria-label="Закрыть диалог" onClick={onClose} variants={backdropVariants} className="absolute inset-0 bg-ink/60 [backface-visibility:hidden]" />
         <motion.div
           ref={dialogRef}
           role="dialog"
@@ -79,6 +81,7 @@ export function Dialog({ open, onClose, title, children, scrollable = true, mobi
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
           variants={surfaceVariants}
+          data-dialog-surface="true"
           className={`dialog-surface relative z-10 flex w-full flex-col overflow-hidden bg-white md:max-w-[780px] md:p-6 ${mobileTall ? 'max-h-[100dvh] p-4 pt-3 md:max-h-[96dvh]' : scrollable ? 'max-h-[92dvh] p-5 md:max-h-[96dvh]' : 'max-h-[calc(100dvh-12px)] p-5 md:max-h-[96dvh]'}`}
         >
           <div className="mx-auto mb-2 h-1.5 w-10 shrink-0 rounded-full bg-ink/15 md:hidden" />

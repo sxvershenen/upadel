@@ -4,8 +4,9 @@ import type { ReferenceTrajectory } from './referenceTrajectories'
 import { WebGL2BallRenderer } from './webgl2BallRenderer'
 
 export interface ReferenceBallSceneHandle {
-  // Null means unavailable; a flight settles on completion or cancellation.
-  startFlight: (trajectory: ReferenceTrajectory, duration: number) => Promise<void> | null
+  // Null means unavailable. Both barriers settle on cancellation so navigation
+  // can never deadlock when WebGL is interrupted.
+  startFlight: (trajectory: ReferenceTrajectory, duration: number) => { apex: Promise<void>; complete: Promise<void> } | null
   cancel: () => void
 }
 
@@ -20,11 +21,11 @@ export const ReferenceBallScene = forwardRef<ReferenceBallSceneHandle>(function 
       const renderer = rendererRef.current
       if (!renderer) return null
       const flight = renderer.startFlight(trajectory, duration)
-      flightRef.current = flight
       if (!flight) return null
+      flightRef.current = flight.complete
       if (mountRef.current) mountRef.current.dataset.flightActive = 'true'
-      void flight.then(() => {
-        if (flightRef.current !== flight) return
+      void flight.complete.then(() => {
+        if (flightRef.current !== flight.complete) return
         flightRef.current = null
         if (mountRef.current) {
           delete mountRef.current.dataset.flightActive

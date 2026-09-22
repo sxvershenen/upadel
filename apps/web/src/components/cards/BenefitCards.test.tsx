@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import test from 'node:test'
 import React from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
@@ -51,4 +52,13 @@ test('kids card is an internal link to the training page', () => {
   assert.match(html, /aria-label="Открыть: Секции для детей с 5 лет"/)
   assert.doesNotMatch(html, /href="#training"/)
   assert.match(html, /cursor-pointer/)
+})
+
+test('mobile benefits swiper keeps image overlays in a stable Safari paint layer', () => {
+  const sectionSource = readFileSync(new URL('../../sections/Benefits.tsx', import.meta.url), 'utf8')
+  const css = readFileSync(new URL('../../index.css', import.meta.url), 'utf8')
+
+  assert.match(sectionSource, /benefits-swiper/)
+  assert.match(css, /\.benefits-swiper \[data-gsap-reveal-boundary="true"\][\s\S]*?contain: paint;[\s\S]*?-webkit-mask-image: none;/)
+  assert.match(css, /\.benefits-swiper \[data-gsap-reveal-boundary="true"\]::after/)
 })

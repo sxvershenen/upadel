@@ -74,7 +74,9 @@ export class WebGL2BallRenderer {
 
   private activeFlight: { duration: number; startedAt: number; trajectory: ReferenceTrajectory } | null = null
   private animationFrame: number | null = null
+  private flightApexDeadline: ReturnType<typeof setTimeout> | null = null
   private flightDeadline: ReturnType<typeof setTimeout> | null = null
+  private settleApex: (() => void) | null = null
   private settleFlight: (() => void) | null = null
   private contextLost = false
   private readonly ballIndexCount: number
@@ -149,12 +151,14 @@ export class WebGL2BallRenderer {
     if (this.destroyed || this.contextLost) return null
     this.cancelFlight()
     if (!Number.isFinite(duration) || duration <= 0) return null
-    const completion = new Promise<void>((resolve) => { this.settleFlight = resolve })
+    const apex = new Promise<void>((resolve) => { this.settleApex = resolve })
+    const complete = new Promise<void>((resolve) => { this.settleFlight = resolve })
     this.activeFlight = { duration, startedAt: performance.now(), trajectory }
     this.trailHistory.length = 0
     this.resetFrameTiming()
     // A suspended RAF (background tab / lost context) must not deadlock Swup.
     // Clear/cancel before releasing the waiter, even if the final RAF never ran.
+    this.flightApexDeadline = setTimeout(() => this.releaseApex(), duration * 0.5)
     this.flightDeadline = setTimeout(() => this.cancelFlight(), duration + 250)
     try {
       this.resize()
@@ -162,7 +166,7 @@ export class WebGL2BallRenderer {
     } catch {
       this.cancelFlight()
     }
-    return completion
+    return { apex, complete }
   }
 
   cancelFlight() {
@@ -171,15 +175,26 @@ export class WebGL2BallRenderer {
     this.resetFrameTiming()
     if (this.animationFrame !== null) cancelAnimationFrame(this.animationFrame)
     this.animationFrame = null
+    if (this.flightApexDeadline !== null) clearTimeout(this.flightApexDeadline)
+    this.flightApexDeadline = null
     if (this.flightDeadline !== null) clearTimeout(this.flightDeadline)
     this.flightDeadline = null
     try {
       this.clear()
     } finally {
+      this.releaseApex()
       const settle = this.settleFlight
       this.settleFlight = null
       settle?.()
     }
+  }
+
+  private releaseApex() {
+    if (this.flightApexDeadline !== null) clearTimeout(this.flightApexDeadline)
+    this.flightApexDeadline = null
+    const settle = this.settleApex
+    this.settleApex = null
+    settle?.()
   }
 
   resize() {

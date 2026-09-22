@@ -282,7 +282,8 @@ test('flight promise settles only after the final frame clears and removes the R
   context.mock.timers.enable({ apis: ['setTimeout'] })
   const { renderer, calls, frames, step } = rendererHarness(context, true)
   let settled = false
-  const flight = renderer.startFlight(trajectory, 1000)!.then(() => {
+  const signal = renderer.startFlight(trajectory, 1000)!
+  const flight = signal.complete.then(() => {
     settled = true
     assert.equal(frames.size, 0)
     assert.equal(calls.at(-1)!.name, 'clear')
@@ -300,12 +301,34 @@ test('flight promise settles only after the final frame clears and removes the R
   assert.equal(calls.length, afterCompletion, 'normal completion removes the fallback timer')
 })
 
+test('apex barrier releases halfway through the flight without clearing the ball', async (context) => {
+  context.mock.timers.enable({ apis: ['setTimeout'] })
+  const { renderer, frames } = rendererHarness(context, true)
+  const signal = renderer.startFlight(trajectory, 1000)!
+  let apexReached = false
+  let completed = false
+  void signal.apex.then(() => { apexReached = true })
+  void signal.complete.then(() => { completed = true })
+
+  context.mock.timers.tick(499)
+  await Promise.resolve()
+  assert.equal(apexReached, false)
+  context.mock.timers.tick(1)
+  await signal.apex
+  assert.equal(apexReached, true)
+  assert.equal(completed, false)
+  assert.equal(frames.size, 1)
+
+  renderer.cancelFlight()
+  await signal.complete
+})
+
 test('suspended RAF cancels and clears before releasing the navigation barrier', async (context) => {
   context.mock.timers.enable({ apis: ['setTimeout'] })
   const { renderer, calls, frames } = rendererHarness(context, true)
   let completed = 0
   renderer.onComplete = () => { completed += 1 }
-  const flight = renderer.startFlight(trajectory, 980)
+  const flight = renderer.startFlight(trajectory, 980)!.complete
   context.mock.timers.tick(1229)
   assert.equal(frames.size, 1)
   context.mock.timers.tick(1)
@@ -320,11 +343,11 @@ test('replacement settles the old flight and its stale deadline cannot cancel th
   const { renderer, frames } = rendererHarness(context, true)
   const oldFlight = renderer.startFlight(trajectory, 1000)
   const nextFlight = renderer.startFlight(trajectory, 2000)
-  await oldFlight
+  await oldFlight!.complete
   context.mock.timers.tick(1250)
   assert.equal(frames.size, 1)
   renderer.cancelFlight()
-  await nextFlight
+  await nextFlight!.complete
   assert.equal(frames.size, 0)
 })
 
@@ -339,7 +362,7 @@ for (const reason of ['context loss', 'destroy', 'render error'] as const) {
       context.mock.method(gl, 'drawElements', () => { throw new Error('driver failure') })
       step(400)
     }
-    await flight
+    await flight!.complete
     assert.equal(frames.size, 0)
     if (reason !== 'render error') assert.equal(renderer.startFlight(trajectory), null)
   })
@@ -350,7 +373,7 @@ test('invalid duration cancels any old flight without scheduling a new one', asy
   for (const duration of [0, -1, NaN, Infinity]) {
     const pending = renderer.startFlight(trajectory)
     assert.equal(renderer.startFlight(trajectory, duration), null)
-    await pending
+    await pending!.complete
     assert.equal(frames.size, 0)
   }
 })

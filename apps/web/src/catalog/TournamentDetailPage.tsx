@@ -31,6 +31,7 @@ import { ButtonLink } from '../components/ui/Button'
 import { ImageCard, MeshCard, type ImageOverlay, type MeshTone } from '../components/ui/Card'
 import { SectionAction, SectionHeader } from '../components/ui/SectionHeader'
 import { Reveal } from '../components/ui/Reveal'
+import { Tabs } from '../components/ui/Tabs'
 import { cn } from '../utils/cn'
 
 export function AnimatedAccordionItem({
@@ -447,39 +448,24 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
         <section aria-label="Участники и результаты">
           <SectionHeader
             title={typograph('Турнир')}
-            className="!flex-nowrap items-end justify-between gap-2 sm:gap-6 mb-6"
+            className="mb-6 !grid grid-cols-1 items-stretch gap-4 sm:flex sm:items-end sm:gap-6"
             titleClassName="type-section font-semibold text-ink leading-tight"
-            actionClassName="ml-auto shrink-0"
+            actionClassName="!ml-0 w-full shrink-0 sm:!ml-auto sm:w-auto"
             action={
-              <div role="tablist" aria-label="Вкладки соревнования" className="se-2 inline-flex h-[36px] sm:h-[40px] items-center bg-control p-0.5 sm:p-1 gap-0.5 sm:gap-1 shrink-0">
-                {(
-                  [
-                    { id: 'participants', label: 'Участники' },
-                    { id: 'standings', label: 'Итоги' },
-                    { id: 'prizes', label: 'Призы' },
-                  ] as const
-                ).map((tab) => {
-                  const active = activeTab === tab.id
-                  return (
-                    <button
-                      key={tab.id}
-                      role="tab"
-                      type="button"
-                      aria-selected={active}
-                      aria-controls={`tab-${tab.id}`}
-                      onClick={() => setActiveTab(tab.id)}
-                      className={cn(
-                        'se-1 px-2.5 sm:px-4 py-1 sm:py-2 type-ui font-medium transition-colors cursor-pointer whitespace-nowrap text-xs sm:text-sm',
-                        active
-                          ? 'bg-ink text-white shadow-xs font-semibold'
-                          : 'text-ink-soft hover:text-ink'
-                      )}
-                    >
-                      {tab.label}
-                    </button>
-                  )
-                })}
-              </div>
+              <Tabs
+                reveal={false}
+                fullWidth
+                layoutId="tournament-competition-tabs"
+                aria-label="Вкладки соревнования"
+                tabs={[
+                  { id: 'participants', label: 'Участники', panelId: 'tab-participants' },
+                  { id: 'standings', label: 'Итоги', panelId: 'tab-standings' },
+                  { id: 'prizes', label: 'Призы', panelId: 'tab-prizes' },
+                ]}
+                value={activeTab}
+                onChange={setActiveTab}
+                className="w-full sm:w-auto sm:[&>button]:flex-none"
+              />
             }
           />
 
