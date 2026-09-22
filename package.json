@@ -21,7 +21,8 @@
     "analytics:maintain": "npm run analytics:maintain --workspace @unlim/cms",
     "test:analytics:db": "npm run test:analytics:db --workspace @unlim/cms",
     "test:analytics": "npm run test:analytics --workspace @unlim/cms",
-    "test:integrations": "npm run test:integrations --workspaces --if-present"
+    "test:integrations": "npm run test:integrations --workspaces --if-present",
+    "test:content:db": "npm run test:content:db --workspace @unlim/cms"
   },
   "engines": {
     "node": ">=22.12.0",

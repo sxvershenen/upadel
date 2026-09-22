@@ -17,14 +17,16 @@
     "analytics:maintain": "cross-env NODE_OPTIONS=--no-deprecation payload run src/scripts/analyticsMaintenance.ts",
     "test:analytics:db": "cross-env NODE_OPTIONS=--no-deprecation payload run src/scripts/analyticsIntegration.ts",
     "test:analytics": "node --import tsx --test src/analytics/*.test.ts ../web/src/analytics/*.test.ts",
-    "test:integrations": "node --import tsx --test src/integrations/validation.test.ts src/notifications/leadNotifications.test.ts src/collections/*.test.ts src/uploads/*.test.ts src/pageMap/*.test.ts src/content/*.test.ts src/config/*.test.ts src/components/admin/mediaDrawerSelection.test.ts src/lib/mediaUsage.test.ts src/globals/ThematicPages.test.ts"
+    "test:integrations": "node --import tsx --test src/integrations/validation.test.ts src/notifications/leadNotifications.test.ts src/collections/*.test.ts src/uploads/*.test.ts src/pageMap/*.test.ts src/content/*.test.ts src/config/*.test.ts src/components/admin/mediaDrawerSelection.test.ts src/lib/mediaUsage.test.ts src/globals/ThematicPages.test.ts src/leads/*.test.ts src/components/admin/AdminToolsNav.test.ts src/components/admin/adminRequestCache.test.ts",
+    "media:responsive": "cross-env NODE_OPTIONS=--no-deprecation payload run src/scripts/mediaResponsiveBackfill.ts",
+    "test:content:db": "cross-env NODE_OPTIONS=--no-deprecation payload run src/scripts/contentLifecycleIntegration.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.89.0",
     "@payloadcms/next": "3.89.0",
     "@payloadcms/richtext-lexical": "3.89.0",
     "@payloadcms/ui": "3.89.0",
-    "@unlim/content-contract": "0.0.7",
+    "@unlim/content-contract": "0.0.8",
     "cross-env": "7.0.3",
     "graphql": "16.11.0",
     "next": "16.3.5",

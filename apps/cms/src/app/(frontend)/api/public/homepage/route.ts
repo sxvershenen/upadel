@@ -1,3 +1,4 @@
+import { projectionCache, publicProjectionError } from '@/content/projectionCache'
 import { createHash, timingSafeEqual } from 'node:crypto'
 
 import config from '@payload-config'
@@ -25,17 +26,14 @@ export async function GET(request: Request): Promise<Response> {
 
   try {
     const payload = await getPayload({ config })
-    const dto = await createHomepageProjection(payload, { origin: publicContentOrigin(url.origin, process.env.PUBLIC_CONTENT_URL), preview: previewRequested })
+    const origin = publicContentOrigin(url.origin, process.env.PUBLIC_CONTENT_URL)
+    const dto = await projectionCache.read(`homepage:${origin}`, () => createHomepageProjection(payload, { origin, preview: previewRequested }), previewRequested)
     return Response.json(dto, {
       headers: {
-        'Cache-Control': previewRequested ? 'no-store' : 'public, max-age=0, s-maxage=60, stale-while-revalidate=300',
+        'Cache-Control': 'no-store',
       },
     })
   } catch (error) {
-    request.signal.throwIfAborted()
-    return Response.json(
-      { error: error instanceof Error ? error.message : 'Unable to build homepage projection.' },
-      { status: 500, headers: { 'Cache-Control': 'no-store' } },
-    )
+    return publicProjectionError(error, 'homepage')
   }
 }

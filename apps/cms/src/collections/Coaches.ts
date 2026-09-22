@@ -1,3 +1,4 @@
+import { coachLevelOptions, coachFocusOptions } from '@unlim/content-contract'
 import type { CollectionConfig } from 'payload'
 
 import { authenticated, publishedAndActiveOrAuthenticated } from '../fields/access'
@@ -82,20 +83,11 @@ export const Coaches: CollectionConfig = {
             },
             {
               name: 'levels', type: 'select', hasMany: true, label: 'Уровни — фильтр', required: true,
-              options: [
-                { label: 'Новички', value: 'beginner' }, { label: 'Продолжающие', value: 'intermediate' },
-                { label: 'Средний уровень', value: 'medium' }, { label: 'Турнирный уровень', value: 'tournament' },
-                { label: 'Дети', value: 'kids' }, { label: 'Любой уровень', value: 'all' },
-              ],
+              options: [...coachLevelOptions],
             },
             {
               name: 'focusAreas', type: 'select', hasMany: true, label: 'Направления — фильтр', required: true,
-              options: [
-                { label: 'Техника', value: 'technique' }, { label: 'Тактика пары', value: 'pair-tactics' },
-                { label: 'Турнирная подготовка', value: 'tournament-prep' }, { label: 'Детские группы', value: 'kids' },
-                { label: 'Физическая подготовка', value: 'fitness' }, { label: 'Старт с нуля', value: 'beginner-start' },
-                { label: 'Групповые тренировки', value: 'groups' }, { label: 'Женские группы', value: 'women' },
-              ],
+              options: [...coachFocusOptions],
             },
             {
               name: 'languageCodes', type: 'select', hasMany: true, label: 'Языки — фильтр', required: true,

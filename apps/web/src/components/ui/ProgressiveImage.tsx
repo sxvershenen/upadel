@@ -1,14 +1,16 @@
 import { motion, type HTMLMotionProps } from 'framer-motion'
 import { forwardRef, useLayoutEffect, useRef } from 'react'
+import type { MediaDTO } from '@unlim/content-contract'
 
-type ProgressiveImageProps = HTMLMotionProps<'img'> & { skeleton?: boolean }
+type ProgressiveImageProps = HTMLMotionProps<'img'> & { skeleton?: boolean; media?: MediaDTO | null }
 
 /**
  * Shared image loading treatment. Remove this component (or the CSS rules for
  * data-progressive-image) to roll the visual enhancement back independently.
  */
 export const ProgressiveImage = forwardRef<HTMLImageElement, ProgressiveImageProps>(
-  ({ onLoad, onError, skeleton = true, ...props }, forwardedRef) => {
+  ({ onLoad, onError, skeleton = true, media, ...supplied }, forwardedRef) => {
+    const props = { src: media?.url, alt: media?.alt ?? '', width: media?.width ?? undefined, height: media?.height ?? undefined, srcSet: media?.srcSet, ...supplied }
     const localRef = useRef<HTMLImageElement | null>(null)
     const loadingState = skeleton ? 'loading' : 'fade-loading'
     const loadedState = skeleton ? 'loaded' : 'fade-loaded'
@@ -39,10 +41,11 @@ export const ProgressiveImage = forwardRef<HTMLImageElement, ProgressiveImagePro
       if (!image) return
       image.dataset.progressiveImage = loadingState
       if (image.complete && image.naturalWidth > 0) revealDecoded(image)
-    }, [loadingState, loadedState, props.src])
+    }, [loadingState, loadedState, props.src, props.srcSet])
 
     return <motion.img
       {...props}
+      sizes={props.srcSet ? props.sizes ?? '100vw' : props.sizes}
       fetchPriority={props.fetchPriority ?? (props.loading === 'lazy' ? 'low' : undefined)}
       ref={setRef}
       data-progressive-image={loadingState}

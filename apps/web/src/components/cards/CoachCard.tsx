@@ -28,7 +28,7 @@ export function CoachCard({ coach, loading = "lazy", reveal = true }: { coach: C
       <WhiteCard reveal={reveal} className="flex h-full flex-col overflow-hidden p-4">
         <div ref={photoRef} data-parallax-viewport className="parallax-viewport se-2 relative aspect-[4/5] w-full">
           <motion.div data-parallax-layer style={{ y: photoY }} className="parallax-layer overflow-hidden">
-            <ProgressiveImage src={coach.photo.url} alt={coach.photo.alt} loading={loading} className="h-full w-full object-cover" variants={{ rest: { scale: 1.04 }, hover: { scale: 1.095 } }} transition={springSoft} />
+            <ProgressiveImage media={coach.photo} sizes="(min-width: 1024px) 20vw, (min-width: 640px) 50vw, 100vw" alt={coach.photo.alt} loading={loading} className="h-full w-full object-cover" variants={{ rest: { scale: 1.04 }, hover: { scale: 1.095 } }} transition={springSoft} />
           </motion.div>
           <div className="absolute left-3 top-3"><Badge tone="glass" className="image-glass px-2.5"><Star size={12} className="fill-lime text-lime" /> {coach.rating} · {coach.reviewsCount}</Badge></div>
           <div className="absolute right-3 top-3 flex flex-col items-end gap-1.5">{coach.certificates.slice(0, 2).map((certificate) => <span key={certificate} className="se-1 type-micro image-glass flex items-center gap-1 px-2 py-1 text-white"><BadgeCheck size={11} /> {certificate}</span>)}</div>
@@ -43,7 +43,7 @@ export function CoachCard({ coach, loading = "lazy", reveal = true }: { coach: C
 
     <Dialog open={open} onClose={closeDialog} title={coach.name} scrollable={false}>
       <div className="grid grid-cols-[140px_minmax(0,1fr)] gap-x-4 gap-y-5 md:grid-cols-[240px_minmax(0,1fr)] md:gap-6">
-        <img src={coach.photo.url} alt={coach.photo.alt} loading="eager" decoding="async" className="se-3 h-[175px] w-[140px] object-cover md:h-auto md:max-h-[360px] md:w-full" />
+        <ProgressiveImage media={coach.photo} sizes="(min-width: 768px) 480px, 140px" loading="eager" decoding="async" className="se-3 h-[175px] w-[140px] object-cover md:h-auto md:max-h-[360px] md:w-full" />
         <div className="flex flex-col">
           <Typography role="body" tone="muted">{coach.bio}</Typography>
           <p className="type-caption mt-3 font-medium leading-snug text-lime-deep">{coach.specialization}</p>

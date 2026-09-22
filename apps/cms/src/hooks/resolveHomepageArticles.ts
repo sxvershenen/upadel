@@ -3,6 +3,7 @@ import type { Payload } from 'payload'
 import type { Article } from '../payload-types'
 
 const homepageSlotCount = 3
+const cardSelect = { id: true, slug: true, homePosition: true, previewImage: true, category: true, readingTimeMinutes: true, title: true, excerpt: true, publishedAt: true, createdAt: true } as const
 
 export function arrangeHomepageArticles(pinned: Article[], newestPublished: Article[]): Article[] {
   const slots: Array<Article | undefined> = Array.from({ length: homepageSlotCount })
@@ -39,6 +40,7 @@ export async function resolveHomepageArticles(payload: Payload, options: { previ
   const { preview = false } = options
   const pinnedResult = await payload.find({
     collection: 'articles',
+    select: cardSelect,
     draft: preview,
     pagination: false,
     sort: 'homePosition',
@@ -50,13 +52,14 @@ export async function resolveHomepageArticles(payload: Payload, options: { previ
     },
   })
 
-  const pinned = pinnedResult.docs
+  const pinned = pinnedResult.docs as Article[]
   const emptySlotCount = homepageSlotCount - pinned.length
   if (emptySlotCount <= 0) return arrangeHomepageArticles(pinned, [])
 
   const pinnedIDs = pinned.map(({ id }) => id)
   const newestResult = await payload.find({
     collection: 'articles',
+    select: cardSelect,
     draft: preview,
     limit: emptySlotCount,
     sort: ['-publishedAt', '-createdAt'],
@@ -68,5 +71,5 @@ export async function resolveHomepageArticles(payload: Payload, options: { previ
     },
   })
 
-  return arrangeHomepageArticles(pinned, newestResult.docs)
+  return arrangeHomepageArticles(pinned, newestResult.docs as Article[])
 }

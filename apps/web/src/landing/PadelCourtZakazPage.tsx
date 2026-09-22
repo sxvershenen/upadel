@@ -146,10 +146,8 @@ export function CourtModelTabs({ badge, models, onSelectModel }: { badge: string
                 <div className="grid gap-8 lg:grid-cols-[1.15fr_.85fr] lg:gap-12 lg:items-start">
                   <div className="relative aspect-[16/9] w-full overflow-hidden bg-white flex items-center justify-center">
                     <ProgressiveImage
-                      src={model.image.url}
-                      alt={model.image.alt}
-                      width={model.image.width ?? undefined}
-                      height={model.image.height ?? undefined}
+                      media={model.image}
+                      sizes="(min-width: 1024px) 55vw, 100vw"
                       loading="lazy"
                       decoding="async"
                       className="h-full w-full object-contain"
@@ -535,11 +533,8 @@ function DirectContactButtons({ contacts }: { contacts: PadelCourtZakazPageDTO['
   )
 }
 
-export function PadelCourtZakazPage({ dto, publicOrigin }: { dto: PadelCourtZakazPageDTO; publicOrigin: string }) {
+export function PadelCourtZakazPage({ dto, publicOrigin: _publicOrigin }: { dto: PadelCourtZakazPageDTO; publicOrigin: string }) {
   const { site } = dto
-  const origin = new URL(publicOrigin).origin
-  const pageURL = new URL('/padel-court-zakaz', origin).toString()
-  const heroImageURL = new URL(dto.page.hero.media.url, origin).toString()
   const [activeModelForForm, setActiveModelForForm] = useState<ModelId>(dto.models.items[0]?.id ?? 'consultation')
   const heroRef = useRef<HTMLElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -570,46 +565,6 @@ export function PadelCourtZakazPage({ dto, publicOrigin }: { dto: PadelCourtZaka
 
   return (
     <SiteFrame site={site} backLink={{ href: '/' }}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@graph': [
-              {
-                '@type': 'Organization',
-                name: site.brandName,
-                url: origin,
-                description: dto.page.intro,
-              },
-              {
-                '@type': 'Product',
-                name: dto.page.title,
-                image: heroImageURL,
-                description: dto.page.intro,
-                brand: { '@type': 'Brand', name: 'JUBO Padel' },
-                offers: {
-                  '@type': 'AggregateOffer',
-                  priceCurrency: 'RUB',
-                  priceSpecification: {
-                    '@type': 'UnitPriceSpecification',
-                    priceType: 'https://schema.org/InvoicePrice',
-                    unitText: 'корт под ключ',
-                  },
-                },
-              },
-              {
-                '@type': 'BreadcrumbList',
-                itemListElement: [
-                  { '@type': 'ListItem', position: 1, name: 'Главная', item: new URL('/', origin).toString() },
-                  { '@type': 'ListItem', position: 2, name: dto.page.title, item: pageURL },
-                ],
-              },
-            ],
-          }),
-        }}
-      />
-
       {/* 1. HERO-ШАПКА: КОМПАКТНАЯ ВЫСОТА НА ОДИН ЭКРАН, GSAP ПАРАЛЛАКС, БЕЗ 01-04 И EYEBROWS */}
       <header
         ref={heroRef}
@@ -791,7 +746,7 @@ export function PadelCourtZakazPage({ dto, publicOrigin }: { dto: PadelCourtZaka
 
         {/* 5. ИНФОГРАФИКА ТЕХНОЛОГИЙ JUBO (НЕТ БЛЮРА НА КАРТИНКЕ, НЕТ ОБВОДОК У ПЛАШЕК, АНИМАЦИЯ БЕЗ 0 OPACITY) */}
         <section className="relative isolate overflow-hidden py-16 text-white md:py-24 bg-ink" aria-labelledby="tech-title">
-          <ProgressiveImage src={dto.technology.background.url} alt={dto.technology.background.alt} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
+          <ProgressiveImage media={dto.technology.background} sizes="100vw" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
           {/* Чистое затемнение без размытия/блюра фонового изображения */}
           <div className="absolute inset-0 bg-ink/80" />
 
@@ -856,10 +811,8 @@ export function PadelCourtZakazPage({ dto, publicOrigin }: { dto: PadelCourtZaka
                   <figure className="group">
                     <div className="se-3 aspect-[16/9] overflow-hidden bg-control">
                       <ProgressiveImage
-                        src={image.media.url}
-                        alt={image.media.alt}
-                        width={image.media.width ?? undefined}
-                        height={image.media.height ?? undefined}
+                        media={image.media}
+                        sizes="(min-width: 1024px) 50vw, 100vw"
                         loading="lazy"
                         decoding="async"
                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"

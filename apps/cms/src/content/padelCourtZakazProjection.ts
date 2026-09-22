@@ -1,3 +1,4 @@
+import { ContentUnavailableError } from './projectionCache'
 import { homepageDTOversion, parsePadelCourtZakazPageDTO, type PadelCourtZakazPageDTO } from '@unlim/content-contract'
 import type { Payload } from 'payload'
 
@@ -17,7 +18,7 @@ export async function createPadelCourtZakazProjection(payload: Payload, options:
     payload.find({ collection: 'partners', depth: 1, draft: preview, pagination: false, overrideAccess: true, sort: 'homepageOrder', where: preview ? undefined : { and: [{ _status: { equals: 'published' } }, { isActive: { equals: true } }] } } as never) as unknown as Promise<{ docs: Row[] }>,
   ])
 
-  if (!preview && (page._status !== 'published' || site._status !== 'published')) throw new Error('Published padel court page or site settings are unavailable.')
+  if (!preview && (page._status !== 'published' || site._status !== 'published')) throw new ContentUnavailableError()
 
   const hero = pageHeroDTO(page, 'padel-court-zakaz', origin)
   const dto = {

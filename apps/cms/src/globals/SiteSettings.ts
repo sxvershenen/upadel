@@ -183,7 +183,7 @@ export const SiteSettings: GlobalConfig = {
             { name: 'phoneValue', type: 'text', label: 'Телефон для ссылки', defaultValue: '+79858350055' },
             { name: 'email', type: 'email', label: 'Email', defaultValue: 'hello@unlimriga.club' },
             { name: 'transit', type: 'text', label: 'Как добраться', defaultValue: 'Мякинино · 12 мин пешком' },
-            { name: 'parking', type: 'text', label: 'Парковка', defaultValue: '40 бесплатных мест у входа' },
+            { name: 'parking', type: 'text', label: 'Парковка', defaultValue: '50 бесплатных мест у входа' },
             { name: 'openingHours', type: 'text', label: 'Режим работы', defaultValue: 'Ежедневно 07:00–23:00' },
             {
               name: 'map',
@@ -216,7 +216,7 @@ export const SiteSettings: GlobalConfig = {
               maxRows: 4,
               defaultValue: [
                 { value: '2023', label: 'Год открытия' },
-                { value: '4', label: 'Панорамных корта' },
+                { value: '3', label: 'Панорамных корта' },
                 { value: '9', label: 'Тренеров в штате' },
                 { value: '2 100+', label: 'Игроков в клубе' },
               ],
@@ -252,10 +252,7 @@ export const SiteSettings: GlobalConfig = {
               label: 'Соцсети',
               maxRows: 5,
               admin: { description: 'Значение # сохраняет prototype-заглушку безопасно; замените её реальным HTTPS URL до запуска.' },
-              defaultValue: [
-                { provider: 'telegram', label: 'Telegram', url: 'https://t.me' },
-                { provider: 'vk', label: 'VK', url: 'https://vk.com' },
-              ],
+              defaultValue: [{ provider: 'vk', label: 'VK', url: 'https://vk.ru/unlimpadel' }],
               fields: [
                 {
                   name: 'provider',

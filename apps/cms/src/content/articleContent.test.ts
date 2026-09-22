@@ -4,7 +4,7 @@ import test from 'node:test'
 import { articleContentHTML } from './articleContent'
 
 const payload = {
-  findByID: async ({ id }: { id: string }) => id === '7' ? {
+  find: async ({ where }: { where: { id: { in: string[] } } }) => ({ docs: where.id.in.includes('7') ? [{
     id: 7,
     alt: 'Корт <лето>',
     caption: 'Фото & клуб',
@@ -13,7 +13,7 @@ const payload = {
     sizes: { card: { height: 600, mimeType: 'image/webp', url: '/media/court-card.webp', width: 1200 } },
     url: '/media/court.webp?x=1&y=2',
     width: 1600,
-  } : null,
+  }] : [] }),
 }
 
 test('renders semantic article nodes, UI-kit headings and safely resolved Media uploads', async () => {
@@ -76,8 +76,26 @@ test('uses an already populated Media relation without an extra query', async ()
     type: 'upload', relationTo: 'media', value: { id: 'populated', alt: 'Alt', height: 10, mimeType: 'image/webp', url: '/populated.webp', width: 20 },
   }] } }, {
     origin: 'https://cms.example.test',
-    payload: { findByID: async () => { queried = true; return null } } as never,
+    payload: { find: async () => { queried = true; return { docs: [] } } } as never,
   })
   assert.equal(queried, false)
   assert.match(html, /src="https:\/\/cms\.example\.test\/populated\.webp"/)
+})
+
+test('batches distinct unresolved uploads and ignores invalid IDs without losing valid media', async () => {
+  const calls: string[][] = []
+  const html = await articleContentHTML({ root: { children: [7, 7, 8, 'bad'].map((value) => ({ type: 'upload', relationTo: 'media', value })) } }, {
+    origin: 'https://cms.example.test', payload: { find: async ({ where }: { where: { id: { in: string[] } } }) => {
+      calls.push(where.id.in)
+      return { docs: [{ id: 7, mimeType: 'image/webp', url: '/one.webp' }] }
+    } } as never,
+  })
+  assert.deepEqual(calls, [['7', '8']])
+  assert.equal((html.match(/<figure/g) ?? []).length, 2)
+})
+
+test('a media query outage propagates instead of caching an incomplete article', async () => {
+  await assert.rejects(articleContentHTML({ root: { children: [{ type: 'upload', relationTo: 'media', value: 7 }] } }, {
+    origin: 'https://cms.example.test', payload: { find: async () => { throw new Error('media unavailable') } } as never,
+  }), /media unavailable/)
 })

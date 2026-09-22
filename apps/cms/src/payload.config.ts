@@ -36,12 +36,15 @@ import { TournamentsPage } from './globals/TournamentsPage'
 import { TournamentDefaults } from './globals/TournamentDefaults'
 import { AboutPage, ContactsPage, CourtsPage, GalleryPage, GiftPage, OfertaPage, PadelCourtZakazPage, PolicyPage, PricesPage, TrainingPage } from './globals/ThematicPages'
 import { migrations } from './migrations'
+import { installTransactionInvalidation, invalidateCollectionContent, invalidateGlobalContent } from './content/projectionCache'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const configuredAdminRoute = process.env.PAYLOAD_ADMIN_ROUTE?.trim() ?? ''
 const adminRoute = /^\/[a-z0-9-]+$/.test(configuredAdminRoute) ? configuredAdminRoute : '/urp-panel'
 
 export default buildConfig({
+  onInit: async (payload) => { installTransactionInvalidation(payload) },
+  jobs: { autoRun: process.env.PAYLOAD_DISABLE_JOBS === '1' ? [] : [{ cron: '* * * * *', allQueues: true, limit: 20 }] },
   ...payloadPublicURLConfig({
     PUBLIC_CMS_URL: process.env.PUBLIC_CMS_URL,
     PUBLIC_WEB_URL: process.env.PUBLIC_WEB_URL,
@@ -99,10 +102,11 @@ export default buildConfig({
     AnalyticsSessions,
     AnalyticsDaily,
     Redirects,
-  ],
+  ].map((collection) => collection.slug === 'users' || collection.slug === 'leads' || collection.slug.startsWith('analytics-') ? collection : invalidateCollectionContent(collection)),
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URL ?? '',
+      connectionTimeoutMillis: 3_000,
     },
     prodMigrations: migrations,
     push: false,
@@ -113,7 +117,7 @@ export default buildConfig({
     TournamentDefaults,
     ...[HomePage, BlogPage, CoachesPage, TournamentsPage, PricesPage, TrainingPage, GiftPage, CourtsPage, PadelCourtZakazPage, GalleryPage, AboutPage, ContactsPage, PolicyPage, OfertaPage]
       .map((global) => ({ ...global, admin: { ...global.admin, group: 'Контент' } })),
-  ],
+  ].map(invalidateGlobalContent),
   secret: process.env.PAYLOAD_SECRET ?? '',
   sharp,
   typescript: {

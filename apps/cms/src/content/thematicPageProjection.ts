@@ -1,3 +1,4 @@
+import { ContentUnavailableError } from './projectionCache'
 import { homepageDTOversion, parseThematicPageDTO, type HomepageDTO, type ThematicPageDTO } from '@unlim/content-contract'
 import type { Payload } from 'payload'
 
@@ -28,7 +29,7 @@ export async function createThematicPageProjection(payload: Payload, options: { 
     payload.findGlobal({ slug: 'site-settings', draft: preview, depth: 2, overrideAccess: true, showHiddenFields: false }),
     publishedCollection(payload, 'partners', preview),
   ])
-  if (!preview && (page._status !== 'published' || site._status !== 'published')) throw new Error('Published page globals are unavailable.')
+  if (!preview && (page._status !== 'published' || site._status !== 'published')) throw new ContentUnavailableError()
   const hero = pageHeroDTO(page, kind, origin)
   const seo = seoDTO(page.seo, origin)
   const base = {

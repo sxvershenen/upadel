@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { createDetailProjection } from './catalogProjection'
+import { createCatalogProjection, createDetailProjection } from './catalogProjection'
 
 const media = {
   id: 1,
@@ -27,6 +27,28 @@ const article = {
   createdAt: '2026-09-18T00:00:00.000Z',
   seo: { robots: 'noindex-nofollow' },
 }
+
+test('catalog filters the complete dataset before pagination, with deterministic card-only reads', async () => {
+  let args: Record<string, unknown> = {}
+  const payload = {
+    findGlobal: async ({ slug }: { slug: string }) => ({ _status: 'published', brandName: 'UNLIM', title: slug, intro: '', seo: { robots: 'index-follow' }, socialLinks: [] }),
+    find: async (input: Record<string, unknown>) => {
+      if (input.collection === 'partners' || input.collection === 'article-categories') return { docs: [] }
+      args = input
+      return { docs: [article], totalDocs: 125, totalPages: 11 }
+    },
+  }
+  const dto = await createCatalogProjection(payload as never, { kind: 'blog', origin: 'https://cms.example', preview: false, query: { page: 9, category: 'guide', sort: 'popular' } })
+  assert.equal(dto?.pagination.page, 9)
+  assert.equal(dto?.pagination.totalDocs, 125)
+  assert.equal(args.limit, 12)
+  assert.equal(args.page, 9)
+  assert.deepEqual(args.where, { and: [{ _status: { equals: 'published' } }, { 'category.slug': { equals: 'guide' } }] })
+  assert.deepEqual(args.sort, ['-popularityScore', '-publishedAt', 'id'])
+  assert.equal((args.select as Record<string, unknown>).content, undefined)
+  assert.equal((args.select as Record<string, unknown>).previewImage, true)
+  assert.equal((await createCatalogProjection(payload as never, { kind: 'blog', origin: 'https://cms.example', preview: false, query: { page: 12 } })), null)
+})
 
 test('draft article preview resolves related cards from published documents only', async () => {
   let relatedArgs: Record<string, unknown> | undefined

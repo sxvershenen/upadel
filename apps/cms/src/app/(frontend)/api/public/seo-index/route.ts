@@ -1,3 +1,4 @@
+import { projectionCache, publicProjectionError } from '@/content/projectionCache'
 import {
   codeDefinedRouteRegistry,
   dynamicRouteRegistry,
@@ -16,6 +17,7 @@ type IndexDocument = {
 export async function GET() {
   try {
     const payload = await getPayload({ config });
+    const result = await projectionCache.read('seo-index', async () => {
     const redirects = await payload.find({
       collection: "redirects",
       depth: 0,
@@ -94,14 +96,13 @@ export async function GET() {
         }),
       )
     ).filter(Boolean);
+    return { urls: [...fixed, ...codeDefined, ...dynamic] }
+    })
     return Response.json(
-      { urls: [...fixed, ...codeDefined, ...dynamic] },
-      { headers: { "Cache-Control": "public, max-age=0, s-maxage=300" } },
+      result,
+      { headers: { "Cache-Control": "no-store" } },
     );
-  } catch {
-    return Response.json(
-      { error: "SEO index unavailable." },
-      { status: 503, headers: { "Cache-Control": "no-store" } },
-    );
+  } catch (error) {
+    return publicProjectionError(error, 'seo-index')
   }
 }

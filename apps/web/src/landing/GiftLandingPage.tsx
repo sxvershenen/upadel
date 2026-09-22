@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import type { ThematicPageDTO } from '@unlim/content-contract'
+import type { MediaDTO, ThematicPageDTO } from '@unlim/content-contract'
 import {
   CalendarCheck,
   Check,
@@ -51,7 +51,7 @@ export const useCases = [
     icon: Layers,
     badge: 'Корты Jubo',
     title: 'Аренда кортов',
-    text: '4 панорамных корта Jubo Super Panoramic с профессиональным покрытием Mondo и климат-контролем.',
+    text: '3 панорамных корта Jubo Super Panoramic с профессиональным покрытием PRO TURF 240 и климат-контролем.',
   },
   {
     icon: Target,
@@ -142,7 +142,7 @@ type GiftFormatView = {
   id: string
   badge: string
   title: string
-  image: string
+  image: string | MediaDTO
   features: string[]
   buttonText: string
   buttonSelectedText: string
@@ -159,6 +159,14 @@ const giftFormDefaults = {
   submitLabel: 'Получить сертификат', successTitle: 'Заявка успешно отправлена!',
   successText: 'Менеджер клуба свяжется с вами в течение 5 минут для согласования и проведения оплаты.', resubmitLabel: 'Оформить ещё один сертификат',
 }
+
+export const giftPurposeOptions = [
+  { value: 'match', label: 'Игра с друзьями' },
+  { value: 'training', label: 'Персональная тренировка' },
+  { value: 'course', label: 'Курс тренировок' },
+  { value: 'split', label: 'Сплит-тренировка' },
+  { value: 'custom', label: 'Номинал согласовать с менеджером' },
+]
 
 // 4. Частые вопросы
 export const faqItems = [
@@ -188,15 +196,14 @@ export const faqItems = [
   },
 ]
 
-export function GiftLandingPage({ dto, publicOrigin = 'https://unlimriga.ru' }: { dto: ThematicPageDTO; publicOrigin?: string }) {
+export function GiftLandingPage({ dto, publicOrigin: _publicOrigin = 'https://unlimriga.ru' }: { dto: ThematicPageDTO; publicOrigin?: string }) {
   const site = dto.site
-  const origin = new URL(publicOrigin).origin
   const giftPage = dto.kind === 'gift' ? dto : null
   const pageUseCases = giftPage?.benefits?.length
     ? giftPage.benefits.map((item) => ({ icon: giftBenefitIcons[item.icon] ?? Layers, badge: item.badge, title: item.title, text: item.body }))
     : useCases
   const pageFormats: GiftFormatView[] = giftPage?.formats?.length
-    ? giftPage.formats.map((format) => ({ ...format, image: format.image.url }))
+    ? giftPage.formats
     : giftFormats
   const pageTerms = giftPage?.terms?.length
     ? giftPage.terms.map((term) => ({ ...term, icon: giftTermIcons[term.icon] ?? Check }))
@@ -337,13 +344,9 @@ export function GiftLandingPage({ dto, publicOrigin = 'https://unlimriga.ru' }: 
               {typograph(format.badge)}
             </Badge>
           </div>
-          <ProgressiveImage
-            src={format.image}
-            alt={format.title}
-            loading="lazy"
-            decoding="async"
-            className="h-full w-full object-cover transition-transform duration-500 hover:scale-[1.02]"
-          />
+          {typeof format.image === 'string'
+            ? <ProgressiveImage src={format.image} alt={format.title} sizes="(min-width: 768px) 50vw, 100vw" loading="lazy" decoding="async" className="h-full w-full object-cover transition-transform duration-500 hover:scale-[1.02]" />
+            : <ProgressiveImage media={format.image} sizes="(min-width: 768px) 50vw, 100vw" loading="lazy" decoding="async" className="h-full w-full object-cover transition-transform duration-500 hover:scale-[1.02]" />}
         </div>
 
         <div className="mt-6 flex-1">
@@ -384,59 +387,11 @@ export function GiftLandingPage({ dto, publicOrigin = 'https://unlimriga.ru' }: 
 
   return (
     <div className="min-h-screen bg-page text-ink selection:bg-lime selection:text-lime-ink">
-      {/* Schema.org JSON-LD */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@graph': [
-              {
-                '@type': 'Organization',
-                name: site.brandName,
-                url: origin,
-                description: 'Премиальный падел-клуб UNLIM RIGA PADEL в Москве и Московской области.',
-              },
-              {
-                '@type': 'Product',
-                name: giftPage?.page.title ?? 'Подарочный сертификат на падел в Москве',
-                image: giftPage?.formats?.[0]?.image.url ?? new URL('/images/gift/card.jpg', origin).toString(),
-                description: giftPage?.page.intro ?? 'Подарочный сертификат на аренду панорамных кортов Jubo, тренировки с тренером и экипировку Varlion в клубе UNLIM RIGA PADEL.',
-                brand: { '@type': 'Brand', name: 'UNLIM PADEL' },
-                offers: {
-                  '@type': 'AggregateOffer',
-                  priceCurrency: 'RUB',
-                  lowPrice: 6000,
-                  highPrice: 30000,
-                  offerCount: 2,
-                },
-              },
-              {
-                '@type': 'BreadcrumbList',
-                itemListElement: [
-                  { '@type': 'ListItem', position: 1, name: 'Главная', item: new URL('/', origin).toString() },
-                  { '@type': 'ListItem', position: 2, name: 'Подарочный сертификат', item: new URL('/gift', origin).toString() },
-                ],
-              },
-              {
-                '@type': 'FAQPage',
-                mainEntity: pageFaqItems.map((item) => ({
-                  '@type': 'Question',
-                  name: item.q,
-                  acceptedAnswer: {
-                    '@type': 'Answer',
-                    text: item.a,
-                  },
-                })),
-              },
-            ],
-          }),
-        }}
-      />
-
       {/* 1. HERO ШАПКА ВИДОМ КАК У PAGE-VIEW (БЕЗ БЕЙДЖЕЙ, БЕЗ КНОПОК И МЕТРИК) */}
       <header className="page-hero relative isolate overflow-hidden bg-ink pb-6 pt-12 text-white md:pb-12 md:pt-24">
-        <ProgressiveImage src={giftPage?.page.hero.media.url ?? '/images/gift/card.jpg'} alt={giftPage?.page.hero.media.alt ?? ''} loading="eager" fetchPriority="high" decoding="async" className="absolute inset-0 -z-20 h-full w-full object-cover grayscale" />
+        {giftPage?.page.hero.media
+          ? <ProgressiveImage media={giftPage.page.hero.media} sizes="100vw" loading="eager" fetchPriority="high" decoding="async" className="absolute inset-0 -z-20 h-full w-full object-cover grayscale" />
+          : <ProgressiveImage src="/images/gift/card.jpg" alt="" sizes="100vw" loading="eager" fetchPriority="high" decoding="async" className="absolute inset-0 -z-20 h-full w-full object-cover grayscale" />}
         <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(3,5,8,.95)_0%,rgba(3,5,8,.84)_52%,rgba(3,5,8,.62)_100%)]" />
 
         <div className="container-page relative z-10">
@@ -795,15 +750,7 @@ export function GiftLandingPage({ dto, publicOrigin = 'https://unlimriga.ru' }: 
                           labelVisibility="sr-only"
                           value={selectedPurpose}
                           onChange={(e) => setSelectedPurpose(e.target.value)}
-                          options={[
-                            { value: 'match', label: 'Матч для четверых (12 000 ₽)' },
-                            { value: 'training', label: 'Персональная тренировка (6 000 ₽)' },
-                            { value: 'course', label: 'Курс из 5 тренировок (28 000 ₽)' },
-                            { value: 'split', label: 'Сплит-тренировка (8 500 ₽)' },
-                            { value: 'deposit_15', label: 'Депозит 15 000 ₽' },
-                            { value: 'deposit_30', label: 'Депозит 30 000 ₽' },
-                            { value: 'custom', label: 'Индивидуальная сумма' },
-                          ]}
+                          options={giftPurposeOptions}
                         />
                       </div>
 

@@ -6,7 +6,7 @@ type PageHeaderData = Pick<CatalogPageHeader, 'eyebrow' | 'title' | 'intro' | 'h
 
 export function PageHeader({ page, actions }: { page: PageHeaderData; actions?: ReactNode }) {
   return <header className="page-hero relative isolate overflow-hidden pb-6 pt-12 text-white md:pb-12 md:pt-24">
-      <ProgressiveImage src={page.hero.media.url} alt={page.hero.media.alt} loading="eager" fetchPriority="high" decoding="async" className={`absolute inset-0 -z-20 h-full w-full object-cover ${page.hero.grayscale ? 'grayscale' : ''}`} />
+      <ProgressiveImage media={page.hero.media} alt={page.hero.media.alt} loading="eager" fetchPriority="high" decoding="async" className={`absolute inset-0 -z-20 h-full w-full object-cover ${page.hero.grayscale ? 'grayscale' : ''}`} />
       <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(3,5,8,.94)_0%,rgba(3,5,8,.8)_56%,rgba(3,5,8,.58)_100%)]" />
       <div className="container-page">
         <h1 data-page-enter="title" className="type-section max-w-[920px] text-white">{page.title}</h1>

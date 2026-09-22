@@ -1,4 +1,6 @@
-export const homepageDTOversion = 12 as const
+import type { CatalogPagination, CatalogQuery } from './catalog'
+export * from './catalog'
+export const homepageDTOversion = 13 as const
 
 export const publicRouteRegistry = [
   { path: '/', parent: null, template: 'homepage', globalSlug: 'homepage' },
@@ -54,6 +56,7 @@ export type MediaDTO = {
   mimeType: string
   url: string
   width?: number | null
+  srcSet?: string
 }
 
 export type BrandLogoMode = 'text' | 'prefix' | 'replace'
@@ -140,7 +143,7 @@ export type HomepageDTO = {
     }
   }
   home: {
-    hero: { titleLine: string; titleConnector: string; titleAccent: string; description: string; desktopMedia?: MediaDTO | null; mobileMedia?: MediaDTO | null; desktopPoster?: MediaDTO | null; mobilePoster?: MediaDTO | null; primaryAction: ActionDTO; secondaryAction: ActionDTO; socialProof: { ratingLabel: string; caption: string; coachPhotos: MediaDTO[] }; stats: Array<{ value: string; label: string }> }
+    hero: { seoHeading: string; titleLine: string; titleConnector: string; titleAccent: string; description: string; desktopMedia?: MediaDTO | null; mobileMedia?: MediaDTO | null; desktopPoster?: MediaDTO | null; mobilePoster?: MediaDTO | null; primaryAction: ActionDTO; secondaryAction: ActionDTO; socialProof: { ratingLabel: string; caption: string; coachPhotos: MediaDTO[] }; stats: Array<{ value: string; label: string }> }
     benefits: { eyebrow: string; title: string; cards: Array<{ id: string; variant: 'parking' | 'lockers' | 'shower' | 'chill' | 'online-booking' | 'coaches-metric' | 'kids-wide'; eyebrow?: string | null; title: string; description: string; supportingText?: string | null; media?: MediaDTO | null; overlay?: string | null; meshTone?: string | null; action: ActionDTO }> }
     offers: Array<{ id: string; variant: 'tournament-venue' | 'event'; badge: string; title: string; description: string; image?: MediaDTO | null; overlay: string; icon: 'Trophy' | 'PartyPopper'; action: ActionDTO }>
     courtsSection: { titleLineOne: string; titleLineTwo: string; background?: MediaDTO | null; backgroundAlt: string }
@@ -170,7 +173,7 @@ export type HomepageDTO = {
 export type SiteDTO = HomepageDTO['site']
 export type PageSEO = HomepageDTO['seo']
 export type CatalogPageHeader = { eyebrow: string; title: string; intro: string; hero: PageHeroDTO; seo: PageSEO }
-export type ArticleCatalogItem = Omit<HomepageDTO['entities']['articles'][number], 'category'> & { category: { slug: string; title: string }; publishedAt: string; popularityScore: number }
+export type ArticleCatalogItem = Omit<HomepageDTO['entities']['articles'][number], 'category'> & { category: { slug: string; title: string }; publishedAt: string; updatedAt?: string; popularityScore: number }
 export type CoachCatalogItem = HomepageDTO['entities']['coaches'][number] & { levels: string[]; focusAreas: string[]; languageCodes: string[] }
 export type TournamentCatalogItem = TournamentCardDTO & {
   action: ActionDTO
@@ -189,9 +192,10 @@ export type TournamentCatalogItem = TournamentCardDTO & {
 }
 
 type CatalogBase = { version: typeof homepageDTOversion; preview: boolean; generatedAt: string; page: CatalogPageHeader; site: SiteDTO }
-export type BlogCatalogDTO = CatalogBase & { kind: 'blog'; items: ArticleCatalogItem[]; categories: Array<{ slug: string; title: string }> }
-export type CoachesCatalogDTO = CatalogBase & { kind: 'coaches'; items: CoachCatalogItem[] }
-export type TournamentsCatalogDTO = CatalogBase & { kind: 'tournaments'; items: TournamentCatalogItem[] }
+type CatalogListBase = CatalogBase & { pagination: CatalogPagination; query: CatalogQuery }
+export type BlogCatalogDTO = CatalogListBase & { kind: 'blog'; items: ArticleCatalogItem[]; categories: Array<{ slug: string; title: string }> }
+export type CoachesCatalogDTO = CatalogListBase & { kind: 'coaches'; items: CoachCatalogItem[] }
+export type TournamentsCatalogDTO = CatalogListBase & { kind: 'tournaments'; items: Array<TournamentCardDTO & Pick<TournamentCatalogItem, 'lifecycle' | 'action'>> }
 export type CatalogDTO = BlogCatalogDTO | CoachesCatalogDTO | TournamentsCatalogDTO
 
 export type BlogDetailDTO = CatalogBase & { kind: 'blog'; item: ArticleCatalogItem & { contentHTML: string; seo: PageSEO }; related: ArticleCatalogItem[] }
@@ -463,6 +467,7 @@ export function parseCatalogDTO(value: unknown): CatalogDTO {
   if (dto.version !== homepageDTOversion || !dto.site || !dto.page || !Array.isArray(dto.items)) throw new Error('Catalog DTO is incomplete.')
   if (dto.kind !== 'blog' && dto.kind !== 'coaches' && dto.kind !== 'tournaments') throw new Error('Catalog DTO kind is invalid.')
   assertDesktopNavigation(dto.site)
+  if (!dto.pagination || !dto.query || !Number.isSafeInteger(dto.pagination.page) || dto.pagination.page < 1 || !Number.isSafeInteger(dto.pagination.totalPages) || dto.pagination.totalPages < dto.pagination.page || !Number.isSafeInteger(dto.pagination.totalDocs) || dto.pagination.totalDocs < 0 || !Number.isSafeInteger(dto.pagination.limit) || dto.pagination.limit < 1 || dto.query.page !== dto.pagination.page) throw new Error('Catalog pagination is invalid.')
   return dto as CatalogDTO
 }
 

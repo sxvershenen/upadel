@@ -18,6 +18,6 @@ function TournamentBody({ tournament }: { tournament: Tournament }) {
 }
 
 export function TournamentCard({ tournament, loading = "eager", reveal = true }: { tournament: Tournament; loading?: "eager" | "lazy"; reveal?: RevealConfig }) {
-  if (tournament.visualStyle === "image" && tournament.image) return <a href={`/tournaments/${tournament.slug}`} className="block h-full"><ImageCard loading={loading} reveal={reveal} src={tournament.image.url} alt={tournament.image.alt} overlay={tournament.imageOverlay as ImageOverlay} className="aspect-[3/4] h-full"><TournamentBody tournament={tournament} /></ImageCard></a>;
+  if (tournament.visualStyle === "image" && tournament.image) return <a href={`/tournaments/${tournament.slug}`} className="block h-full"><ImageCard loading={loading} reveal={reveal} media={tournament.image} src={tournament.image.url} alt={tournament.image.alt} overlay={tournament.imageOverlay as ImageOverlay} className="aspect-[3/4] h-full"><TournamentBody tournament={tournament} /></ImageCard></a>;
   return <a href={`/tournaments/${tournament.slug}`} className="block h-full"><MeshCard reveal={reveal} tone={tournament.meshStyle as MeshTone} className="aspect-[3/4] h-full"><TournamentBody tournament={tournament} /></MeshCard></a>;
 }

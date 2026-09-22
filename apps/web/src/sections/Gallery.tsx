@@ -31,7 +31,7 @@ export function Gallery() {
               className="marquee-breathe"
             >
               {row.map((item, index) => (
-                <GalleryCard key={item.id} src={item.media.url} reveal={{ delay: index * 0.06 }} />
+                <GalleryCard key={item.id} media={item.media} src={item.media.url} reveal={{ delay: index * 0.06 }} />
               ))}
             </Marquee>
           </Reveal>

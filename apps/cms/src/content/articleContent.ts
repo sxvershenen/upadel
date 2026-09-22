@@ -97,14 +97,12 @@ async function resolveMedia(value: { root?: unknown }, payload: Payload): Promis
     else unresolved.add(id)
   })
 
-  await Promise.all([...unresolved].filter((id) => !resolved.has(id)).map(async (id) => {
-    try {
-      const doc = await payload.findByID({ collection: 'media', id, depth: 0, overrideAccess: true })
-      if (doc) resolved.set(id, doc as unknown as PublicMedia)
-    } catch {
-      // A deleted or inaccessible upload is omitted from public HTML.
-    }
-  }))
+  const ids = [...unresolved].filter((id) => !resolved.has(id) && /^\d+$/.test(id) && Number(id) > 0 && Number(id) <= 2_147_483_647)
+  for (let index = 0; index < ids.length; index += 100) {
+    const batch = ids.slice(index, index + 100)
+    const result = await payload.find({ collection: 'media', depth: 0, pagination: false, overrideAccess: true, where: { id: { in: batch } } })
+    for (const doc of result.docs) resolved.set(String(doc.id), doc as unknown as PublicMedia)
+  }
   return resolved
 }
 

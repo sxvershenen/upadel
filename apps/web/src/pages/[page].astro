@@ -2,25 +2,26 @@
 import type { ThematicPageDTO } from '@unlim/content-contract'
 import { ThematicPage } from '../thematic/ThematicPage'
 import { loadPage, type ThematicPageKind } from '../content/loadPage'
+import PublicErrorPage from '../components/PublicErrorPage.astro'
 import SiteLayout from '../layouts/SiteLayout.astro'
+import { publicRouteError } from '../lib/publicRouteError'
+import { giftStructuredData, resolveCanonicalURL } from '../seo/structuredData'
 
 export const prerender = false
 
 const kind = Astro.params.page as ThematicPageKind
-const dto = await loadPage(import.meta.env.CMS_URL, kind) as ThematicPageDTO
-const isGift = dto.kind === 'gift'
-const pageTitle = isGift
-  ? 'Подарочный сертификат на падел в Москве — тренировки и аренда корта | UNLIM'
-  : (dto.page.seo.title ?? dto.page.title)
-
-const pageDescription = isGift
-  ? 'Подарочный сертификат на игру в падел в клубе UNLIM RIGA PADEL: аренда панорамных кортов Jubo, тренировки с тренером и экипировка Varlion. Электронный за 2 минуты или в премиальном боксе. Срок действия 1 год.'
-  : (dto.page.seo.description ?? dto.page.intro)
-
-const socialImage = isGift
-  ? '/images/gift/card.jpg'
-  : dto.page.seo.socialImage?.url
+let dto: ThematicPageDTO | null = null
+let routeError: ReturnType<typeof publicRouteError> | null = null
+try {
+  dto = await loadPage(import.meta.env.CMS_URL, kind) as ThematicPageDTO
+} catch (error) {
+  routeError = publicRouteError(error)
+  Astro.response.status = routeError.status
+}
+const publicOrigin = import.meta.env.PUBLIC_SITE_URL ?? Astro.url.origin
+const canonical = dto ? resolveCanonicalURL(publicOrigin, Astro.url.pathname, dto.page.seo.canonical) : null
+const structuredData = dto?.kind === 'gift' && canonical ? giftStructuredData(dto, publicOrigin, canonical) : []
 ---
-<SiteLayout site={dto.site} title={pageTitle} description={pageDescription} canonical={dto.page.seo.canonical} robots={dto.page.seo.robots} socialImage={socialImage} webmasterVerification={dto.site.analytics.vendors.webmasterVerification}>
+{dto && canonical ? <SiteLayout site={dto.site} title={dto.page.seo.title ?? dto.page.title} description={dto.page.seo.description ?? dto.page.intro} canonical={canonical} robots={dto.page.seo.robots} socialImage={dto.page.seo.socialImage?.url ?? dto.page.hero.media.url} structuredData={structuredData} webmasterVerification={dto.site.analytics.vendors.webmasterVerification}>
   <ThematicPage client:load dto={dto} publicOrigin={Astro.url.origin} />
-</SiteLayout>
+</SiteLayout> : routeError && <SiteLayout title={routeError.title} description={routeError.message} robots="noindex,nofollow"><PublicErrorPage {...routeError} /></SiteLayout>}

@@ -329,6 +329,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
             <div aria-label="Визитка турнира" className="flex flex-col">
               {dto.item.visualStyle === 'image' && dto.item.image ? (
                 <ImageCard
+                  media={dto.item.image}
                   src={dto.item.image.url}
                   alt={dto.item.image.alt}
                   overlay={(dto.item.imageOverlay as ImageOverlay) || 'overlay-dark'}

@@ -1,9 +1,10 @@
-import { homepageDTOversion, type ArticleCatalogItem, type CatalogDTO, type CatalogPageHeader, type CoachCatalogItem, type DetailDTO, type PageSEO, type TournamentCardDTO, type TournamentCatalogItem } from '@unlim/content-contract'
+import { catalogPageSize, parseCatalogQuery, catalogQueryParams, type CatalogQuery, homepageDTOversion, type ArticleCatalogItem, type CatalogDTO, type CatalogPageHeader, type CoachCatalogItem, type DetailDTO, type PageSEO, type TournamentCardDTO, type TournamentCatalogItem } from '@unlim/content-contract'
 import type { Payload } from 'payload'
 
 import type { Article, Coach, SiteSetting, Tournament, TournamentDefault } from '../payload-types'
 import { formatTournamentLevel, formatTournamentSchedule, resolveTournamentFormatLabel } from '../tournaments/model'
 import { articleContentHTML } from './articleContent'
+import { ContentUnavailableError } from './projectionCache'
 import { actionDTO, mediaDTO, pageHeroDTO, requiredMedia, seoDTO, siteDTO } from './normalize'
 
 export type CatalogKind = 'blog' | 'coaches' | 'tournaments'
@@ -17,7 +18,7 @@ function categoryDTO(value: unknown): { slug: string; title: string } {
 }
 
 function articleItem(article: Article, origin: string): ArticleCatalogItem {
-  return { id: String(article.id), slug: article.slug, image: requiredMedia(article.previewImage, origin), category: categoryDTO(article.category), readingTimeMinutes: article.readingTimeMinutes, title: article.title, excerpt: article.excerpt, publishedAt: article.publishedAt ?? article.createdAt, popularityScore: article.popularityScore ?? 0 }
+  return { id: String(article.id), slug: article.slug, image: requiredMedia(article.previewImage, origin), category: categoryDTO(article.category), readingTimeMinutes: article.readingTimeMinutes, title: article.title, excerpt: article.excerpt, publishedAt: article.publishedAt ?? article.createdAt, updatedAt: article.updatedAt, popularityScore: article.popularityScore ?? 0 }
 }
 
 function coachItem(coach: Coach, origin: string): CoachCatalogItem {
@@ -116,33 +117,55 @@ export function richContentHTML(value: { root?: unknown }): string {
   return render(value?.root)
 }
 
-async function baseData(payload: Payload, kind: CatalogKind, origin: string, preview: boolean) {
+async function baseData(payload: Payload, kind: CatalogKind, origin: string, preview: boolean, includeDefaults = true) {
   const [page, site, partners, tournamentDefaults] = await Promise.all([
     payload.findGlobal({ slug: pageSlugs[kind], draft: preview, depth: 2, overrideAccess: true }),
     payload.findGlobal({ slug: 'site-settings', draft: preview, depth: 2, overrideAccess: true }),
     payload.find({ collection: 'partners', depth: 1, draft: preview, pagination: false, overrideAccess: true, sort: 'homepageOrder', where: preview ? undefined : { and: [{ _status: { equals: 'published' } }, { isActive: { equals: true } }] } }),
-    kind === 'tournaments' ? payload.findGlobal({ slug: 'tournament-defaults', draft: preview, depth: 0, overrideAccess: true }) : Promise.resolve(null),
+    kind === 'tournaments' && includeDefaults ? payload.findGlobal({ slug: 'tournament-defaults', draft: preview, depth: 0, overrideAccess: true }) : Promise.resolve(null),
   ])
-  if (!preview && (page._status !== 'published' || site._status !== 'published' || kind === 'tournaments' && tournamentDefaults?._status !== 'published')) throw new Error('Published catalog globals are unavailable.')
+  if (!preview && (page._status !== 'published' || site._status !== 'published' || kind === 'tournaments' && includeDefaults && tournamentDefaults?._status !== 'published')) throw new ContentUnavailableError()
   const hero = pageHeroDTO(page, kind, origin)
   const seo = seoDTO(page.seo, origin)
   const header: CatalogPageHeader = { eyebrow: page.eyebrow, title: page.title, intro: page.intro, hero, seo: { ...seo, socialImage: seo.socialImage ?? hero.media } }
   return { header, rawSite: site as SiteSetting, site: siteDTO(site, origin, partners.docs as unknown as Array<Record<string, unknown>>), tournamentDefaults: tournamentDefaults as TournamentDefault | null }
 }
 
-export async function createCatalogProjection(payload: Payload, options: { kind: CatalogKind; origin: string; preview: boolean }): Promise<CatalogDTO> {
+/** Select only card fields: article bodies and tournament participant history stay on detail routes. */
+const catalogSelect = {
+  blog: { id: true, slug: true, title: true, excerpt: true, category: true, previewImage: true, readingTimeMinutes: true, popularityScore: true, publishedAt: true, createdAt: true, updatedAt: true },
+  coaches: { id: true, slug: true, name: true, photo: true, specialization: true, bio: true, level: true, experience: true, languages: true, rating: true, reviewsCount: true, certificates: true, priceFrom: true, action: true, levels: true, focusAreas: true, languageCodes: true },
+  tournaments: { id: true, slug: true, visualStyle: true, image: true, imageOverlay: true, meshStyle: true, levelFrom: true, levelTo: true, icon: true, title: true, startsAt: true, endsAt: true, format: true, customFormat: true, entryFee: true, description: true, prizeLabel: true, prize: true, action: true, lifecycle: true },
+} as const
+
+export async function createCatalogProjection(payload: Payload, options: { kind: CatalogKind; origin: string; preview: boolean; query?: CatalogQuery }): Promise<CatalogDTO | null> {
   const { kind, origin, preview } = options
-  const { header, rawSite, site, tournamentDefaults } = await baseData(payload, kind, origin, preview)
-  const where = preview ? undefined : kind === 'coaches' ? { and: [{ _status: { equals: 'published' } }, { isActive: { equals: true } }] } : { _status: { equals: 'published' } }
-  const result = await payload.find({ collection: collectionSlugs[kind], depth: 2, draft: preview, limit: 100, overrideAccess: true, pagination: false, sort: kind === 'blog' ? '-publishedAt' : kind === 'coaches' ? 'name' : 'homepageOrder', where } as never) as unknown as { docs: Array<Article | Coach | Tournament> }
-  const base = { version: homepageDTOversion, preview, generatedAt: new Date().toISOString(), page: header, site }
-  if (kind === 'blog') {
-    const categories = await payload.find({ collection: 'article-categories', depth: 0, draft: preview, pagination: false, overrideAccess: true, sort: 'title', where: preview ? undefined : { _status: { equals: 'published' } } })
-    return { ...base, kind, items: (result.docs as Article[]).map((item) => articleItem(item, origin)), categories: categories.docs.map(({ slug, title }) => ({ slug, title })) }
+  const query = parseCatalogQuery(kind, catalogQueryParams(options.query ?? { page: 1 }))
+  const conditions: Record<string, unknown>[] = preview ? [] : [{ _status: { equals: 'published' } }]
+  if (kind === 'coaches') {
+    if (!preview) conditions.push({ isActive: { equals: true } })
+    if (query.level) conditions.push({ levels: { in: [query.level] } })
+    if (query.focus) conditions.push({ focusAreas: { in: [query.focus] } })
+  } else if (kind === 'blog') {
+    if (query.category) conditions.push({ 'category.slug': { equals: query.category } })
+  } else {
+    if (query.lifecycle) conditions.push({ lifecycle: { equals: query.lifecycle } })
+    if (query.format) conditions.push({ format: { equals: query.format } })
+    if (query.level) conditions.push({ levelFrom: { less_than_equal: query.level } }, { levelTo: { greater_than_equal: query.level } })
   }
+  const sort = kind === 'blog' ? (query.sort === 'popular' ? ['-popularityScore', '-publishedAt', 'id'] : ['-publishedAt', 'id']) : kind === 'coaches' ? ['name', 'id'] : ['homepageOrder', 'id']
+  const [baseDataResult, result, categories] = await Promise.all([
+    baseData(payload, kind, origin, preview, false),
+    payload.find({ collection: collectionSlugs[kind], depth: 1, draft: preview, page: query.page, limit: catalogPageSize, overrideAccess: true, sort, select: catalogSelect[kind], where: conditions.length ? { and: conditions } : undefined } as never) as unknown as Promise<{ docs: Array<Article | Coach | Tournament>; totalDocs: number; totalPages: number }>,
+    kind === 'blog' ? payload.find({ collection: 'article-categories', depth: 0, draft: preview, pagination: false, overrideAccess: true, select: { slug: true, title: true }, sort: 'title', where: preview ? undefined : { _status: { equals: 'published' } } }) : Promise.resolve(null),
+  ])
+  const { header, site } = baseDataResult
+  const totalPages = Math.max(1, result.totalPages)
+  if (query.page > totalPages) return null
+  const base = { version: homepageDTOversion, preview, generatedAt: new Date().toISOString(), page: header, site, query, pagination: { page: query.page, limit: catalogPageSize, totalDocs: result.totalDocs, totalPages } }
+  if (kind === 'blog') return { ...base, kind, items: (result.docs as Article[]).map((item) => articleItem(item, origin)), categories: (categories?.docs ?? []).map(({ slug, title }) => ({ slug, title })) }
   if (kind === 'coaches') return { ...base, kind, items: (result.docs as Coach[]).map((item) => coachItem(item, origin)) }
-  if (!tournamentDefaults) throw new Error('Tournament defaults are unavailable.')
-  return { ...base, kind, items: (result.docs as Tournament[]).map((item) => tournamentItem(item, origin, { defaults: tournamentDefaults, site: rawSite })) }
+  return { ...base, kind, items: (result.docs as Tournament[]).map((item) => ({ ...tournamentCard(item, origin), action: actionDTO(item.action), lifecycle: item.lifecycle })) }
 }
 
 export async function createDetailProjection(payload: Payload, options: { kind: CatalogKind; origin: string; preview: boolean; slug: string }): Promise<DetailDTO | null> {

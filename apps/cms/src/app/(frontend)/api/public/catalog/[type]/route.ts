@@ -1,3 +1,5 @@
+import { parseCatalogQuery, catalogQueryParams } from '@unlim/content-contract'
+import { projectionCache, publicProjectionError } from '@/content/projectionCache'
 import { createHash, timingSafeEqual } from 'node:crypto'
 
 import config from '@payload-config'
@@ -26,12 +28,14 @@ export async function GET(request: Request, context: { params: Promise<{ type: s
 
   try {
     const payload = await getPayload({ config })
-    const result = slug
-      ? await createDetailProjection(payload, { kind, origin: publicContentOrigin(url.origin, process.env.PUBLIC_CONTENT_URL), preview, slug })
-      : await createCatalogProjection(payload, { kind, origin: publicContentOrigin(url.origin, process.env.PUBLIC_CONTENT_URL), preview })
+    const query = parseCatalogQuery(kind, url.searchParams)
+    const origin = publicContentOrigin(url.origin, process.env.PUBLIC_CONTENT_URL)
+    const result = await projectionCache.read(`catalog:${kind}:${slug ?? ''}:${catalogQueryParams(query)}:${origin}`, async () => slug
+      ? await createDetailProjection(payload, { kind, origin, preview, slug })
+      : await createCatalogProjection(payload, { kind, origin, preview, query }), preview)
     if (!result) return Response.json({ error: 'Not found.' }, { status: 404, headers: { 'Cache-Control': 'no-store' } })
-    return Response.json(result, { headers: { 'Cache-Control': preview ? 'no-store' : 'public, max-age=0, s-maxage=60, stale-while-revalidate=300' } })
+    return Response.json(result, { headers: { 'Cache-Control': 'no-store' } })
   } catch (error) {
-    return Response.json({ error: error instanceof Error ? error.message : 'Unable to build catalog projection.' }, { status: 500, headers: { 'Cache-Control': 'no-store' } })
+    return publicProjectionError(error, 'catalog')
   }
 }

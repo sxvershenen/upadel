@@ -2,9 +2,11 @@
 import { loadPadelCourtZakazPage } from '../content/loadPage'
 import { PadelCourtZakazPage } from '../landing/PadelCourtZakazPage'
 import SiteLayout from '../layouts/SiteLayout.astro'
+import { courtServiceStructuredData, resolveCanonicalURL } from '../seo/structuredData'
 
 const content = await loadPadelCourtZakazPage(import.meta.env.CMS_URL)
-const canonical = content.page.seo.canonical ?? new URL('/padel-court-zakaz', import.meta.env.PUBLIC_SITE_URL ?? Astro.url.origin).toString()
+const publicOrigin = import.meta.env.PUBLIC_SITE_URL ?? Astro.url.origin
+const canonical = resolveCanonicalURL(publicOrigin, '/padel-court-zakaz/', content.page.seo.canonical)
 ---
 
 <SiteLayout
@@ -14,6 +16,7 @@ const canonical = content.page.seo.canonical ?? new URL('/padel-court-zakaz', im
 	canonical={canonical}
 	robots={content.page.seo.robots}
 	socialImage={content.page.seo.socialImage?.url ?? content.page.hero.media.url}
+	structuredData={courtServiceStructuredData(content, publicOrigin, canonical)}
 	webmasterVerification={content.site.analytics.vendors.webmasterVerification}
 >
 	<PadelCourtZakazPage client:load dto={content} publicOrigin={Astro.url.origin} />

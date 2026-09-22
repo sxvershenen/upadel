@@ -1,13 +1,10 @@
+import { catalogTournamentFormats } from '@unlim/content-contract'
+
 export const tournamentLevelValues = Array.from({ length: 13 }, (_, index) => (1 + index * 0.5).toFixed(1))
 
 export const tournamentLevelOptions = tournamentLevelValues.map((value) => ({ label: value, value }))
 
-export const tournamentFormatOptions = [
-  { label: 'Americano (смена напарников каждый сет)', value: 'americano' },
-  { label: 'Групповой этап + олимпийская сетка', value: 'groups-knockout' },
-  { label: 'Round Robin + финальный плей-офф', value: 'round-robin-playoff' },
-  { label: 'Другой формат', value: 'other' },
-] as const
+export const tournamentFormatOptions = catalogTournamentFormats
 
 const tournamentFormatLabels = Object.fromEntries(
   tournamentFormatOptions.map(({ label, value }) => [value, label]),

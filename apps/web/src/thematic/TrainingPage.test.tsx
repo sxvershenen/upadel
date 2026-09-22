@@ -1,3 +1,4 @@
+import { homepageDTOversion } from '@unlim/content-contract'
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import React from 'react'
@@ -27,7 +28,7 @@ const mockSite = {
 }
 
 const mockDTO: TrainingPageDTO = {
-  version: 12,
+  version: homepageDTOversion,
   preview: false,
   generatedAt: new Date().toISOString(),
   kind: 'training',

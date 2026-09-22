@@ -1,3 +1,5 @@
+import * as migration_20260922_120000_seo_content_truth from './20260922_120000_seo_content_truth'
+import * as migration_20260922_020000_responsive_media from './20260922_020000_responsive_media'
 import * as migration_20260914_230951_analytics_mvp from './20260914_230951_analytics_mvp';
 import * as migration_20260914_232431_analytics_late_event_marker from './20260914_232431_analytics_late_event_marker';
 import * as migration_20260914_234029_page_map_redirects from './20260914_234029_page_map_redirects';
@@ -102,4 +104,6 @@ export const migrations = [
     down: migration_20260921_134500_training_page_content.down,
     name: '20260921_134500_training_page_content'
   },
+  { up: migration_20260922_020000_responsive_media.up, down: migration_20260922_020000_responsive_media.down, name: '20260922_020000_responsive_media' },
+  { up: migration_20260922_120000_seo_content_truth.up, down: migration_20260922_120000_seo_content_truth.down, name: '20260922_120000_seo_content_truth' },
 ];

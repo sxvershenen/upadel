@@ -1,0 +1,18 @@
+---
+interface Props {
+  status: 404 | 503
+  title: string
+  message: string
+}
+
+const { status, title, message } = Astro.props
+---
+
+<main class="container-page flex min-h-screen items-center py-24 text-ink">
+  <div class="max-w-2xl">
+    <p class="type-caption text-ink-soft">Ошибка {status}</p>
+    <h1 class="type-section mt-4">{title}</h1>
+    <p class="type-editorial mt-5 text-ink-soft">{message}</p>
+    <a class="mt-8 inline-flex min-h-12 items-center rounded-full bg-ink px-6 text-white" href="/">На главную</a>
+  </div>
+</main>

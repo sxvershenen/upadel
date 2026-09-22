@@ -1211,7 +1211,7 @@ async function seed() {
           { value: '11.5 м', label: 'Высота потолка', icon: 'PanelTop' },
           { value: '+21°C', label: 'Температура в зале', icon: 'Lightbulb' },
           { value: '350 Lux', label: 'Flicker-free свет', icon: 'Activity' },
-          { value: '2', label: 'Панорамных корта', icon: 'Layers3' },
+          { value: '3', label: 'Панорамных корта', icon: 'Layers3' },
         ],
       },
       {
@@ -1219,8 +1219,8 @@ async function seed() {
         description: 'Неопреновые демпферы между стеклом и металлом гасят удары конструкции — мяч ведёт себя предсказуемо.',
       },
       {
-        slug: 'surface', title: 'Официальное покрытие World Padel Tour', eyebrow: 'Mondo XN', cardVariant: 'surface',
-        description: 'Моноволоконное покрытие с оптимальным сцеплением — то же, что используется на турнирах тура.',
+        slug: 'surface', title: 'Профессиональное покрытие PRO TURF 240', eyebrow: 'PRO TURF 240', cardVariant: 'surface',
+        description: 'Профессиональное покрытие PRO TURF 240 с оптимальным сцеплением и предсказуемым отскоком мяча.',
       },
     ]
     for (const [index, court] of courts.entries()) {
@@ -1231,6 +1231,11 @@ async function seed() {
         await migrateSeededField(payload, 'courts', seededCourt.id, 'title', 'Панорамное остекление', court.title)
         await migrateSeededField(payload, 'courts', seededCourt.id, 'eyebrow', 'Jubo Super Panoramic', court.eyebrow)
         await migrateSeededField(payload, 'courts', seededCourt.id, 'description', '12 мм закалённого стекла без массивных угловых рам и стоек — стабильная игра от стен на любой скорости мяча.', court.description)
+      }
+      if (court.slug === 'surface') {
+        await migrateSeededField(payload, 'courts', seededCourt.id, 'title', 'Официальное покрытие World Padel Tour', court.title)
+        await migrateSeededField(payload, 'courts', seededCourt.id, 'eyebrow', 'Mondo XN', court.eyebrow)
+        await migrateSeededField(payload, 'courts', seededCourt.id, 'description', 'Моноволоконное покрытие с оптимальным сцеплением — то же, что используется на турнирах тура.', court.description)
       }
     }
 
@@ -1527,7 +1532,7 @@ async function seed() {
           formatsTitle: 'Форматы вручения', formatsCopy: 'Премиальный бокс для личного вручения или электронный PDF с доставкой в мессенджер.',
           termsTitle: 'Условия и правила', termsCopy: 'Понятные правила действия сертификата без скрытых условий.',
           benefits: [
-            { badge: 'Корты Jubo', title: 'Аренда кортов', body: '4 панорамных корта Jubo Super Panoramic с профессиональным покрытием Mondo и климат-контролем.', icon: 'Gift' },
+            { badge: 'Корты Jubo', title: 'Аренда кортов', body: '3 панорамных корта Jubo Super Panoramic с профессиональным покрытием PRO TURF 240 и климат-контролем.', icon: 'Gift' },
             { badge: 'PRO-тренеры', title: 'Занятия с тренером', body: 'Персональные и сплит-тренировки с тренерами категорий PRO и Master для любого уровня.', icon: 'BadgeCheck' },
             { badge: 'Varlion Tech', title: 'Тест-драйв ракеток', body: 'Премиальные ракетки испанского бренда Varlion и мячи уже включены в каждый визит.', icon: 'CalendarCheck' },
             { badge: 'Матчи 2х2', title: 'Игра для четверых', body: 'Классический парный матч с друзьями или коллегами: азартная динамичная игра с первого розыгрыша.', icon: 'Sparkles' },
@@ -1559,7 +1564,7 @@ async function seed() {
           ],
           form: giftFormSeed,
           action: { label: 'Оформить сертификат', mode: 'lead-form', leadType: 'gift' },
-          seo: { title: 'Подарочный сертификат на падел в Москве — тренировки и аренда корта | UNLIM', description: 'Подарочный сертификат на падел в Москве: электронный PDF за 2 минуты или премиальный бокс, аренда панорамного корта Jubo и тренировка с тренером.', robots: 'index-follow' },
+          seo: { title: 'Подарочный сертификат на падел в Москве — тренировки и аренда корта | UNLIM', description: 'Подарочный сертификат на падел в Москве: аренда панорамного корта, тренировка с тренером, электронный PDF или подарочный бокс.', socialImage: giftMedia.card.id, robots: 'index-follow' },
         },
       },
       {
@@ -1567,9 +1572,9 @@ async function seed() {
           eyebrow: 'Инфраструктура', title: 'Панорамные корты', intro: 'Турнирная геометрия, профессиональное покрытие и контролируемый климат для стабильной игры круглый год.',
           infographicTitle: 'Корт в цифрах', infographicCopy: 'Параметры площадки и зала, которые напрямую влияют на качество игры.',
           metrics: [
-            { value: '4', label: 'панорамных корта', icon: 'Layers3' }, { value: '11.5 м', label: 'высота потолка', icon: 'PanelTop' },
+            { value: '3', label: 'панорамных корта', icon: 'Layers3' }, { value: '11.5 м', label: 'высота потолка', icon: 'PanelTop' },
             { value: '350 Lux', label: 'flicker-free свет', icon: 'Lightbulb' }, { value: '+21°C', label: 'климат круглый год', icon: 'Thermometer' },
-          ], seo: { title: 'Корты — UNLIM RIGA PADEL', description: 'Панорамные корты Jubo и профессиональное покрытие Mondo.', robots: 'index-follow' },
+          ], seo: { title: 'Корты — UNLIM RIGA PADEL', description: 'Три панорамных корта Jubo и профессиональное покрытие PRO TURF 240.', robots: 'index-follow' },
         },
       },
       { slug: 'gallery-page' as const, data: { eyebrow: 'Сообщество', title: 'Галерея клуба', intro: 'Тренировки, турниры и повседневная жизнь UNLIM RIGA PADEL.', seo: { title: 'Галерея — UNLIM RIGA PADEL', description: 'Фотографии клуба, тренировок и турниров.', robots: 'index-follow' } } },
@@ -1577,7 +1582,7 @@ async function seed() {
         slug: 'about-page' as const, data: {
           eyebrow: 'О клубе', title: 'Пространство для игры и сообщества', intro: 'Мы объединили профессиональные корты, сильную тренерскую команду и атмосферу современного спортивного клуба.',
           story: richText('UNLIM RIGA PADEL создан для игроков разного уровня — от первой тренировки до клубных лиг. Пространство спроектировано вокруг качества игры, восстановления и общения.'),
-          stats: [{ value: '2023', label: 'год открытия' }, { value: '4', label: 'панорамных корта' }, { value: '9', label: 'тренеров' }, { value: '2 100+', label: 'игроков клуба' }],
+          stats: [{ value: '2023', label: 'год открытия' }, { value: '3', label: 'панорамных корта' }, { value: '9', label: 'тренеров' }, { value: '2 100+', label: 'игроков клуба' }],
           seo: { title: 'О клубе — UNLIM RIGA PADEL', description: 'История, команда и инфраструктура клуба.', robots: 'index-follow' },
         },
       },
@@ -1650,11 +1655,21 @@ async function seed() {
         const additions = Object.fromEntries(['offerEyebrow', 'offerTitle', 'offerCopy', 'formatsTitle', 'formatsCopy', 'termsTitle', 'termsCopy', 'stepsEyebrow', 'stepsTitle', 'faqTitle', 'formats', 'terms', 'form'].filter((key) => current[key] == null || Array.isArray(current[key]) && current[key].length === 0).map((key) => [key, giftData[key]]))
         if (!current.form || typeof current.form !== 'object' || !current.form.sectionTitle) additions.form = giftData.form
         if (seededBenefits && (seededBenefits.badge == null || seededBenefits.title !== 'Аренда кортов')) additions.benefits = giftData.benefits
+        const migratedBenefits = Array.isArray(current.benefits) ? current.benefits.map((benefit: Record<string, unknown>) => benefit.body === '4 панорамных корта Jubo Super Panoramic с профессиональным покрытием Mondo и климат-контролем.'
+          ? { ...benefit, body: '3 панорамных корта Jubo Super Panoramic с профессиональным покрытием PRO TURF 240 и климат-контролем.' }
+          : benefit) : []
+        if (JSON.stringify(migratedBenefits) !== JSON.stringify(current.benefits ?? [])) additions.benefits = migratedBenefits
         if (current.title === 'Подарить падел') {
           additions.title = giftData.title
           additions.intro = giftData.intro
         }
         if (String(current.heroImage ?? '') !== String(giftMedia.card.id)) additions.heroImage = giftMedia.card.id
+        const currentSEO = current.seo && typeof current.seo === 'object' ? current.seo : {}
+        const nextSEO = { ...currentSEO } as Record<string, unknown>
+        if (!nextSEO.title) nextSEO.title = (giftData.seo as Record<string, unknown>).title
+        if (!nextSEO.description || nextSEO.description === 'Подарочный сертификат на падел в Москве: электронный PDF за 2 минуты или премиальный бокс, аренда панорамного корта Jubo и тренировка с тренером.') nextSEO.description = (giftData.seo as Record<string, unknown>).description
+        if (!nextSEO.socialImage) nextSEO.socialImage = giftMedia.card.id
+        if (JSON.stringify(nextSEO) !== JSON.stringify(currentSEO)) additions.seo = nextSEO
         if (Object.keys(additions).length > 0) {
           await payload.updateGlobal({ slug: page.slug, draft: false, overrideAccess: true, data: { ...additions, _status: 'published' } as never })
           stats.globalsPublished += 1
@@ -1737,6 +1752,7 @@ async function seed() {
       ? await payload.findGlobal({ slug: 'homepage', draft: false, depth: 0, overrideAccess: true, showHiddenFields: true })
       : draftCurrentHome
     if (currentHome.seedVersion === seedVersion) {
+      const homepageUpdates: Record<string, unknown> = {}
       const currentCards = Array.isArray(currentHome.benefitsSection?.cards) ? currentHome.benefitsSection.cards : []
       const migratedCards = currentCards.map((card: Record<string, any>) => {
         if (card.variant === 'shower' && card.title === 'Тропический душ') {
@@ -1760,8 +1776,17 @@ async function seed() {
         return card
       })
       const benefitsChanged = migratedCards.some((card, index) => card !== currentCards[index])
-      if (benefitsChanged) {
-        await payload.updateGlobal({ slug: 'homepage', draft: false, overrideAccess: true, data: { benefitsSection: { ...currentHome.benefitsSection, cards: migratedCards }, _status: 'published' } as never })
+      if (benefitsChanged) homepageUpdates.benefitsSection = { ...currentHome.benefitsSection, cards: migratedCards }
+      const currentHero = currentHome.hero && typeof currentHome.hero === 'object' ? currentHome.hero as Record<string, any> : {}
+      const migratedHero = { ...currentHero }
+      if (!migratedHero.seoHeading) migratedHero.seoHeading = 'Премиальный крытый падел-клуб'
+      if (migratedHero.description === 'Премиальный крытый падел-клуб с испанскими панорамными кортами Jubo Super Panoramic, профессиональным покрытием Mondo Super XN и клубным лаунжем.' || migratedHero.description === 'Премиальный крытый падел-клуб с испанскими панорамными кортами Jubo Super Panoramic, профессиональным покрытием Mondo Super XN и клубным лаунжем.') {
+        migratedHero.description = 'с испанскими панорамными кортами Jubo Super Panoramic, профессиональным покрытием PRO TURF 240 и клубным лаунжем.'
+      }
+      migratedHero.stats = Array.isArray(migratedHero.stats) ? migratedHero.stats.map((stat: Record<string, unknown>) => stat.label === 'Jubo Super Panoramic' && (stat.value === '2 корта' || stat.value === '4 корта') ? { ...stat, value: '3 корта' } : stat) : migratedHero.stats
+      if (JSON.stringify(migratedHero) !== JSON.stringify(currentHero)) homepageUpdates.hero = migratedHero
+      if (Object.keys(homepageUpdates).length > 0) {
+        await payload.updateGlobal({ slug: 'homepage', draft: false, overrideAccess: true, data: { ...homepageUpdates, _status: 'published' } as never })
         stats.globalsPublished += 1
       } else {
         stats.skipped += 1
@@ -1783,13 +1808,14 @@ async function seed() {
           ],
           hero: {
             titleLine: 'Первая тренировка', titleConnector: 'за', titleAccent: '1 990 ₽',
-            description: 'Премиальный крытый падел-клуб с испанскими панорамными кортами Jubo Super Panoramic, профессиональным покрытием Mondo Super XN и клубным лаунжем.',
+            seoHeading: 'Премиальный крытый падел-клуб',
+            description: 'с испанскими панорамными кортами Jubo Super Panoramic, профессиональным покрытием PRO TURF 240 и клубным лаунжем.',
             desktopMedia: mediaID(images.hero),
             primaryAction: { label: 'Забронировать', mode: 'booking' },
             secondaryAction: { label: 'Пробное занятие', mode: 'trial-booking' },
             socialProof: { ratingLabel: '4.9 · 500+ игроков', caption: 'Рейтинг клуба на Новой Риге', coaches: coaches.slice(0, 3).map(({ id }) => id) },
             stats: [
-              { value: '2 корта', label: 'Jubo Super Panoramic' }, { value: '11.5 м', label: 'Высота до балок' },
+              { value: '3 корта', label: 'Jubo Super Panoramic' }, { value: '11.5 м', label: 'Высота до балок' },
               { value: '+21°C', label: 'Климат-контроль круглый год' }, { value: '30 сек', label: 'Мгновенное бронирование' },
             ],
           },
@@ -1884,8 +1910,18 @@ async function seed() {
       if (currentSettings.phoneDisplay === '+7 999 000-00-00') contactUpdates.phoneDisplay = '+7 985 835-00-55'
       if (currentSettings.phoneValue === '+79990000000') contactUpdates.phoneValue = '+79858350055'
       if (currentSettings.openingHours === 'Ежедневно 07:00–00:00') contactUpdates.openingHours = 'Ежедневно 07:00–23:00'
+      if (currentSettings.parking === '40 бесплатных мест у входа' || currentSettings.parking === '40 бесплатных мест у входа') contactUpdates.parking = '50 бесплатных мест у входа'
       if (Object.keys(contactUpdates).length > 0) {
         await payload.updateGlobal({ slug: 'site-settings', draft: false, overrideAccess: true, data: { ...contactUpdates, _status: 'published' } as never })
+        stats.globalsPublished += 1
+      }
+      const migratedFooterStats = (currentSettings.footerStats ?? []).map((stat: Record<string, unknown>) => stat.label === 'Панорамных корта' && stat.value === '4' ? { ...stat, value: '3' } : stat)
+      const migratedSocialLinks = (currentSettings.socialLinks ?? [])
+        .filter((link: Record<string, unknown>) => link.url !== 'https://t.me' && link.url !== '#')
+        .map((link: Record<string, unknown>) => link.provider === 'vk' && link.url === 'https://vk.com' ? { ...link, url: 'https://vk.ru/unlimpadel' } : link)
+      if (!migratedSocialLinks.some((link: Record<string, unknown>) => link.provider === 'vk')) migratedSocialLinks.push({ provider: 'vk', label: 'VK', url: 'https://vk.ru/unlimpadel' })
+      if (JSON.stringify(migratedFooterStats) !== JSON.stringify(currentSettings.footerStats ?? []) || JSON.stringify(migratedSocialLinks) !== JSON.stringify(currentSettings.socialLinks ?? [])) {
+        await payload.updateGlobal({ slug: 'site-settings', draft: false, overrideAccess: true, data: { footerStats: migratedFooterStats, socialLinks: migratedSocialLinks, _status: 'published' } as never })
         stats.globalsPublished += 1
       }
     } else {
@@ -1907,20 +1943,16 @@ async function seed() {
           address: 'Новорижское шоссе, 3к1', directionsURL: 'https://yandex.ru/maps/?text=Новорижское%20шоссе%203к1',
           addressLabel: 'Адрес', transitLabel: 'Ближайшее метро', parkingLabel: 'Парковка', openingHoursLabel: 'Режим работы', phoneFieldLabel: 'Телефон', emailFieldLabel: 'Email',
           phoneDisplay: '+7 985 835-00-55', phoneValue: '+79858350055', email: 'hello@unlimriga.club', transit: 'Мякинино · 12 мин пешком',
-          parking: '40 бесплатных мест у входа', openingHours: 'Ежедневно 07:00–23:00', map: { latitude: 55.8, longitude: 37.15, zoom: 14 },
+          parking: '50 бесплатных мест у входа', openingHours: 'Ежедневно 07:00–23:00', map: { latitude: 55.8, longitude: 37.15, zoom: 14 },
           footerImage: mediaID(images.footerClub),
           footerAbout: 'Unlim Riga Padel — клуб для тех, кто хочет играть на кортах уровня мировых турниров рядом с домом. Мы строили пространство вокруг трёх вещей: качества покрытия, работы тренеров и атмосферы, в которую хочется возвращаться. Здесь одинаково комфортно и новичку на первой тренировке, и резиденту клуба перед финалом лиги.',
           footerStats: [
-            { value: '2023', label: 'Год открытия' }, { value: '4', label: 'Панорамных корта' },
+            { value: '2023', label: 'Год открытия' }, { value: '3', label: 'Панорамных корта' },
             { value: '9', label: 'Тренеров в штате' }, { value: '2 100+', label: 'Игроков в клубе' },
           ],
           legalEntity: 'ООО «Анлим Спорт» · ИНН 5024178932 · ОГРН 1235000078451',
           footerNavigation: [...footerNavigation],
-          socialLinks: [
-            { provider: 'telegram', label: 'Telegram', url: 'https://t.me' },
-            { provider: 'video', label: 'Видео клуба', url: '#' },
-            { provider: 'vk', label: 'VK', url: 'https://vk.com' },
-          ],
+          socialLinks: [{ provider: 'vk', label: 'VK', url: 'https://vk.ru/unlimpadel' }],
           legalLinks: [...legalLinks],
           copyright: '© 2026 Unlim Riga Padel. Все права защищены.',
           cookieNotice: { text: 'Используем cookies, чтобы бронирование и подбор тренировок работали быстрее.', acceptLabel: 'Хорошо' },

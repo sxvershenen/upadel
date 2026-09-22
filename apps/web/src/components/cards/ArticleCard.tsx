@@ -16,7 +16,7 @@ export function ArticleCard({ post, mobilePlain = false, loading = "eager", reve
   const imageY = useImageParallax(imageRef);
   return <motion.a {...revealAttributes(reveal, undefined, true)} href={`/blog/${post.slug}`} initial="rest" whileHover="hover" variants={{ rest: { y: 0, scale: 1 }, hover: { y: -5, scale: 1.012 } }} transition={springSoft} className={`card-spring group group/card flex cursor-pointer flex-col ${mobilePlain ? 'border-b border-ink/10 pb-5' : ''}`}>
     <div ref={imageRef} data-parallax-viewport className="parallax-viewport se-3 relative aspect-[4/3] w-full">
-      <motion.div data-parallax-layer style={{ y: imageY }} className="parallax-layer overflow-hidden"><ProgressiveImage src={post.image.url} alt={post.image.alt} loading={loading} className="h-full w-full object-cover" variants={{ rest: { scale: 1.04 }, hover: { scale: 1.095 } }} transition={springSoft} /></motion.div>
+      <motion.div data-parallax-layer style={{ y: imageY }} className="parallax-layer overflow-hidden"><ProgressiveImage media={post.image} sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw" alt={post.image.alt} loading={loading} className="h-full w-full object-cover" variants={{ rest: { scale: 1.04 }, hover: { scale: 1.095 } }} transition={springSoft} /></motion.div>
       <div className={`absolute left-3 top-3 items-center gap-2 ${mobilePlain ? "hidden md:flex" : "flex"}`}><Badge tone="glass">{typeof post.category === "string" ? post.category : post.category.title}</Badge></div>
       <div className="absolute right-3 top-3"><ArrowAction tone="glass" size="sm" cardHover /></div>
     </div>

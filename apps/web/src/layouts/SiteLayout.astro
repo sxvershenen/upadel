@@ -1,8 +1,9 @@
 ---
 import '../index.css'
-import type { SiteDTO } from '@unlim/content-contract'
+import type { MediaDTO, SiteDTO } from '@unlim/content-contract'
 import { SiteChromeIsland } from '../components/navigation/SiteChromeIsland'
 import { GlobalPageTransition } from '../transition-demo/GlobalPageTransition'
+import { resolveCanonicalURL, serializeStructuredData, type StructuredDataNode } from '../seo/structuredData'
 
 interface Props {
   description?: string
@@ -10,6 +11,8 @@ interface Props {
   robots?: string
   canonical?: string | null
   socialImage?: string | null
+  preloadImage?: MediaDTO | null
+  structuredData?: StructuredDataNode[]
   webmasterVerification?: string | null
   site?: SiteDTO
 }
@@ -20,40 +23,50 @@ const {
   robots,
   canonical,
   socialImage,
+  preloadImage,
+  structuredData = [],
   webmasterVerification,
   site,
 } = Astro.props
 const robotsContent = robots?.replace('-', ', ')
 const publicOrigin = import.meta.env.PUBLIC_SITE_URL ?? Astro.url.origin
-const canonicalPath = Astro.url.pathname === '/' ? '/' : `${Astro.url.pathname.replace(/\/+$/, '')}/`
-const resolvedCanonical = canonical?.trim() || new URL(canonicalPath, publicOrigin).toString()
+const publicRoot = resolveCanonicalURL(publicOrigin, '/')
+const resolvedCanonical = resolveCanonicalURL(publicOrigin, Astro.url.pathname, canonical)
 const siteSchema = site ? {
   '@context': 'https://schema.org',
   '@graph': [
     {
-      '@type': 'Organization',
-      '@id': `${publicOrigin}/#organization`,
+      '@type': 'WebSite',
+      '@id': `${publicRoot}#website`,
       name: site.brandName,
-      url: publicOrigin,
+      url: publicRoot,
+      publisher: { '@id': `${publicRoot}#organization` },
+    },
+    {
+      '@type': 'Organization',
+      '@id': `${publicRoot}#organization`,
+      name: site.brandName,
+      url: publicRoot,
       ...(site.brandLogo?.url ? { logo: site.brandLogo.url } : {}),
       sameAs: site.footer.socialLinks.map(({ url }) => url).filter((url) => /^https?:\/\//i.test(url)),
     },
     {
       '@type': 'SportsActivityLocation',
-      '@id': `${publicOrigin}/#club`,
+      '@id': `${publicRoot}#club`,
       name: site.brandName,
-      url: publicOrigin,
+      url: publicRoot,
       address: site.contacts.address,
       telephone: site.contacts.phoneValue || undefined,
       email: site.contacts.email || undefined,
       ...(site.contacts.map.latitude || site.contacts.map.longitude
         ? { geo: { '@type': 'GeoCoordinates', latitude: site.contacts.map.latitude, longitude: site.contacts.map.longitude } }
         : {}),
-      parentOrganization: { '@id': `${publicOrigin}/#organization` },
+      parentOrganization: { '@id': `${publicRoot}#organization` },
     },
   ],
 } : null
-const siteSchemaJSON = siteSchema ? JSON.stringify(siteSchema).replaceAll('<', '\\u003c') : null
+const schemaGraph = [...(siteSchema?.['@graph'] ?? []), ...structuredData]
+const siteSchemaJSON = schemaGraph.length > 0 ? serializeStructuredData({ '@context': 'https://schema.org', '@graph': schemaGraph }) : null
 const enableGlobalTransitions = !Astro.url.pathname.startsWith('/transitions/') && !Astro.url.pathname.startsWith('/preview/')
 const pageEntrance = Astro.url.pathname === '/gift'
   ? 'gift'
@@ -85,7 +98,7 @@ const pageEntrance = Astro.url.pathname === '/gift'
     <meta name="twitter:description" content={description} />
     {socialImage && <meta name="twitter:image" content={socialImage} />}
     {siteSchemaJSON && <script type="application/ld+json" is:inline set:html={siteSchemaJSON} />}
-    {socialImage && <link rel="preload" href={socialImage} as="image" fetchpriority="high" />}
+    {preloadImage && <link rel="preload" href={preloadImage.url} as="image" fetchpriority="high" imagesrcset={preloadImage.srcSet ?? undefined} imagesizes={preloadImage.srcSet ? '100vw' : undefined} />}
     {webmasterVerification?.trim() && <meta name="yandex-verification" content={webmasterVerification.trim()} />}
     <link rel="preload" href="/fonts/inter-tight/inter-tight-v9-cyrillic.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/inter-tight/inter-tight-v9-latin.woff2" as="font" type="font/woff2" crossorigin />

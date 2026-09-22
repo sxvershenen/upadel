@@ -20,11 +20,21 @@ export const heroFields: Field[] = [
         ],
       },
       {
+        name: 'seoHeading',
+        type: 'text',
+        label: 'Главный заголовок для поисковых систем (SEO)',
+        defaultValue: 'Премиальный крытый падел-клуб',
+        required: true,
+        admin: {
+          description: 'Главный заголовок для поисковых систем (SEO). Обычно менять не нужно: он показывается под большим предложением и должен точно описывать клуб.',
+        },
+      },
+      {
         name: 'description',
         type: 'textarea',
-        label: 'Описание',
+        label: 'Продолжение главного SEO-заголовка',
         defaultValue:
-          'Премиальный крытый падел-клуб с испанскими панорамными кортами Jubo Super Panoramic, профессиональным покрытием Mondo Super XN и клубным лаунжем.',
+          'с испанскими панорамными кортами Jubo Super Panoramic, профессиональным покрытием PRO TURF 240 и клубным лаунжем.',
       },
       {
         name: 'desktopMedia',
@@ -68,7 +78,7 @@ export const heroFields: Field[] = [
         label: 'Статистика',
         maxRows: 4,
         defaultValue: [
-          { value: '2 корта', label: 'Jubo Super Panoramic' },
+          { value: '3 корта', label: 'Jubo Super Panoramic' },
           { value: '11.5 м', label: 'Высота до балок' },
           { value: '+21°C', label: 'Климат-контроль круглый год' },
           { value: '30 сек', label: 'Мгновенное бронирование' },

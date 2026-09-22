@@ -1,3 +1,4 @@
+import { projectionCache } from '../content/projectionCache'
 import type { CollectionSlug, Payload, PayloadRequest } from 'payload'
 
 export type MediaUsage = {
@@ -216,7 +217,7 @@ async function findReferencingDocs(payload: Payload, entry: RegistryEntry, ids: 
   return result.docs
 }
 
-export async function getMediaUsage(payload: Payload, mediaIDs: Array<number | string>, req?: PayloadRequest): Promise<MediaUsage[]> {
+async function scanMediaUsage(payload: Payload, mediaIDs: Array<number | string>, req?: PayloadRequest): Promise<MediaUsage[]> {
   const ids = [...new Set(mediaIDs.map(String))]
   if (ids.length === 0) return []
   const usage = new Map<string, MediaUsage>()
@@ -231,27 +232,29 @@ export async function getMediaUsage(payload: Payload, mediaIDs: Array<number | s
     await Promise.all(collectionTasks.map((task) => task()))
   }
 
-  const articleBodyTasks = [
-    () => payload.find({ collection: 'articles', depth: 0, draft: false, pagination: false, overrideAccess: true, req, where: { _status: { equals: 'published' } } } as never),
-    () => payload.find({ collection: 'articles', depth: 0, draft: true, pagination: false, overrideAccess: true, req } as never),
-  ] as const
-  const articleBodyResults = req
-    ? [await articleBodyTasks[0](), await articleBodyTasks[1]()]
-    : await Promise.all(articleBodyTasks.map((task) => task()))
-  scanArticleBodies(usage, articleBodyResults[0].docs as unknown as Array<Record<string, unknown>>, 'live')
-  scanArticleBodies(usage, articleBodyResults[1].docs as unknown as Array<Record<string, unknown>>, 'draft-only')
-
-  const versions = await payload.findVersions({
-    collection: 'articles',
-    depth: 0,
-    pagination: false,
-    overrideAccess: true,
-    req,
-  })
-  scanArticleBodies(usage, versions.docs.map((entry) => {
-    const version = entry.version as unknown as Record<string, unknown>
-    return { ...version, id: entry.parent ?? version.id }
-  }), 'version', true)
+  // Scan bounded pages; deletion checks always carry the live transaction request.
+  for (const draft of [false, true]) {
+    let page = 1
+    for (;;) {
+      const result = await payload.find({ collection: 'articles', depth: 0, draft, page, limit: 100,
+        select: { id: true, title: true, content: true }, overrideAccess: true, req,
+        sort: 'id', where: draft ? undefined : { _status: { equals: 'published' } },
+      })
+      scanArticleBodies(usage, result.docs as unknown as Array<Record<string, unknown>>, draft ? 'draft-only' : 'live')
+      if (!result.hasNextPage || !result.nextPage) break
+      page = result.nextPage
+    }
+  }
+  let versionPage = 1
+  for (;;) {
+    const versions = await payload.findVersions({ collection: 'articles', depth: 0, page: versionPage, limit: 100, sort: 'id', overrideAccess: true, req })
+    scanArticleBodies(usage, versions.docs.map((entry) => {
+      const version = entry.version as unknown as Record<string, unknown>
+      return { ...version, id: entry.parent ?? version.id }
+    }), 'version', true)
+    if (!versions.hasNextPage || !versions.nextPage) break
+    versionPage = versions.nextPage
+  }
 
   const globalTasks = [
     () => payload.findGlobal({ slug: 'homepage', depth: 0, draft: false, overrideAccess: true, req }),
@@ -288,4 +291,15 @@ export async function getMediaUsage(payload: Payload, mediaIDs: Array<number | s
   }
 
   return [...usage.values()].filter(({ mediaID }) => ids.includes(mediaID)).sort((a, b) => a.location.localeCompare(b.location, 'ru'))
+}
+
+const payloadIDs = new WeakMap<Payload, number>()
+let nextPayloadID = 0
+export async function getMediaUsage(payload: Payload, mediaIDs: Array<number | string>, req?: PayloadRequest): Promise<MediaUsage[]> {
+  // Deletion authorization never consumes an admin display cache, even inside a transaction.
+  if (req) return scanMediaUsage(payload, mediaIDs, req)
+  const ids = [...new Set(mediaIDs.map(String))].sort()
+  if (!ids.length) return []
+  if (!payloadIDs.has(payload)) payloadIDs.set(payload, ++nextPayloadID)
+  return projectionCache.read(`media-usage:${payloadIDs.get(payload)}:${ids.join(',')}`, () => scanMediaUsage(payload, ids))
 }

@@ -19,7 +19,21 @@ export function mediaDTO(value: unknown, origin: string, variant: MediaVariant =
   if (!isMedia(value) || !value.url || !value.mimeType) return null
   const selected = value.mimeType.startsWith('image/') && variant !== 'original' ? value.sizes?.[variant] : null
   const url = selected?.url ?? value.url
-  return { alt: value.alt, height: selected?.height ?? value.height, mimeType: selected?.mimeType ?? value.mimeType, url: publicMediaURL(url, origin), width: selected?.width ?? value.width }
+  const width = selected?.width ?? value.width
+  const height = selected?.height ?? value.height
+  const ratio = width && height ? width / height : null
+  const candidates = new Map<number, string>()
+  if (variant !== 'original' && ratio && value.mimeType !== 'image/svg+xml' && value.mimeType !== 'image/gif') {
+    // A cropped square thumbnail must never replace an uncropped landscape image.
+    for (const candidate of [value, ...Object.values(value.sizes ?? {})]) {
+      if (!candidate?.url || !candidate.width || !candidate.height || candidate.width > 1920) continue
+      if (Math.abs(candidate.width / candidate.height - ratio) / ratio > .015) continue
+      candidates.set(candidate.width, publicMediaURL(candidate.url, origin))
+    }
+  }
+  if (candidates.size && width) candidates.set(width, publicMediaURL(url, origin))
+  const srcSet = candidates.size > 1 ? [...candidates].sort(([a], [b]) => a - b).map(([size, src]) => `${src} ${size}w`).join(', ') : undefined
+  return { alt: value.alt, height, mimeType: selected?.mimeType ?? value.mimeType, url: publicMediaURL(url, origin), width, ...(srcSet ? { srcSet } : {}) }
 }
 
 export function requiredMedia(value: unknown, origin: string, variant: MediaVariant = 'card'): MediaDTO {
@@ -46,8 +60,15 @@ export function seoDTO(value: unknown, origin: string): PageSEO {
   return { title: seo.title, description: seo.description, canonical: seo.canonical, robots: seo.robots ?? 'index-follow', socialImage: mediaDTO(seo.socialImage, origin) }
 }
 
+export function isPublicSocialURL(value: string): boolean {
+  try {
+    const url = new URL(value)
+    return url.protocol === 'https:' && (url.pathname.replace(/\//g, '').length > 0 || Boolean(url.search))
+  } catch { return false }
+}
+
 export function siteDTO(site: SiteSetting, origin: string, partners: Array<Record<string, unknown>> = []): SiteDTO {
-  const social = site.socialLinks ?? []
+  const social = (site.socialLinks ?? []).filter(({ url }) => isPublicSocialURL(url))
   const telegram = social.find(({ provider }) => provider === 'telegram')
   const vk = social.find(({ provider }) => provider === 'vk')
   const confirmation = site.contactConfirmation
@@ -76,7 +97,7 @@ export function siteDTO(site: SiteSetting, origin: string, partners: Array<Recor
     },
     footer: {
       image: mediaDTO(site.footerImage, origin), about: site.footerAbout ?? '', stats: (site.footerStats ?? []).map(({ value, label }) => ({ value, label })), legalEntity: site.legalEntity ?? '',
-      navigation: (site.footerNavigation ?? []).map(({ label, href, column }) => ({ label, href, column })), socialLinks: (site.socialLinks ?? []).map(({ provider, label, url }) => ({ provider, label, url })), legalLinks: (site.legalLinks ?? []).map(({ label, href }) => ({ label, href })), copyright: site.copyright ?? '', cookieNotice: { text: site.cookieNotice?.text ?? '', acceptLabel: site.cookieNotice?.acceptLabel ?? 'Принять', rejectLabel: site.cookieNotice?.rejectLabel ?? 'Отклонить', manageLabel: site.cookieNotice?.manageLabel ?? 'Настроить cookies' },
+      navigation: (site.footerNavigation ?? []).map(({ label, href, column }) => ({ label, href, column })), socialLinks: social.map(({ provider, label, url }) => ({ provider, label, url })), legalLinks: (site.legalLinks ?? []).map(({ label, href }) => ({ label, href })), copyright: site.copyright ?? '', cookieNotice: { text: site.cookieNotice?.text ?? '', acceptLabel: site.cookieNotice?.acceptLabel ?? 'Принять', rejectLabel: site.cookieNotice?.rejectLabel ?? 'Отклонить', manageLabel: site.cookieNotice?.manageLabel ?? 'Настроить cookies' },
     },
     analytics: {
       mode: site.analytics?.mode ?? 'consent-required', endpoint: new URL('/api/public/analytics', process.env.PUBLIC_CONTENT_URL ?? process.env.PUBLIC_CMS_URL ?? origin).toString(), schemaVersion: 1,
@@ -97,8 +118,8 @@ export function siteDTO(site: SiteSetting, origin: string, partners: Array<Recor
       channels: [
         { channel: 'phone', enabled: confirmation?.phoneEnabled !== false, label: 'Телефон', displayValue: site.phoneDisplay ?? '', destination: `tel:${site.phoneValue ?? ''}` },
         { channel: 'email', enabled: confirmation?.emailEnabled !== false, label: 'Email', displayValue: site.email ?? '', destination: `mailto:${site.email ?? ''}` },
-        { channel: 'telegram', enabled: confirmation?.telegramEnabled !== false, label: telegram?.label ?? 'Telegram', displayValue: telegram?.url ?? '', destination: telegram?.url ?? '' },
-        { channel: 'vk', enabled: confirmation?.vkEnabled !== false, label: vk?.label ?? 'VK', displayValue: vk?.url ?? '', destination: vk?.url ?? '' },
+        { channel: 'telegram', enabled: Boolean(telegram) && confirmation?.telegramEnabled !== false, label: telegram?.label ?? 'Telegram', displayValue: telegram?.url ?? '', destination: telegram?.url ?? '' },
+        { channel: 'vk', enabled: Boolean(vk) && confirmation?.vkEnabled !== false, label: vk?.label ?? 'VK', displayValue: vk?.url ?? '', destination: vk?.url ?? '' },
       ],
     },
   }

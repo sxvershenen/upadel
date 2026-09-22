@@ -9,6 +9,7 @@ import {
   GiftLandingPage,
   useCases,
   giftFormats,
+  giftPurposeOptions,
   termsList,
   faqItems,
   typograph,
@@ -48,7 +49,7 @@ const mockSite = {
   address: 'Новорижское шоссе, 3к1',
 }
 
-test('GiftLandingPage renders server HTML with SEO content, schema.org metadata and key sections', () => {
+test('GiftLandingPage renders server HTML with SEO content and key sections', () => {
   const html = renderToStaticMarkup(
     <ActionLayerProvider site={mockSite as any}>
       <GiftLandingPage dto={{ site: mockSite } as any} />
@@ -60,12 +61,8 @@ test('GiftLandingPage renders server HTML with SEO content, schema.org metadata 
   assert.match(html, /id="terms"/)
   assert.match(html, /id="order-section"/)
 
-  // Schema.org JSON-LD
-  assert.match(html, /application\/ld\+json/)
-  assert.match(html, /schema\.org/)
-  assert.match(html, /"FAQPage"/)
-  assert.match(html, /"BreadcrumbList"/)
-  assert.match(html, /"Product"/)
+  // JSON-LD is emitted once by the SSR layout, outside this hydrated island.
+  assert.doesNotMatch(html, /application\/ld\+json/)
 
   // Formats (physical box on left, digital PDF on right)
   assert.equal(giftFormats.length, 2)
@@ -75,6 +72,9 @@ test('GiftLandingPage renders server HTML with SEO content, schema.org metadata 
   assert.match(html, /Электронный PDF/)
   assert.doesNotMatch(html, /Выбран бокс|Выбран PDF/)
   assert.match(html, /aria-label="Формат сертификата"/)
+  assert.equal(giftPurposeOptions.at(-1)?.label, 'Номинал согласовать с менеджером')
+  assert.equal(giftPurposeOptions.some(({ label }) => /\d[\d\s]*₽/.test(label)), false)
+  assert.doesNotMatch(html, /Матч для четверых \(12 000 ₽\)|Депозит 30 000 ₽/)
   assert.doesNotMatch(html, /ring-ink/)
 
   // Use cases, terms, and FAQs counts

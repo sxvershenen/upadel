@@ -94,3 +94,30 @@ test('reports article body uploads from published, draft and retained versions',
   assert.equal(usage.find(({ mediaID }) => mediaID === '23')?.state, 'version')
   assert.equal(usage.find(({ mediaID }) => mediaID === '23')?.href, '/admin/collections/articles/3')
 })
+
+test('admin display cache is invalidated on content changes; deletion checks always rescan', async () => {
+  const { markContentChanged } = await import('../content/projectionCache')
+  let mediaID = 11; let scans = 0
+  const payload = { find: async () => ({ docs: [] }), findVersions: async () => ({ docs: [] }), findGlobal: async ({ slug }: { slug: string }) => {
+    scans++; return slug === 'site-settings' ? { _status: 'published', brandLogo: mediaID } : { _status: 'draft' }
+  } }
+  assert.equal((await getMediaUsage(payload as never, [11])).length, 1)
+  const before = scans; await getMediaUsage(payload as never, [11]); assert.equal(scans, before)
+  mediaID = 12
+  assert.equal((await getMediaUsage(payload as never, [12], {} as never)).length, 1)
+  assert.ok(scans > before)
+  await markContentChanged({})
+  assert.equal((await getMediaUsage(payload as never, [11])).length, 0)
+})
+
+test('later article/version pages retain deletion references and scan failures reject', async () => {
+  const upload = { root: { children: [{ type: 'upload', relationTo: 'media', value: 55 }] } }
+  const payload = {
+    find: async () => ({ docs: [] }),
+    findVersions: async ({ page }: { page: number }) => page === 1 ? { docs: [], hasNextPage: true, nextPage: 2 } : { docs: [{ parent: 8, version: { content: upload, title: 'Archived' } }], hasNextPage: false },
+    findGlobal: async () => ({ _status: 'draft' }),
+  }
+  assert.equal((await getMediaUsage(payload as never, [55], {} as never))[0]?.state, 'version')
+  payload.findVersions = async () => { throw new Error('scan failed') }
+  await assert.rejects(getMediaUsage(payload as never, [55], {} as never), /scan failed/)
+})

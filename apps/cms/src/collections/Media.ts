@@ -78,6 +78,12 @@ export const Media: CollectionConfig = {
     focalPoint: true,
     imageSizes: [
       {
+        name: 'small',
+        width: 640,
+        withoutEnlargement: true,
+        formatOptions: { format: 'webp', options: { quality: 80 } },
+      },
+      {
         name: 'thumbnail',
         width: 480,
         height: 480,

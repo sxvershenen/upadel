@@ -1,3 +1,4 @@
+import type { MediaDTO } from '@unlim/content-contract'
 import React, { useRef, type ReactNode } from "react";
 import { motion, type HTMLMotionProps } from "framer-motion";
 import { cn } from "../../utils/cn";
@@ -59,6 +60,8 @@ export function DarkMeshCard(props: Omit<SurfaceCardProps, "tone">) {
 
 export type ImageOverlay = "overlay-lime" | "overlay-blue" | "overlay-cyan" | "overlay-violet" | "overlay-sunset" | "overlay-emerald" | "overlay-dark";
 export interface ImageCardProps extends Omit<HTMLMotionProps<"div">, "children"> {
+  media?: MediaDTO | null;
+  sizes?: string;
   src: string;
   alt: string;
   overlay: ImageOverlay;
@@ -69,7 +72,7 @@ export interface ImageCardProps extends Omit<HTMLMotionProps<"div">, "children">
 }
 
 /** Full-bleed image card with a mandatory colorized overlay. */
-export function ImageCard({ src, alt, overlay, className, children, imgClassName, interactive = true, loading = "lazy", reveal = true, style, ...props }: ImageCardProps & { loading?: "eager" | "lazy"; reveal?: RevealConfig }) {
+export function ImageCard({ src, alt, media, sizes = "(min-width: 1024px) 50vw, 100vw", overlay, className, children, imgClassName, interactive = true, loading = "lazy", reveal = true, style, ...props }: ImageCardProps & { loading?: "eager" | "lazy"; reveal?: RevealConfig }) {
   const imageRef = useRef<HTMLDivElement>(null);
   const imageY = useImageParallax(imageRef, interactive ? 11 : 0);
   const revealProps = revealAttributes(reveal, style, true);
@@ -93,7 +96,7 @@ export function ImageCard({ src, alt, overlay, className, children, imgClassName
         data-parallax-layer
         className="parallax-layer overflow-hidden"
       >
-        <ProgressiveImage src={src} alt={alt} loading={loading} className={cn("h-full w-full object-cover", imgClassName)} variants={interactive ? imageVariants : undefined} transition={springSoft} />
+        <ProgressiveImage media={media} sizes={sizes} src={src} alt={alt} loading={loading} className={cn("h-full w-full object-cover", imgClassName)} variants={interactive ? imageVariants : undefined} transition={springSoft} />
       </motion.div>
     </div>
     <div className="relative z-10 flex h-full flex-col">{children}</div>

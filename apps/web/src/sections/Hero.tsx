@@ -15,7 +15,20 @@ function HeroBackgroundMedia({ media, poster, className }: { media: MediaDTO; po
   const classes = cn("absolute inset-0 h-full w-full object-cover", className);
   return media.mimeType.startsWith("video/")
     ? <video data-hero-parallax-media="" autoPlay muted loop playsInline poster={poster?.url} className={classes}><source src={media.url} type={media.mimeType} /></video>
-    : <ProgressiveImage data-hero-parallax-media="" src={media.url} alt={media.alt} loading="eager" fetchPriority="high" decoding="async" className={classes} />;
+    : <ProgressiveImage data-hero-parallax-media="" media={media} sizes="100vw" loading="eager" fetchPriority="high" decoding="async" className={classes} />;
+}
+
+function HeroBackground({ desktop, mobile, desktopPoster, mobilePoster }: { desktop?: MediaDTO | null; mobile?: MediaDTO | null; desktopPoster?: MediaDTO | null; mobilePoster?: MediaDTO | null }) {
+  if (desktop && mobile && desktop.mimeType.startsWith("image/") && mobile.mimeType.startsWith("image/")) {
+    return <picture>
+      <source media="(max-width: 767px)" srcSet={mobile.srcSet ?? mobile.url} sizes="100vw" />
+      <ProgressiveImage data-hero-parallax-media="" media={desktop} sizes="100vw" loading="eager" fetchPriority="high" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
+    </picture>;
+  }
+  return <>
+    {desktop && <HeroBackgroundMedia media={desktop} poster={desktopPoster} className={mobile ? "hidden md:block" : undefined} />}
+    {mobile && <HeroBackgroundMedia media={mobile} poster={mobilePoster} className="md:hidden" />}
+  </>;
 }
 
 function SocialProof({ className }: { className?: string }) {
@@ -58,8 +71,7 @@ export function Hero() {
 
   return (
     <section id="top" data-hero-parallax-root="" className="relative isolate h-[100svh] min-h-[720px] w-full overflow-hidden bg-ink">
-      {hero.desktopMedia && <HeroBackgroundMedia media={hero.desktopMedia} poster={hero.desktopPoster} className={hero.mobileMedia ? "hidden md:block" : undefined} />}
-      {hero.mobileMedia && <HeroBackgroundMedia media={hero.mobileMedia} poster={hero.mobilePoster} className="md:hidden" />}
+      <HeroBackground desktop={hero.desktopMedia} mobile={hero.mobileMedia} desktopPoster={hero.desktopPoster} mobilePoster={hero.mobilePoster} />
       <div
         className="absolute inset-0"
         style={{
@@ -92,17 +104,17 @@ export function Hero() {
 
       <div className="container-page relative z-10 flex h-full flex-col justify-end pb-[calc(104px+env(safe-area-inset-bottom))] pt-32 sm:pb-9 lg:pb-12">
         <div className="flex max-w-[980px] flex-col">
-          <h1 className="type-hero font-semibold text-white">
+          <div className="type-hero font-semibold text-white">
             <SplitTextReveal text={hero.titleLine} animateOnMount />{" "}
             <br />
             <SplitTextReveal text={hero.titleConnector} animateOnMount />{" "}
             <span data-hero-accent="" className="inline-block text-[#c2f542]">
               {hero.titleAccent}
             </span>
-          </h1>
-          <p data-hero-description="" className="type-hero-lead mt-7 max-w-[900px] text-white/75">
-            {hero.description}
-          </p>
+          </div>
+          <div data-hero-description="" className="type-hero-lead mt-7 max-w-[900px] text-white/75">
+            <h1 className="inline">{hero.seoHeading}</h1>{hero.description ? <>{" "}<span>{hero.description}</span></> : null}
+          </div>
           <div data-hide-icons-narrow className="mt-8 flex flex-nowrap items-center gap-2 sm:gap-3">
             <div data-hero-cta="primary" className="min-w-0 flex-1 sm:flex-none">
               <ContentAction reveal={false} action={hero.primaryAction} variant="primary" size="lg" icon={<CalendarCheck size={17} />} className="w-full min-w-0 whitespace-nowrap px-4 !leading-none text-[14px] sm:w-auto sm:px-5 sm:text-base" />

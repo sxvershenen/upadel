@@ -1,3 +1,4 @@
+import { ContentUnavailableError } from './projectionCache'
 import { homepageDTOversion, parseHomepageDTO, type HomepageDTO } from '@unlim/content-contract'
 import type { Payload } from 'payload'
 
@@ -25,11 +26,12 @@ export async function createHomepageProjection(
   ])
 
   if (!preview && (homepage._status !== 'published' || siteSettings._status !== 'published')) {
-    throw new Error('Published homepage globals are not available.')
+    throw new ContentUnavailableError()
   }
 
   const articleRowsResult = await payload.find({
     collection: 'articles',
+    select: { id: true, slug: true, title: true, excerpt: true },
     draft: preview,
     depth: 0,
     limit: 6,
@@ -62,7 +64,7 @@ export async function createHomepageProjection(
     site: siteDTO(siteSettings, origin, entities.partners),
     home: {
       hero: {
-        titleLine: homepage.hero.titleLine ?? '', titleConnector: homepage.hero.titleConnector ?? '', titleAccent: homepage.hero.titleAccent ?? '',
+        seoHeading: homepage.hero.seoHeading ?? 'Премиальный крытый падел-клуб', titleLine: homepage.hero.titleLine ?? '', titleConnector: homepage.hero.titleConnector ?? '', titleAccent: homepage.hero.titleAccent ?? '',
         description: homepage.hero.description ?? '', desktopMedia: homeHeroMedia,
         mobileMedia: mediaDTO(homepage.hero.mobileMedia, origin, 'hero'), desktopPoster: mediaDTO(homepage.hero.desktopVideoPoster, origin),
         mobilePoster: mediaDTO(homepage.hero.mobileVideoPoster, origin), primaryAction: actionDTO(homepage.hero.primaryAction),

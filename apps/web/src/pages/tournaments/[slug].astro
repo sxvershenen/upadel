@@ -2,12 +2,24 @@
 import type { TournamentDetailDTO } from '@unlim/content-contract'
 import { DetailPage } from '../../catalog/DetailPage'
 import { CatalogLoadError, loadDetail } from '../../content/loadCatalog'
+import PublicErrorPage from '../../components/PublicErrorPage.astro'
 import SiteLayout from '../../layouts/SiteLayout.astro'
+import { publicRouteError } from '../../lib/publicRouteError'
+import { detailStructuredData, resolveCanonicalURL } from '../../seo/structuredData'
 
 export const prerender = false
 
 const slug = Astro.params.slug
 if (!slug) throw new CatalogLoadError('Tournament slug is required.')
-const dto = await loadDetail(import.meta.env.CMS_URL, 'tournaments', slug) as TournamentDetailDTO
+let dto: TournamentDetailDTO | null = null
+let routeError: ReturnType<typeof publicRouteError> | null = null
+try {
+  dto = await loadDetail(import.meta.env.CMS_URL, 'tournaments', slug) as TournamentDetailDTO
+} catch (error) {
+  routeError = publicRouteError(error)
+  Astro.response.status = routeError.status
+}
+const publicOrigin = import.meta.env.PUBLIC_SITE_URL ?? Astro.url.origin
+const canonical = dto ? resolveCanonicalURL(publicOrigin, Astro.url.pathname, dto.item.seo.canonical) : null
 ---
-<SiteLayout site={dto.site} title={dto.item.seo.title ?? dto.item.title} description={dto.item.seo.description ?? dto.item.description} canonical={dto.item.seo.canonical} robots={dto.item.seo.robots} socialImage={dto.item.seo.socialImage?.url ?? dto.item.image?.url} webmasterVerification={dto.site.analytics.vendors.webmasterVerification}><DetailPage client:load dto={dto} /></SiteLayout>
+{dto && canonical ? <SiteLayout site={dto.site} title={dto.item.seo.title ?? dto.item.title} description={dto.item.seo.description ?? dto.item.description} canonical={canonical} robots={dto.item.seo.robots} socialImage={dto.item.seo.socialImage?.url ?? dto.item.image?.url} structuredData={detailStructuredData(dto, publicOrigin, canonical)} webmasterVerification={dto.site.analytics.vendors.webmasterVerification}><DetailPage client:load dto={dto} /></SiteLayout> : routeError && <SiteLayout title={routeError.title} description={routeError.message} robots="noindex,nofollow"><PublicErrorPage {...routeError} /></SiteLayout>}
