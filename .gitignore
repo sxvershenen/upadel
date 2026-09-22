@@ -4,6 +4,7 @@ node_modules/
 .astro/
 dist/
 .next/
+.next-check/
 out/
 coverage/
 *.tsbuildinfo

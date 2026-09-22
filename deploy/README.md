@@ -66,7 +66,7 @@ sudo -u unlim ./deploy/release.sh
 sudo systemctl restart unlim-cms.service unlim-web.service
 ```
 
-An existing installation is backed up before migrations. The release becomes current only after dependency installation, checks, builds and migrations succeed.
+An existing installation is backed up before migrations. The release becomes current only after dependency installation, checks, builds, migrations and the idempotent small-image backfill succeed. Its immutable deployment path is separate from the backup helper’s RELEASE_DIR. Activation atomically replaces the current symlink; CMS starts on loopback behind Nginx.
 
 ## 4. Verification
 
@@ -127,3 +127,5 @@ npx astro dev --host 0.0.0.0 --force
 ```
 
 Open `http://192.168.1.20:4321` on the phone. Only the web port is needed for pages, media, analytics and lead forms. Allow incoming Node.js connections in the computer firewall and disable Wi‑Fi client isolation if the router enables it.
+
+For local validation beside a running dev server, use `NEXT_DIST_DIR=.next-check PAYLOAD_DISABLE_JOBS=1 npm run build:cms`; the normal build directory is unchanged. Production templates use `unlimpadel.ru` and `cms.unlimpadel.ru`; replace credentials and configure DNS/TLS before release. Keep forwarded client-address headers overwritten at the trusted Nginx ingress; do not expose port 3000 directly.

@@ -9,10 +9,9 @@ User=unlim
 Group=unlim
 WorkingDirectory=/srv/unlim/current/apps/cms
 Environment=NODE_ENV=production
-Environment=HOSTNAME=127.0.0.1
 Environment=PORT=3000
 EnvironmentFile=/srv/unlim/shared/.env.production
-ExecStart=/usr/bin/npm run start
+ExecStart=/usr/bin/npm run start -- --hostname 127.0.0.1
 Restart=on-failure
 RestartSec=5
 TimeoutStopSec=30

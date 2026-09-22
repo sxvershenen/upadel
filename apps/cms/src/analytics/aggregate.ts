@@ -1,8 +1,8 @@
 import { createHash } from 'node:crypto'
 import type { Payload } from 'payload'
 
-import { addHLL, createHLL, serializeHLL } from './hll'
-import { orderedFunnel, type FunnelInput } from './funnel'
+import { addHLL, createHLL, deserializeHLL, mergeHLL, serializeHLL } from './hll'
+import { analyticsTransaction, databaseRow, insertValues, type AnalyticsClient } from './database'
 
 const DAY_MS = 86_400_000
 const MOSCOW_OFFSET_MS = 3 * 60 * 60_000
@@ -58,64 +58,117 @@ function addToBucket(buckets: Map<string, Bucket>, date: string, event: RawEvent
   addHLL(bucket.browserHll, value(event, 'anonymousId')); addHLL(bucket.sessionHll, value(event, 'sessionId'))
 }
 
-export async function aggregateDate(payload: Payload, date: string): Promise<{ date: string; rawEvents: number; rows: number }> {
-  const range = utcRangeForMoscowDate(date)
-  const result = await payload.find({ collection: 'analytics-events', depth: 0, pagination: false, overrideAccess: true, sort: 'occurredAt', where: { and: [{ occurredAt: { greater_than_equal: range.from } }, { occurredAt: { less_than_equal: range.to } }] } })
-  const events = result.docs as unknown as RawEvent[]
-  const anonymousIDs = [...new Set(events.map((event) => value(event, 'anonymousId')))]
-  const firstSeen = new Map<string, string>()
-  for (let index = 0; index < anonymousIDs.length; index += 100) {
-    const ids = anonymousIDs.slice(index, index + 100)
-    if (!ids.length) continue
-    const browsers = await payload.find({ collection: 'analytics-browsers', depth: 0, pagination: false, overrideAccess: true, where: { anonymousId: { in: ids } } })
-    for (const browser of browsers.docs as unknown as RawEvent[]) firstSeen.set(value(browser, 'anonymousId'), moscowDate(value(browser, 'firstSeenAt')))
-  }
-  const buckets = new Map<string, Bucket>()
-  for (const event of events) {
-    addToBucket(buckets, date, event, eventDimensions(event, date, firstSeen), true)
-  }
-  const formSteps = ['form_view', 'form_start', 'form_submit_attempt', 'form_submit_success']
-  const sessionIDs = [...new Set(events.filter((event) => formSteps.includes(value(event, 'name'))).map((event) => value(event, 'sessionId')))]
-  const funnelContext: RawEvent[] = []
-  for (let index = 0; index < sessionIDs.length; index += 100) {
-    const ids = sessionIDs.slice(index, index + 100)
-    const context = await payload.find({ collection: 'analytics-events', depth: 0, pagination: false, overrideAccess: true, sort: 'occurredAt', where: { and: [{ sessionId: { in: ids } }, { occurredAt: { less_than_equal: range.to } }] } })
-    funnelContext.push(...context.docs as unknown as RawEvent[])
-  }
-  const funnelInputs: FunnelInput[] = funnelContext.filter((event) => formSteps.includes(value(event, 'name'))).map((event) => ({ occurredAt: value(event, 'occurredAt'), sessionId: value(event, 'sessionId'), objectKey: `${value(event, 'formType')}\u0001${value(event, 'objectId')}`, step: value(event, 'name') }))
-  const achieved = orderedFunnel(funnelInputs, formSteps)
-  for (const [step, keys] of Object.entries(achieved)) {
-    for (const key of keys) {
-      const [sessionId, objectKey] = key.split('\u0000'); const [formType, objectId] = objectKey.split('\u0001')
-      const representative = events.find((event) => value(event, 'sessionId') === sessionId && value(event, 'formType') === formType && value(event, 'objectId') === objectId && value(event, 'name') === step)
-      if (representative) addToBucket(buckets, date, representative, eventDimensions(representative, date, firstSeen, `funnel_${step}`), false)
-    }
-  }
-  const verifiedAt = new Date().toISOString()
-  const writtenKeys: string[] = []
-  for (const [aggregateKey, bucket] of buckets) {
-    const data = { aggregateKey, date: `${date}T00:00:00.000Z`, ...bucket.keyParts, eventCount: bucket.eventCount, activeMs: bucket.activeMs, exactLeadCount: bucket.exactLeadCount, browserHll: serializeHLL(bucket.browserHll), sessionHll: serializeHLL(bucket.sessionHll), rawEventCount: bucket.rawEventCount, verifiedAt }
-    const found = await payload.find({ collection: 'analytics-daily', depth: 0, limit: 1, overrideAccess: true, where: { aggregateKey: { equals: aggregateKey } } })
-    if (found.docs[0]) await payload.update({ collection: 'analytics-daily', id: found.docs[0].id, overrideAccess: true, data: data as never })
-    else await payload.create({ collection: 'analytics-daily', overrideAccess: true, data: data as never })
-    writtenKeys.push(aggregateKey)
-  }
-  const stale = await payload.find({ collection: 'analytics-daily', depth: 0, pagination: false, overrideAccess: true, where: { date: { equals: `${date}T00:00:00.000Z` } } })
-  for (const row of stale.docs as unknown as RawEvent[]) if (!writtenKeys.includes(value(row, 'aggregateKey'))) await payload.delete({ collection: 'analytics-daily', id: row.id as number | string, overrideAccess: true })
-  const verification = await payload.find({ collection: 'analytics-daily', depth: 0, pagination: false, overrideAccess: true, where: { date: { equals: `${date}T00:00:00.000Z` } } })
-  const aggregateCount = (verification.docs as unknown as RawEvent[]).reduce((sum, row) => sum + Number(row.rawEventCount ?? 0), 0)
-  if (aggregateCount !== events.length) throw new Error(`Aggregate verification failed for ${date}: raw=${events.length}, aggregated=${aggregateCount}.`)
-  for (let index = 0; index < events.length; index += 100) {
-    const ids = events.slice(index, index + 100).map((event) => event.id as number | string)
-    await payload.update({ collection: 'analytics-events', overrideAccess: true, where: { id: { in: ids } }, data: { aggregatedAt: verifiedAt } })
-  }
-  return { date, rawEvents: events.length, rows: buckets.size }
+const PAGE_SIZE = 100
+const formSteps = ['form_view', 'form_start', 'form_submit_attempt', 'form_submit_success']
+
+function applicationRow(row: Record<string, unknown>): RawEvent {
+  return Object.fromEntries(Object.entries(row).map(([key, item]) => [key === 'lead_id' ? 'lead' : key.replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase()), item instanceof Date ? item.toISOString() : item]))
 }
 
-export async function aggregateRecent(payload: Payload, now = new Date()): Promise<Array<{ date: string; rawEvents: number; rows: number }>> {
-  const pending = await payload.find({ collection: 'analytics-events', depth: 0, pagination: false, overrideAccess: true, where: { aggregatedAt: { exists: false } } })
-  const dates = [moscowDate(new Date(now.valueOf() - DAY_MS)), moscowDate(now), ...(pending.docs as unknown as RawEvent[]).map((event) => moscowDate(value(event, 'occurredAt')))]
-  return Promise.all([...new Set(dates)].map((date) => aggregateDate(payload, date)))
+async function firstSeenFor(client: AnalyticsClient, events: RawEvent[]): Promise<Map<string, string>> {
+  const ids = [...new Set(events.map((event) => value(event, 'anonymousId')))]
+  if (!ids.length) return new Map()
+  const result = await client.query('SELECT anonymous_id, first_seen_at FROM analytics_browsers WHERE anonymous_id = ANY($1::text[])', [ids])
+  return new Map(result.rows.map((row) => [row.anonymous_id as string, moscowDate(row.first_seen_at as Date)]))
+}
+
+/** Merge one bounded page into this transaction's rebuilt day, not an earlier snapshot. */
+async function flushBuckets(client: AnalyticsClient, date: string, buckets: Map<string, Bucket>, verifiedAt: string) {
+  const entries = [...buckets]
+  for (let offset = 0; offset < entries.length; offset += PAGE_SIZE) {
+    const batch = entries.slice(offset, offset + PAGE_SIZE)
+    const previous = await client.query('SELECT * FROM analytics_daily WHERE aggregate_key = ANY($1::text[])', [batch.map(([key]) => key)])
+    const previousByKey = new Map(previous.rows.map((row) => [row.aggregate_key, row]))
+    const data = batch.map(([aggregateKey, bucket]) => {
+      const old = previousByKey.get(aggregateKey)
+      if (old) { mergeHLL(bucket.browserHll, deserializeHLL(old.browser_hll)); mergeHLL(bucket.sessionHll, deserializeHLL(old.session_hll)) }
+      return databaseRow({ aggregateKey, date: `${date}T00:00:00.000Z`, ...bucket.keyParts,
+        eventCount: bucket.eventCount + Number(old?.event_count ?? 0), activeMs: bucket.activeMs + Number(old?.active_ms ?? 0), exactLeadCount: bucket.exactLeadCount + Number(old?.exact_lead_count ?? 0),
+        browserHll: serializeHLL(bucket.browserHll), sessionHll: serializeHLL(bucket.sessionHll), rawEventCount: bucket.rawEventCount + Number(old?.raw_event_count ?? 0), verifiedAt,
+      })
+    })
+    const insert = insertValues(data)
+    await client.query(`INSERT INTO analytics_daily (${insert.columns}) VALUES ${insert.placeholders} ON CONFLICT (aggregate_key) DO UPDATE SET ${Object.keys(data[0]).filter((column) => column !== 'aggregate_key').map((column) => `"${column}" = EXCLUDED."${column}"`).join(',')}`, insert.values)
+  }
+}
+
+export async function aggregateDate(payload: Payload, date: string, retentionNow = new Date()): Promise<{ date: string; rawEvents: number; rows: number; verifiedAt: string }> {
+  const range = utcRangeForMoscowDate(date)
+  return analyticsTransaction(payload, async (client) => {
+    const verifiedAt = new Date().toISOString()
+    if (date < moscowDate(new Date(retentionNow.valueOf() - 90 * DAY_MS))) {
+      const raw = await client.query('SELECT id FROM analytics_events WHERE occurred_at >= $1::timestamptz AND occurred_at <= $2::timestamptz LIMIT 1', [range.from, range.to])
+      if (!raw.rows.length) {
+        // Another retention worker may already have removed this verified day's raw data.
+        // Replaying that day must not replace its historical aggregate with an empty one.
+        const retained = await client.query('SELECT count(*) AS rows, max(verified_at) AS verified_at FROM analytics_daily WHERE date = $1::timestamptz', [`${date}T00:00:00.000Z`])
+        if (Number(retained.rows[0].rows) > 0 && retained.rows[0].verified_at) return {
+          date, rawEvents: 0, rows: Number(retained.rows[0].rows), verifiedAt: new Date(retained.rows[0].verified_at).toISOString(),
+        }
+      }
+    }
+    // Readers retain the preceding complete day until this entire rebuild commits.
+    await client.query('DELETE FROM analytics_daily WHERE date = $1::timestamptz', [`${date}T00:00:00.000Z`])
+    let lastID = 0; let rawEvents = 0
+    const sessionIDs = new Set<string>()
+    for (;;) {
+      const result = await client.query('SELECT * FROM analytics_events WHERE occurred_at >= $1::timestamptz AND occurred_at <= $2::timestamptz AND id > $3 ORDER BY id LIMIT $4', [range.from, range.to, lastID, PAGE_SIZE])
+      if (!result.rows.length) break
+      const events = result.rows.map(applicationRow)
+      const firstSeen = await firstSeenFor(client, events)
+      const buckets = new Map<string, Bucket>()
+      for (const event of events) {
+        addToBucket(buckets, date, event, eventDimensions(event, date, firstSeen), true)
+        if (formSteps.includes(value(event, 'name'))) sessionIDs.add(value(event, 'sessionId'))
+      }
+      await flushBuckets(client, date, buckets, verifiedAt)
+      rawEvents += events.length; lastID = Number(events.at(-1)!.id)
+    }
+
+    const sessions = [...sessionIDs]
+    for (let offset = 0; offset < sessions.length; offset += PAGE_SIZE) {
+      const batch = sessions.slice(offset, offset + PAGE_SIZE)
+      const progress = new Map<string, number>()
+      const achieved = new Set<string>()
+      const representatives = new Map<string, RawEvent>()
+      let cursorTime: string | null = null; let cursorID = 0
+      for (;;) {
+        const result = await client.query(`SELECT * FROM analytics_events WHERE session_id = ANY($1::text[]) AND name = ANY($2::text[]) AND occurred_at <= $3::timestamptz
+          AND ($4::timestamptz IS NULL OR (occurred_at, id) > ($4::timestamptz, $5)) ORDER BY occurred_at, id LIMIT $6`, [batch, formSteps, range.to, cursorTime, cursorID, PAGE_SIZE])
+        if (!result.rows.length) break
+        for (const row of result.rows) {
+          const event = applicationRow(row)
+          const key = `${value(event, 'sessionId')}\u0000${value(event, 'formType')}\u0001${value(event, 'objectId')}`
+          const step = value(event, 'name'); const stepKey = `${step}\u0000${key}`
+          const expected = progress.get(key) ?? 0
+          if (step === formSteps[expected]) { achieved.add(stepKey); progress.set(key, expected + 1) }
+          if (value(event, 'occurredAt') >= range.from && !representatives.has(stepKey)) representatives.set(stepKey, event)
+          cursorTime = value(event, 'occurredAt'); cursorID = Number(event.id)
+        }
+      }
+      const completed = [...representatives].filter(([key]) => achieved.has(key)).map(([, event]) => event)
+      for (let index = 0; index < completed.length; index += PAGE_SIZE) {
+        const events = completed.slice(index, index + PAGE_SIZE)
+        const firstSeen = await firstSeenFor(client, events)
+        const buckets = new Map<string, Bucket>()
+        for (const event of events) addToBucket(buckets, date, event, eventDimensions(event, date, firstSeen, `funnel_${value(event, 'name')}`), false)
+        await flushBuckets(client, date, buckets, verifiedAt)
+      }
+    }
+
+    const verification = await client.query('SELECT count(*) AS rows, COALESCE(sum(raw_event_count), 0) AS raw_count FROM analytics_daily WHERE date = $1::timestamptz', [`${date}T00:00:00.000Z`])
+    if (Number(verification.rows[0].raw_count) !== rawEvents) throw new Error(`Aggregate verification failed for ${date}.`)
+    await client.query('UPDATE analytics_events SET aggregated_at = $1::timestamptz WHERE occurred_at >= $2::timestamptz AND occurred_at <= $3::timestamptz AND id <= $4', [verifiedAt, range.from, range.to, lastID])
+    return { date, rawEvents, rows: Number(verification.rows[0].rows), verifiedAt }
+  }, `unlim-analytics-day:${date}`)
+}
+
+export async function aggregateRecent(payload: Payload, now = new Date()): Promise<Array<{ date: string; rawEvents: number; rows: number; verifiedAt: string }>> {
+  const pending = await payload.db.pool.query("SELECT DISTINCT to_char(occurred_at AT TIME ZONE 'Europe/Moscow', 'YYYY-MM-DD') AS date FROM analytics_events WHERE aggregated_at IS NULL")
+  const dates = new Set([moscowDate(new Date(now.valueOf() - DAY_MS)), moscowDate(now), ...pending.rows.map((row) => row.date as string)])
+  const results = []
+  for (const date of dates) results.push(await aggregateDate(payload, date, now))
+  return results
 }
 
 export async function executeRetentionDays(
@@ -147,25 +200,26 @@ export async function runMaintenance(payload: Payload, now = new Date()): Promis
   const cutoff = new Date(now.valueOf() - 90 * DAY_MS)
   const cutoffMoscowDate = moscowDate(cutoff)
   const completedCutoff = completedRawRetentionCutoff(now)
-  const oldEvents = await payload.find({ collection: 'analytics-events', depth: 0, pagination: false, overrideAccess: true, sort: 'occurredAt', where: { occurredAt: { less_than: completedCutoff } } })
-  const days = [...new Set((oldEvents.docs as unknown as RawEvent[]).map((event) => moscowDate(value(event, 'occurredAt'))))].filter((date) => date < cutoffMoscowDate)
+  const oldDays = await payload.db.pool.query("SELECT DISTINCT to_char(occurred_at AT TIME ZONE 'Europe/Moscow', 'YYYY-MM-DD') AS date FROM analytics_events WHERE occurred_at < $1::timestamptz ORDER BY date", [completedCutoff])
+  const days = oldDays.rows.map((row) => row.date as string).filter((date) => date < cutoffMoscowDate)
+  const verified = new Map<string, string>()
   const deletedRaw = await executeRetentionDays(days, {
     aggregateAndVerify: async (date) => {
-      await aggregateDate(payload, date)
-      const rows = await payload.find({ collection: 'analytics-daily', depth: 0, pagination: false, overrideAccess: true, where: { date: { equals: `${date}T00:00:00.000Z` } } })
-      if (!rows.docs.length || rows.docs.some((row) => !row.verifiedAt)) throw new Error(`Retention stopped: ${date} has no verified aggregate.`)
+      const result = await aggregateDate(payload, date, now)
+      if (!result.rows || !result.verifiedAt) throw new Error(`Retention stopped: ${date} has no verified aggregate.`)
+      verified.set(date, result.verifiedAt)
     },
     removeRaw: async (date) => {
       const range = utcRangeForMoscowDate(date)
-      const removed = await payload.delete({ collection: 'analytics-events', overrideAccess: true, where: { and: [{ occurredAt: { greater_than_equal: range.from } }, { occurredAt: { less_than_equal: range.to } }] } })
-      return removed.docs.length
+      // A late row inserted after verification remains raw and pending for the next run.
+      const removed = await payload.db.pool.query('DELETE FROM analytics_events WHERE occurred_at >= $1::timestamptz AND occurred_at <= $2::timestamptz AND aggregated_at = $3::timestamptz', [range.from, range.to, verified.get(date)])
+      return removed.rowCount ?? 0
     },
   })
   const firstSourceCutoff = new Date(now.valueOf() - 60 * DAY_MS).toISOString()
-  const sourceRows = await payload.find({ collection: 'analytics-browsers', depth: 0, pagination: false, overrideAccess: true, where: { firstSourceCapturedAt: { less_than: firstSourceCutoff } } })
-  for (const browser of sourceRows.docs) await payload.update({ collection: 'analytics-browsers', id: browser.id, overrideAccess: true, data: { firstSourceCapturedAt: null, firstChannel: null, firstSource: null, firstMedium: null, firstCampaign: null } as never })
-  const expiredBrowsers = await payload.delete({ collection: 'analytics-browsers', overrideAccess: true, where: { expiresAt: { less_than: now.toISOString() } } })
-  await payload.delete({ collection: 'analytics-sessions', overrideAccess: true, where: { lastActivityAt: { less_than: new Date(now.valueOf() - 13 * 30.4375 * DAY_MS).toISOString() } } })
-  const expiredDaily = await payload.delete({ collection: 'analytics-daily', overrideAccess: true, where: { date: { less_than: new Date(now.valueOf() - 36 * 30.4375 * DAY_MS).toISOString() } } })
-  return { ...preview, deletedRaw, clearedFirstSources: sourceRows.docs.length, deletedBrowsers: expiredBrowsers.docs.length, deletedDailyRows: expiredDaily.docs.length }
+  const sourceRows = await payload.db.pool.query('UPDATE analytics_browsers SET first_source_captured_at = NULL, first_channel = NULL, first_source = NULL, first_medium = NULL, first_campaign = NULL WHERE first_source_captured_at < $1::timestamptz', [firstSourceCutoff])
+  const expiredBrowsers = await payload.db.pool.query('DELETE FROM analytics_browsers WHERE expires_at < $1::timestamptz', [now.toISOString()])
+  await payload.db.pool.query('DELETE FROM analytics_sessions WHERE last_activity_at < $1::timestamptz', [new Date(now.valueOf() - 13 * 30.4375 * DAY_MS).toISOString()])
+  const expiredDaily = await payload.db.pool.query('DELETE FROM analytics_daily WHERE date < $1::timestamptz', [new Date(now.valueOf() - 36 * 30.4375 * DAY_MS).toISOString()])
+  return { ...preview, deletedRaw, clearedFirstSources: sourceRows.rowCount ?? 0, deletedBrowsers: expiredBrowsers.rowCount ?? 0, deletedDailyRows: expiredDaily.rowCount ?? 0 }
 }

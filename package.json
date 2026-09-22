@@ -22,6 +22,8 @@
     "test:analytics:db": "npm run test:analytics:db --workspace @unlim/cms",
     "test:analytics": "npm run test:analytics --workspace @unlim/cms",
     "test:integrations": "npm run test:integrations --workspaces --if-present",
+    "test:deploy": "node --test deploy/*.test.mjs",
+    "test:analytics:batch:db": "npm run test:analytics:batch:db --workspace @unlim/cms",
     "test:content:db": "npm run test:content:db --workspace @unlim/cms"
   },
   "engines": {
