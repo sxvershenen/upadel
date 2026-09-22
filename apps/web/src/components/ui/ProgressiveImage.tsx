@@ -39,8 +39,12 @@ export const ProgressiveImage = forwardRef<HTMLImageElement, ProgressiveImagePro
     useLayoutEffect(() => {
       const image = localRef.current
       if (!image) return
-      image.dataset.progressiveImage = loadingState
+      // The layout bootstrap can reveal server-rendered images before a lazy
+      // Suspense boundary hydrates. Preserve that per-image result instead of
+      // hiding an already decoded image again during hydration.
+      if (image.dataset.progressiveImage === loadedState) return
       if (image.complete && image.naturalWidth > 0) revealDecoded(image)
+      else image.dataset.progressiveImage = loadingState
     }, [loadingState, loadedState, props.src, props.srcSet])
 
     return <motion.img
@@ -49,6 +53,7 @@ export const ProgressiveImage = forwardRef<HTMLImageElement, ProgressiveImagePro
       fetchPriority={props.fetchPriority ?? (props.loading === 'lazy' ? 'low' : undefined)}
       ref={setRef}
       data-progressive-image={loadingState}
+      suppressHydrationWarning
       onLoad={(event) => { revealDecoded(event.currentTarget); onLoad?.(event) }}
       onError={(event) => { settle(event.currentTarget); onError?.(event) }}
     />

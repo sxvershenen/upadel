@@ -306,9 +306,16 @@ const pageEntrance = Astro.url.pathname === '/gift'
         if ('requestIdleCallback' in window) window.requestIdleCallback(flushTypography, { timeout: 250 })
         else window.setTimeout(flushTypography, 0)
       }
-      const prepareNativeImage = (image) => {
-        if (!(image instanceof HTMLImageElement) || image.dataset.progressiveNative !== 'loading') return
-        const settle = () => { image.dataset.progressiveNative = 'loaded' }
+      const prepareProgressiveImage = (image) => {
+        if (!(image instanceof HTMLImageElement)) return
+        const stateKey = image.dataset.progressiveNative ? 'progressiveNative' : image.dataset.progressiveImage ? 'progressiveImage' : null
+        if (!stateKey) return
+        const loadingState = image.dataset[stateKey]
+        if (loadingState !== 'loading' && loadingState !== 'fade-loading') return
+        const loadedState = loadingState === 'fade-loading' ? 'fade-loaded' : 'loaded'
+        const settle = () => {
+          if (image.dataset[stateKey] === loadingState) image.dataset[stateKey] = loadedState
+        }
         const revealDecoded = () => {
           if (typeof image.decode !== 'function') return settle()
           image.decode().catch(() => {}).then(settle)
@@ -319,14 +326,14 @@ const pageEntrance = Astro.url.pathname === '/gift'
           image.addEventListener('error', settle, { once: true })
         }
       }
-      document.querySelectorAll('img[data-progressive-native]').forEach(prepareNativeImage)
+      document.querySelectorAll('img[data-progressive-native], img[data-progressive-image]').forEach(prepareProgressiveImage)
       new MutationObserver((mutations) => {
         if (mutations.some((mutation) => mutation.addedNodes.length > 0)) scheduleScrollReveals()
         mutations.forEach((mutation) => {
           mutation.addedNodes.forEach((node) => {
             pending.add(node)
-            if (node instanceof HTMLImageElement) prepareNativeImage(node)
-            else if (node instanceof Element) node.querySelectorAll('img[data-progressive-native]').forEach(prepareNativeImage)
+            if (node instanceof HTMLImageElement) prepareProgressiveImage(node)
+            else if (node instanceof Element) node.querySelectorAll('img[data-progressive-native], img[data-progressive-image]').forEach(prepareProgressiveImage)
           })
           if (mutation.type === 'characterData') pending.add(mutation.target)
         })
