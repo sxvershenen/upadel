@@ -2456,37 +2456,35 @@ export interface Homepage {
     mobileVideoPoster?: (number | null) | Media;
     tint?: {
       desktop?: {
-        point1?: {
+        centerX?: number | null;
+        centerY?: number | null;
+        stop1?: {
           opacity?: number | null;
-          x?: number | null;
-          y?: number | null;
+          position?: number | null;
         };
-        point2?: {
+        stop2?: {
           opacity?: number | null;
-          x?: number | null;
-          y?: number | null;
+          position?: number | null;
         };
-        point3?: {
+        stop3?: {
           opacity?: number | null;
-          x?: number | null;
-          y?: number | null;
+          position?: number | null;
         };
       };
       mobile?: {
-        point1?: {
+        centerX?: number | null;
+        centerY?: number | null;
+        stop1?: {
           opacity?: number | null;
-          x?: number | null;
-          y?: number | null;
+          position?: number | null;
         };
-        point2?: {
+        stop2?: {
           opacity?: number | null;
-          x?: number | null;
-          y?: number | null;
+          position?: number | null;
         };
-        point3?: {
+        stop3?: {
           opacity?: number | null;
-          x?: number | null;
-          y?: number | null;
+          position?: number | null;
         };
       };
     };
@@ -3832,51 +3830,49 @@ export interface HomepageSelect<T extends boolean = true> {
               desktop?:
                 | T
                 | {
-                    point1?:
+                    centerX?: T;
+                    centerY?: T;
+                    stop1?:
                       | T
                       | {
                           opacity?: T;
-                          x?: T;
-                          y?: T;
+                          position?: T;
                         };
-                    point2?:
+                    stop2?:
                       | T
                       | {
                           opacity?: T;
-                          x?: T;
-                          y?: T;
+                          position?: T;
                         };
-                    point3?:
+                    stop3?:
                       | T
                       | {
                           opacity?: T;
-                          x?: T;
-                          y?: T;
+                          position?: T;
                         };
                   };
               mobile?:
                 | T
                 | {
-                    point1?:
+                    centerX?: T;
+                    centerY?: T;
+                    stop1?:
                       | T
                       | {
                           opacity?: T;
-                          x?: T;
-                          y?: T;
+                          position?: T;
                         };
-                    point2?:
+                    stop2?:
                       | T
                       | {
                           opacity?: T;
-                          x?: T;
-                          y?: T;
+                          position?: T;
                         };
-                    point3?:
+                    stop3?:
                       | T
                       | {
                           opacity?: T;
-                          x?: T;
-                          y?: T;
+                          position?: T;
                         };
                   };
             };

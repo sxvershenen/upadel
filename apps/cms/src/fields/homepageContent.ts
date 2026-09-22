@@ -6,7 +6,7 @@ import { imageOnlyFilter } from './media'
 import { imageOverlayOptions, meshToneOptions } from './presentation'
 import { validateUniqueRowsByKey } from './validators'
 
-function heroTintPoint(name: string, label: string, defaultValue: HeroTintDeviceDTO['point1']): Field {
+function heroTintStop(name: string, label: string, defaultValue: HeroTintDeviceDTO['stop1']): Field {
   return {
     name,
     type: 'group',
@@ -15,9 +15,8 @@ function heroTintPoint(name: string, label: string, defaultValue: HeroTintDevice
       {
         type: 'row',
         fields: [
-          { name: 'opacity', type: 'number', label: 'Opacity чёрного, %', min: 0, max: 100, defaultValue: defaultValue.opacity, admin: { width: '33%', step: 1 } },
-          { name: 'x', type: 'number', label: 'Положение X, %', min: 0, max: 100, defaultValue: defaultValue.x, admin: { width: '33%', step: 1 } },
-          { name: 'y', type: 'number', label: 'Положение Y, %', min: 0, max: 100, defaultValue: defaultValue.y, admin: { width: '34%', step: 1 } },
+          { name: 'opacity', type: 'number', label: 'Opacity чёрного, %', min: 0, max: 100, defaultValue: defaultValue.opacity, admin: { width: '50%', step: 1 } },
+          { name: 'position', type: 'number', label: 'Положение stop, %', min: 0, max: 200, defaultValue: defaultValue.position, admin: { width: '50%', step: 1 } },
         ],
       },
     ],
@@ -30,9 +29,16 @@ function heroTintDevice(name: 'desktop' | 'mobile', label: string, defaultValue:
     type: 'group',
     label,
     fields: [
-      heroTintPoint('point1', 'Точка 1', defaultValue.point1),
-      heroTintPoint('point2', 'Точка 2', defaultValue.point2),
-      heroTintPoint('point3', 'Точка 3', defaultValue.point3),
+      {
+        type: 'row',
+        fields: [
+          { name: 'centerX', type: 'number', label: 'Центр X, %', min: 0, max: 100, defaultValue: defaultValue.centerX, admin: { width: '50%', step: 1 } },
+          { name: 'centerY', type: 'number', label: 'Центр Y, %', min: 0, max: 100, defaultValue: defaultValue.centerY, admin: { width: '50%', step: 1 } },
+        ],
+      },
+      heroTintStop('stop1', 'Stop 1', defaultValue.stop1),
+      heroTintStop('stop2', 'Stop 2', defaultValue.stop2),
+      heroTintStop('stop3', 'Stop 3', defaultValue.stop3),
     ],
   }
 }
@@ -40,7 +46,7 @@ function heroTintDevice(name: 'desktop' | 'mobile', label: string, defaultValue:
 const heroTintField: Field = {
   type: 'collapsible',
   label: 'Затемнение hero',
-  admin: { description: 'Чёрный радиальный tint из трёх точек. Для каждой точки задаются непрозрачность и положение; форма градиента фиксирована кодом.', initCollapsed: true },
+  admin: { description: 'Один чёрный radial-gradient: центр и три color stop с opacity и положением. Форма градиента фиксирована кодом.', initCollapsed: true },
   fields: [
     {
       name: 'tint',

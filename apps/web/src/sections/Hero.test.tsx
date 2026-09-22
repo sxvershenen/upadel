@@ -59,26 +59,22 @@ test('hero renders separate desktop and mobile three-point black tints and keeps
   const responsiveContent = structuredClone(content)
   responsiveContent.home.hero.tint = {
     desktop: {
-      point1: { opacity: 81, x: 11, y: 22 }, point2: { opacity: 62, x: 33, y: 44 }, point3: { opacity: 43, x: 55, y: 66 },
+      centerX: 11, centerY: 22,
+      stop1: { opacity: 0, position: 30 }, stop2: { opacity: 64, position: 70 }, stop3: { opacity: 79, position: 154 },
     },
     mobile: {
-      point1: { opacity: 71, x: 17, y: 28 }, point2: { opacity: 52, x: 39, y: 50 }, point3: { opacity: 33, x: 61, y: 72 },
+      centerX: 50, centerY: 35,
+      stop1: { opacity: 0, position: 30 }, stop2: { opacity: 64, position: 70 }, stop3: { opacity: 79, position: 154 },
     },
   }
   responsiveContent.home.hero.titleFontSize = { mobile: 42, desktop: 96 }
   const html = renderToStaticMarkup(<ContentProvider content={responsiveContent}><Hero /></ContentProvider>)
-  const desktopTint = heroTintGradient([
-    responsiveContent.home.hero.tint.desktop.point1,
-    responsiveContent.home.hero.tint.desktop.point2,
-    responsiveContent.home.hero.tint.desktop.point3,
-  ])
+  const desktopTint = heroTintGradient(responsiveContent.home.hero.tint.desktop)
   assert.match(html, /data-hero-tint="desktop"/)
   assert.match(html, /data-hero-tint="mobile"/)
-  assert.match(html, /radial-gradient\(ellipse[^)]* at 11% 22%, rgba\(0,0,0,0\.81\) 0%, transparent 74%\)/)
-  assert.match(html, /radial-gradient\(ellipse[^)]* at 17% 28%, rgba\(0,0,0,0\.71\) 0%, transparent 74%\)/)
+  assert.match(html, /radial-gradient\(ellipse 80% 60% at 11% 22%, rgb\(0 0 0 \/ 0%\) 30%, #000000a3 70%, #000000c9 154%\)/)
+  assert.match(html, /radial-gradient\(ellipse 80% 60% at 50% 35%, rgb\(0 0 0 \/ 0%\) 30%, #000000a3 70%, #000000c9 154%\)/)
   assert.match(html, /container-page absolute inset-x-0 top-8 z-10 md:hidden/)
   assert.match(html, /data-hero-title=""[^>]*style="--hero-title-font-size-mobile:42px;--hero-title-font-size-desktop:96px"/)
-  assert.equal(desktopTint.match(/radial-gradient/g)?.length, 3)
-  assert.equal(desktopTint.match(/rgba\(/g)?.length, 3)
-  assert.doesNotMatch(desktopTint, /28%/)
+  assert.equal(desktopTint, 'radial-gradient(ellipse 80% 60% at 11% 22%, rgb(0 0 0 / 0%) 30%, #000000a3 70%, #000000c9 154%)')
 })

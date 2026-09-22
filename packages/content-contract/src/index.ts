@@ -1,6 +1,6 @@
 import type { CatalogPagination, CatalogQuery } from './catalog'
 export * from './catalog'
-export const homepageDTOversion = 15 as const
+export const homepageDTOversion = 16 as const
 
 export const publicRouteRegistry = [
   { path: '/', parent: null, template: 'homepage', globalSlug: 'homepage' },
@@ -63,21 +63,25 @@ export type BrandLogoMode = 'text' | 'prefix' | 'replace'
 export type PageHeroDTO = { media: MediaDTO; grayscale: boolean }
 export type DesktopNavigationChild = { label: string; href: string; icon?: MediaDTO | null }
 export type DesktopNavigationItem = DesktopNavigationChild & { children?: DesktopNavigationChild[] | null }
-export type HeroTintPointDTO = { opacity: number; x: number; y: number }
-export type HeroTintDeviceDTO = { point1: HeroTintPointDTO; point2: HeroTintPointDTO; point3: HeroTintPointDTO }
+export type HeroTintStopDTO = { opacity: number; position: number }
+export type HeroTintDeviceDTO = { centerX: number; centerY: number; stop1: HeroTintStopDTO; stop2: HeroTintStopDTO; stop3: HeroTintStopDTO }
 export type HeroTintDTO = { desktop: HeroTintDeviceDTO; mobile: HeroTintDeviceDTO }
 export type HeroTitleFontSizeDTO = { mobile: number; desktop: number }
 
 export const defaultHeroTint: HeroTintDTO = {
   desktop: {
-    point1: { opacity: 98, x: 0, y: 100 },
-    point2: { opacity: 72, x: 100, y: 100 },
-    point3: { opacity: 34, x: 0, y: 0 },
+    centerX: 80,
+    centerY: 30,
+    stop1: { opacity: 0, position: 30 },
+    stop2: { opacity: 64, position: 70 },
+    stop3: { opacity: 79, position: 154 },
   },
   mobile: {
-    point1: { opacity: 98, x: 50, y: 100 },
-    point2: { opacity: 56, x: 0, y: 0 },
-    point3: { opacity: 56, x: 100, y: 0 },
+    centerX: 50,
+    centerY: 35,
+    stop1: { opacity: 0, position: 30 },
+    stop2: { opacity: 64, position: 70 },
+    stop3: { opacity: 79, position: 154 },
   },
 }
 

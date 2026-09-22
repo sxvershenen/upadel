@@ -20,12 +20,11 @@ function numberOr(value: unknown, fallback: number): number {
   return typeof value === 'number' && Number.isFinite(value) ? value : fallback
 }
 
-function projectHeroTintPoint(value: unknown, fallback: HeroTintDTO['desktop']['point1']): HeroTintDTO['desktop']['point1'] {
-  const point = typeof value === 'object' && value !== null ? value as Record<string, unknown> : {}
+function projectHeroTintStop(value: unknown, fallback: HeroTintDTO['desktop']['stop1']): HeroTintDTO['desktop']['stop1'] {
+  const stop = typeof value === 'object' && value !== null ? value as Record<string, unknown> : {}
   return {
-    opacity: clamp(numberOr(point.opacity, fallback.opacity), 0, 100),
-    x: clamp(numberOr(point.x, fallback.x), 0, 100),
-    y: clamp(numberOr(point.y, fallback.y), 0, 100),
+    opacity: clamp(numberOr(stop.opacity, fallback.opacity), 0, 100),
+    position: clamp(numberOr(stop.position, fallback.position), 0, 200),
   }
 }
 
@@ -35,9 +34,11 @@ function projectHeroTint(value: unknown): HeroTintDTO {
     const device = typeof tint[name] === 'object' && tint[name] !== null ? tint[name] as Record<string, unknown> : {}
     const fallback = defaultHeroTint[name]
     return {
-      point1: projectHeroTintPoint(device.point1, fallback.point1),
-      point2: projectHeroTintPoint(device.point2, fallback.point2),
-      point3: projectHeroTintPoint(device.point3, fallback.point3),
+      centerX: clamp(numberOr(device.centerX, fallback.centerX), 0, 100),
+      centerY: clamp(numberOr(device.centerY, fallback.centerY), 0, 100),
+      stop1: projectHeroTintStop(device.stop1, fallback.stop1),
+      stop2: projectHeroTintStop(device.stop2, fallback.stop2),
+      stop3: projectHeroTintStop(device.stop3, fallback.stop3),
     }
   }
   return { desktop: projectDevice('desktop'), mobile: projectDevice('mobile') }
