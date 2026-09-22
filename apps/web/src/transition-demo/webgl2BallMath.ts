@@ -81,22 +81,6 @@ export function mat4LookAt(out: Mat4, eye: Vec3, center: Vec3, up: Vec3): Mat4 {
   return out
 }
 
-function mat4Multiply(out: Mat4, a: Mat4, b: Mat4): Mat4 {
-  const a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3]
-  const a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7]
-  const a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11]
-  const a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15]
-  for (let column = 0; column < 4; column += 1) {
-    const offset = column * 4
-    const b0 = b[offset], b1 = b[offset + 1], b2 = b[offset + 2], b3 = b[offset + 3]
-    out[offset] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30
-    out[offset + 1] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31
-    out[offset + 2] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32
-    out[offset + 3] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33
-  }
-  return out
-}
-
 export function mat4Translate(out: Mat4, a: Mat4, [x, y, z]: Vec3): Mat4 {
   out[12] = a[0] * x + a[4] * y + a[8] * z + a[12]
   out[13] = a[1] * x + a[5] * y + a[9] * z + a[13]
@@ -125,13 +109,19 @@ export function mat4RotateEuler(out: Mat4, a: Mat4, x: number, y: number, z: num
   const cx = Math.cos(x), sx = Math.sin(x)
   const cy = Math.cos(y), sy = Math.sin(y)
   const cz = Math.cos(z), sz = Math.sin(z)
-  const rotation = new Float32Array([
-    cy * cz, cy * sz, -sy, 0,
-    sx * sy * cz - cx * sz, sx * sy * sz + cx * cz, sx * cy, 0,
-    cx * sy * cz + sx * sz, cx * sy * sz - sx * cz, cx * cy, 0,
-    0, 0, 0, 1,
-  ])
-  return mat4Multiply(out, a, rotation)
+  // Keep the former Float32 rotation coefficients, but avoid a temporary
+  // typed array on every frame. Read each row before writing for out === a.
+  const r00 = Math.fround(cy * cz), r01 = Math.fround(cy * sz), r02 = Math.fround(-sy)
+  const r10 = Math.fround(sx * sy * cz - cx * sz), r11 = Math.fround(sx * sy * sz + cx * cz), r12 = Math.fround(sx * cy)
+  const r20 = Math.fround(cx * sy * cz + sx * sz), r21 = Math.fround(cx * sy * sz - sx * cz), r22 = Math.fround(cx * cy)
+  for (let row = 0; row < 4; row += 1) {
+    const a0 = a[row], a1 = a[row + 4], a2 = a[row + 8]
+    out[row] = r00 * a0 + r01 * a1 + r02 * a2
+    out[row + 4] = r10 * a0 + r11 * a1 + r12 * a2
+    out[row + 8] = r20 * a0 + r21 * a1 + r22 * a2
+    out[row + 12] = a[row + 12]
+  }
+  return out
 }
 
 export function mat3NormalFromMat4(out: Float32Array, a: Mat4): Float32Array {

@@ -123,6 +123,27 @@ export function computeReferenceTrajectory(options: { portrait?: boolean } = {})
 
 export function evaluateReferenceTrajectory(traj: ReferenceTrajectory, progress: number): ReferencePoint {
   const t = Math.max(0, Math.min(1, progress))
+  const point = evaluateOriginalTrajectory(traj, t)
+  const halfWindow = 0.1
+  const distance = t - 0.5
+  if (t <= 0.5 - halfWindow || t >= 0.5 + halfWindow || distance === 0) return point
+
+  // Local cubic Hermite correction: zero position/velocity change at 0.4/0.6,
+  // zero position change at the peak, and one shared velocity through the peak.
+  // A harmonic mean limits the fast incoming depth tangent without introducing
+  // an overshoot/reversal on the much slower outgoing branch.
+  const weight = 1 - Math.abs(distance) / halfWindow
+  const correction = distance * weight * weight
+  for (const axis of ['x', 'y', 'z'] as const) {
+    const incoming = 4 * (traj.peak[axis] - traj.control[axis])
+    const outgoing = axis === 'z' ? 4.8 : incoming * 0.6
+    const shared = incoming * outgoing > 0 ? 2 * incoming * outgoing / (incoming + outgoing) : 0
+    point[axis] += (shared - (distance < 0 ? incoming : outgoing)) * correction
+  }
+  return point
+}
+
+function evaluateOriginalTrajectory(traj: ReferenceTrajectory, t: number): ReferencePoint {
   const s = traj.start
   const p = traj.peak
   const e = traj.end

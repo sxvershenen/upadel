@@ -88,6 +88,7 @@ export class WebGL2BallRenderer {
   private readonly trailProgram: WebGLProgram
   private readonly trailVAO: WebGLVertexArrayObject
   private readonly trailVBO: WebGLBuffer
+  private readonly uniformLocations = new Map<WebGLProgram, Map<string, WebGLUniformLocation | null>>()
   private readonly viewMatrix = mat4Create()
 
   constructor(private readonly canvas: HTMLCanvasElement, private readonly compact: boolean) {
@@ -118,6 +119,7 @@ export class WebGL2BallRenderer {
     this.trailAlphaVBO = this.bindAttribute(1, this.trailAlphas, 1, gl.DYNAMIC_DRAW)
     gl.bindVertexArray(null)
     mat4LookAt(this.viewMatrix, [0, 0, 5], [0, 0, 0], [0, 1, 0])
+    this.initializeUniforms()
     this.resize()
     this.clear()
   }
@@ -150,6 +152,10 @@ export class WebGL2BallRenderer {
     }
     this.gl.viewport(0, 0, renderWidth, renderHeight)
     mat4Perspective(this.projectionMatrix, Math.PI / 4, renderWidth / renderHeight, 0.1, 100)
+    for (const program of [this.ballProgram, this.trailProgram]) {
+      this.gl.useProgram(program)
+      this.uniformMatrix4(program, 'uProjectionMatrix', this.projectionMatrix)
+    }
   }
 
   destroy() {
@@ -162,6 +168,7 @@ export class WebGL2BallRenderer {
     gl.deleteVertexArray(this.trailVAO)
     gl.deleteProgram(this.ballProgram)
     gl.deleteProgram(this.trailProgram)
+    this.uniformLocations.clear()
   }
 
   private readonly tick = (now: number) => {
@@ -204,9 +211,16 @@ export class WebGL2BallRenderer {
     gl.useProgram(this.ballProgram)
     gl.bindVertexArray(this.ballVAO)
     this.uniformMatrix4(this.ballProgram, 'uModelMatrix', this.modelMatrix)
+    gl.uniformMatrix3fv(this.uniformLocation(this.ballProgram, 'uNormalMatrix'), false, this.normalMatrix)
+    gl.drawElements(gl.TRIANGLES, this.ballIndexCount, gl.UNSIGNED_SHORT, 0)
+  }
+
+  private initializeUniforms() {
+    const gl = this.gl
+    gl.useProgram(this.ballProgram)
+    this.uniformLocation(this.ballProgram, 'uModelMatrix')
+    this.uniformLocation(this.ballProgram, 'uNormalMatrix')
     this.uniformMatrix4(this.ballProgram, 'uViewMatrix', this.viewMatrix)
-    this.uniformMatrix4(this.ballProgram, 'uProjectionMatrix', this.projectionMatrix)
-    gl.uniformMatrix3fv(gl.getUniformLocation(this.ballProgram, 'uNormalMatrix'), false, this.normalMatrix)
     this.uniform1(this.ballProgram, 'uNoiseScale', ballConfig.noiseScale)
     this.uniform1(this.ballProgram, 'uNoiseDetail', ballConfig.noiseDetail)
     this.uniform1(this.ballProgram, 'uFuzzStrength', ballConfig.fuzzStrength)
@@ -217,7 +231,7 @@ export class WebGL2BallRenderer {
     this.uniform1(this.ballProgram, 'uLineWidth', ballConfig.lineWidth)
     this.uniform1(this.ballProgram, 'uContrast', ballConfig.contrast)
     this.uniform1(this.ballProgram, 'uSmoothing', ballConfig.smoothing)
-    gl.uniform3fv(gl.getUniformLocation(this.ballProgram, 'uSeamPoints'), this.seamPoints)
+    gl.uniform3fv(this.uniformLocation(this.ballProgram, 'uSeamPoints'), this.seamPoints)
     this.uniform3(this.ballProgram, 'uBaseColor', ballConfig.baseColor)
     this.uniform3(this.ballProgram, 'uRimColor', ballConfig.rimColor)
     this.uniform3(this.ballProgram, 'uSeamColor', ballConfig.seamColor)
@@ -227,7 +241,12 @@ export class WebGL2BallRenderer {
     this.uniform1(this.ballProgram, 'uFuzzWrap', ballConfig.fuzzWrap)
     this.uniform1(this.ballProgram, 'uSheenIntensity', ballConfig.sheenIntensity)
     this.uniformLighting()
-    gl.drawElements(gl.TRIANGLES, this.ballIndexCount, gl.UNSIGNED_SHORT, 0)
+
+    gl.useProgram(this.trailProgram)
+    this.uniformMatrix4(this.trailProgram, 'uViewMatrix', this.viewMatrix)
+    this.uniform3(this.trailProgram, 'uTrailColor', ballConfig.rimColor)
+    this.uniform1(this.trailProgram, 'uTrailIntensity', ballConfig.trailIntensity)
+    this.uniform1(this.trailProgram, 'uPointSize', this.compact ? 12 : 16)
   }
 
   private renderTrail() {
@@ -255,11 +274,6 @@ export class WebGL2BallRenderer {
     gl.depthMask(false)
     gl.useProgram(this.trailProgram)
     gl.bindVertexArray(this.trailVAO)
-    this.uniformMatrix4(this.trailProgram, 'uViewMatrix', this.viewMatrix)
-    this.uniformMatrix4(this.trailProgram, 'uProjectionMatrix', this.projectionMatrix)
-    this.uniform3(this.trailProgram, 'uTrailColor', ballConfig.rimColor)
-    this.uniform1(this.trailProgram, 'uTrailIntensity', ballConfig.trailIntensity)
-    this.uniform1(this.trailProgram, 'uPointSize', this.compact ? 12 : 16)
     gl.drawArrays(gl.POINTS, 0, this.trailHistory.length)
     gl.depthMask(true)
     gl.disable(gl.BLEND)
@@ -338,15 +352,26 @@ export class WebGL2BallRenderer {
     return buffer
   }
 
+  private uniformLocation(program: WebGLProgram, name: string): WebGLUniformLocation | null {
+    let locations = this.uniformLocations.get(program)
+    if (!locations) {
+      locations = new Map()
+      this.uniformLocations.set(program, locations)
+    }
+    // Null is a valid cached result for uniforms removed by the shader compiler.
+    if (!locations.has(name)) locations.set(name, this.gl.getUniformLocation(program, name))
+    return locations.get(name) ?? null
+  }
+
   private uniform1(program: WebGLProgram, name: string, value: number) {
-    this.gl.uniform1f(this.gl.getUniformLocation(program, name), value)
+    this.gl.uniform1f(this.uniformLocation(program, name), value)
   }
 
   private uniform3(program: WebGLProgram, name: string, value: Vec3) {
-    this.gl.uniform3fv(this.gl.getUniformLocation(program, name), value)
+    this.gl.uniform3fv(this.uniformLocation(program, name), value)
   }
 
   private uniformMatrix4(program: WebGLProgram, name: string, value: Float32Array) {
-    this.gl.uniformMatrix4fv(this.gl.getUniformLocation(program, name), false, value)
+    this.gl.uniformMatrix4fv(this.uniformLocation(program, name), false, value)
   }
 }
