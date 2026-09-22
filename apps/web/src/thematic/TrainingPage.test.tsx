@@ -135,7 +135,7 @@ test('TrainingPage renders Swiss layout with methodology pillars, formats, coach
   assert.match(html, /class="[^"]*max-sm:!rounded-none[^"]*"/)
   assert.match(html, /class="[^"]*sm:rounded-\[var\(--se-2\)\][^"]*sm:bg-surface-muted[^"]*"/)
   assert.match(html, /class="[^"]*border-b border-ink\/10[^"]*last:border-b-0[^"]*sm:border-b-0[^"]*"/)
-  assert.equal((html.match(/class="mt-12 md:mt-20"/g) ?? []).length, 3)
+  assert.equal((html.match(/class="py-12 md:py-20"/g) ?? []).length, 4)
 
   // Formats section
   assert.match(plainText, /Форматы тренировок/)

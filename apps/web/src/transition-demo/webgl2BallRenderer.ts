@@ -46,7 +46,7 @@ const ballConfig = {
   sheenIntensity: 0,
   smoothing: 0.014,
   specular: 0.35,
-  spinMultiplier: 0.2,
+  spinMultiplier: 0.06,
   trailIntensity: 1.2,
 }
 

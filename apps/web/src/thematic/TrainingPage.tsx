@@ -54,9 +54,9 @@ export function TrainingPage({ dto }: { dto: TrainingPageDTO }) {
   const coaches = dto.coaches ?? []
 
   return (
-    <article className="container-page pb-16 pt-8 md:pb-24 md:pt-12">
+    <article className="container-page">
       {/* 1. Swiss Methodology Pillars */}
-      <section aria-labelledby="methodology-title">
+      <section className="py-12 md:py-20" aria-labelledby="methodology-title">
         <SectionHeader titleId="methodology-title" eyebrow={dto.infographicEyebrow} title={dto.infographicTitle} />
 
         <div data-mobile-compact-list className="mt-8 border-y border-ink/10 sm:grid sm:grid-cols-3 sm:gap-4 sm:border-y-0">
@@ -87,7 +87,7 @@ export function TrainingPage({ dto }: { dto: TrainingPageDTO }) {
       </section>
 
       {/* 2. Training Formats */}
-      <section className="mt-12 md:mt-20" aria-labelledby="training-formats-title">
+      <section className="py-12 md:py-20" aria-labelledby="training-formats-title">
         <SectionHeader
           titleId="training-formats-title"
           eyebrow={dto.programsEyebrow}
@@ -146,7 +146,7 @@ export function TrainingPage({ dto }: { dto: TrainingPageDTO }) {
 
       {/* 3. Coaches Section - Swiss Swiper matching homepage style */}
       {coaches.length > 0 && (
-        <section className="mt-12 md:mt-20" aria-labelledby="coaches-title">
+        <section className="py-12 md:py-20" aria-labelledby="coaches-title">
           <SectionHeader
             titleId="coaches-title"
             eyebrow={dto.coachesEyebrow}
@@ -223,7 +223,7 @@ export function TrainingPage({ dto }: { dto: TrainingPageDTO }) {
       )}
 
       {/* 4. Knowledge base: first visit on the left, FAQ on the right */}
-      <section className="mt-12 md:mt-20" aria-label={dto.knowledgeTitle}>
+      <section className="py-12 md:py-20" aria-label={dto.knowledgeTitle}>
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-0 lg:divide-x lg:divide-ink/10">
           <div className="lg:pr-16">
             <Typography as="h2" role="section" className="font-semibold text-ink">{typograph(dto.firstVisitTitle)}</Typography>
