@@ -32,6 +32,7 @@ export function Gallery() {
               reverse={rowIndex === 1}
               gapClass="gap-4 md:gap-7"
               className="marquee-breathe"
+              interactiveCopies
             >
               {row.map((item, index) => (
                 <GalleryCard key={item.id} media={item.media} src={item.media.url} alt={item.media.alt} onOpen={() => setActive(entities.gallery.findIndex(({ id }) => id === item.id))} reveal={{ delay: index * 0.06 }} />

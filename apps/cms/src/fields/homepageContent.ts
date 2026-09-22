@@ -75,6 +75,67 @@ const heroTitleFontSizeField: Field = {
   ],
 }
 
+function heroActionField(name: 'primaryAction' | 'secondaryAction', label: string, defaultValue: Record<string, string>): Field {
+  const action = createActionField(name, label)
+  return {
+    type: 'collapsible',
+    label,
+    admin: { initCollapsed: true },
+    fields: [{ ...action, label: false, admin: { ...action.admin, hideGutter: true }, defaultValue }],
+  }
+}
+
+const heroSocialProofField: Field = {
+  type: 'collapsible',
+  label: 'Социальное доказательство',
+  admin: { initCollapsed: true },
+  fields: [
+    {
+      name: 'socialProof',
+      type: 'group',
+      label: false,
+      admin: { hideGutter: true },
+      fields: [
+        { name: 'ratingLabel', type: 'text', label: 'Рейтинг и аудитория', defaultValue: '4.9 · 500+ игроков' },
+        { name: 'caption', type: 'text', label: 'Подпись', defaultValue: 'Рейтинг клуба на Новой Риге' },
+        {
+          name: 'coaches',
+          type: 'relationship',
+          relationTo: 'coaches',
+          hasMany: true,
+          maxRows: 3,
+          label: 'Тренеры на аватарах',
+          admin: { description: 'Используются фотографии существующих тренеров; медиа не копируется.' },
+        },
+      ],
+    },
+  ],
+}
+
+const heroStatsField: Field = {
+  type: 'collapsible',
+  label: 'Статистика',
+  admin: { initCollapsed: true },
+  fields: [
+    {
+      name: 'stats',
+      type: 'array',
+      label: false,
+      maxRows: 4,
+      defaultValue: [
+        { value: '3 корта', label: 'Jubo Super Panoramic' },
+        { value: '11.5 м', label: 'Высота до балок' },
+        { value: '+21°C', label: 'Климат-контроль круглый год' },
+        { value: '30 сек', label: 'Мгновенное бронирование' },
+      ],
+      fields: [
+        { name: 'value', type: 'text', label: 'Значение', required: true },
+        { name: 'label', type: 'text', label: 'Подпись', required: true },
+      ],
+    },
+  ],
+}
+
 export const heroFields: Field[] = [
   {
     name: 'hero',
@@ -124,42 +185,10 @@ export const heroFields: Field[] = [
       { name: 'mobileVideoPoster', type: 'upload', relationTo: 'media', filterOptions: imageOnlyFilter, label: 'Poster mobile-видео' },
       heroTintField,
       heroTitleFontSizeField,
-      { ...createActionField('primaryAction', 'Основная кнопка'), defaultValue: { label: 'Забронировать', mode: 'booking' } },
-      { ...createActionField('secondaryAction', 'Вторая кнопка'), defaultValue: { label: 'Пробное занятие', mode: 'trial-booking' } },
-      {
-        name: 'socialProof',
-        type: 'group',
-        label: 'Социальное доказательство',
-        fields: [
-          { name: 'ratingLabel', type: 'text', label: 'Рейтинг и аудитория', defaultValue: '4.9 · 500+ игроков' },
-          { name: 'caption', type: 'text', label: 'Подпись', defaultValue: 'Рейтинг клуба на Новой Риге' },
-          {
-            name: 'coaches',
-            type: 'relationship',
-            relationTo: 'coaches',
-            hasMany: true,
-            maxRows: 3,
-            label: 'Тренеры на аватарах',
-            admin: { description: 'Используются фотографии существующих тренеров; медиа не копируется.' },
-          },
-        ],
-      },
-      {
-        name: 'stats',
-        type: 'array',
-        label: 'Статистика',
-        maxRows: 4,
-        defaultValue: [
-          { value: '3 корта', label: 'Jubo Super Panoramic' },
-          { value: '11.5 м', label: 'Высота до балок' },
-          { value: '+21°C', label: 'Климат-контроль круглый год' },
-          { value: '30 сек', label: 'Мгновенное бронирование' },
-        ],
-        fields: [
-          { name: 'value', type: 'text', label: 'Значение', required: true },
-          { name: 'label', type: 'text', label: 'Подпись', required: true },
-        ],
-      },
+      heroActionField('primaryAction', 'Основная кнопка', { label: 'Забронировать', mode: 'booking' }),
+      heroActionField('secondaryAction', 'Вторая кнопка', { label: 'Пробное занятие', mode: 'trial-booking' }),
+      heroSocialProofField,
+      heroStatsField,
     ],
   },
 ]
