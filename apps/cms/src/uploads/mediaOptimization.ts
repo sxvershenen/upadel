@@ -18,7 +18,13 @@ export const optimizeMediaUploadBeforeOperation: CollectionBeforeOperationHook<'
   const mimeType = file.type || file.mimetype || ''
   if (!mimeType.startsWith('image/') || mimeType === 'image/svg+xml' || mimeType === 'image/gif') return input.args
 
-  const data = await optimizeRasterImage(file.tempFilePath ?? file.data)
+  // Payload's multipart parser may expose `tempFilePath` as an empty string when
+  // the upload lives in memory. Sharp treats that value as a path and fails with
+  // `Unsupported input ''`, so only prefer an actual non-empty temporary path.
+  const source = typeof file.tempFilePath === 'string' && file.tempFilePath.length > 0
+    ? file.tempFilePath
+    : file.data
+  const data = await optimizeRasterImage(source)
   file.data = data
   file.mimetype = 'image/webp'
   file.type = 'image/webp'

@@ -28,3 +28,23 @@ test('keeps SVG and GIF uploads out of the raster WebP transform', async () => {
     assert.equal(file.data.toString(), 'unchanged')
   }
 })
+
+test('falls back to the in-memory upload when Payload provides an empty temp file path', async () => {
+  const data = await sharp({
+    create: { width: 3, height: 2, channels: 3, background: { r: 194, g: 245, b: 66 } },
+  }).png().toBuffer()
+  const file = {
+    data,
+    mimetype: 'image/png',
+    name: 'payload-memory-upload.png',
+    size: data.length,
+    tempFilePath: '',
+    type: 'image/png',
+  }
+
+  await optimizeMediaUploadBeforeOperation({ args: {}, operation: 'create', req: { file } } as never)
+
+  assert.equal(file.type, 'image/webp')
+  assert.equal(file.name, 'payload-memory-upload.webp')
+  assert.equal((await sharp(file.data).metadata()).format, 'webp')
+})
