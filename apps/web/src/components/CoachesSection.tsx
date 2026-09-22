@@ -8,6 +8,7 @@ import { ButtonLink, IconButton } from './ui/Button'
 import { Reveal } from './ui/Reveal'
 import { SectionAction, SectionHeader } from './ui/SectionHeader'
 import { horizontalSwiperProps } from '../lib/swiper'
+import { useMobileSwipeHint } from '../lib/useMobileSwipeHint'
 
 type CoachesSectionProps = {
   coaches: Coach[]
@@ -37,6 +38,7 @@ export function CoachesSection({
   const swiperRef = useRef<SwiperType | null>(null)
   const [atStart, setAtStart] = useState(true)
   const [atEnd, setAtEnd] = useState(false)
+  const swipeHintRef = useMobileSwipeHint(swiperRef, sectionId ?? 'training-coaches')
 
   if (coaches.length === 0) return null
 
@@ -71,7 +73,7 @@ export function CoachesSection({
         />
       </Reveal>
 
-      <div>
+      <div ref={swipeHintRef} className="swiper-page-gutter">
         <Swiper
           {...horizontalSwiperProps}
           onSwiper={(swiper) => {

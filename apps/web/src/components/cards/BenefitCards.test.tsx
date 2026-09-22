@@ -54,16 +54,24 @@ test('kids card is an internal link to the training page', () => {
   assert.match(html, /cursor-pointer/)
 })
 
-test('mobile benefits swiper uses native scroll snap and real overlay elements for Safari', () => {
+test('mobile benefits swiper uses a horizontal track with protected side gutters and real overlays', () => {
   const sectionSource = readFileSync(new URL('../../sections/Benefits.tsx', import.meta.url), 'utf8')
   const css = readFileSync(new URL('../../index.css', import.meta.url), 'utf8')
   const cardSource = readFileSync(new URL('../ui/Card.tsx', import.meta.url), 'utf8')
 
-  assert.match(sectionSource, /<Swiper[^>]*cssMode/)
-  assert.doesNotMatch(sectionSource, /benefits-swiper swiper-breathe !px-5/)
+  assert.doesNotMatch(sectionSource, /<Swiper[^>]*cssMode/)
+  assert.match(sectionSource, /className="swiper-page-gutter lg:hidden"/)
+  assert.match(css, /\.swiper-page-gutter > \.swiper \{ padding-inline: var\(--page-gutter\); touch-action: pan-y; \}/)
   assert.match(cardSource, /data-image-overlay=\{overlay\}/)
   assert.match(css, /\.benefits-swiper:not\(\.swiper-initialized\) \.swiper-wrapper,[\s\S]*?gap: 12px;/)
   assert.match(css, /\.benefits-swiper:not\(\.swiper-initialized\) \.swiper-slide \{ width: 100%; \}/)
   assert.match(css, /\.benefits-swiper \[data-image-card="true"\][\s\S]*?-webkit-mask-image: none;[\s\S]*?contain: none;/)
   assert.doesNotMatch(css, /\.benefits-swiper[^\{]*\{[^}]*translate3d/)
+})
+
+test('UI kit overlay previews use the production overlay element', () => {
+  const kitSource = readFileSync(new URL('../../ui-kit/UiKitPage.tsx', import.meta.url), 'utf8')
+  const overlays = readFileSync(new URL('../../styles/surfaces.css', import.meta.url), 'utf8')
+  assert.match(kitSource, /overlayTones\.map\(\(overlay\) =>[\s\S]*?data-image-overlay=\{overlay\}/)
+  assert.match(overlays, /\[data-image-overlay="overlay-blue"\] \{ background:/)
 })

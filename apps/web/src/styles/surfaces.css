@@ -10,7 +10,7 @@
 .parallax-viewport { overflow: hidden; }
 .parallax-layer { position: absolute; inset-inline: 0; top: -18%; height: 136%; will-change: transform; }
 .parallax-layer-wide { position: absolute; inset-inline: 0; top: -32%; height: 164%; will-change: transform; }
-.swiper-breathe { padding-block: 24px !important; margin-block: -24px; }
+.swiper-breathe { padding-block: 12px !important; margin-block: -12px; }
 .marquee-breathe { padding-block: 16px; margin-block: -16px; }
 .dialog-surface { border-radius: var(--se-5) var(--se-5) 0 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; contain: paint; will-change: transform; }
 @media (min-width: 768px) { .dialog-surface { border-radius: var(--se-4); } }

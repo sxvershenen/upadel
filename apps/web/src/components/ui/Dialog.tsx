@@ -5,8 +5,8 @@ import { X } from "lucide-react";
 import { IconButton } from "./Button";
 
 const presenceVariants = {
-  closed: { transition: { when: "afterChildren" as const } },
-  open: { transition: { when: "beforeChildren" as const } },
+  closed: { opacity: 0.999, transition: { when: "afterChildren" as const, duration: 0.01 } },
+  open: { opacity: 1, transition: { when: "beforeChildren" as const, duration: 0.01 } },
 };
 const backdropVariants = {
   closed: { opacity: 0, transition: { duration: 0.22 } },
@@ -16,12 +16,17 @@ const surfaceVariants = {
   closed: { y: 28, transition: { duration: 0.26, ease: [0.4, 0, 1, 1] as const } },
   open: { y: 0, transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] as const } },
 };
+const mobileSurfaceVariants = {
+  closed: { y: "100%", transition: { duration: 0.28, ease: [0.4, 0, 1, 1] as const } },
+  open: { y: 0, transition: { duration: 0.34, ease: [0.22, 1, 0.36, 1] as const } },
+};
 
 export function Dialog({ open, onClose, title, children, scrollable = true, mobileTall = false }: { open: boolean; onClose: () => void; title: string; children: ReactNode; scrollable?: boolean; mobileTall?: boolean }) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const titleId = useId();
+  const isMobile = typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches;
 
   useLayoutEffect(() => {
     if (!open) return;
@@ -80,7 +85,7 @@ export function Dialog({ open, onClose, title, children, scrollable = true, mobi
           onKeyDown={trapFocus}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
-          variants={surfaceVariants}
+          variants={isMobile ? mobileSurfaceVariants : surfaceVariants}
           data-dialog-surface="true"
           className={`dialog-surface relative z-10 flex w-full flex-col overflow-hidden bg-white md:max-w-[780px] md:p-6 ${mobileTall ? 'max-h-[100dvh] p-4 pt-3 md:max-h-[96dvh]' : scrollable ? 'max-h-[92dvh] p-5 md:max-h-[96dvh]' : 'max-h-[calc(100dvh-12px)] p-5 md:max-h-[96dvh]'}`}
         >

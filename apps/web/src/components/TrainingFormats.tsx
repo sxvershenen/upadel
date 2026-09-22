@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import type { Swiper as SwiperType } from 'swiper'
 
@@ -7,6 +7,7 @@ import { RentalRateCard } from './cards/RentPricingCards'
 import type { Training } from './cards/TrainingCard'
 import { TrainingCard } from './cards/TrainingCard'
 import { horizontalSwiperProps } from '../lib/swiper'
+import { useMobileSwipeHint } from '../lib/useMobileSwipeHint'
 
 type TrainingFormatsProps = {
   programs: Training[]
@@ -16,6 +17,8 @@ type TrainingFormatsProps = {
 }
 
 export function TrainingFormats({ programs, trial, sourcePage, onSwiperChange }: TrainingFormatsProps) {
+  const swiperRef = useRef<SwiperType | null>(null)
+  const swipeHintRef = useMobileSwipeHint(swiperRef, sourcePage === '/training' ? 'training-formats' : 'home-pricing-training')
   const formats = [
     ...programs.map((program) => ({ kind: 'program' as const, item: program })),
     ...(trial ? [{ kind: 'trial' as const, item: trial }] : []),
@@ -37,10 +40,10 @@ export function TrainingFormats({ programs, trial, sourcePage, onSwiperChange }:
         ))}
       </div>
 
-      <div className="md:hidden">
+      <div ref={swipeHintRef} className="swiper-page-gutter md:hidden">
         <Swiper
           {...horizontalSwiperProps}
-          onSwiper={onSwiperChange}
+          onSwiper={(swiper) => { swiperRef.current = swiper; onSwiperChange?.(swiper) }}
           onSlideChange={onSwiperChange}
           onResize={onSwiperChange}
           slidesPerView={1}
