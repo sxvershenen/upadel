@@ -102,6 +102,17 @@ const pageEntrance = Astro.url.pathname === '/gift'
     {webmasterVerification?.trim() && <meta name="yandex-verification" content={webmasterVerification.trim()} />}
     <link rel="preload" href="/fonts/inter-tight/inter-tight-v9-cyrillic.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/inter-tight/inter-tight-v9-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <script is:inline>
+      (() => {
+        if (!/(?:YaSearchApp|YaSearchBrowser|YaApp_Android)\//.test(navigator.userAgent)) return
+        document.documentElement.setAttribute('data-yandex-app', 'true')
+        document.addEventListener('DOMContentLoaded', () => {
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            document.documentElement.setAttribute('data-yandex-motion-ready', 'true')
+          }))
+        }, { once: true })
+      })()
+    </script>
     <title>{title}</title>
   </head>
   <body>

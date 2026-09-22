@@ -1,9 +1,8 @@
-import { useCallback, useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { BadgeCheck, Star } from "lucide-react";
 import type { HomepageDTO } from "@unlim/content-contract";
 import { springSoft } from "../../lib/motion";
-import { useImageParallax } from "../../lib/useImageParallax";
 import { ArrowAction } from "../ui/ArrowAction";
 import { Badge } from "../ui/Badge";
 import { ButtonLink } from "../ui/Button";
@@ -21,9 +20,7 @@ export function CoachCard({ coach, loading = "lazy", reveal = true }: { coach: C
   const [open, setOpen] = useState(false);
   const [modalPhotoSrc, setModalPhotoSrc] = useState(coach.photo.url);
   const closeDialog = useCallback(() => setOpen(false), []);
-  const photoRef = useRef<HTMLDivElement>(null);
   const photoImageRef = useRef<HTMLImageElement>(null);
-  const photoY = useImageParallax(photoRef);
   const openDialog = useCallback(() => {
     const image = photoImageRef.current;
     setModalPhotoSrc(image?.currentSrc || image?.src || coach.photo.url);
@@ -31,10 +28,10 @@ export function CoachCard({ coach, loading = "lazy", reveal = true }: { coach: C
   }, [coach.photo.url]);
 
   return <>
-    <button type="button" aria-haspopup="dialog" aria-label={`Открыть профиль тренера ${coach.name}`} onClick={openDialog} className="block h-full w-full text-left focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-4">
-      <WhiteCard reveal={reveal} className="flex h-full flex-col overflow-hidden p-4">
-        <div ref={photoRef} data-parallax-viewport className="parallax-viewport se-2 relative aspect-[4/5] w-full">
-          <motion.div data-parallax-layer style={{ y: photoY }} className="parallax-layer overflow-hidden">
+    <button data-coach-card="true" type="button" aria-haspopup="dialog" aria-label={`Открыть профиль тренера ${coach.name}`} onClick={openDialog} className="block h-full w-full text-left focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-4">
+      <WhiteCard data-coach-surface="true" reveal={reveal} className="flex h-full flex-col overflow-hidden p-4">
+        <div data-parallax-viewport className="parallax-viewport se-2 relative aspect-[4/5] w-full">
+          <motion.div data-parallax-layer className="parallax-layer overflow-hidden">
             <ProgressiveImage ref={photoImageRef} media={coach.photo} sizes="(min-width: 1024px) 20vw, (min-width: 640px) 50vw, 100vw" alt={coach.photo.alt} loading={loading} className="h-full w-full object-cover" variants={{ rest: { scale: 1.04 }, hover: { scale: 1.095 } }} transition={springSoft} />
           </motion.div>
           <div className="absolute left-3 top-3"><Badge tone="glass" className="image-glass px-2.5"><Star size={12} className="fill-lime text-lime" /> {coach.rating} · {coach.reviewsCount}</Badge></div>

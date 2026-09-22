@@ -1,5 +1,6 @@
 import type { HomepageDTO } from '@unlim/content-contract'
 import { ArrowRight, Check } from 'lucide-react'
+import React from 'react'
 
 import { springSoft } from '../../lib/motion'
 import { ArrowAction } from '../ui/ArrowAction'

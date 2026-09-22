@@ -154,7 +154,7 @@ test('TrainingPage renders Swiss layout with methodology pillars, formats, coach
   assert.match(html, /href="\/coaches"/)
   assert.match(html, /aria-label="Предыдущие тренеры"/)
   assert.match(html, /aria-label="Следующие тренеры"/)
-  assert.match(html, /training-coaches-swiper/)
+  assert.match(html, /coaches-swiper/)
 
   // Knowledge base goes straight to its two useful columns without a duplicate section title.
   assert.doesNotMatch(plainText, /Перед первой тренировкой/)
@@ -170,15 +170,31 @@ test('TrainingPage renders Swiss layout with methodology pillars, formats, coach
   assert.equal(plainText.includes('Готовы выйти на корт?'), false)
 })
 
-test('training swipers preserve their hydrated geometry and paint layers before initialization', () => {
+test('training swipers avoid scroll-triggered transforms on mobile', () => {
   const css = readFileSync(new URL('../index.css', import.meta.url), 'utf8')
-  const hintSource = readFileSync(new URL('../lib/useMobileSwipeHint.ts', import.meta.url), 'utf8')
+  const pageSource = readFileSync(new URL('./TrainingPage.tsx', import.meta.url), 'utf8')
+  const formatsSource = readFileSync(new URL('../components/TrainingFormats.tsx', import.meta.url), 'utf8')
+  const pricingTrainingSource = readFileSync(new URL('../sections/pricing/PricingTraining.tsx', import.meta.url), 'utf8')
+  const coachesSource = readFileSync(new URL('../components/CoachesSection.tsx', import.meta.url), 'utf8')
+  const homepageCoachesSource = readFileSync(new URL('../sections/Coaches.tsx', import.meta.url), 'utf8')
+  const coachSource = readFileSync(new URL('../components/cards/CoachCard.tsx', import.meta.url), 'utf8')
 
   assert.match(css, /\.training-formats-swiper:not\(\.swiper-initialized\) \.swiper-wrapper \{ gap: 12px; \}/)
-  assert.match(css, /\.training-formats-swiper:not\(\.swiper-initialized\) \.swiper-slide \{ width: calc\(\(100% - \.96px\) \/ 1\.08\); \}/)
-  assert.match(css, /\.training-coaches-swiper:not\(\.swiper-initialized\) \.swiper-slide \{ width: calc\(\(100% - 1\.28px\) \/ 1\.08\); \}/)
-  assert.match(css, /\.training-formats-swiper \.swiper-slide > div > \[data-gsap-reveal-boundary="true"\][\s\S]*?-webkit-mask-image: none/)
-  assert.match(hintSource, /addEventListener\('pointerdown', stopHintForInteraction, \{ capture: true, passive: true \}\)/)
+  assert.match(css, /\.training-formats-swiper:not\(\.swiper-initialized\) \.swiper-slide \{ width: 100%; \}/)
+  assert.match(formatsSource, /slidesPerView=\{1\}/)
+  assert.match(formatsSource, /className="training-formats-swiper swiper-breathe"/)
+  assert.doesNotMatch(formatsSource, /-mx-5|!px-5/)
+  assert.match(pageSource, /<TrainingFormats programs=\{dto\.programs\} trial=\{dto\.trial\}/)
+  assert.match(pricingTrainingSource, /<TrainingFormats programs=\{entities\.trainingPrograms\}/)
+  assert.match(pageSource, /<CoachesSection/)
+  assert.match(homepageCoachesSource, /<CoachesSection/)
+  assert.match(coachesSource, /slidesPerView=\{1\}/)
+  assert.match(coachesSource, /<CoachCard coach=\{coach\} loading="lazy" reveal=\{false\}/)
+  assert.doesNotMatch(coachesSource, /-mx-5|!px-5/)
+  assert.doesNotMatch(`${formatsSource}\n${pageSource}\n${pricingTrainingSource}\n${coachesSource}`, /useMobileSwipeHint/)
+  assert.doesNotMatch(css, /\.training-formats-swiper[^\{]*\{[^}]*translateZ/)
+  assert.doesNotMatch(coachSource, /useImageParallax|style=\{\{ y: photoY \}\}/)
+  assert.match(css, /\[data-coach-card="true"\] \[data-parallax-layer\][\s\S]*?transform: none !important/)
 })
 
 test('coach dialog reuses the loaded photo without a second progressive reveal and fits the dynamic viewport', () => {
@@ -194,6 +210,8 @@ test('coach dialog reuses the loaded photo without a second progressive reveal a
   assert.match(dialogSource, /focus\(\{ preventScroll: true \}\)/)
   assert.match(dialogSource, /h-\[100dvh\]/)
   assert.match(dialogSource, /max-h-\[calc\(100dvh-12px\)\]/)
+  const surfaceVariantSource = dialogSource.match(/const surfaceVariants = \{([\s\S]*?)\n\};/)?.[1] ?? ''
+  assert.doesNotMatch(surfaceVariantSource, /opacity/)
 })
 
 test('RentalRateCard renders compact layout with unboxed eyebrow, bottom-edge background images, and standard action button', () => {

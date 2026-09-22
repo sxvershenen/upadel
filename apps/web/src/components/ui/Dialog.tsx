@@ -13,8 +13,8 @@ const backdropVariants = {
   open: { opacity: 1, transition: { duration: 0.2 } },
 };
 const surfaceVariants = {
-  closed: { opacity: 0, y: 28, transition: { duration: 0.26, ease: [0.4, 0, 1, 1] as const } },
-  open: { opacity: 1, y: 0, transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] as const } },
+  closed: { y: 28, transition: { duration: 0.26, ease: [0.4, 0, 1, 1] as const } },
+  open: { y: 0, transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] as const } },
 };
 
 export function Dialog({ open, onClose, title, children, scrollable = true, mobileTall = false }: { open: boolean; onClose: () => void; title: string; children: ReactNode; scrollable?: boolean; mobileTall?: boolean }) {

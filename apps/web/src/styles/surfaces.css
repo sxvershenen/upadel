@@ -12,7 +12,7 @@
 .parallax-layer-wide { position: absolute; inset-inline: 0; top: -32%; height: 164%; will-change: transform; }
 .swiper-breathe { padding-block: 24px !important; margin-block: -24px; }
 .marquee-breathe { padding-block: 16px; margin-block: -16px; }
-.dialog-surface { border-radius: var(--se-5) var(--se-5) 0 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; contain: paint; will-change: transform, opacity; }
+.dialog-surface { border-radius: var(--se-5) var(--se-5) 0 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; contain: paint; will-change: transform; }
 @media (min-width: 768px) { .dialog-surface { border-radius: var(--se-4); } }
 @supports (corner-shape: squircle) {
   .dialog-surface { border-radius: calc(var(--se-5) * 2) calc(var(--se-5) * 2) 0 0; corner-shape: squircle; }

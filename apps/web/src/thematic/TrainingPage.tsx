@@ -1,10 +1,8 @@
-import React, { useRef, useState } from 'react'
+import React from 'react'
 import type { TrainingPageDTO } from '@unlim/content-contract'
 import {
   ArrowRight,
   Calendar,
-  ChevronLeft,
-  ChevronRight,
   Dumbbell,
   Footprints,
   ShowerHead,
@@ -13,20 +11,13 @@ import {
   TrendingUp,
   Users,
 } from 'lucide-react'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import type { Swiper as SwiperType } from 'swiper'
-
-import { CoachCard } from '../components/cards/CoachCard'
-import { RentalRateCard } from '../components/cards/RentPricingCards'
-import { TrainingCard } from '../components/cards/TrainingCard'
+import { CoachesSection } from '../components/CoachesSection'
+import { TrainingFormats } from '../components/TrainingFormats'
 import { ContentAction } from '../components/ContentAction'
-import { ButtonLink, IconButton } from '../components/ui/Button'
 import { Accordion } from '../components/ui/Accordion'
 import { SurfaceCard } from '../components/ui/Card'
-import { SectionAction, SectionHeader } from '../components/ui/SectionHeader'
+import { SectionHeader } from '../components/ui/SectionHeader'
 import { Typography } from '../components/ui/Typography'
-import { horizontalSwiperProps } from '../lib/swiper'
-import { useMobileSwipeHint } from '../lib/useMobileSwipeHint'
 
 export function typograph(text: string): string {
   if (!text) return ''
@@ -38,19 +29,6 @@ export function typograph(text: string): string {
 
 const methodIcons = { Target, Calendar, TrendingUp, Users }
 export function TrainingPage({ dto }: { dto: TrainingPageDTO }) {
-  const formats = [
-    ...dto.programs.map((program) => ({ kind: 'program' as const, item: program })),
-    ...(dto.trial ? [{ kind: 'trial' as const, item: dto.trial }] : []),
-  ]
-
-  const formatSwiperRef = useRef<SwiperType | null>(null)
-  const formatSwipeHintRef = useMobileSwipeHint(formatSwiperRef, 'training-formats')
-
-  const coachesSwiperRef = useRef<SwiperType | null>(null)
-  const [coachesAtStart, setCoachesAtStart] = useState(true)
-  const [coachesAtEnd, setCoachesAtEnd] = useState(false)
-  const coachesSwipeHintRef = useMobileSwipeHint(coachesSwiperRef, 'training-coaches')
-
   const coaches = dto.coaches ?? []
 
   return (
@@ -95,132 +73,17 @@ export function TrainingPage({ dto }: { dto: TrainingPageDTO }) {
           className="mb-8"
         />
 
-        {/* Desktop 4-column grid */}
-        <div className="hidden gap-4 lg:grid lg:grid-cols-4">
-          {formats.map((entry) => (
-            <div key={`${entry.kind}-${entry.item.id}`} className="h-full">
-              {entry.kind === 'program' ? (
-                <TrainingCard training={entry.item} />
-              ) : (
-                <RentalRateCard
-                  rate={entry.item}
-                  sourcePage="/training"
-                  sourceEntity={entry.item.title}
-                  layout="compact"
-                />
-              )}
-            </div>
-          ))}
-        </div>
-
-        {/* Mobile Swiper */}
-        <div ref={formatSwipeHintRef} className="-mx-5 lg:hidden">
-          <Swiper
-            {...horizontalSwiperProps}
-            onSwiper={(swiper) => {
-              formatSwiperRef.current = swiper
-            }}
-            slidesPerView={1.08}
-            spaceBetween={12}
-            className="training-formats-swiper swiper-breathe !px-5"
-          >
-            {formats.map((entry) => (
-              <SwiperSlide key={`${entry.kind}-${entry.item.id}`} className="!h-auto">
-                <div className="h-full min-h-[500px]">
-                  {entry.kind === 'program' ? (
-                    <TrainingCard training={entry.item} interactive={false} />
-                  ) : (
-                    <RentalRateCard
-                      rate={entry.item}
-                      sourcePage="/training"
-                      sourceEntity={entry.item.title}
-                      layout="compact"
-                    />
-                  )}
-                </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </div>
+        <TrainingFormats programs={dto.programs} trial={dto.trial} sourcePage="/training" />
       </section>
 
       {/* 3. Coaches Section - Swiss Swiper matching homepage style */}
-      {coaches.length > 0 && (
-        <section className="py-12 md:py-20" aria-labelledby="coaches-title">
-          <SectionHeader
-            titleId="coaches-title"
-            eyebrow={dto.coachesEyebrow}
-            title={dto.coachesTitle}
-            action={
-              <div className="flex items-center gap-2">
-                <SectionAction action={{ mode: 'internal-link', href: '/coaches', label: dto.coachesDesktopActionLabel }} className="hidden sm:inline-flex">
-                  {dto.coachesDesktopActionLabel}
-                </SectionAction>
-                <IconButton
-                  variant="neutral"
-                  size="sm"
-                  aria-label="Предыдущие тренеры"
-                  disabled={coachesAtStart}
-                  onClick={() => coachesSwiperRef.current?.slidePrev()}
-                >
-                  <ChevronLeft size={16} />
-                </IconButton>
-                <IconButton
-                  variant="neutral"
-                  size="sm"
-                  aria-label="Следующие тренеры"
-                  disabled={coachesAtEnd}
-                  onClick={() => coachesSwiperRef.current?.slideNext()}
-                >
-                  <ChevronRight size={16} />
-                </IconButton>
-              </div>
-            }
-            className="mb-8"
-          />
-
-          <div ref={coachesSwipeHintRef} className="-mx-5 md:mx-0">
-            <Swiper
-              {...horizontalSwiperProps}
-              onSwiper={(s) => (coachesSwiperRef.current = s)}
-              onSlideChange={(s) => {
-                setCoachesAtStart(s.isBeginning)
-                setCoachesAtEnd(s.isEnd)
-              }}
-              onResize={(s) => {
-                setCoachesAtStart(s.isBeginning)
-                setCoachesAtEnd(s.isEnd)
-              }}
-              spaceBetween={16}
-              slidesPerView={1.08}
-              breakpoints={{
-                640: { slidesPerView: 2.2 },
-                1024: { slidesPerView: 4 },
-                1280: { slidesPerView: 4 },
-              }}
-              className="coaches-swiper training-coaches-swiper swiper-breathe !px-5 md:!px-0"
-            >
-              {coaches.map((coach) => (
-                <SwiperSlide key={coach.id} className="!h-auto">
-                  <CoachCard coach={coach} loading="lazy" />
-                </SwiperSlide>
-              ))}
-            </Swiper>
-          </div>
-
-          <div className="mt-5 sm:hidden">
-            <ButtonLink
-              href="/coaches"
-              variant="neutral"
-              fullWidth
-              size="md"
-              icon={<ArrowRight size={16} />}
-            >
-              {dto.coachesMobileActionLabel}
-            </ButtonLink>
-          </div>
-        </section>
-      )}
+      <CoachesSection
+        coaches={coaches}
+        eyebrow={dto.coachesEyebrow}
+        title={dto.coachesTitle}
+        titleId="coaches-title"
+        catalogAction={{ href: '/coaches', desktopLabel: dto.coachesDesktopActionLabel, mobileLabel: dto.coachesMobileActionLabel }}
+      />
 
       {/* 4. Knowledge base: first visit on the left, FAQ on the right */}
       <section className="py-12 md:py-20" aria-label={dto.knowledgeTitle}>

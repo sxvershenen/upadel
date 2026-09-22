@@ -60,7 +60,10 @@ test('mobile benefits swiper uses native scroll snap and real overlay elements f
   const cardSource = readFileSync(new URL('../ui/Card.tsx', import.meta.url), 'utf8')
 
   assert.match(sectionSource, /<Swiper[^>]*cssMode/)
+  assert.doesNotMatch(sectionSource, /benefits-swiper swiper-breathe !px-5/)
   assert.match(cardSource, /data-image-overlay=\{overlay\}/)
+  assert.match(css, /\.benefits-swiper:not\(\.swiper-initialized\) \.swiper-wrapper,[\s\S]*?gap: 12px;/)
+  assert.match(css, /\.benefits-swiper:not\(\.swiper-initialized\) \.swiper-slide \{ width: 100%; \}/)
   assert.match(css, /\.benefits-swiper \[data-image-card="true"\][\s\S]*?-webkit-mask-image: none;[\s\S]*?contain: none;/)
   assert.doesNotMatch(css, /\.benefits-swiper[^\{]*\{[^}]*translate3d/)
 })

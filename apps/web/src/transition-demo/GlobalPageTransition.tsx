@@ -77,15 +77,23 @@ export function GlobalPageTransition() {
     }
 
     const startNavigation = (event: MouseEvent) => {
-      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
       const link = internalNavigableLink(event.target)
       if (!link) return
       beginTransitionProgress()
-      if (runtimeReadyRef.current) return
-
-      event.preventDefault()
       const url = new URL(link.href, window.location.href)
       const href = `${url.pathname}${url.search}${url.hash}`
+      // Own internal navigation from the capture phase. Some embedded app
+      // browsers bypass Swup's delegated click handler and perform a full load.
+      event.preventDefault()
+      if (runtimeReadyRef.current && navigateRef.current) {
+        void navigateRef.current(href).catch(() => {
+          completeTransitionProgress()
+          window.location.assign(href)
+        })
+        return
+      }
+
       pendingHrefRef.current = href
       setPendingHref(href)
       void loadRuntimeForNavigation({

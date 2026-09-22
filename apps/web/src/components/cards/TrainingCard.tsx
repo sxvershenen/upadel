@@ -1,5 +1,6 @@
 import type { HomepageDTO } from '@unlim/content-contract'
 import { Baby, User, Users } from 'lucide-react'
+import React from 'react'
 
 import { ArrowAction } from '../ui/ArrowAction'
 import { Badge } from '../ui/Badge'
