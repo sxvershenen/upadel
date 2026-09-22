@@ -9,6 +9,7 @@ import { waitForGsapAnimation } from './animationLifecycle'
 import { computeReferenceTrajectory } from './referenceTrajectories'
 import { transitionAudio } from './transitionAudio'
 import { beginTransitionProgress, completeTransitionProgress } from './transitionProgress'
+import { cancelBrowserIdle, createPostNavigationSceneLoader, scheduleBrowserIdle } from './postNavigationScene'
 
 const duration = 980
 
@@ -66,37 +67,51 @@ function animateIn() {
 
 type BallSceneComponent = ForwardRefExoticComponent<RefAttributes<ReferenceBallSceneHandle>>
 
-export function GlobalPageTransitionRuntime({ initialNavigation, onReady }: { initialNavigation?: string | null; onReady?: () => void }) {
+export function GlobalPageTransitionRuntime({ initialNavigation, onReady }: { initialNavigation?: string | null; onReady?: (navigate: (href: string) => Promise<unknown>) => void }) {
   const ballRef = useRef<ReferenceBallSceneHandle | null>(null)
   const swupRef = useRef<Swup | null>(null)
+  const navigateRef = useRef<((href: string) => Promise<unknown>) | null>(null)
   const [BallScene, setBallScene] = useState<BallSceneComponent | null>(null)
 
   useEffect(() => {
-    let mounted = true
-    void import('./ReferenceBallScene').then(({ ReferenceBallScene }) => {
-      if (mounted) setBallScene(() => ReferenceBallScene)
-    }).catch(() => {
-      // The lightweight Swup transition remains available without WebGL.
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const sceneLoader = createPostNavigationSceneLoader({
+      load: () => import('./ReferenceBallScene').then(({ ReferenceBallScene }) => ReferenceBallScene),
+      accept: (scene) => setBallScene(() => scene),
+      isReducedMotion: () => motionQuery.matches,
+      scheduleIdle: scheduleBrowserIdle,
+      cancelIdle: cancelBrowserIdle,
     })
+    const markDestinationReady = () => sceneLoader.destinationBecameReady()
+    const handleMotionChange = () => sceneLoader.motionPreferenceChanged()
+    document.addEventListener('unlim:main-ready', markDestinationReady)
+    motionQuery.addEventListener('change', handleMotionChange)
 
     const swup = new Swup({
       containers: ['#swup'],
+      cache: false,
+      requestHeaders: {
+        'X-Requested-With': 'swup',
+        'Accept': 'text/html, application/xhtml+xml',
+        'Cache-Control': 'no-cache',
+      },
       linkSelector: 'a[href]:not([data-transition-link])',
       animationSelector: false,
       plugins: [new SwupHeadPlugin({ awaitAssets: true, persistAssets: true }), new SwupScriptsPlugin({ head: false, body: true })],
       ignoreVisit: (url, { el } = {}) => {
         if (el?.closest('[data-no-swup]')) return true
-        return new URL(url, window.location.href).pathname.startsWith('/transitions/')
+        const pathname = new URL(url, window.location.href).pathname
+        return pathname.startsWith('/transitions/') || pathname.startsWith('/preview/')
       },
       hooks: {
         'visit:start': (visit) => {
           beginTransitionProgress()
+          sceneLoader.visitStarted()
           // Keep the current page stable until the next document is ready.
           // The visual transition can then run as one uninterrupted timeline.
           visit.animation.wait = true
         },
         'animation:out:start': () => {
-          document.dispatchEvent(new Event('astro:before-swap'))
           if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
             const portrait = window.matchMedia('(max-width: 767px) and (orientation: portrait)').matches
             const trajectory = computeReferenceTrajectory({ portrait })
@@ -105,6 +120,9 @@ export function GlobalPageTransitionRuntime({ initialNavigation, onReady }: { in
               transitionAudio.playWhoosh(duration / 1000)
             }
           }
+        },
+        'content:replace.before': () => {
+          document.dispatchEvent(new Event('astro:before-swap'))
         },
         'page:view': () => {
           // Astro islands removed by Swup otherwise never receive their unmount event.
@@ -115,25 +133,41 @@ export function GlobalPageTransitionRuntime({ initialNavigation, onReady }: { in
           ballRef.current?.cancel()
           resetTransitionStyles()
           resumeCurrentPage()
+          sceneLoader.visitSettled()
         },
         'visit:fail': () => {
           completeTransitionProgress()
           ballRef.current?.cancel()
           resetTransitionStyles()
           resumeCurrentPage()
+          sceneLoader.visitSettled()
         },
-        'visit:end': () => completeTransitionProgress(),
+        'visit:end': () => {
+          completeTransitionProgress()
+          sceneLoader.visitCompleted()
+        },
       },
     })
     swupRef.current = swup
-    onReady?.()
+    const navigate = (href: string) => new Promise<void>((resolve, reject) => {
+      const cleanup = () => { offEnd(); offAbort(); offFail() }
+      const offEnd = swup.hooks.once('visit:end', () => { cleanup(); resolve() })
+      const offAbort = swup.hooks.once('visit:abort', () => { cleanup(); resolve() })
+      const offFail = swup.hooks.once('visit:fail', () => { cleanup(); reject(new Error('Swup navigation failed')) })
+      try { swup.navigate(href) } catch (error) { cleanup(); reject(error) }
+    })
+    navigateRef.current = navigate
+    onReady?.(navigate)
 
     swup.hooks.replace('animation:out:await', () => animateOut())
     swup.hooks.replace('animation:in:await', () => animateIn())
 
     return () => {
-      mounted = false
       swupRef.current = null
+      navigateRef.current = null
+      document.removeEventListener('unlim:main-ready', markDestinationReady)
+      motionQuery.removeEventListener('change', handleMotionChange)
+      sceneLoader.dispose()
       ballRef.current?.cancel()
       resetTransitionStyles()
       void swup.destroy()
@@ -141,10 +175,10 @@ export function GlobalPageTransitionRuntime({ initialNavigation, onReady }: { in
   }, [onReady])
 
   useEffect(() => {
-    const swup = swupRef.current
-    if (!swup || !initialNavigation) return
+    const navigate = navigateRef.current
+    if (!navigate || !initialNavigation) return
     if (`${window.location.pathname}${window.location.search}${window.location.hash}` === initialNavigation) return
-    void swup.navigate(initialNavigation)
+    void navigate(initialNavigation).catch(() => window.location.assign(initialNavigation))
   }, [initialNavigation])
 
   return BallScene ? <BallScene ref={ballRef} /> : <div className="transition-demo-reference-ball" aria-hidden="true" />

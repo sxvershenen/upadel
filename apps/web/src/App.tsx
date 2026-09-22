@@ -1,5 +1,5 @@
 import { MotionConfig } from "framer-motion";
-import { lazy, Suspense, type ComponentType } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, type ComponentType } from "react";
 import { CookieBanner } from "./components/CookieBanner";
 import { Hero } from "./sections/Hero";
 import { CoolModeEffects } from "./components/ui/CoolModeButton";
@@ -9,6 +9,7 @@ import { visibleHomepageSections } from "./content/sections";
 import { AnalyticsTracker } from './analytics/AnalyticsTracker'
 import { ExternalAnalytics } from './analytics/ExternalAnalytics'
 import { MainContentReady } from './components/MainContentReady'
+import { disconnectDeferredSectionObservers, waitUntilSectionIsNear, type DeferredObserverCleanup } from './deferredSectionLifecycle'
 
 type AppProps = {
   content: HomepageDTO;
@@ -17,45 +18,39 @@ type AppProps = {
 
 type SectionModule = Promise<{ default: ComponentType }>;
 
-function waitUntilSectionIsNear(key: string) {
-  if (typeof window === "undefined") return Promise.resolve();
-  const section = document.querySelector<HTMLElement>(`[data-home-section="${key}"]`);
-  if (!section || !("IntersectionObserver" in window)) return Promise.resolve();
-  const rect = section.getBoundingClientRect();
-  if (rect.bottom >= -600 && rect.top <= window.innerHeight + 900) return Promise.resolve();
-
-  return new Promise<void>((resolve) => {
-    const observer = new IntersectionObserver((entries) => {
-      if (!entries.some((entry) => entry.isIntersecting)) return;
-      observer.disconnect();
-      resolve();
-    }, { rootMargin: "900px 0px" });
-    observer.observe(section);
-  });
+function deferredSection(key: string, load: () => SectionModule, cleanups: Set<DeferredObserverCleanup>) {
+  return lazy(() => typeof window === "undefined" ? load() : waitUntilSectionIsNear(key, cleanups).then(load));
 }
 
-function deferredSection(key: string, load: () => SectionModule) {
-  return lazy(() => typeof window === "undefined" ? load() : waitUntilSectionIsNear(key).then(load));
+function createSectionComponents(cleanups: Set<DeferredObserverCleanup>): Record<HomeSectionKey, ComponentType> {
+  return {
+    hero: Hero,
+    benefits: deferredSection("benefits", () => import("./sections/Benefits").then(({ Benefits }) => ({ default: Benefits })), cleanups),
+    offers: deferredSection("offers", () => import("./sections/Offers").then(({ Offers }) => ({ default: Offers })), cleanups),
+    courts: deferredSection("courts", () => import("./sections/Courts").then(({ Courts }) => ({ default: Courts })), cleanups),
+    pricing: deferredSection("pricing", () => import("./sections/Pricing").then(({ Pricing }) => ({ default: Pricing })), cleanups),
+    coaches: deferredSection("coaches", () => import("./sections/Coaches").then(({ Coaches }) => ({ default: Coaches })), cleanups),
+    "methodist-banner": deferredSection("methodist-banner", () => import("./sections/MethodistBanner").then(({ MethodistBanner }) => ({ default: MethodistBanner })), cleanups),
+    tournaments: deferredSection("tournaments", () => import("./sections/Tournaments").then(({ Tournaments }) => ({ default: Tournaments })), cleanups),
+    gallery: deferredSection("gallery", () => import("./sections/Gallery").then(({ Gallery }) => ({ default: Gallery })), cleanups),
+    blog: deferredSection("blog", () => import("./sections/Blog").then(({ Blog }) => ({ default: Blog })), cleanups),
+    "reviews-faq": deferredSection("reviews-faq", () => import("./sections/ReviewsFAQ").then(({ ReviewsFAQ }) => ({ default: ReviewsFAQ })), cleanups),
+  }
 }
 
-const sectionComponents: Record<HomeSectionKey, ComponentType> = {
-  hero: Hero,
-  benefits: deferredSection("benefits", () => import("./sections/Benefits").then(({ Benefits }) => ({ default: Benefits }))),
-  offers: deferredSection("offers", () => import("./sections/Offers").then(({ Offers }) => ({ default: Offers }))),
-  courts: deferredSection("courts", () => import("./sections/Courts").then(({ Courts }) => ({ default: Courts }))),
-  pricing: deferredSection("pricing", () => import("./sections/Pricing").then(({ Pricing }) => ({ default: Pricing }))),
-  coaches: deferredSection("coaches", () => import("./sections/Coaches").then(({ Coaches }) => ({ default: Coaches }))),
-  "methodist-banner": deferredSection("methodist-banner", () => import("./sections/MethodistBanner").then(({ MethodistBanner }) => ({ default: MethodistBanner }))),
-  tournaments: deferredSection("tournaments", () => import("./sections/Tournaments").then(({ Tournaments }) => ({ default: Tournaments }))),
-  gallery: deferredSection("gallery", () => import("./sections/Gallery").then(({ Gallery }) => ({ default: Gallery }))),
-  blog: deferredSection("blog", () => import("./sections/Blog").then(({ Blog }) => ({ default: Blog }))),
-  "reviews-faq": deferredSection("reviews-faq", () => import("./sections/ReviewsFAQ").then(({ ReviewsFAQ }) => ({ default: ReviewsFAQ }))),
-};
-
-const DeferredFooter = deferredSection("footer", () => import("./sections/Footer").then(({ Footer }) => ({ default: Footer })));
 const DeferredUiKitPage = lazy(() => import("./ui-kit/UiKitPage").then(({ UiKitPage }) => ({ default: UiKitPage })));
 
 export default function App({ content, view = "home" }: AppProps) {
+  const deferredObserverCleanups = useRef(new Set<DeferredObserverCleanup>())
+  const sectionComponents = useMemo(() => createSectionComponents(deferredObserverCleanups.current), [])
+  const DeferredFooter = useMemo(() => deferredSection("footer", () => import("./sections/Footer").then(({ Footer }) => ({ default: Footer })), deferredObserverCleanups.current), [])
+
+  useEffect(() => {
+    const disconnect = () => disconnectDeferredSectionObservers(deferredObserverCleanups.current)
+    document.addEventListener('astro:before-swap', disconnect, { once: true })
+    return () => document.removeEventListener('astro:before-swap', disconnect)
+  }, [])
+
   function handleAppClick(event: React.MouseEvent<HTMLDivElement>) {
     const target = event.target as HTMLElement;
     const anchor = target.closest("a[href^='#']") as HTMLAnchorElement | null;
@@ -66,7 +61,7 @@ export default function App({ content, view = "home" }: AppProps) {
       if (destination) {
         event.preventDefault();
         destination.scrollIntoView({ behavior: "smooth", block: "start" });
-        window.history.replaceState(null, "", href);
+        window.history.replaceState(window.history.state, "", href);
         return;
       }
     }

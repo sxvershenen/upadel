@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState, type ComponentType } from 'react'
 
 import { beginTransitionProgress, completeTransitionProgress } from './transitionProgress'
+import { createRetryableRuntimeLoader, loadRuntimeForNavigation } from './runtimeLoader'
 
-type TransitionRuntime = ComponentType<{ initialNavigation?: string | null; onReady?: () => void }>
+type RuntimeNavigate = (href: string) => Promise<unknown>
+type TransitionRuntime = ComponentType<{ initialNavigation?: string | null; onReady?: (navigate: RuntimeNavigate) => void }>
 
 function internalNavigableLink(target: EventTarget | null): HTMLAnchorElement | null {
   if (!(target instanceof Element)) return null
@@ -11,7 +13,7 @@ function internalNavigableLink(target: EventTarget | null): HTMLAnchorElement | 
 
   try {
     const url = new URL(link.href, window.location.href)
-    if (url.origin !== window.location.origin || url.pathname.startsWith('/transitions/')) return null
+    if (url.origin !== window.location.origin || url.pathname.startsWith('/transitions/') || url.pathname.startsWith('/preview/')) return null
     if (url.pathname === window.location.pathname && url.search === window.location.search) return null
     return link
   } catch {
@@ -22,33 +24,26 @@ function internalNavigableLink(target: EventTarget | null): HTMLAnchorElement | 
 export function GlobalPageTransition() {
   const [Runtime, setRuntime] = useState<TransitionRuntime | null>(null)
   const [pendingHref, setPendingHref] = useState<string | null>(null)
-  const importRef = useRef<Promise<void> | null>(null)
   const runtimeReadyRef = useRef(false)
   const pendingHrefRef = useRef<string | null>(null)
-  const handleRuntimeReady = useCallback(() => { runtimeReadyRef.current = true }, [])
+  const navigateRef = useRef<RuntimeNavigate | null>(null)
+  const handleRuntimeReady = useCallback((navigate: RuntimeNavigate) => {
+    runtimeReadyRef.current = true
+    navigateRef.current = navigate
+  }, [])
 
   useEffect(() => {
     let disposed = false
     let idleHandle: number | null = null
     let idleTimer: ReturnType<typeof globalThis.setTimeout> | null = null
 
-    const loadRuntime = () => {
-      if (!importRef.current) {
-        importRef.current = import('./GlobalPageTransitionRuntime')
-          .then(({ GlobalPageTransitionRuntime: runtime }) => {
-            if (!disposed) setRuntime(() => runtime)
-          })
-          .catch(() => {
-            const href = pendingHrefRef.current
-            completeTransitionProgress()
-            if (href) window.location.assign(href)
-          })
-      }
-      return importRef.current
-    }
+    const loadRuntime = createRetryableRuntimeLoader(
+      () => import('./GlobalPageTransitionRuntime').then(({ GlobalPageTransitionRuntime }) => GlobalPageTransitionRuntime),
+      (runtime) => { if (!disposed) setRuntime(() => runtime) },
+    )
 
     const scheduleRuntime = () => {
-      if (importRef.current || idleHandle !== null || idleTimer !== null) return
+      if (idleHandle !== null || idleTimer !== null) return
       if (typeof window.requestIdleCallback === 'function') {
         idleHandle = window.requestIdleCallback(() => {
           idleHandle = null
@@ -78,7 +73,33 @@ export function GlobalPageTransition() {
       const href = `${url.pathname}${url.search}${url.hash}`
       pendingHrefRef.current = href
       setPendingHref(href)
-      void loadRuntime()
+      void loadRuntimeForNavigation({
+        load: loadRuntime,
+        href,
+        isReady: () => runtimeReadyRef.current || pendingHrefRef.current !== href,
+        assign: (fallbackHref) => {
+          completeTransitionProgress()
+          window.location.assign(fallbackHref)
+        },
+      })
+    }
+
+    const navigateProgrammatically = (event: Event) => {
+      const navigation = event as CustomEvent<{ href?: string }>
+      const rawHref = navigation.detail?.href
+      if (!rawHref) return
+      let url: URL
+      try { url = new URL(rawHref, window.location.href) } catch { return }
+      if (url.origin !== window.location.origin || url.pathname.startsWith('/transitions/') || url.pathname.startsWith('/preview/')) return
+      if (`${url.pathname}${url.search}${url.hash}` === `${window.location.pathname}${window.location.search}${window.location.hash}`) return
+      beginTransitionProgress()
+      if (!navigation.cancelable || !navigateRef.current) return
+      navigation.preventDefault()
+      const href = `${url.pathname}${url.search}${url.hash}`
+      void navigateRef.current(href).catch(() => {
+        completeTransitionProgress()
+        window.location.assign(href)
+      })
     }
 
     document.addEventListener('click', startNavigation, true)
@@ -86,6 +107,7 @@ export function GlobalPageTransition() {
     document.addEventListener('focusin', primeOnIntent)
     document.addEventListener('touchstart', primeOnIntent, { passive: true })
     document.addEventListener('unlim:main-ready', scheduleRuntime, { once: true })
+    document.addEventListener('unlim:navigate', navigateProgrammatically)
     if (document.querySelector<HTMLElement>('#swup')?.dataset.mainReady === 'true') scheduleRuntime()
     else window.addEventListener('DOMContentLoaded', scheduleRuntime, { once: true })
 
@@ -98,7 +120,10 @@ export function GlobalPageTransition() {
       document.removeEventListener('touchstart', primeOnIntent)
       document.removeEventListener('click', startNavigation, true)
       document.removeEventListener('unlim:main-ready', scheduleRuntime)
+      document.removeEventListener('unlim:navigate', navigateProgrammatically)
       window.removeEventListener('DOMContentLoaded', scheduleRuntime)
+      navigateRef.current = null
+      runtimeReadyRef.current = false
     }
   }, [])
 
