@@ -12,27 +12,34 @@ export function useMobileSwipeHint(swiperRef: { current: SwiperType | null }, hi
     let played = false;
     let visible = false;
     let retryTimer: number | undefined;
-    let finishTimer: number | undefined;
+    let wrapper: HTMLElement | null = null;
     let retries = 0;
+
+    const finish = (event: AnimationEvent) => {
+      if (event.target !== wrapper || event.animationName !== "swiper-swipe-hint") return;
+      container.classList.remove("swiper-hint-playing");
+      wrapper?.removeEventListener("animationend", finish);
+    };
 
     const stop = () => {
       played = true;
       window.clearTimeout(retryTimer);
-      window.clearTimeout(finishTimer);
+      wrapper?.removeEventListener("animationend", finish);
       container.classList.remove("swiper-hint-playing");
     };
 
     const play = () => {
       if (!visible || played) return;
       const swiper = swiperRef.current;
-      if (!swiper?.initialized || swiper.slides.length < 2) {
+      wrapper = container.querySelector(":scope > .swiper > .swiper-wrapper");
+      if (!swiper?.initialized || swiper.slides.length < 2 || !wrapper) {
         if (retries++ < 25) retryTimer = window.setTimeout(play, 80);
         return;
       }
 
       played = true;
+      wrapper.addEventListener("animationend", finish);
       container.classList.add("swiper-hint-playing");
-      finishTimer = window.setTimeout(() => container.classList.remove("swiper-hint-playing"), 1450);
     };
 
     const observer = new IntersectionObserver(([entry]) => {
@@ -41,10 +48,8 @@ export function useMobileSwipeHint(swiperRef: { current: SwiperType | null }, hi
     }, { threshold: 0.45 });
 
     observer.observe(container);
-    container.addEventListener("pointerdown", stop, { capture: true, passive: true });
     return () => {
       observer.disconnect();
-      container.removeEventListener("pointerdown", stop, true);
       stop();
     };
   }, [hintKey, swiperRef]);

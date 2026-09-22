@@ -106,4 +106,4 @@ The native WebGL2 ball scene loads only during stable idle after the first compl
 
 ## D18 — Photo card overlays and mobile motion — accepted
 
-Only the photo benefits (Varlion rackets, auto spa, food and drinks) and training program cards use the seven-color linear overlay palette on desktop and mobile. Their mobile carousel images stay static without nested parallax or card reveal; coach photos use the same filter-free image loading treatment. Rental, membership, and other photo cards retain their existing surfaces.
+Only the photo benefits (Varlion rackets, auto spa, food and drinks) and training program cards use the seven-color linear overlay palette on desktop and mobile. Each gradient has stops at 0/30/70/75/100%, with a saturated 75% tone and lighter 100% tone. Their mobile carousel images and coach photos use scroll parallax with filter-free image loading. Swipe hints finish their visual cycle even if a card is touched. Rental, membership, and other photo cards retain their existing surfaces.

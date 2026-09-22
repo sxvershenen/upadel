@@ -42,13 +42,13 @@
 [data-image-overlay="overlay-emerald"] { background: radial-gradient(circle at 78% 70%, rgb(52 211 153 / 75%) 0%, transparent 45%), radial-gradient(circle at 18% 100%, rgb(5 150 105 / 82%) 0%, transparent 55%), linear-gradient(to bottom, transparent 0%, rgb(6 50 35 / 8%) 28%, rgb(8 75 50 / 64%) 64%, #052d20 100%); }
 [data-image-overlay="overlay-dark"] { background: linear-gradient(to bottom, rgb(2 5 9 / 8%) 0%, rgb(2 5 9 / 22%) 34%, rgb(2 5 9 / 78%) 72%, #020509 100%), radial-gradient(circle at 78% 72%, rgb(72 88 108 / 24%) 0%, transparent 48%); }
 
-[data-linear-overlay="true"] [data-image-overlay="overlay-lime"] { background: linear-gradient(to bottom, transparent 0%, rgb(45 75 12 / 12%) 30%, rgb(101 163 13 / 90%) 70%, #4c7d08 100%); }
-[data-linear-overlay="true"] [data-image-overlay="overlay-blue"] { background: linear-gradient(to bottom, transparent 0%, rgb(8 18 30 / 12%) 30%, rgb(0 92 210 / 90%) 70%, #0044dc 100%); }
-[data-linear-overlay="true"] [data-image-overlay="overlay-cyan"] { background: linear-gradient(to bottom, transparent 0%, rgb(6 45 55 / 12%) 30%, rgb(8 145 178 / 90%) 70%, #006f8c 100%); }
-[data-linear-overlay="true"] [data-image-overlay="overlay-violet"] { background: linear-gradient(to bottom, transparent 0%, rgb(55 15 90 / 12%) 30%, rgb(107 33 168 / 90%) 70%, #6820a7 100%); }
-[data-linear-overlay="true"] [data-image-overlay="overlay-sunset"] { background: linear-gradient(to bottom, transparent 0%, rgb(110 45 8 / 12%) 30%, rgb(234 88 12 / 90%) 70%, #a83e08 100%); }
-[data-linear-overlay="true"] [data-image-overlay="overlay-emerald"] { background: linear-gradient(to bottom, transparent 0%, rgb(6 50 35 / 12%) 30%, rgb(5 150 105 / 90%) 70%, #006b50 100%); }
-[data-linear-overlay="true"] [data-image-overlay="overlay-dark"] { background: linear-gradient(to bottom, transparent 0%, rgb(2 5 9 / 12%) 30%, rgb(2 5 9 / 90%) 70%, #020509 100%); }
+[data-linear-overlay="true"] [data-image-overlay="overlay-lime"] { background: linear-gradient(to bottom, transparent 0%, rgb(45 75 12 / 12%) 30%, rgb(65 120 0 / 90%) 70%, #458500 75%, #79b336 100%); }
+[data-linear-overlay="true"] [data-image-overlay="overlay-blue"] { background: linear-gradient(to bottom, transparent 0%, rgb(8 18 30 / 12%) 30%, rgb(0 86 196 / 90%) 70%, #0044dc 75%, #588cff 100%); }
+[data-linear-overlay="true"] [data-image-overlay="overlay-cyan"] { background: linear-gradient(to bottom, transparent 0%, rgb(6 45 55 / 12%) 30%, rgb(0 115 153 / 90%) 70%, #007fa8 75%, #54bfd9 100%); }
+[data-linear-overlay="true"] [data-image-overlay="overlay-violet"] { background: linear-gradient(to bottom, transparent 0%, rgb(55 15 90 / 12%) 30%, rgb(91 20 171 / 90%) 70%, #6615bc 75%, #ad75e8 100%); }
+[data-linear-overlay="true"] [data-image-overlay="overlay-sunset"] { background: linear-gradient(to bottom, transparent 0%, rgb(110 45 8 / 12%) 30%, rgb(198 65 0 / 90%) 70%, #d94700 75%, #f99853 100%); }
+[data-linear-overlay="true"] [data-image-overlay="overlay-emerald"] { background: linear-gradient(to bottom, transparent 0%, rgb(6 50 35 / 12%) 30%, rgb(0 117 80 / 90%) 70%, #00865d 75%, #53cda6 100%); }
+[data-linear-overlay="true"] [data-image-overlay="overlay-dark"] { background: linear-gradient(to bottom, transparent 0%, rgb(2 5 9 / 12%) 30%, rgb(6 18 32 / 90%) 70%, #06192f 75%, #385c82 100%); }
 
 .glass { background: rgb(255 255 255 / 12%); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); }
 .glass-overlay { background: rgb(255 255 255 / 10%); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); }

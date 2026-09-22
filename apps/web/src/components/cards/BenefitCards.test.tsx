@@ -78,7 +78,7 @@ test('UI kit overlay previews use the production overlay element', () => {
   assert.match(overlays, /\[data-image-overlay="overlay-blue"\] \{ background:/)
 })
 
-test('mobile photo benefits and training cards use a flat image and the scoped linear palette', () => {
+test('mobile photo benefits and training cards keep parallax with filter-free image loading', () => {
   const benefit = renderToStaticMarkup(<BenefitCard benefit={{
     ...baseBenefit,
     variant: 'chill',
@@ -86,20 +86,35 @@ test('mobile photo benefits and training cards use a flat image and the scoped l
     media: { url: '/food.webp', alt: 'Еда и напитки', mimeType: 'image/webp' },
     overlay: 'overlay-sunset',
   } as any} mobile />)
-  const flatCard = renderToStaticMarkup(<ImageCard src="/training.webp" alt="Тренировка" overlay="overlay-blue" staticMedia fadeImage reveal={false} interactive={false} data-linear-overlay="true" />)
+  const trainingCard = renderToStaticMarkup(<ImageCard src="/training.webp" alt="Тренировка" overlay="overlay-blue" parallax fadeImage reveal={false} interactive={false} data-linear-overlay="true" />)
   const styles = readFileSync(new URL('../../styles/surfaces.css', import.meta.url), 'utf8')
   const trainingSource = readFileSync(new URL('./TrainingCard.tsx', import.meta.url), 'utf8')
   const sectionSource = readFileSync(new URL('../../sections/Benefits.tsx', import.meta.url), 'utf8')
 
-  for (const html of [benefit, flatCard]) {
+  for (const html of [benefit, trainingCard]) {
     assert.match(html, /data-linear-overlay="true"/)
     assert.match(html, /data-progressive-image="fade-loading"/)
-    assert.doesNotMatch(html, /data-parallax-viewport|data-parallax-layer|data-gsap-reveal=/)
+    assert.match(html, /data-parallax-viewport/)
+    assert.match(html, /data-parallax-layer/)
+    assert.doesNotMatch(html, /data-gsap-reveal=/)
   }
-  assert.match(trainingSource, /data-linear-overlay="true" fadeImage staticMedia=\{!interactive\}/)
+  assert.match(trainingSource, /data-linear-overlay="true" fadeImage parallax/)
   assert.match(sectionSource, /<BenefitCard benefit=\{card\} mobile \/>/)
   for (const tone of ['lime', 'blue', 'cyan', 'violet', 'sunset', 'emerald', 'dark']) {
-    assert.match(styles, new RegExp(`\\[data-linear-overlay="true"\\] \\[data-image-overlay="overlay-${tone}"\\] \\{ background: linear-gradient\\(to bottom, transparent 0%,`))
+    const gradient = styles.match(new RegExp(`\\[data-linear-overlay="true"\\] \\[data-image-overlay="overlay-${tone}"\\] \\{ background: linear-gradient\\(to bottom, ([^;]+)\\);`))?.[1]
+    assert.ok(gradient, `missing ${tone} linear overlay`)
+    assert.match(gradient, /^transparent 0%, rgb\(.+ \/ 12%\) 30%, rgb\(.+ \/ 90%\) 70%, #[0-9a-f]{6} 75%, #[0-9a-f]{6} 100%$/)
+    const [, strong, light] = gradient.match(/(#[0-9a-f]{6}) 75%, (#[0-9a-f]{6}) 100%$/) ?? []
+    const brightness = (hex: string) => {
+      const [r, g, b] = [1, 3, 5].map((offset) => parseInt(hex.slice(offset, offset + 2), 16))
+      return r * 0.2126 + g * 0.7152 + b * 0.0722
+    }
+    const saturation = (hex: string) => {
+      const channels = [1, 3, 5].map((offset) => parseInt(hex.slice(offset, offset + 2), 16))
+      return (Math.max(...channels) - Math.min(...channels)) / Math.max(...channels)
+    }
+    assert.ok(brightness(light) > brightness(strong), `${tone} must get lighter at the bottom`)
+    assert.ok(saturation(strong) > saturation(light), `${tone} must peak in saturation at 75%`)
   }
-  assert.match(styles, /\[data-linear-overlay="true"\] \[data-image-overlay="overlay-blue"\] \{ background: linear-gradient\(to bottom, transparent 0%, rgb\(8 18 30 \/ 12%\) 30%, rgb\(0 92 210 \/ 90%\) 70%, #0044dc 100%\)/)
+  assert.match(styles, /\[data-linear-overlay="true"\] \[data-image-overlay="overlay-blue"\] \{ background: linear-gradient\(to bottom, transparent 0%, rgb\(8 18 30 \/ 12%\) 30%, rgb\(0 86 196 \/ 90%\) 70%, #0044dc 75%, #588cff 100%\)/)
 })
