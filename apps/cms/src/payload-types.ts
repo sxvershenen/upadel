@@ -2454,9 +2454,6 @@ export interface Homepage {
      */
     mobileMedia?: (number | null) | Media;
     mobileVideoPoster?: (number | null) | Media;
-    /**
-     * Чёрный радиальный tint из трёх точек. Для каждой точки задаются непрозрачность и положение; форма градиента фиксирована кодом.
-     */
     tint?: {
       desktop?: {
         point1?: {
@@ -2493,9 +2490,6 @@ export interface Homepage {
         };
       };
     };
-    /**
-     * Размер крупного заголовка hero. Значения задаются в px отдельно для мобильного и desktop.
-     */
     titleFontSize?: {
       mobile?: number | null;
       desktop?: number | null;

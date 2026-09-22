@@ -12,9 +12,14 @@ function heroTintPoint(name: string, label: string, defaultValue: HeroTintDevice
     type: 'group',
     label,
     fields: [
-      { name: 'opacity', type: 'number', label: 'Opacity чёрного, %', min: 0, max: 100, defaultValue: defaultValue.opacity, admin: { width: '33%', step: 1 } },
-      { name: 'x', type: 'number', label: 'Положение X, %', min: 0, max: 100, defaultValue: defaultValue.x, admin: { width: '33%', step: 1 } },
-      { name: 'y', type: 'number', label: 'Положение Y, %', min: 0, max: 100, defaultValue: defaultValue.y, admin: { width: '34%', step: 1 } },
+      {
+        type: 'row',
+        fields: [
+          { name: 'opacity', type: 'number', label: 'Opacity чёрного, %', min: 0, max: 100, defaultValue: defaultValue.opacity, admin: { width: '33%', step: 1 } },
+          { name: 'x', type: 'number', label: 'Положение X, %', min: 0, max: 100, defaultValue: defaultValue.x, admin: { width: '33%', step: 1 } },
+          { name: 'y', type: 'number', label: 'Положение Y, %', min: 0, max: 100, defaultValue: defaultValue.y, admin: { width: '34%', step: 1 } },
+        ],
+      },
     ],
   }
 }
@@ -33,24 +38,40 @@ function heroTintDevice(name: 'desktop' | 'mobile', label: string, defaultValue:
 }
 
 const heroTintField: Field = {
-  name: 'tint',
-  type: 'group',
+  type: 'collapsible',
   label: 'Затемнение hero',
-  admin: { description: 'Чёрный радиальный tint из трёх точек. Для каждой точки задаются непрозрачность и положение; форма градиента фиксирована кодом.' },
+  admin: { description: 'Чёрный радиальный tint из трёх точек. Для каждой точки задаются непрозрачность и положение; форма градиента фиксирована кодом.', initCollapsed: true },
   fields: [
-    heroTintDevice('desktop', 'ПК', defaultHeroTint.desktop),
-    heroTintDevice('mobile', 'Мобильный', defaultHeroTint.mobile),
+    {
+      name: 'tint',
+      type: 'group',
+      label: false,
+      admin: { hideGutter: true },
+      fields: [heroTintDevice('desktop', 'ПК', defaultHeroTint.desktop), heroTintDevice('mobile', 'Мобильный', defaultHeroTint.mobile)],
+    },
   ],
 }
 
 const heroTitleFontSizeField: Field = {
-  name: 'titleFontSize',
-  type: 'group',
+  type: 'collapsible',
   label: 'Размер заголовка hero',
-  admin: { description: 'Размер крупного заголовка hero. Значения задаются в px отдельно для мобильного и desktop.' },
+  admin: { description: 'Размер крупного заголовка hero. Значения задаются в px отдельно для мобильного и desktop.', initCollapsed: true },
   fields: [
-    { name: 'mobile', type: 'number', label: 'Мобильный, px', min: 24, max: 160, defaultValue: defaultHeroTitleFontSize.mobile, admin: { width: '50%', step: 1 } },
-    { name: 'desktop', type: 'number', label: 'Desktop, px', min: 24, max: 160, defaultValue: defaultHeroTitleFontSize.desktop, admin: { width: '50%', step: 1 } },
+    {
+      name: 'titleFontSize',
+      type: 'group',
+      label: false,
+      admin: { hideGutter: true },
+      fields: [
+        {
+          type: 'row',
+          fields: [
+            { name: 'mobile', type: 'number', label: 'Мобильный, px', min: 24, max: 160, defaultValue: defaultHeroTitleFontSize.mobile, admin: { width: '50%', step: 1 } },
+            { name: 'desktop', type: 'number', label: 'Desktop, px', min: 24, max: 160, defaultValue: defaultHeroTitleFontSize.desktop, admin: { width: '50%', step: 1 } },
+          ],
+        },
+      ],
+    },
   ],
 }
 
