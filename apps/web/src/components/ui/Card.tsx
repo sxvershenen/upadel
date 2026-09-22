@@ -80,11 +80,12 @@ export function ImageCard({ src, alt, media, sizes = "(min-width: 1024px) 50vw, 
     {...props}
     {...revealProps}
     data-gsap-reveal-boundary="true"
+    data-image-card="true"
     initial={interactive ? "rest" : undefined}
     whileHover={interactive ? "hover" : undefined}
     variants={interactive ? cardVariants : undefined}
     transition={interactive ? springSoft : undefined}
-    className={cn("group/card group se-3 relative isolate flex flex-col overflow-hidden text-white", interactive && "card-spring cursor-pointer", overlay, className)}
+    className={cn("group/card group se-3 relative isolate flex flex-col overflow-hidden text-white", interactive && "card-spring cursor-pointer", className)}
   >
     <div ref={imageRef} data-parallax-viewport className="parallax-viewport absolute inset-0 z-0">
       <motion.div
@@ -99,6 +100,7 @@ export function ImageCard({ src, alt, media, sizes = "(min-width: 1024px) 50vw, 
         <ProgressiveImage media={media} sizes={sizes} src={src} alt={alt} loading={loading} className={cn("h-full w-full object-cover", imgClassName)} variants={interactive ? imageVariants : undefined} transition={springSoft} />
       </motion.div>
     </div>
+    <div data-image-overlay={overlay} className="pointer-events-none absolute inset-0 z-[1]" aria-hidden="true" />
     <div className="relative z-10 flex h-full flex-col">{children}</div>
   </motion.div>;
 }

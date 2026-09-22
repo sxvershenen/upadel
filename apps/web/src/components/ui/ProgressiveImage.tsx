@@ -1,5 +1,5 @@
 import { motion, type HTMLMotionProps } from 'framer-motion'
-import { forwardRef, useLayoutEffect, useRef } from 'react'
+import React, { forwardRef, useLayoutEffect, useRef } from 'react'
 import type { MediaDTO } from '@unlim/content-contract'
 
 type ProgressiveImageProps = HTMLMotionProps<'img'> & { skeleton?: boolean; media?: MediaDTO | null }

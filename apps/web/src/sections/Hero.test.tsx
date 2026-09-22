@@ -35,7 +35,7 @@ test('hero CTAs have one SSR entrance owner and no nested GSAP reveal', () => {
 test('glass hero CTA animates its own backdrop-filter layer', () => {
   const css = readFileSync(new URL('../index.css', import.meta.url), 'utf8')
   const glassKeyframes = css.match(/@keyframes unlim-enter-glass \{([\s\S]*?)\n\}/)?.[1]
-  const secondaryRule = css.match(/\[data-hero-cta="secondary"\] \{([\s\S]*?)\n  \}/)?.[1]
+  const secondaryRule = css.match(/\[data-hero-cta="secondary"\] \{([\s\S]*?)\n\}/)?.[1]
 
   assert.match(glassKeyframes ?? '', /translate3d\(0, 0, 0\)/)
   assert.match(secondaryRule ?? '', /animation: unlim-enter-glass/)
@@ -60,7 +60,7 @@ test('hero keeps the offer decorative and exposes the SEO heading below it', () 
 test('hero title entrance stays on the compositor for late words and the accent', () => {
   const css = readFileSync(new URL('../index.css', import.meta.url), 'utf8')
   const wordKeyframes = css.match(/@keyframes unlim-enter-word \{([\s\S]*?)\n\}/)?.[1]
-  const wordRule = css.match(/\[data-hero-word\] \{([\s\S]*?)\n  \}/)?.[1]
+  const wordRule = css.match(/\[data-hero-word\] \{([\s\S]*?)\n\}/)?.[1]
   const accentRule = css.match(/\[data-hero-accent\] \{([^}]*)\}/)?.[1]
 
   assert.ok(wordKeyframes)

@@ -36,23 +36,38 @@ export function GlobalPageTransition() {
     let disposed = false
     let idleHandle: number | null = null
     let idleTimer: ReturnType<typeof globalThis.setTimeout> | null = null
+    let hardTimer: ReturnType<typeof globalThis.setTimeout> | null = null
 
     const loadRuntime = createRetryableRuntimeLoader(
       () => import('./GlobalPageTransitionRuntime').then(({ GlobalPageTransitionRuntime }) => GlobalPageTransitionRuntime),
       (runtime) => { if (!disposed) setRuntime(() => runtime) },
     )
 
+    const runScheduledLoad = () => {
+      if (idleHandle !== null && typeof window.cancelIdleCallback === 'function') window.cancelIdleCallback(idleHandle)
+      if (idleTimer !== null) globalThis.clearTimeout(idleTimer)
+      if (hardTimer !== null) globalThis.clearTimeout(hardTimer)
+      idleHandle = null
+      idleTimer = null
+      hardTimer = null
+      void loadRuntime()
+    }
+
     const scheduleRuntime = () => {
-      if (idleHandle !== null || idleTimer !== null) return
+      if (idleHandle !== null || idleTimer !== null || hardTimer !== null) return
+      hardTimer = globalThis.setTimeout(() => {
+        hardTimer = null
+        runScheduledLoad()
+      }, 900)
       if (typeof window.requestIdleCallback === 'function') {
         idleHandle = window.requestIdleCallback(() => {
           idleHandle = null
-          void loadRuntime()
+          runScheduledLoad()
         }, { timeout: 650 })
       } else {
         idleTimer = globalThis.setTimeout(() => {
           idleTimer = null
-          void loadRuntime()
+          runScheduledLoad()
         }, 350)
       }
     }
@@ -115,6 +130,7 @@ export function GlobalPageTransition() {
       disposed = true
       if (idleHandle !== null && typeof window.cancelIdleCallback === 'function') window.cancelIdleCallback(idleHandle)
       if (idleTimer !== null) globalThis.clearTimeout(idleTimer)
+      if (hardTimer !== null) globalThis.clearTimeout(hardTimer)
       document.removeEventListener('pointerover', primeOnIntent)
       document.removeEventListener('focusin', primeOnIntent)
       document.removeEventListener('touchstart', primeOnIntent)

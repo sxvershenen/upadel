@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import test, { type TestContext } from 'node:test'
 import { gsap } from 'gsap'
 import type Swup from 'swup'
@@ -83,6 +84,15 @@ function harness(context: TestContext, available = true, reduced = false) {
 }
 
 const flush = async () => { await new Promise<void>((resolve) => queueMicrotask(resolve)) }
+
+test('embedded browsers get entrance CSS and a bounded transition runtime load', () => {
+  const css = readFileSync(new URL('../index.css', import.meta.url), 'utf8')
+  const loader = readFileSync(new URL('./GlobalPageTransition.tsx', import.meta.url), 'utf8')
+
+  assert.doesNotMatch(css, /prefers-reduced-motion: no-preference/)
+  assert.match(loader, /hardTimer = globalThis\.setTimeout\([\s\S]*?900\)/)
+  assert.match(loader, /if \(hardTimer !== null\) globalThis\.clearTimeout\(hardTimer\)/)
+})
 
 test('DOM replacement happens at the ball apex and the new page enters during the second half', async (context) => {
   const h = harness(context)

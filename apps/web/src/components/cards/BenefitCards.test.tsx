@@ -54,11 +54,13 @@ test('kids card is an internal link to the training page', () => {
   assert.match(html, /cursor-pointer/)
 })
 
-test('mobile benefits swiper keeps image overlays in a stable Safari paint layer', () => {
+test('mobile benefits swiper uses native scroll snap and real overlay elements for Safari', () => {
   const sectionSource = readFileSync(new URL('../../sections/Benefits.tsx', import.meta.url), 'utf8')
   const css = readFileSync(new URL('../../index.css', import.meta.url), 'utf8')
+  const cardSource = readFileSync(new URL('../ui/Card.tsx', import.meta.url), 'utf8')
 
-  assert.match(sectionSource, /benefits-swiper/)
-  assert.match(css, /\.benefits-swiper \[data-gsap-reveal-boundary="true"\][\s\S]*?contain: paint;[\s\S]*?-webkit-mask-image: none;/)
-  assert.match(css, /\.benefits-swiper \[data-gsap-reveal-boundary="true"\]::after/)
+  assert.match(sectionSource, /<Swiper[^>]*cssMode/)
+  assert.match(cardSource, /data-image-overlay=\{overlay\}/)
+  assert.match(css, /\.benefits-swiper \[data-image-card="true"\][\s\S]*?-webkit-mask-image: none;[\s\S]*?contain: none;/)
+  assert.doesNotMatch(css, /\.benefits-swiper[^\{]*\{[^}]*translate3d/)
 })

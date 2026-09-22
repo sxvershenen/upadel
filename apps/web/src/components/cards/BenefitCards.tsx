@@ -1,5 +1,6 @@
 import type { HomepageDTO } from '@unlim/content-contract'
 import { Coffee, CircleParking, ShieldCheck, ShowerHead, Smartphone, Smile, Sparkles } from 'lucide-react'
+import React from 'react'
 
 import { springSoft } from '../../lib/motion'
 import { useActionLayer } from '../../actions/ActionLayer'
