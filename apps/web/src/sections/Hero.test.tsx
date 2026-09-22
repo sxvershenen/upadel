@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import test from 'node:test'
 import React from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
@@ -44,6 +45,21 @@ test('hero keeps the offer decorative and exposes the SEO heading below it', () 
   assert.equal((html.match(/<h1/g) ?? []).length, 1)
   assert.match(html, /<h1 class="inline">Премиальный крытый падел-клуб<\/h1> <span>с испанскими панорамными кортами<\/span>/)
   assert.doesNotMatch(html, /<h1[^>]*>[\s\S]*Первая тренировка/)
+})
+
+test('hero title entrance stays on the compositor for late words and the accent', () => {
+  const css = readFileSync(new URL('../index.css', import.meta.url), 'utf8')
+  const wordKeyframes = css.match(/@keyframes unlim-enter-word \{([\s\S]*?)\n\}/)?.[1]
+  const wordRule = css.match(/\[data-hero-word\] \{([\s\S]*?)\n  \}/)?.[1]
+  const accentRule = css.match(/\[data-hero-accent\] \{([^}]*)\}/)?.[1]
+
+  assert.ok(wordKeyframes)
+  assert.doesNotMatch(wordKeyframes, /filter\s*:/)
+  assert.match(wordKeyframes, /from \{ opacity: 0; transform: translate3d\(0, \.7em, 0\); \}/)
+  assert.match(wordKeyframes, /to \{ opacity: 1; transform: translate3d\(0, 0, 0\); \}/)
+  assert.match(wordRule ?? '', /backface-visibility: hidden/)
+  assert.match(wordRule ?? '', /will-change: opacity, transform/)
+  assert.match(accentRule ?? '', /will-change: opacity, transform/)
 })
 
 test('hero renders responsive image variants through one picture image', () => {
