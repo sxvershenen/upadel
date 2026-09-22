@@ -103,6 +103,6 @@ export function ImageCard({ src, alt, media, sizes = "(min-width: 1024px) 50vw, 
       </motion.div>
     </div>
     <div data-image-overlay={overlay} className="pointer-events-none absolute inset-0 z-[1]" aria-hidden="true" />
-    <div className="relative z-10 flex h-full flex-col">{children}</div>
+    <div data-image-content="true" className="relative z-10 flex h-full flex-col">{children}</div>
   </motion.div>;
 }

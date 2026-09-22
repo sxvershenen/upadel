@@ -228,7 +228,18 @@ html[data-reveal-ready] [data-reveal-visible="true"] [data-reveal-word] { --reve
   contain: none;
   will-change: auto;
 }
-.benefits-swiper [data-image-overlay] { transform: none; }
+@supports (-webkit-touch-callout: none) {
+  @media (max-width: 1023px) {
+    .swiper [data-image-card="true"] { -webkit-mask-image: none; }
+    /* Keep static overlay and text layers painted while WebKit translates a slide. */
+    .swiper [data-image-card="true"] > [data-image-overlay],
+    .swiper [data-image-card="true"] > [data-image-content="true"] {
+      transform: translate3d(0, 0, 0);
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+    }
+  }
+}
 @media (hover: none), (pointer: coarse) {
   [data-coach-card="true"] [data-coach-surface="true"],
   [data-coach-card="true"] img {
