@@ -1,6 +1,6 @@
 import type { CatalogPagination, CatalogQuery } from './catalog'
 export * from './catalog'
-export const homepageDTOversion = 14 as const
+export const homepageDTOversion = 15 as const
 
 export const publicRouteRegistry = [
   { path: '/', parent: null, template: 'homepage', globalSlug: 'homepage' },
@@ -66,6 +66,7 @@ export type DesktopNavigationItem = DesktopNavigationChild & { children?: Deskto
 export type HeroTintPointDTO = { opacity: number; x: number; y: number }
 export type HeroTintDeviceDTO = { point1: HeroTintPointDTO; point2: HeroTintPointDTO; point3: HeroTintPointDTO }
 export type HeroTintDTO = { desktop: HeroTintDeviceDTO; mobile: HeroTintDeviceDTO }
+export type HeroTitleFontSizeDTO = { mobile: number; desktop: number }
 
 export const defaultHeroTint: HeroTintDTO = {
   desktop: {
@@ -79,6 +80,8 @@ export const defaultHeroTint: HeroTintDTO = {
     point3: { opacity: 56, x: 100, y: 0 },
   },
 }
+
+export const defaultHeroTitleFontSize: HeroTitleFontSizeDTO = { mobile: 48, desktop: 102 }
 
 export type ActionDTO = {
   href?: string | null
@@ -159,7 +162,7 @@ export type HomepageDTO = {
     }
   }
   home: {
-    hero: { seoHeading: string; titleLine: string; titleConnector: string; titleAccent: string; description: string; desktopMedia?: MediaDTO | null; mobileMedia?: MediaDTO | null; desktopPoster?: MediaDTO | null; mobilePoster?: MediaDTO | null; tint: HeroTintDTO; primaryAction: ActionDTO; secondaryAction: ActionDTO; socialProof: { ratingLabel: string; caption: string; coachPhotos: MediaDTO[] }; stats: Array<{ value: string; label: string }> }
+    hero: { seoHeading: string; titleLine: string; titleConnector: string; titleAccent: string; description: string; desktopMedia?: MediaDTO | null; mobileMedia?: MediaDTO | null; desktopPoster?: MediaDTO | null; mobilePoster?: MediaDTO | null; tint: HeroTintDTO; titleFontSize: HeroTitleFontSizeDTO; primaryAction: ActionDTO; secondaryAction: ActionDTO; socialProof: { ratingLabel: string; caption: string; coachPhotos: MediaDTO[] }; stats: Array<{ value: string; label: string }> }
     benefits: { eyebrow: string; title: string; cards: Array<{ id: string; variant: 'parking' | 'lockers' | 'shower' | 'chill' | 'online-booking' | 'coaches-metric' | 'kids-wide'; eyebrow?: string | null; title: string; description: string; supportingText?: string | null; media?: MediaDTO | null; overlay?: string | null; meshTone?: string | null; action: ActionDTO }> }
     offers: Array<{ id: string; variant: 'tournament-venue' | 'event'; badge: string; title: string; description: string; image?: MediaDTO | null; overlay: string; icon: 'Trophy' | 'PartyPopper'; action: ActionDTO }>
     courtsSection: { titleLineOne: string; titleLineTwo: string; background?: MediaDTO | null; backgroundAlt: string }

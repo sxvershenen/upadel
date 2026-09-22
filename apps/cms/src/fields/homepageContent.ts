@@ -1,5 +1,5 @@
 import type { Field } from 'payload'
-import { defaultHeroTint, type HeroTintDeviceDTO } from '@unlim/content-contract'
+import { defaultHeroTint, defaultHeroTitleFontSize, type HeroTintDeviceDTO } from '@unlim/content-contract'
 
 import { createActionField } from './action'
 import { imageOnlyFilter } from './media'
@@ -40,6 +40,17 @@ const heroTintField: Field = {
   fields: [
     heroTintDevice('desktop', 'ПК', defaultHeroTint.desktop),
     heroTintDevice('mobile', 'Мобильный', defaultHeroTint.mobile),
+  ],
+}
+
+const heroTitleFontSizeField: Field = {
+  name: 'titleFontSize',
+  type: 'group',
+  label: 'Размер офферного заголовка',
+  admin: { description: 'Размер крупного заголовка «Первая тренировка за …». Значения задаются в px отдельно для мобильного и desktop.' },
+  fields: [
+    { name: 'mobile', type: 'number', label: 'Мобильный, px', min: 24, max: 160, defaultValue: defaultHeroTitleFontSize.mobile, admin: { width: '50%', step: 1 } },
+    { name: 'desktop', type: 'number', label: 'Desktop, px', min: 24, max: 160, defaultValue: defaultHeroTitleFontSize.desktop, admin: { width: '50%', step: 1 } },
   ],
 }
 
@@ -91,6 +102,7 @@ export const heroFields: Field[] = [
       },
       { name: 'mobileVideoPoster', type: 'upload', relationTo: 'media', filterOptions: imageOnlyFilter, label: 'Poster mobile-видео' },
       heroTintField,
+      heroTitleFontSizeField,
       { ...createActionField('primaryAction', 'Основная кнопка'), defaultValue: { label: 'Забронировать', mode: 'booking' } },
       { ...createActionField('secondaryAction', 'Вторая кнопка'), defaultValue: { label: 'Пробное занятие', mode: 'trial-booking' } },
       {

@@ -65,12 +65,14 @@ test('hero renders separate desktop and mobile three-point black tints and keeps
       point1: { opacity: 71, x: 17, y: 28 }, point2: { opacity: 52, x: 39, y: 50 }, point3: { opacity: 33, x: 61, y: 72 },
     },
   }
+  responsiveContent.home.hero.titleFontSize = { mobile: 42, desktop: 96 }
   const html = renderToStaticMarkup(<ContentProvider content={responsiveContent}><Hero /></ContentProvider>)
   assert.match(html, /data-hero-tint="desktop"/)
   assert.match(html, /data-hero-tint="mobile"/)
   assert.match(html, /radial-gradient\(ellipse[^)]* at 11% 22%, rgba\(0,0,0,0\.81\) 0%/)
   assert.match(html, /radial-gradient\(ellipse[^)]* at 17% 28%, rgba\(0,0,0,0\.71\) 0%/)
   assert.match(html, /container-page absolute inset-x-0 top-8 z-10 md:hidden/)
+  assert.match(html, /data-hero-title=""[^>]*style="--hero-title-font-size-mobile:42px;--hero-title-font-size-desktop:96px"/)
   assert.equal(heroTintGradient([
     responsiveContent.home.hero.tint.desktop.point1,
     responsiveContent.home.hero.tint.desktop.point2,

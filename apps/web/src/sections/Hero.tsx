@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { CalendarCheck, MapPin, Play, Star, Users } from "lucide-react";
 import { ContentAction } from "../components/ContentAction";
 import { useContent } from "../content/ContentContext";
 import { SplitTextReveal } from "../components/ui/SplitTextReveal";
 import { cn } from "../utils/cn";
-import { defaultHeroTint, type HeroTintPointDTO, type MediaDTO } from "@unlim/content-contract";
+import { defaultHeroTint, defaultHeroTitleFontSize, type HeroTintPointDTO, type MediaDTO } from "@unlim/content-contract";
 import { ProgressiveImage } from "../components/ui/ProgressiveImage";
 
 export function resolveHeroParallaxTarget<T>(mobile: boolean, desktopTarget: T | null, mobileTarget: T | null) {
@@ -78,6 +78,7 @@ export function Hero() {
   const { home, site } = useContent();
   const hero = home.hero;
   const tint = hero.tint ?? defaultHeroTint;
+  const titleFontSize = hero.titleFontSize ?? defaultHeroTitleFontSize;
   const replaceBrand = Boolean(site.brandLogo) && site.brandLogoMode === "replace";
   const [brandLogoFailed, setBrandLogoFailed] = useState(false);
 
@@ -105,7 +106,14 @@ export function Hero() {
 
       <div className="container-page relative z-10 flex h-full flex-col justify-end pb-[calc(104px+env(safe-area-inset-bottom))] pt-32 sm:pb-9 lg:pb-12">
         <div className="flex max-w-[980px] flex-col">
-          <div className="type-hero font-semibold text-white">
+          <div
+            data-hero-title=""
+            className="type-hero font-semibold text-white"
+            style={{
+              '--hero-title-font-size-mobile': `${titleFontSize.mobile}px`,
+              '--hero-title-font-size-desktop': `${titleFontSize.desktop}px`,
+            } as CSSProperties}
+          >
             <SplitTextReveal text={hero.titleLine} animateOnMount />{" "}
             <br />
             <SplitTextReveal text={hero.titleConnector} animateOnMount />{" "}

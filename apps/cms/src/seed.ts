@@ -4,7 +4,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { getPayload, type CollectionSlug, type Payload } from 'payload'
-import { defaultHeroTint } from '@unlim/content-contract'
+import { defaultHeroTint, defaultHeroTitleFontSize } from '@unlim/content-contract'
 
 import config from './payload.config'
 import { mergeRequiredNavigation, navigationChanged, normalizeDesktopNavigation, priceNavigationChildren, requiredPageLinks } from './content/requiredNavigation'
@@ -1781,6 +1781,7 @@ async function seed() {
       const currentHero = currentHome.hero && typeof currentHome.hero === 'object' ? currentHome.hero as Record<string, any> : {}
       const migratedHero = { ...currentHero }
       if (!migratedHero.tint) migratedHero.tint = defaultHeroTint
+      if (!migratedHero.titleFontSize) migratedHero.titleFontSize = defaultHeroTitleFontSize
       if (!migratedHero.seoHeading) migratedHero.seoHeading = 'Премиальный крытый падел-клуб'
       if (migratedHero.description === 'Премиальный крытый падел-клуб с испанскими панорамными кортами Jubo Super Panoramic, профессиональным покрытием Mondo Super XN и клубным лаунжем.' || migratedHero.description === 'Премиальный крытый падел-клуб с испанскими панорамными кортами Jubo Super Panoramic, профессиональным покрытием Mondo Super XN и клубным лаунжем.') {
         migratedHero.description = 'с испанскими панорамными кортами Jubo Super Panoramic, профессиональным покрытием PRO TURF 240 и клубным лаунжем.'
@@ -1814,6 +1815,7 @@ async function seed() {
             description: 'с испанскими панорамными кортами Jubo Super Panoramic, профессиональным покрытием PRO TURF 240 и клубным лаунжем.',
             desktopMedia: mediaID(images.hero),
             tint: defaultHeroTint,
+            titleFontSize: defaultHeroTitleFontSize,
             primaryAction: { label: 'Забронировать', mode: 'booking' },
             secondaryAction: { label: 'Пробное занятие', mode: 'trial-booking' },
             socialProof: { ratingLabel: '4.9 · 500+ игроков', caption: 'Рейтинг клуба на Новой Риге', coaches: coaches.slice(0, 3).map(({ id }) => id) },

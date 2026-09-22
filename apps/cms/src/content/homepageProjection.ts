@@ -1,5 +1,5 @@
 import { ContentUnavailableError } from './projectionCache'
-import { defaultHeroTint, homepageDTOversion, parseHomepageDTO, type HeroTintDTO, type HomepageDTO } from '@unlim/content-contract'
+import { defaultHeroTint, defaultHeroTitleFontSize, homepageDTOversion, parseHomepageDTO, type HeroTitleFontSizeDTO, type HeroTintDTO, type HomepageDTO } from '@unlim/content-contract'
 import type { Payload } from 'payload'
 
 import type { ArticleCategory, Tournament } from '../payload-types'
@@ -41,6 +41,14 @@ function projectHeroTint(value: unknown): HeroTintDTO {
     }
   }
   return { desktop: projectDevice('desktop'), mobile: projectDevice('mobile') }
+}
+
+function projectHeroTitleFontSize(value: unknown): HeroTitleFontSizeDTO {
+  const fontSize = typeof value === 'object' && value !== null ? value as Record<string, unknown> : {}
+  return {
+    mobile: clamp(numberOr(fontSize.mobile, defaultHeroTitleFontSize.mobile), 24, 160),
+    desktop: clamp(numberOr(fontSize.desktop, defaultHeroTitleFontSize.desktop), 24, 160),
+  }
 }
 
 export async function createHomepageProjection(
@@ -98,7 +106,7 @@ export async function createHomepageProjection(
         seoHeading: homepage.hero.seoHeading ?? 'Премиальный крытый падел-клуб', titleLine: homepage.hero.titleLine ?? '', titleConnector: homepage.hero.titleConnector ?? '', titleAccent: homepage.hero.titleAccent ?? '',
         description: homepage.hero.description ?? '', desktopMedia: homeHeroMedia,
         mobileMedia: mediaDTO(homepage.hero.mobileMedia, origin, 'hero'), desktopPoster: mediaDTO(homepage.hero.desktopVideoPoster, origin),
-        mobilePoster: mediaDTO(homepage.hero.mobileVideoPoster, origin), tint: projectHeroTint(homepage.hero.tint), primaryAction: actionDTO(homepage.hero.primaryAction),
+        mobilePoster: mediaDTO(homepage.hero.mobileVideoPoster, origin), tint: projectHeroTint(homepage.hero.tint), titleFontSize: projectHeroTitleFontSize(homepage.hero.titleFontSize), primaryAction: actionDTO(homepage.hero.primaryAction),
         secondaryAction: actionDTO(homepage.hero.secondaryAction),
         socialProof: {
           ratingLabel: homepage.hero.socialProof?.ratingLabel ?? '', caption: homepage.hero.socialProof?.caption ?? '',

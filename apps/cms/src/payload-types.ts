@@ -2493,6 +2493,13 @@ export interface Homepage {
         };
       };
     };
+    /**
+     * Размер крупного заголовка «Первая тренировка за …». Значения задаются в px отдельно для мобильного и desktop.
+     */
+    titleFontSize?: {
+      mobile?: number | null;
+      desktop?: number | null;
+    };
     primaryAction: {
       label?: string | null;
       mode: 'none' | 'booking' | 'trial-booking' | 'internal-link' | 'external-link' | 'phone' | 'email' | 'lead-form';
@@ -3878,6 +3885,12 @@ export interface HomepageSelect<T extends boolean = true> {
                           y?: T;
                         };
                   };
+            };
+        titleFontSize?:
+          | T
+          | {
+              mobile?: T;
+              desktop?: T;
             };
         primaryAction?:
           | T
