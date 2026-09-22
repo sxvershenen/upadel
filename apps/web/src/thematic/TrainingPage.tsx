@@ -59,7 +59,7 @@ export function TrainingPage({ dto }: { dto: TrainingPageDTO }) {
       <section aria-labelledby="methodology-title">
         <SectionHeader titleId="methodology-title" eyebrow={dto.infographicEyebrow} title={dto.infographicTitle} />
 
-        <div data-mobile-compact-list className="mt-8 border-y border-ink/10 sm:grid sm:grid-cols-3 sm:gap-4 sm:border-y-0">
+        <div data-mobile-compact-list className="mt-8 sm:grid sm:grid-cols-3 sm:gap-4">
           {dto.blocks.map((block) => {
             const Icon = methodIcons[block.icon] ?? Target
             return (
@@ -67,16 +67,16 @@ export function TrainingPage({ dto }: { dto: TrainingPageDTO }) {
                 interactive={false}
                 reveal={false}
                 key={block.title}
-                className="flex items-start gap-4 border-b border-ink/10 bg-transparent px-0 py-5 last:border-b-0 sm:block sm:border-b-0 sm:bg-white sm:p-6"
+                className="max-sm:!rounded-none flex items-start gap-3 bg-transparent px-0 py-5 sm:block sm:bg-white sm:p-6"
               >
-                <span className="se-2 flex h-9 w-9 shrink-0 items-center justify-center bg-surface-muted text-ink">
+                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center text-ink-soft sm:mt-0 sm:h-9 sm:w-9 sm:bg-surface-muted sm:text-ink">
                   <Icon size={18} />
                 </span>
                 <div className="min-w-0">
-                  <h3 className="type-title-card text-ink sm:mt-4">
+                  <h3 className="type-body font-medium text-ink sm:mt-4 sm:!text-[24px] sm:!leading-[1.15] sm:!font-semibold sm:!tracking-[-0.025em] md:!text-[26px]">
                     {typograph(block.title)}
                   </h3>
-                  <p className="type-body-sm mt-2 text-ink-soft">
+                  <p className="type-body-sm mt-1.5 leading-relaxed text-ink-soft sm:mt-2">
                     {typograph(block.body)}
                   </p>
                 </div>

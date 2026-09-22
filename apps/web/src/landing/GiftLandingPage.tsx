@@ -420,21 +420,21 @@ export function GiftLandingPage({ dto, publicOrigin: _publicOrigin = 'https://un
           </Typography>
         </Reveal>
 
-        <div data-mobile-compact-list className="grid border-y border-ink/10 sm:grid-cols-2 sm:gap-4 sm:border-y-0 lg:grid-cols-4">
+        <div data-mobile-compact-list className="grid sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
           {pageUseCases.map((item, idx) => {
             const Icon = item.icon
             return (
-              <Reveal key={item.title} delay={idx * 0.08} className="h-full border-b border-ink/10 last:border-b-0 sm:border-b-0">
-                <SurfaceCard tone="white" interactive={false} className="flex h-full items-start gap-4 bg-transparent px-0 py-5 sm:block sm:bg-white sm:p-6">
-                  <span className="se-2 flex h-10 w-10 shrink-0 items-center justify-center bg-surface-muted text-ink">
+              <Reveal key={item.title} delay={idx * 0.08} className="h-full">
+                <SurfaceCard tone="white" interactive={false} className="max-sm:!rounded-none flex h-full items-start gap-3 bg-transparent px-0 py-5 sm:block sm:bg-white sm:p-6">
+                  <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center text-ink-soft sm:mt-0 sm:h-10 sm:w-10 sm:bg-surface-muted sm:text-ink">
                     <Icon size={20} />
                   </span>
                   <div className="min-w-0">
-                    <Typography as="h3" role="title-card" className="font-semibold text-ink sm:mt-5">
+                    <Typography as="h3" role="body" className="font-medium text-ink sm:mt-5 sm:!text-[24px] sm:!leading-[1.15] sm:!font-semibold sm:!tracking-[-0.025em] md:!text-[26px]">
                       {typograph(item.title)}
                     </Typography>
 
-                    <Typography role="body-small" tone="subtle" className="mt-2.5 leading-relaxed">
+                    <Typography role="body-small" tone="subtle" className="mt-1.5 leading-relaxed sm:mt-2.5">
                       {typograph(item.text)}
                     </Typography>
                   </div>
