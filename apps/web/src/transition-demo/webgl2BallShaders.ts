@@ -156,10 +156,17 @@ void main() {
   vec2 material = sampleMaterial(pObj);
   float seamDist = material.x;
   float feltFibers = material.y;
+#ifdef BAKED_MATERIAL
+  // Screen-space height derivatives amplify quantized texels and triangle
+  // boundaries at reduced resolution. Keep smooth sphere normals; the baked
+  // felt, seam colour and trench shading still supply surface detail.
+  vec3 perturbedNormal = normalize(vNormal);
+#else
   float h = evaluateHeight(feltFibers, seamDist);
   vec3 dPdx = dFdx(vWorldPosition);
   vec3 dPdy = dFdy(vWorldPosition);
   vec3 perturbedNormal = normalize(vNormal - (dPdx * dFdx(h) + dPdy * dFdy(h)) * (uNormalIntensity * 85.0));
+#endif
   float halfWidth = uLineWidth * 0.5;
   float smoothEdge = max(0.003, uSmoothing);
   float seamMask = smoothstep(halfWidth + smoothEdge, halfWidth - smoothEdge, seamDist);
@@ -213,6 +220,7 @@ ${ballLighting}
 // The compact flight shader contains no procedural noise or seam loop. Bake
 // those object-space values once; lighting and rotation still run every frame.
 export const compactBallFragmentShaderSource = `#version 300 es
+#define BAKED_MATERIAL
 precision highp float;
 ${ballFragmentInputs}
 ${ballMaterialUniforms}

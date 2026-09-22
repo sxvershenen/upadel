@@ -93,7 +93,14 @@ function rendererHarness(context: TestContext, compact = false, inactiveUniform 
   })
   globalValue('cancelAnimationFrame', (id: number) => frames.delete(id))
   context.mock.method(performance, 'now', () => 0)
-  const canvas = { clientWidth: 800, clientHeight: 600, width: 0, height: 0, getContext: () => gl }
+  const events = new EventTarget()
+  const canvas = {
+    clientWidth: 800, clientHeight: 600, width: 0, height: 0,
+    getContext: (...args: unknown[]) => { record('getContext', args); return gl },
+    addEventListener: events.addEventListener.bind(events),
+    removeEventListener: events.removeEventListener.bind(events),
+    dispatchEvent: events.dispatchEvent.bind(events),
+  }
   if (failure) assert.throws(() => new WebGL2BallRenderer(canvas as unknown as HTMLCanvasElement, compact), /ball material|test bake/)
   else renderer = new WebGL2BallRenderer(canvas as unknown as HTMLCanvasElement, compact)
   function step(now: number) {
@@ -157,7 +164,7 @@ test('steady-state frames only upload model/normal matrices and keep program-spe
   assert.equal(lookups().length, initializedLookups, 'resize uses cached program-specific locations')
 })
 
-test('compact renderer caches null dynamic locations and preserves its DPR and point size', (context) => {
+test('compact renderer caches null dynamic locations and preserves its DPR without a trail', (context) => {
   const { renderer, canvas, calls, draws, step } = rendererHarness(context, true, 'uNormalMatrix')
   renderer.startFlight(trajectory)
   step(100)
@@ -166,7 +173,8 @@ test('compact renderer caches null dynamic locations and preserves its DPR and p
   assert.equal(normalLookups.length, 2, 'one lookup in the flight program and one in the one-time bake program')
   assert.equal(new Set(normalLookups.map((call) => call.args[0])).size, 2, 'null locations are cached per program')
   assert.deepEqual([canvas.width, canvas.height], [1000, 750])
-  assert.equal(draws.find((draw) => draw.kind === 'trail')!.uniforms.get('uPointSize'), 12)
+  assert.equal(draws.filter((draw) => draw.kind === 'trail').length, 0)
+  assert.equal(calls.filter((call) => call.name === 'bufferSubData').length, 0)
 })
 
 test('idle, cancellation, replacement, completion and disposal do not retain a render loop or old trail', (context) => {
@@ -240,7 +248,7 @@ test('compact material is baked once, sampled in flight, and freed on disposal',
   assert.deepEqual(uploads.map((call) => call.name), Array.from({ length: 3 }, () => ['uniformMatrix4fv', 'uniformMatrix3fv']).flat())
   for (const ball of draws.filter((draw) => draw.kind === 'ball')) {
     assert.equal(ball.uniforms.get('uMaterial'), 0)
-    assert.equal(ball.count, 40 * 28 * 6)
+    assert.equal(ball.count, 64 * 48 * 6)
   }
   assert.ok(calls.some((call) => call.name === 'cullFace' && call.args[0] === gl.BACK))
   renderer.cancelFlight()
@@ -255,7 +263,99 @@ test('compact material is baked once, sampled in flight, and freed on disposal',
   assert.equal(calls.filter((call) => call.name === 'deleteBuffer').length, 5)
 })
 
-test('slow mobile frames reduce fill rate without changing trajectory, projection, trail size on screen, or completion', (context) => {
+test('compact close-up requests antialiasing and smooth normals without procedural work or particle buffer updates', (context) => {
+  const { renderer, calls, draws, step } = rendererHarness(context, true)
+  assert.equal((calls.find((call) => call.name === 'getContext')!.args[1] as WebGLContextAttributes).antialias, true)
+  assert.match(compactBallFragmentShaderSource, /#define BAKED_MATERIAL/)
+  const compactNormals = compactBallFragmentShaderSource.split('#ifdef BAKED_MATERIAL')[1].split('#else')[0]
+  assert.match(compactNormals, /vec3 perturbedNormal = normalize\(vNormal\)/)
+  assert.doesNotMatch(compactNormals, /dFdx\(|dFdy\(/)
+  renderer.startFlight(trajectory, 1000)
+  const beforeFrames = calls.length
+  for (const now of [400, 416, 432, 448, 464, 480, 496, 512, 528, 544, 560, 576, 592]) step(now)
+  assert.deepEqual([...new Set(draws.filter((draw) => draw.kind !== 'material').map((draw) => draw.kind))], ['ball'])
+  assert.equal(calls.slice(beforeFrames).filter((call) => call.name === 'bufferSubData').length, 0)
+  assert.equal(draws.filter((draw) => draw.kind === 'ball').length, 13)
+})
+
+test('flight promise settles only after the final frame clears and removes the RAF and deadline', async (context) => {
+  context.mock.timers.enable({ apis: ['setTimeout'] })
+  const { renderer, calls, frames, step } = rendererHarness(context, true)
+  let settled = false
+  const flight = renderer.startFlight(trajectory, 1000)!.then(() => {
+    settled = true
+    assert.equal(frames.size, 0)
+    assert.equal(calls.at(-1)!.name, 'clear')
+  })
+  step(340)
+  await Promise.resolve()
+  assert.equal(settled, false)
+  step(999)
+  await Promise.resolve()
+  assert.equal(settled, false)
+  step(1000)
+  await flight
+  const afterCompletion = calls.length
+  context.mock.timers.tick(2000)
+  assert.equal(calls.length, afterCompletion, 'normal completion removes the fallback timer')
+})
+
+test('suspended RAF cancels and clears before releasing the navigation barrier', async (context) => {
+  context.mock.timers.enable({ apis: ['setTimeout'] })
+  const { renderer, calls, frames } = rendererHarness(context, true)
+  let completed = 0
+  renderer.onComplete = () => { completed += 1 }
+  const flight = renderer.startFlight(trajectory, 980)
+  context.mock.timers.tick(1229)
+  assert.equal(frames.size, 1)
+  context.mock.timers.tick(1)
+  await flight
+  assert.equal(frames.size, 0)
+  assert.equal(calls.at(-1)!.name, 'clear')
+  assert.equal(completed, 0, 'watchdog cancellation is not a completed visual flight')
+})
+
+test('replacement settles the old flight and its stale deadline cannot cancel the new flight', async (context) => {
+  context.mock.timers.enable({ apis: ['setTimeout'] })
+  const { renderer, frames } = rendererHarness(context, true)
+  const oldFlight = renderer.startFlight(trajectory, 1000)
+  const nextFlight = renderer.startFlight(trajectory, 2000)
+  await oldFlight
+  context.mock.timers.tick(1250)
+  assert.equal(frames.size, 1)
+  renderer.cancelFlight()
+  await nextFlight
+  assert.equal(frames.size, 0)
+})
+
+for (const reason of ['context loss', 'destroy', 'render error'] as const) {
+  test(`${reason} releases pending navigation and leaves no RAF behind`, async (context) => {
+    const { renderer, canvas, frames, step } = rendererHarness(context, true)
+    const flight = renderer.startFlight(trajectory, 1000)
+    if (reason === 'context loss') canvas.dispatchEvent(new Event('webglcontextlost'))
+    else if (reason === 'destroy') renderer.destroy()
+    else {
+      const gl = canvas.getContext() as unknown as WebGL2RenderingContext
+      context.mock.method(gl, 'drawElements', () => { throw new Error('driver failure') })
+      step(400)
+    }
+    await flight
+    assert.equal(frames.size, 0)
+    if (reason !== 'render error') assert.equal(renderer.startFlight(trajectory), null)
+  })
+}
+
+test('invalid duration cancels any old flight without scheduling a new one', async (context) => {
+  const { renderer, frames } = rendererHarness(context)
+  for (const duration of [0, -1, NaN, Infinity]) {
+    const pending = renderer.startFlight(trajectory)
+    assert.equal(renderer.startFlight(trajectory, duration), null)
+    await pending
+    assert.equal(frames.size, 0)
+  }
+})
+
+test('slow mobile frames reduce fill rate without changing trajectory, projection, or completion', (context) => {
   const { renderer, canvas, draws, step, frames } = rendererHarness(context, true)
   let completions = 0
   const progress: number[] = []
@@ -268,7 +368,7 @@ test('slow mobile frames reduce fill rate without changing trajectory, projectio
   assert.equal(canvas.width, 1000, 'wait for sustained missed frames')
   step(100)
   assert.deepEqual([canvas.width, canvas.height], [800, 600])
-  assert.equal(draws.findLast((draw) => draw.kind === 'trail')!.uniforms.get('uPointSize'), 12 * 0.8)
+  assert.equal(draws.filter((draw) => draw.kind === 'trail').length, 0)
   for (const now of [130, 160, 190]) step(now)
   assert.deepEqual([canvas.width, canvas.height], [600, 450])
   for (const now of [220, 250, 280, 310, 340, 370]) step(now)

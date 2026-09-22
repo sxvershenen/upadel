@@ -74,6 +74,9 @@ export class WebGL2BallRenderer {
 
   private activeFlight: { duration: number; startedAt: number; trajectory: ReferenceTrajectory } | null = null
   private animationFrame: number | null = null
+  private flightDeadline: ReturnType<typeof setTimeout> | null = null
+  private settleFlight: (() => void) | null = null
+  private contextLost = false
   private readonly ballIndexCount: number
   private readonly ballProgram: WebGLProgram
   private readonly ballVAO: WebGLVertexArrayObject
@@ -101,7 +104,7 @@ export class WebGL2BallRenderer {
   constructor(private readonly canvas: HTMLCanvasElement, private readonly compact: boolean) {
     const gl = canvas.getContext('webgl2', {
       alpha: true,
-      antialias: !compact,
+      antialias: true,
       depth: true,
       powerPreference: 'high-performance',
     })
@@ -110,7 +113,9 @@ export class WebGL2BallRenderer {
     this.ballProgram = this.createProgram(ballVertexShaderSource, compact ? compactBallFragmentShaderSource : ballFragmentShaderSource)
     this.trailProgram = this.createProgram(trailVertexShaderSource, trailFragmentShaderSource)
 
-    const sphere = createSphereGeometry(1, compact ? 40 : 64, compact ? 28 : 48)
+    // Silhouette tessellation is cheap compared with fragment shading and must
+    // survive the close-up. Compact mode still uses the baked material.
+    const sphere = createSphereGeometry(1, 64, 48)
     this.ballIndexCount = sphere.indices.length
     this.ballVAO = this.createVAO()
     gl.bindVertexArray(this.ballVAO)
@@ -137,15 +142,27 @@ export class WebGL2BallRenderer {
     }
     this.resize()
     this.clear()
+    canvas.addEventListener('webglcontextlost', this.handleContextLost)
   }
 
   startFlight(trajectory: ReferenceTrajectory, duration = 980) {
-    if (this.destroyed) return
+    if (this.destroyed || this.contextLost) return null
+    this.cancelFlight()
+    if (!Number.isFinite(duration) || duration <= 0) return null
+    const completion = new Promise<void>((resolve) => { this.settleFlight = resolve })
     this.activeFlight = { duration, startedAt: performance.now(), trajectory }
     this.trailHistory.length = 0
     this.resetFrameTiming()
-    this.resize()
-    if (this.animationFrame === null) this.animationFrame = requestAnimationFrame(this.tick)
+    // A suspended RAF (background tab / lost context) must not deadlock Swup.
+    // Clear/cancel before releasing the waiter, even if the final RAF never ran.
+    this.flightDeadline = setTimeout(() => this.cancelFlight(), duration + 250)
+    try {
+      this.resize()
+      this.animationFrame = requestAnimationFrame(this.tick)
+    } catch {
+      this.cancelFlight()
+    }
+    return completion
   }
 
   cancelFlight() {
@@ -154,7 +171,15 @@ export class WebGL2BallRenderer {
     this.resetFrameTiming()
     if (this.animationFrame !== null) cancelAnimationFrame(this.animationFrame)
     this.animationFrame = null
-    this.clear()
+    if (this.flightDeadline !== null) clearTimeout(this.flightDeadline)
+    this.flightDeadline = null
+    try {
+      this.clear()
+    } finally {
+      const settle = this.settleFlight
+      this.settleFlight = null
+      settle?.()
+    }
   }
 
   resize() {
@@ -182,6 +207,7 @@ export class WebGL2BallRenderer {
     if (this.destroyed) return
     this.destroyed = true
     this.cancelFlight()
+    this.canvas.removeEventListener('webglcontextlost', this.handleContextLost)
     const gl = this.gl
     this.buffers.forEach((buffer) => gl.deleteBuffer(buffer))
     gl.deleteVertexArray(this.ballVAO)
@@ -198,18 +224,24 @@ export class WebGL2BallRenderer {
     if (!flight || this.destroyed) return
     const progress = Math.min(1, (now - flight.startedAt) / flight.duration)
     if (progress >= 1) {
-      this.activeFlight = null
-      this.trailHistory.length = 0
-      this.resetFrameTiming()
-      this.clear()
+      this.cancelFlight()
       this.onProgress?.(1)
       this.onComplete?.()
       return
     }
-    this.adaptResolution(now)
-    this.renderFlight(flight.trajectory, progress)
-    this.onProgress?.(progress)
-    this.animationFrame = requestAnimationFrame(this.tick)
+    try {
+      this.adaptResolution(now)
+      this.renderFlight(flight.trajectory, progress)
+      this.onProgress?.(progress)
+      this.animationFrame = requestAnimationFrame(this.tick)
+    } catch {
+      this.cancelFlight()
+    }
+  }
+
+  private readonly handleContextLost = () => {
+    this.contextLost = true
+    this.cancelFlight()
   }
 
   private resetFrameTiming() {
@@ -236,11 +268,13 @@ export class WebGL2BallRenderer {
     const gl = this.gl
     const point = evaluateReferenceTrajectory(trajectory, progress)
     const position: Vec3 = [point.x, point.y, point.z]
-    this.trailHistory.unshift(position)
-    if (this.trailHistory.length > maxTrailPoints) this.trailHistory.pop()
+    if (!this.compact) {
+      this.trailHistory.unshift(position)
+      if (this.trailHistory.length > maxTrailPoints) this.trailHistory.pop()
+    }
 
     this.clear()
-    this.renderTrail()
+    if (!this.compact) this.renderTrail()
     gl.enable(gl.DEPTH_TEST)
     gl.depthFunc(gl.LEQUAL)
     if (this.compact) {

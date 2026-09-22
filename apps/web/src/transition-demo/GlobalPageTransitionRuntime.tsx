@@ -1,4 +1,4 @@
-import gsap from 'gsap'
+import { gsap } from 'gsap'
 import Swup from 'swup'
 import SwupHeadPlugin from '@swup/head-plugin'
 import SwupScriptsPlugin from '@swup/scripts-plugin'
@@ -50,7 +50,7 @@ function animateOut() {
   }))
 }
 
-function animateIn() {
+function animateIn(flightPlayed = false) {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return Promise.resolve()
   const surface = getSurface()
   gsap.set(surface, { opacity: 0, y: 28, scale: 0.97 })
@@ -58,7 +58,8 @@ function animateIn() {
     opacity: 1,
     y: 0,
     scale: 1,
-    duration: 0.64,
+    // The flight already provides the long visual beat; keep the reveal brief.
+    duration: flightPlayed ? 0.2 : 0.64,
     ease: 'power4.out',
     onComplete: () => clearTransitionStyles(surface),
     onInterrupt: () => clearTransitionStyles(surface),
@@ -66,6 +67,38 @@ function animateIn() {
 }
 
 type BallSceneComponent = ForwardRefExoticComponent<RefAttributes<ReferenceBallSceneHandle>>
+
+export function installPageTransitionAnimations(swup: Pick<Swup, 'hooks'>, getScene: () => ReferenceBallSceneHandle | null) {
+  let flight: Promise<void> | null = null
+  let flightPlayed = false
+  const cancel = () => {
+    getScene()?.cancel()
+    flight = null
+    flightPlayed = false
+  }
+  const unregister = [
+    swup.hooks.on('animation:out:start', () => {
+      cancel()
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+      const portrait = window.matchMedia('(max-width: 767px) and (orientation: portrait)').matches
+      flight = getScene()?.startFlight(computeReferenceTrajectory({ portrait }), duration) ?? null
+      flightPlayed = flight !== null
+      if (flightPlayed) transitionAudio.playWhoosh(duration / 1000)
+    }),
+    // Swup awaits this before content:replace, including head/scripts plugins
+    // and Astro hydration. The renderer settles only after clearing the ball.
+    swup.hooks.replace('animation:out:await', async () => {
+      await Promise.all([flight, animateOut()])
+    }),
+    swup.hooks.replace('animation:in:await', () => animateIn(flightPlayed)),
+    swup.hooks.on('visit:abort', cancel),
+    swup.hooks.on('visit:fail', cancel),
+  ]
+  return () => {
+    unregister.forEach((off) => off())
+    cancel()
+  }
+}
 
 export function GlobalPageTransitionRuntime({ initialNavigation, onReady }: { initialNavigation?: string | null; onReady?: (navigate: (href: string) => Promise<unknown>) => void }) {
   const ballRef = useRef<ReferenceBallSceneHandle | null>(null)
@@ -83,7 +116,10 @@ export function GlobalPageTransitionRuntime({ initialNavigation, onReady }: { in
       cancelIdle: cancelBrowserIdle,
     })
     const markDestinationReady = () => sceneLoader.destinationBecameReady()
-    const handleMotionChange = () => sceneLoader.motionPreferenceChanged()
+    const handleMotionChange = () => {
+      if (motionQuery.matches) ballRef.current?.cancel()
+      sceneLoader.motionPreferenceChanged()
+    }
     document.addEventListener('unlim:main-ready', markDestinationReady)
     motionQuery.addEventListener('change', handleMotionChange)
 
@@ -111,16 +147,6 @@ export function GlobalPageTransitionRuntime({ initialNavigation, onReady }: { in
           // The visual transition can then run as one uninterrupted timeline.
           visit.animation.wait = true
         },
-        'animation:out:start': () => {
-          if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            const portrait = window.matchMedia('(max-width: 767px) and (orientation: portrait)').matches
-            const trajectory = computeReferenceTrajectory({ portrait })
-            if (ballRef.current) {
-              ballRef.current.startFlight(trajectory, duration)
-              transitionAudio.playWhoosh(duration / 1000)
-            }
-          }
-        },
         'content:replace.before': () => {
           document.dispatchEvent(new Event('astro:before-swap'))
         },
@@ -130,14 +156,12 @@ export function GlobalPageTransitionRuntime({ initialNavigation, onReady }: { in
         },
         'visit:abort': () => {
           completeTransitionProgress()
-          ballRef.current?.cancel()
           resetTransitionStyles()
           resumeCurrentPage()
           sceneLoader.visitSettled()
         },
         'visit:fail': () => {
           completeTransitionProgress()
-          ballRef.current?.cancel()
           resetTransitionStyles()
           resumeCurrentPage()
           sceneLoader.visitSettled()
@@ -148,6 +172,7 @@ export function GlobalPageTransitionRuntime({ initialNavigation, onReady }: { in
         },
       },
     })
+    const disposeAnimations = installPageTransitionAnimations(swup, () => ballRef.current)
     swupRef.current = swup
     const navigate = (href: string) => new Promise<void>((resolve, reject) => {
       const cleanup = () => { offEnd(); offAbort(); offFail() }
@@ -159,16 +184,13 @@ export function GlobalPageTransitionRuntime({ initialNavigation, onReady }: { in
     navigateRef.current = navigate
     onReady?.(navigate)
 
-    swup.hooks.replace('animation:out:await', () => animateOut())
-    swup.hooks.replace('animation:in:await', () => animateIn())
-
     return () => {
       swupRef.current = null
       navigateRef.current = null
       document.removeEventListener('unlim:main-ready', markDestinationReady)
       motionQuery.removeEventListener('change', handleMotionChange)
       sceneLoader.dispose()
-      ballRef.current?.cancel()
+      disposeAnimations()
       resetTransitionStyles()
       void swup.destroy()
     }
