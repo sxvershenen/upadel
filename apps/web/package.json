@@ -15,7 +15,7 @@
     "@swup/head-plugin": "2.3.1",
     "@swup/scripts-plugin": "^2.1.0",
     "@tailwindcss/vite": "4.1.17",
-    "@unlim/content-contract": "0.0.8",
+    "@unlim/content-contract": "0.0.9",
     "astro": "7.3.2",
     "clsx": "2.1.1",
     "framer-motion": "13.2.0",

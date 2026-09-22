@@ -4,11 +4,22 @@ import { ContentAction } from "../components/ContentAction";
 import { useContent } from "../content/ContentContext";
 import { SplitTextReveal } from "../components/ui/SplitTextReveal";
 import { cn } from "../utils/cn";
-import type { MediaDTO } from "@unlim/content-contract";
+import { defaultHeroTint, type HeroTintPointDTO, type MediaDTO } from "@unlim/content-contract";
 import { ProgressiveImage } from "../components/ui/ProgressiveImage";
 
 export function resolveHeroParallaxTarget<T>(mobile: boolean, desktopTarget: T | null, mobileTarget: T | null) {
   return mobile ? mobileTarget ?? desktopTarget : desktopTarget ?? mobileTarget;
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
+}
+
+export function heroTintGradient(points: HeroTintPointDTO[]): string {
+  return points.map(({ opacity, x, y }) => {
+    const alpha = clamp(opacity, 0, 100) / 100;
+    return `radial-gradient(ellipse 80% 72% at ${clamp(x, 0, 100)}% ${clamp(y, 0, 100)}%, rgba(0,0,0,${alpha}) 0%, rgba(0,0,0,${alpha * 0.72}) 28%, rgba(0,0,0,0) 74%)`;
+  }).join(", ");
 }
 
 function HeroBackgroundMedia({ media, poster, className }: { media: MediaDTO; poster?: MediaDTO | null; className?: string }) {
@@ -66,27 +77,17 @@ function HeroAddress({ className }: { className?: string }) {
 export function Hero() {
   const { home, site } = useContent();
   const hero = home.hero;
+  const tint = hero.tint ?? defaultHeroTint;
   const replaceBrand = Boolean(site.brandLogo) && site.brandLogoMode === "replace";
   const [brandLogoFailed, setBrandLogoFailed] = useState(false);
 
   return (
     <section id="top" data-hero-parallax-root="" className="relative isolate h-[100svh] min-h-[720px] w-full overflow-hidden bg-ink">
       <HeroBackground desktop={hero.desktopMedia} mobile={hero.mobileMedia} desktopPoster={hero.desktopPoster} mobilePoster={hero.mobilePoster} />
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(to top, rgba(3,5,8,.98) 0%, rgba(3,5,8,.86) 18%, rgba(3,5,8,.52) 56%, rgba(3,5,8,.32) 100%)",
-        }}
-      />
-      <div
-        className="absolute inset-0"
-        style={{
-          background: "radial-gradient(circle at 86% 12%, rgba(194,245,66,.14) 0%, transparent 42%)",
-        }}
-      />
+      <div data-hero-tint="desktop" className="absolute inset-0 hidden md:block" style={{ background: heroTintGradient([tint.desktop.point1, tint.desktop.point2, tint.desktop.point3]) }} />
+      <div data-hero-tint="mobile" className="absolute inset-0 md:hidden" style={{ background: heroTintGradient([tint.mobile.point1, tint.mobile.point2, tint.mobile.point3]) }} />
 
-      <div className="container-page absolute inset-x-0 top-5 z-10 md:hidden">
+      <div className="container-page absolute inset-x-0 top-8 z-10 md:hidden">
         <a href="#top" className="flex items-center gap-2.5 leading-none text-white">
           {site.brandLogo && site.brandLogoMode !== "text" && !brandLogoFailed ? <img src={site.brandLogo.url} alt={site.brandName} onError={() => setBrandLogoFailed(true)} className={replaceBrand ? "h-9 max-w-[150px] object-contain" : "h-7 w-7 object-contain"} /> : <span className="h-2.5 w-2.5 shrink-0 rounded-[3px] bg-lime" />}
           {(!replaceBrand || !site.brandLogo || brandLogoFailed) && <span className="flex flex-col">

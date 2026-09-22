@@ -2454,6 +2454,45 @@ export interface Homepage {
      */
     mobileMedia?: (number | null) | Media;
     mobileVideoPoster?: (number | null) | Media;
+    /**
+     * Чёрный радиальный tint из трёх точек. Для каждой точки задаются непрозрачность и положение; форма градиента фиксирована кодом.
+     */
+    tint?: {
+      desktop?: {
+        point1?: {
+          opacity?: number | null;
+          x?: number | null;
+          y?: number | null;
+        };
+        point2?: {
+          opacity?: number | null;
+          x?: number | null;
+          y?: number | null;
+        };
+        point3?: {
+          opacity?: number | null;
+          x?: number | null;
+          y?: number | null;
+        };
+      };
+      mobile?: {
+        point1?: {
+          opacity?: number | null;
+          x?: number | null;
+          y?: number | null;
+        };
+        point2?: {
+          opacity?: number | null;
+          x?: number | null;
+          y?: number | null;
+        };
+        point3?: {
+          opacity?: number | null;
+          x?: number | null;
+          y?: number | null;
+        };
+      };
+    };
     primaryAction: {
       label?: string | null;
       mode: 'none' | 'booking' | 'trial-booking' | 'internal-link' | 'external-link' | 'phone' | 'email' | 'lead-form';
@@ -3786,6 +3825,60 @@ export interface HomepageSelect<T extends boolean = true> {
         desktopVideoPoster?: T;
         mobileMedia?: T;
         mobileVideoPoster?: T;
+        tint?:
+          | T
+          | {
+              desktop?:
+                | T
+                | {
+                    point1?:
+                      | T
+                      | {
+                          opacity?: T;
+                          x?: T;
+                          y?: T;
+                        };
+                    point2?:
+                      | T
+                      | {
+                          opacity?: T;
+                          x?: T;
+                          y?: T;
+                        };
+                    point3?:
+                      | T
+                      | {
+                          opacity?: T;
+                          x?: T;
+                          y?: T;
+                        };
+                  };
+              mobile?:
+                | T
+                | {
+                    point1?:
+                      | T
+                      | {
+                          opacity?: T;
+                          x?: T;
+                          y?: T;
+                        };
+                    point2?:
+                      | T
+                      | {
+                          opacity?: T;
+                          x?: T;
+                          y?: T;
+                        };
+                    point3?:
+                      | T
+                      | {
+                          opacity?: T;
+                          x?: T;
+                          y?: T;
+                        };
+                  };
+            };
         primaryAction?:
           | T
           | {

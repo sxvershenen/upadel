@@ -1,5 +1,5 @@
 import { ContentUnavailableError } from './projectionCache'
-import { homepageDTOversion, parseHomepageDTO, type HomepageDTO } from '@unlim/content-contract'
+import { defaultHeroTint, homepageDTOversion, parseHomepageDTO, type HeroTintDTO, type HomepageDTO } from '@unlim/content-contract'
 import type { Payload } from 'payload'
 
 import type { ArticleCategory, Tournament } from '../payload-types'
@@ -10,6 +10,37 @@ import { homepageCollectionLimits, resolveHomepageEntities } from '../hooks/reso
 
 function relationTitle(value: unknown): string {
   return typeof value === 'object' && value !== null && 'title' in value ? String(value.title) : ''
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value))
+}
+
+function numberOr(value: unknown, fallback: number): number {
+  return typeof value === 'number' && Number.isFinite(value) ? value : fallback
+}
+
+function projectHeroTintPoint(value: unknown, fallback: HeroTintDTO['desktop']['point1']): HeroTintDTO['desktop']['point1'] {
+  const point = typeof value === 'object' && value !== null ? value as Record<string, unknown> : {}
+  return {
+    opacity: clamp(numberOr(point.opacity, fallback.opacity), 0, 100),
+    x: clamp(numberOr(point.x, fallback.x), 0, 100),
+    y: clamp(numberOr(point.y, fallback.y), 0, 100),
+  }
+}
+
+function projectHeroTint(value: unknown): HeroTintDTO {
+  const tint = typeof value === 'object' && value !== null ? value as Record<string, unknown> : {}
+  const projectDevice = (name: 'desktop' | 'mobile'): HeroTintDTO['desktop'] => {
+    const device = typeof tint[name] === 'object' && tint[name] !== null ? tint[name] as Record<string, unknown> : {}
+    const fallback = defaultHeroTint[name]
+    return {
+      point1: projectHeroTintPoint(device.point1, fallback.point1),
+      point2: projectHeroTintPoint(device.point2, fallback.point2),
+      point3: projectHeroTintPoint(device.point3, fallback.point3),
+    }
+  }
+  return { desktop: projectDevice('desktop'), mobile: projectDevice('mobile') }
 }
 
 export async function createHomepageProjection(
@@ -67,7 +98,7 @@ export async function createHomepageProjection(
         seoHeading: homepage.hero.seoHeading ?? 'Премиальный крытый падел-клуб', titleLine: homepage.hero.titleLine ?? '', titleConnector: homepage.hero.titleConnector ?? '', titleAccent: homepage.hero.titleAccent ?? '',
         description: homepage.hero.description ?? '', desktopMedia: homeHeroMedia,
         mobileMedia: mediaDTO(homepage.hero.mobileMedia, origin, 'hero'), desktopPoster: mediaDTO(homepage.hero.desktopVideoPoster, origin),
-        mobilePoster: mediaDTO(homepage.hero.mobileVideoPoster, origin), primaryAction: actionDTO(homepage.hero.primaryAction),
+        mobilePoster: mediaDTO(homepage.hero.mobileVideoPoster, origin), tint: projectHeroTint(homepage.hero.tint), primaryAction: actionDTO(homepage.hero.primaryAction),
         secondaryAction: actionDTO(homepage.hero.secondaryAction),
         socialProof: {
           ratingLabel: homepage.hero.socialProof?.ratingLabel ?? '', caption: homepage.hero.socialProof?.caption ?? '',

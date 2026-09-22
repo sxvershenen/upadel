@@ -1,9 +1,47 @@
 import type { Field } from 'payload'
+import { defaultHeroTint, type HeroTintDeviceDTO } from '@unlim/content-contract'
 
 import { createActionField } from './action'
 import { imageOnlyFilter } from './media'
 import { imageOverlayOptions, meshToneOptions } from './presentation'
 import { validateUniqueRowsByKey } from './validators'
+
+function heroTintPoint(name: string, label: string, defaultValue: HeroTintDeviceDTO['point1']): Field {
+  return {
+    name,
+    type: 'group',
+    label,
+    fields: [
+      { name: 'opacity', type: 'number', label: 'Opacity чёрного, %', min: 0, max: 100, defaultValue: defaultValue.opacity, admin: { width: '33%', step: 1 } },
+      { name: 'x', type: 'number', label: 'Положение X, %', min: 0, max: 100, defaultValue: defaultValue.x, admin: { width: '33%', step: 1 } },
+      { name: 'y', type: 'number', label: 'Положение Y, %', min: 0, max: 100, defaultValue: defaultValue.y, admin: { width: '34%', step: 1 } },
+    ],
+  }
+}
+
+function heroTintDevice(name: 'desktop' | 'mobile', label: string, defaultValue: HeroTintDeviceDTO): Field {
+  return {
+    name,
+    type: 'group',
+    label,
+    fields: [
+      heroTintPoint('point1', 'Точка 1', defaultValue.point1),
+      heroTintPoint('point2', 'Точка 2', defaultValue.point2),
+      heroTintPoint('point3', 'Точка 3', defaultValue.point3),
+    ],
+  }
+}
+
+const heroTintField: Field = {
+  name: 'tint',
+  type: 'group',
+  label: 'Затемнение hero',
+  admin: { description: 'Чёрный радиальный tint из трёх точек. Для каждой точки задаются непрозрачность и положение; форма градиента фиксирована кодом.' },
+  fields: [
+    heroTintDevice('desktop', 'ПК', defaultHeroTint.desktop),
+    heroTintDevice('mobile', 'Мобильный', defaultHeroTint.mobile),
+  ],
+}
 
 export const heroFields: Field[] = [
   {
@@ -52,6 +90,7 @@ export const heroFields: Field[] = [
         admin: { description: 'Если пусто, используется desktop media.' },
       },
       { name: 'mobileVideoPoster', type: 'upload', relationTo: 'media', filterOptions: imageOnlyFilter, label: 'Poster mobile-видео' },
+      heroTintField,
       { ...createActionField('primaryAction', 'Основная кнопка'), defaultValue: { label: 'Забронировать', mode: 'booking' } },
       { ...createActionField('secondaryAction', 'Вторая кнопка'), defaultValue: { label: 'Пробное занятие', mode: 'trial-booking' } },
       {

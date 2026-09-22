@@ -3,7 +3,7 @@ import test from 'node:test'
 import React from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { ContentProvider } from '../content/ContentContext'
-import { Hero, resolveHeroParallaxTarget } from './Hero'
+import { Hero, heroTintGradient, resolveHeroParallaxTarget } from './Hero'
 
 const content = {
   site: {
@@ -53,4 +53,27 @@ test('hero renders responsive image variants through one picture image', () => {
   const html = renderToStaticMarkup(<ContentProvider content={responsiveContent}><Hero /></ContentProvider>)
   assert.match(html, /<picture><source media="\(max-width: 767px\)" srcSet="\/mobile-480\.webp 480w, \/mobile\.webp 960w"/)
   assert.equal((html.match(/data-hero-parallax-media/g) ?? []).length, 1)
+})
+
+test('hero renders separate desktop and mobile three-point black tints and keeps the mobile logo at spacing 8', () => {
+  const responsiveContent = structuredClone(content)
+  responsiveContent.home.hero.tint = {
+    desktop: {
+      point1: { opacity: 81, x: 11, y: 22 }, point2: { opacity: 62, x: 33, y: 44 }, point3: { opacity: 43, x: 55, y: 66 },
+    },
+    mobile: {
+      point1: { opacity: 71, x: 17, y: 28 }, point2: { opacity: 52, x: 39, y: 50 }, point3: { opacity: 33, x: 61, y: 72 },
+    },
+  }
+  const html = renderToStaticMarkup(<ContentProvider content={responsiveContent}><Hero /></ContentProvider>)
+  assert.match(html, /data-hero-tint="desktop"/)
+  assert.match(html, /data-hero-tint="mobile"/)
+  assert.match(html, /radial-gradient\(ellipse[^)]* at 11% 22%, rgba\(0,0,0,0\.81\) 0%/)
+  assert.match(html, /radial-gradient\(ellipse[^)]* at 17% 28%, rgba\(0,0,0,0\.71\) 0%/)
+  assert.match(html, /container-page absolute inset-x-0 top-8 z-10 md:hidden/)
+  assert.equal(heroTintGradient([
+    responsiveContent.home.hero.tint.desktop.point1,
+    responsiveContent.home.hero.tint.desktop.point2,
+    responsiveContent.home.hero.tint.desktop.point3,
+  ]).match(/radial-gradient/g)?.length, 3)
 })

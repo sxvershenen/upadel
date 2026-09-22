@@ -1,6 +1,6 @@
 import type { CatalogPagination, CatalogQuery } from './catalog'
 export * from './catalog'
-export const homepageDTOversion = 13 as const
+export const homepageDTOversion = 14 as const
 
 export const publicRouteRegistry = [
   { path: '/', parent: null, template: 'homepage', globalSlug: 'homepage' },
@@ -63,6 +63,22 @@ export type BrandLogoMode = 'text' | 'prefix' | 'replace'
 export type PageHeroDTO = { media: MediaDTO; grayscale: boolean }
 export type DesktopNavigationChild = { label: string; href: string; icon?: MediaDTO | null }
 export type DesktopNavigationItem = DesktopNavigationChild & { children?: DesktopNavigationChild[] | null }
+export type HeroTintPointDTO = { opacity: number; x: number; y: number }
+export type HeroTintDeviceDTO = { point1: HeroTintPointDTO; point2: HeroTintPointDTO; point3: HeroTintPointDTO }
+export type HeroTintDTO = { desktop: HeroTintDeviceDTO; mobile: HeroTintDeviceDTO }
+
+export const defaultHeroTint: HeroTintDTO = {
+  desktop: {
+    point1: { opacity: 98, x: 0, y: 100 },
+    point2: { opacity: 72, x: 100, y: 100 },
+    point3: { opacity: 34, x: 50, y: 0 },
+  },
+  mobile: {
+    point1: { opacity: 98, x: 50, y: 100 },
+    point2: { opacity: 56, x: 0, y: 0 },
+    point3: { opacity: 56, x: 100, y: 0 },
+  },
+}
 
 export type ActionDTO = {
   href?: string | null
@@ -143,7 +159,7 @@ export type HomepageDTO = {
     }
   }
   home: {
-    hero: { seoHeading: string; titleLine: string; titleConnector: string; titleAccent: string; description: string; desktopMedia?: MediaDTO | null; mobileMedia?: MediaDTO | null; desktopPoster?: MediaDTO | null; mobilePoster?: MediaDTO | null; primaryAction: ActionDTO; secondaryAction: ActionDTO; socialProof: { ratingLabel: string; caption: string; coachPhotos: MediaDTO[] }; stats: Array<{ value: string; label: string }> }
+    hero: { seoHeading: string; titleLine: string; titleConnector: string; titleAccent: string; description: string; desktopMedia?: MediaDTO | null; mobileMedia?: MediaDTO | null; desktopPoster?: MediaDTO | null; mobilePoster?: MediaDTO | null; tint: HeroTintDTO; primaryAction: ActionDTO; secondaryAction: ActionDTO; socialProof: { ratingLabel: string; caption: string; coachPhotos: MediaDTO[] }; stats: Array<{ value: string; label: string }> }
     benefits: { eyebrow: string; title: string; cards: Array<{ id: string; variant: 'parking' | 'lockers' | 'shower' | 'chill' | 'online-booking' | 'coaches-metric' | 'kids-wide'; eyebrow?: string | null; title: string; description: string; supportingText?: string | null; media?: MediaDTO | null; overlay?: string | null; meshTone?: string | null; action: ActionDTO }> }
     offers: Array<{ id: string; variant: 'tournament-venue' | 'event'; badge: string; title: string; description: string; image?: MediaDTO | null; overlay: string; icon: 'Trophy' | 'PartyPopper'; action: ActionDTO }>
     courtsSection: { titleLineOne: string; titleLineTwo: string; background?: MediaDTO | null; backgroundAlt: string }

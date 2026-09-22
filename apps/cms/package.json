@@ -27,7 +27,7 @@
     "@payloadcms/next": "3.89.0",
     "@payloadcms/richtext-lexical": "3.89.0",
     "@payloadcms/ui": "3.89.0",
-    "@unlim/content-contract": "0.0.8",
+    "@unlim/content-contract": "0.0.9",
     "cross-env": "7.0.3",
     "graphql": "16.11.0",
     "next": "16.3.5",
