@@ -10,7 +10,10 @@ test('Prices keeps full-width tabs on mobile and content-sized tabs on desktop',
     tabs: { rent: 'Аренда', memberships: 'Абонементы' },
     rentalRates: [],
     memberships: [],
-    rules: [],
+    rules: [
+      { title: 'Бронирование', contentHTML: '<p>Правило бронирования</p>' },
+      { title: 'Отмена и перенос', contentHTML: '<p>Правило отмены</p>' },
+    ],
   } as any} />)
 
   assert.match(html, /class="container-page sticky top-\[var\(--page-gutter\)\] z-30/)
@@ -21,4 +24,7 @@ test('Prices keeps full-width tabs on mobile and content-sized tabs on desktop',
   assert.match(html, /aria-controls="price-panel-memberships"/)
   assert.doesNotMatch(html, /max-w-\[560px\]/)
   assert.doesNotMatch(html, /grid grid-cols-2 gap-1 rounded-2xl bg-ink/)
+  assert.match(html, /data-mobile-compact-list="true"[^>]*class="[^"]*border-y border-ink\/10[^"]*md:grid-cols-2[^"]*md:border-y-0[^"]*"/)
+  assert.match(html, /class="[^"]*max-sm:!rounded-none[^"]*border-b border-ink\/10[^"]*last:border-b-0[^"]*md:border-b-0[^"]*"/)
+  assert.match(html, /class="[^"]*md:rounded-\[var\(--se-2\)\][^"]*md:bg-surface-muted[^"]*"/)
 })

@@ -81,10 +81,11 @@ test('GiftLandingPage renders server HTML with SEO content and key sections', ()
   assert.equal(useCases.length, 4)
   assert.equal(termsList.length, 6)
   assert.equal(faqItems.length, 6)
-  assert.match(html, /data-mobile-compact-list="true"[^>]*class="[^"]*sm:grid-cols-2[^"]*"/)
+  assert.match(html, /data-mobile-compact-list="true"[^>]*class="[^"]*border-y border-ink\/10[^"]*sm:grid-cols-2[^"]*sm:border-y-0[^"]*"/)
   assert.match(html, /class="[^"]*bg-transparent[^"]*sm:bg-white[^"]*"/)
   assert.match(html, /class="[^"]*max-sm:!rounded-none[^"]*"/)
-  assert.doesNotMatch(html, /data-mobile-compact-list="true"[^>]*class="[^"]*border-(?:y|b) /)
+  assert.match(html, /class="[^"]*sm:rounded-\[var\(--se-2\)\][^"]*sm:bg-surface-muted[^"]*"/)
+  assert.match(html, /class="[^"]*border-b border-ink\/10[^"]*last:border-b-0[^"]*sm:border-b-0[^"]*"/)
 
   // Form inputs have sr-only labels
   assert.match(html, /class="[^"]*sr-only[^"]*"[^>]*>Ваше имя<\/label>/)

@@ -59,7 +59,7 @@ export function TrainingPage({ dto }: { dto: TrainingPageDTO }) {
       <section aria-labelledby="methodology-title">
         <SectionHeader titleId="methodology-title" eyebrow={dto.infographicEyebrow} title={dto.infographicTitle} />
 
-        <div data-mobile-compact-list className="mt-8 sm:grid sm:grid-cols-3 sm:gap-4">
+        <div data-mobile-compact-list className="mt-8 border-y border-ink/10 sm:grid sm:grid-cols-3 sm:gap-4 sm:border-y-0">
           {dto.blocks.map((block) => {
             const Icon = methodIcons[block.icon] ?? Target
             return (
@@ -67,9 +67,9 @@ export function TrainingPage({ dto }: { dto: TrainingPageDTO }) {
                 interactive={false}
                 reveal={false}
                 key={block.title}
-                className="max-sm:!rounded-none flex items-start gap-3 bg-transparent px-0 py-5 sm:block sm:bg-white sm:p-6"
+                className="max-sm:!rounded-none flex items-start gap-3 border-b border-ink/10 bg-transparent px-0 py-5 last:border-b-0 sm:block sm:border-b-0 sm:bg-white sm:p-6"
               >
-                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center text-ink-soft sm:mt-0 sm:h-9 sm:w-9 sm:bg-surface-muted sm:text-ink">
+                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center text-ink-soft sm:mt-0 sm:h-9 sm:w-9 sm:rounded-[var(--se-2)] sm:bg-surface-muted sm:text-ink">
                   <Icon size={18} />
                 </span>
                 <div className="min-w-0">
@@ -87,7 +87,7 @@ export function TrainingPage({ dto }: { dto: TrainingPageDTO }) {
       </section>
 
       {/* 2. Training Formats */}
-      <section className="mt-20 md:mt-24" aria-labelledby="training-formats-title">
+      <section className="mt-12 md:mt-20" aria-labelledby="training-formats-title">
         <SectionHeader
           titleId="training-formats-title"
           eyebrow={dto.programsEyebrow}
@@ -146,7 +146,7 @@ export function TrainingPage({ dto }: { dto: TrainingPageDTO }) {
 
       {/* 3. Coaches Section - Swiss Swiper matching homepage style */}
       {coaches.length > 0 && (
-        <section className="mt-20 md:mt-24" aria-labelledby="coaches-title">
+        <section className="mt-12 md:mt-20" aria-labelledby="coaches-title">
           <SectionHeader
             titleId="coaches-title"
             eyebrow={dto.coachesEyebrow}
@@ -223,7 +223,7 @@ export function TrainingPage({ dto }: { dto: TrainingPageDTO }) {
       )}
 
       {/* 4. Knowledge base: first visit on the left, FAQ on the right */}
-      <section className="mt-20 md:mt-24" aria-label={dto.knowledgeTitle}>
+      <section className="mt-12 md:mt-20" aria-label={dto.knowledgeTitle}>
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-0 lg:divide-x lg:divide-ink/10">
           <div className="lg:pr-16">
             <Typography as="h2" role="section" className="font-semibold text-ink">{typograph(dto.firstVisitTitle)}</Typography>
