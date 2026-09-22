@@ -28,9 +28,11 @@ npm run dev:cms
 npm run dev:web
 ```
 
-Run the seed after PostgreSQL is available; it is idempotent and does not overwrite unrelated records. Public web builds require the CMS endpoint configured by `CMS_URL`. Build/typecheck commands are in the root `package.json`.
+Run the seed after PostgreSQL is available; it is idempotent and does not overwrite unrelated records. Public web builds require the CMS endpoint configured by `CMS_URL`. An existing dev-created database must have its schema verified and migration baseline recorded before `payload migrate`; never replay the initial CREATE TABLE migration over an existing database. Build/typecheck commands are in the root `package.json`.
 
 Run analytics aggregation every 15 minutes with `npm run analytics:maintain`; `npm run analytics:demo` is an idempotent local fixture for UI checks and must not be used as production traffic. Production must provide `ANALYTICS_JOB_SECRET` to the protected maintenance endpoint.
+
+Production templates target `unlimpadel.ru` with `cms.unlimpadel.ru`; local Mac development keeps its own localhost/LAN settings.
 
 Production admin uses `PAYLOAD_ADMIN_ROUTE` and `ADMIN_USERNAME` from the server-only environment. Schema changes ship as Payload migrations; never run `migrate:fresh` or commit production secrets.
 

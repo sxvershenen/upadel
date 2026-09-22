@@ -66,8 +66,8 @@ CMS users and SEO redirects are also managed from dedicated tabs inside `Нас�
 - `/coaches`: filtered catalog, quick profile, then `/coaches/[slug]` detail.
 - `/tournaments`: filtered catalog and `/tournaments/[slug]` detail rendered with a compact Swiss-style layout (non-fullscreen branded hero on image or mesh gradient with live status badge, 1.0–7.0 level visual gauge and single CTA button; 4-metric tournament passport dl without duplicate address/buttons; 3-tab competition module with participants grid, pair visualization, responsive standings without horizontal scroll, and prize distribution by places; 2-column lower section with left collapsible details for regulations, pre-court checklist, included perks, matchday timeline, and right FAQ accordion; and related tournaments). Tournament filtering uses player levels `1.0–7.0`; cards foreground the tournament format and keep the player level in metadata.
 - Tournament editing uses tabs for core data, card presentation, participants, sortable manual standings, prizes/fees, FAQ, regulations/rules and SEO. A result row's array order is its place; points never reorder it. Format is one canonical select (plus a custom label only for `other`), and player level is a `from`/`to` range.
-- `/blog`: catalog and `/blog/[slug]` article.
-- Courts, prices, training and about remain single thematic pages; `/contacts` redirects to `/about`, while shared contact details stay in the footer and site settings.
+- `/blog`: catalog and `/blog/[slug]` article. Blog/coach/tournament catalogs use numbered pages of 12, with server filters preserved in URLs.
+- Courts, prices, training and about remain single thematic pages; `/contacts` permanently redirects (301) to `/about/`, while shared contact details stay in the footer and site settings.
 
 Gallery management uses thumbnail cards, not a table. Media management shows live/draft usage locations; referenced files cannot be deleted until links are removed. Implementation-only seed markers are never editor-visible.
 
@@ -95,3 +95,11 @@ On desktop, `Цены` is the only grouped top-level item; `Тренировки
 ## D16 — Article editor — accepted
 
 Keep Payload Lexical for article bodies. The article title is the only H1; body authors can use H2, H3 and H4, fixed formatting controls, lists/checklists, quotes, rules, links and Media uploads. Public article rendering uses escaped code-defined HTML and UI-kit typography (`type-title-large`, `type-title-card`, `type-title-compact`, `type-body`), never editor-provided raw HTML. Media selection inside a drawer inserts the selected record, while the standalone Media section retains edit navigation and batch tools.
+
+## D17 — Public content delivery and SEO — accepted
+
+Published edits appear on the next public request without rebuild, restart or a cache button. Draft edits remain in preview. The single-CMS-process projection cache invalidates automatically after content transactions; outage fallback is finite and never replaces an explicit not-found/unpublished response.
+
+Homepage: preserve the large offer visually; render “Премиальный крытый падел-клуб” as the separate inline H1 beneath it, followed by editable descriptive text. The editor explains that the H1 is an SEO setting normally left unchanged. Owner-confirmed facts: 3 courts, 50 parking spaces, PRO TURF 240 and VK https://vk.ru/unlimpadel; unknown social profiles stay hidden. Coach fallback title: “Имя Фамилия - тренер по паделу | Москва, Новая Рига”. Gift certificates have no fixed price range in copy/schema.
+
+Three.js loads only during stable idle after the first completed Swup navigation. The first transition uses the lightweight animation and never waits for the scene.
