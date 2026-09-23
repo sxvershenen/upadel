@@ -4,6 +4,7 @@ import type { MediaDTO, SiteDTO } from '@unlim/content-contract'
 import { SiteChromeIsland } from '../components/navigation/SiteChromeIsland'
 import { GlobalPageTransition } from '../transition-demo/GlobalPageTransition'
 import { resolveCanonicalURL, serializeStructuredData, type StructuredDataNode } from '../seo/structuredData'
+import { GROUPED_NUMBER_PATTERN_SOURCE, NUMBER_PATTERN_SOURCE, SHORT_WORD_PATTERN_SOURCE } from '../lib/typography'
 
 interface Props {
   description?: string
@@ -122,7 +123,7 @@ const pageEntrance = Astro.url.pathname === '/gift'
       <slot />
     </div>
   </body>
-  <script is:inline>
+  <script is:inline data-grouped-number-pattern={GROUPED_NUMBER_PATTERN_SOURCE} data-number-pattern={NUMBER_PATTERN_SOURCE} data-short-word-pattern={SHORT_WORD_PATTERN_SOURCE}>
     (() => {
       const pageEntrance = document.querySelector('#swup')?.getAttribute('data-page-entrance')
       if (['gift', 'detail', 'article'].includes(pageEntrance ?? '') && !location.hash) {
@@ -284,11 +285,14 @@ const pageEntrance = Astro.url.pathname === '/gift'
         }
       }, true)
 
-      const shortWordPattern = /(^|[ \t\r\n])((?:а|и|в|во|не|но|да|к|ко|с|со|у|о|об|от|до|из|за|на|по|под|над|при|без|для|про|через|между|как|так|что|это|же|ли|бы|то))([ \t\r\n]+)(?=\S)/giu
-      const skipTypography = 'astro-island,script,style,noscript,textarea,input,select,option,code,pre,[contenteditable="true"],[data-no-typography]'
+      const shortWordPattern = new RegExp(document.currentScript?.getAttribute('data-short-word-pattern') ?? '', 'giu')
+      const groupedNumberPattern = new RegExp(document.currentScript?.getAttribute('data-grouped-number-pattern') ?? '', 'gu')
+      const numberPattern = new RegExp(document.currentScript?.getAttribute('data-number-pattern') ?? '', 'giu')
+      const skipTypography = 'astro-island[ssr],script,style,noscript,textarea,input,select,option,code,pre,[contenteditable="true"],[data-no-typography]'
       const typographText = (node) => {
         if (!node.nodeValue || node.parentElement?.closest(skipTypography)) return
-        node.nodeValue = node.nodeValue.replace(shortWordPattern, '$1$2\u00a0')
+        const formatted = node.nodeValue.replace(groupedNumberPattern, '$1\u00a0').replace(shortWordPattern, '$1$2\u00a0').replace(numberPattern, '$1\u00a0')
+        if (formatted !== node.nodeValue) node.nodeValue = formatted
       }
       const typograph = (root) => {
         if (root.nodeType === Node.TEXT_NODE) {
@@ -347,9 +351,10 @@ const pageEntrance = Astro.url.pathname === '/gift'
             else if (node instanceof Element) node.querySelectorAll('img[data-progressive-native], img[data-progressive-image]').forEach(prepareProgressiveImage)
           })
           if (mutation.type === 'characterData') pending.add(mutation.target)
+          if (mutation.type === 'attributes') pending.add(mutation.target)
         })
         scheduleTypography()
-      }).observe(document.body, { childList: true, characterData: true, subtree: true })
+      }).observe(document.body, { childList: true, characterData: true, attributes: true, attributeFilter: ['ssr'], subtree: true })
     })()
   </script>
 </html>

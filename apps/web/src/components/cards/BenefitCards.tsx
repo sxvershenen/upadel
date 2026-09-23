@@ -39,7 +39,7 @@ export function BenefitCard({ benefit, mobile = false }: { benefit: Benefit; mob
   const iconColor = benefit.variant === 'parking' ? '!text-[#244500]' : benefit.variant === 'coaches-metric' ? '!text-[#5c230f]' : '!text-[#0b3a5c]'
   const bodyColor = benefit.variant === 'parking' ? 'text-[#3f6212]' : benefit.variant === 'coaches-metric' ? 'text-[#7c3f14]' : 'text-[#18527c]'
   const decorativeVariants = { rest: { scale: 1, rotate: benefit.variant === 'online-booking' ? -7 : benefit.variant === 'coaches-metric' ? 6 : 0, y: 0 }, hover: { scale: 1.06, rotate: benefit.variant === 'online-booking' ? -3 : benefit.variant === 'coaches-metric' ? 2 : -4, y: -7 } }
-  const mediaClass = benefit.variant === 'online-booking' ? 'booking-phone -bottom-16 -right-10 h-[255px]' : benefit.variant === 'coaches-metric' ? '-bottom-20 -right-10 h-[340px]' : benefit.variant === 'kids-wide' ? '-bottom-16 -right-2 h-[300px]' : '-bottom-20 -right-10 h-[300px]'
+  const mediaClass = benefit.variant === 'online-booking' ? 'booking-phone -bottom-16 -right-10 h-[255px] max-[1380px]:h-[210px]' : benefit.variant === 'coaches-metric' ? '-bottom-20 -right-10 h-[340px] max-[1380px]:h-[270px]' : benefit.variant === 'kids-wide' ? '-bottom-16 -right-2 h-[300px] max-[1380px]:h-[240px]' : '-bottom-20 -right-10 h-[300px] max-[1380px]:h-[240px]'
   const internalAction = benefit.action.mode === 'internal-link' && benefit.action.href
     ? { href: benefit.variant === 'kids-wide' ? '/training' : benefit.action.href, label: benefit.title }
     : null

@@ -55,6 +55,26 @@ test('kids card is an internal link to the training page', () => {
   assert.match(html, /cursor-pointer/)
 })
 
+test('mesh benefit illustrations shrink below the 1380px breakpoint', () => {
+  const variants = [
+    ['online-booking', 'max-[1380px]:h-[210px]'],
+    ['coaches-metric', 'max-[1380px]:h-[270px]'],
+    ['kids-wide', 'max-[1380px]:h-[240px]'],
+    ['parking', 'max-[1380px]:h-[240px]'],
+  ] as const
+
+  for (const [variant, responsiveClass] of variants) {
+    const html = renderToStaticMarkup(<BenefitCard benefit={{
+      ...baseBenefit,
+      variant,
+      title: variant,
+      media: { url: `/${variant}.webp`, alt: '', mimeType: 'image/webp' },
+      supportingText: variant === 'kids-wide' ? 'Детские ракетки' : null,
+    } as any} />)
+    assert.ok(html.includes(responsiveClass), `${variant} is missing ${responsiveClass}`)
+  }
+})
+
 test('mobile benefits swiper uses a horizontal track with protected side gutters and real overlays', () => {
   const sectionSource = readFileSync(new URL('../../sections/Benefits.tsx', import.meta.url), 'utf8')
   const css = readFileSync(new URL('../../index.css', import.meta.url), 'utf8')
