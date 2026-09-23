@@ -615,7 +615,6 @@ async function seed() {
       ...images.blog.map((source, index) => [source, `Статья блога Unlim Riga Padel ${index + 1}`] as const),
       ...images.reviewAvatars.map((source, index) => [source, `Автор отзыва ${index + 1}`] as const),
       [padelCourtZakazSeed.heroImage.source, padelCourtZakazSeed.heroImage.alt],
-      [padelCourtZakazSeed.heroVideo.source, padelCourtZakazSeed.heroVideo.alt],
       [padelCourtZakazSeed.technology.background.source, padelCourtZakazSeed.technology.background.alt],
       ...padelCourtZakazSeed.gallery.items.map(({ source, alt }) => [source, alt] as const),
       ...padelCourtZakazSeed.models.items.map(({ image }) => [image.source, image.alt] as const),
@@ -681,7 +680,6 @@ async function seed() {
 
     const padelCourtZakazMedia = {
       heroImage: mediaID(padelCourtZakazSeed.heroImage.source),
-      heroVideo: mediaID(padelCourtZakazSeed.heroVideo.source),
       technologyBackground: mediaID(padelCourtZakazSeed.technology.background.source),
       gallery: padelCourtZakazSeed.gallery.items.map(({ source }) => mediaID(source)),
       models: padelCourtZakazSeed.models.items.map(({ image }) => mediaID(image.source)),
@@ -1693,7 +1691,7 @@ async function seed() {
       intro: padelCourtZakazSeed.intro,
       heroImage: padelCourtZakazMedia.heroImage,
       heroGrayscale: false,
-      heroVideo: padelCourtZakazMedia.heroVideo,
+      heroVideo: null,
       heroPrimaryLabel: padelCourtZakazSeed.heroPrimaryLabel,
       heroSecondaryLabel: padelCourtZakazSeed.heroSecondaryLabel,
       heroMetrics: padelCourtZakazSeed.heroMetrics,
