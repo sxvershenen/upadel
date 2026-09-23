@@ -15,7 +15,7 @@ const seedVersion = 'prototype-v2'
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const webPublicDir = path.resolve(dirname, '../../web/public')
 const mediaDir = path.resolve(dirname, '../media')
-const seedMediaDir = path.resolve(dirname, '../seed-media')
+const seedMediaDir = path.resolve(dirname, '../seed-media/pexels')
 
 const stats = {
   created: 0,
