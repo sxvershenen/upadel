@@ -1,9 +1,7 @@
 import React from 'react'
-import { CalendarCheck, CircleParking, Clock3, Mail, MapPin, TrainFront, Video } from 'lucide-react'
+import { CircleParking, Clock3, Mail, MapPin, TrainFront, Video } from 'lucide-react'
 import { useSite } from '../content/ContentContext'
-import { ContentAction } from '../components/ContentAction'
 import { Reveal } from '../components/ui/Reveal'
-import { Button, ButtonLink } from '../components/ui/Button'
 import { Partners } from './Partners'
 import { useActionLayer } from '../actions/ActionLayer'
 import { VkIcon } from '../components/ui/VkIcon'
@@ -26,8 +24,6 @@ export function Footer() {
   const socialIcons = { telegram: TelegramIcon, video: Video, vk: VkIcon }
   const mapURL = `https://yandex.ru/map-widget/v1/?ll=${contacts.map.longitude}%2C${contacts.map.latitude}&z=${contacts.map.zoom}&pt=${contacts.map.longitude},${contacts.map.latitude},pm2rdl`
   const navColumns = ['1', '2'].map((column) => footer.navigation.filter((item) => item.column === column))
-  const [legalName = footer.legalEntity, ...legalDetails] = footer.legalEntity.split(/\s*(?:·|\n)\s*/).filter(Boolean)
-  const footerActionClass = 'w-[var(--control-md)] px-0'
 
   return <footer id="footer" className="mesh-dark relative overflow-hidden pb-[calc(96px+env(safe-area-inset-bottom))] pt-20 text-white md:pb-16">
     <div className="container-page"><div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
@@ -35,29 +31,6 @@ export function Footer() {
       <Reveal delay={0.5}><div className="flex flex-col gap-6">{footer.image && <div className="se-3 aspect-[16/10] w-full overflow-hidden"><ProgressiveImage media={footer.image} sizes="(min-width: 1024px) 50vw, 100vw" alt={footer.image.alt} loading="lazy" className="h-full w-full object-cover" /></div>}<p className="type-body-sm max-w-[520px] text-white/60">{footer.about}</p><div className="grid grid-cols-4 gap-3 border-t border-white/10 pt-6 text-center sm:text-left">{footer.stats.map(({ value, label }) => <div key={label} className="flex flex-col gap-1"><span className="type-title-card font-semibold text-white">{value}</span><span className="type-micro leading-tight text-white/45">{label}</span></div>)}</div></div></Reveal>
     </div></div>
     <div className="container-page mt-16"><Partners /></div>
-    <div className="container-page mt-16 flex flex-col gap-8">
-      <div className="grid gap-8 border-t border-white/10 pt-8 lg:grid-cols-[minmax(220px,1fr)_minmax(280px,1fr)_auto] lg:items-start lg:gap-10">
-        <div className="flex flex-col gap-3">
-          <span className="type-editorial font-semibold text-white">{site.brandName}</span>
-          <p data-footer-legal className="type-caption flex max-w-[320px] flex-col leading-relaxed text-white/40">
-            <span>{legalName}</span>
-            {legalDetails.length > 0 && <span>{legalDetails.join(' · ')}</span>}
-          </p>
-        </div>
-        <nav aria-label="Навигация в подвале" className="flex flex-col gap-3">
-          <span className="type-micro uppercase tracking-[0.12em] text-white/35">Навигация</span>
-          <div className="type-ui grid grid-cols-2 gap-x-10 gap-y-2 text-white/55">{navColumns.map((column, index) => <div key={index} className="flex flex-col gap-2.5">{column.map((item) => <a key={item.label} href={item.href} className="transition-colors hover:text-white">{item.label}</a>)}</div>)}</div>
-        </nav>
-        <div data-footer-actions role="group" aria-label="Быстрые действия и соцсети" className="flex flex-wrap items-center gap-2 lg:justify-end">
-          <Button variant="glass" iconOnly icon={<PhoneIcon size={18} />} aria-label="Позвонить" data-analytics-action="phone" onClick={() => requestContact('phone')} className={footerActionClass} />
-          {contacts.directionsURL
-            ? <ButtonLink variant="glass" iconOnly icon={<MapPin aria-hidden="true" size={18} />} aria-label="Построить маршрут" href={contacts.directionsURL} target="_blank" rel="noreferrer" data-analytics-action="directions" className={footerActionClass} />
-            : <Button variant="glass" iconOnly icon={<MapPin aria-hidden="true" size={18} />} aria-label="Построить маршрут" disabled className={footerActionClass} />}
-          <ContentAction action={{ mode: 'booking', label: site.booking.buttonLabel }} variant="glass" iconOnly icon={<CalendarCheck aria-hidden="true" size={18} />} aria-label={site.booking.buttonLabel} className={footerActionClass} />
-          {footer.socialLinks.filter((item) => item.provider !== 'instagram').map((item) => { const Icon = socialIcons[item.provider as keyof typeof socialIcons]; const channel = item.provider === 'telegram' || item.provider === 'vk' ? item.provider : null; return <a key={item.provider} href={item.url} data-analytics-action={channel ?? 'external'} onClick={channel ? (event) => { event.preventDefault(); requestContact(channel) } : undefined} aria-label={item.label} target={item.url.startsWith('https://') ? '_blank' : undefined} rel={item.url.startsWith('https://') ? 'noreferrer' : undefined} className="se-2 flex h-[var(--control-md)] w-[var(--control-md)] shrink-0 items-center justify-center bg-white/10 text-white/70 transition-colors hover:bg-white/20 hover:text-white focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2">{Icon ? <Icon size={18} /> : <span className="type-micro font-semibold">VK</span>}</a> })}
-        </div>
-      </div>
-      <div className="type-caption flex flex-col gap-3 border-t border-white/10 pt-6 text-white/40 sm:flex-row sm:items-center sm:justify-between"><span>{footer.copyright}</span><div className="flex flex-wrap items-center gap-x-5 gap-y-1">{footer.legalLinks.map((item) => <a key={item.label} href={item.href} className="transition-colors hover:text-white/70">{item.label}</a>)}<CookiePreferencesButton /></div></div>
-    </div>
+    <div className="container-page mt-16 flex flex-col gap-8"><div className="flex flex-col justify-between gap-8 md:flex-row"><div className="flex flex-col gap-3"><span className="type-editorial font-semibold text-white">{site.brandName}</span><p className="type-caption max-w-[280px] leading-relaxed text-white/40">{footer.legalEntity}</p><div className="flex items-center gap-2 pt-1">{footer.socialLinks.filter((item) => item.provider !== 'instagram').map((item) => { const Icon = socialIcons[item.provider as keyof typeof socialIcons]; const channel = item.provider === 'telegram' || item.provider === 'vk' ? item.provider : null; return <a key={item.provider} href={item.url} data-analytics-action={channel ?? 'external'} onClick={channel ? (event) => { event.preventDefault(); requestContact(channel) } : undefined} aria-label={item.label} target={item.url.startsWith('https://') ? '_blank' : undefined} rel={item.url.startsWith('https://') ? 'noreferrer' : undefined} className="se-1 type-micro flex h-[var(--control-sm)] w-[var(--control-sm)] items-center justify-center bg-white/10 font-semibold text-white/70 transition-colors hover:bg-white/20 hover:text-white focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2">{Icon ? <Icon size={15} /> : 'VK'}</a> })}</div></div><div className="type-ui grid grid-cols-2 gap-x-10 gap-y-2 text-white/55 sm:flex sm:gap-16">{navColumns.map((column, index) => <div key={index} className="flex flex-col gap-2.5">{column.map((item) => <a key={item.label} href={item.href} className="transition-colors hover:text-white">{item.label}</a>)}</div>)}</div></div><div className="type-caption flex flex-col gap-3 border-t border-white/10 pt-6 text-white/40 sm:flex-row sm:items-center sm:justify-between"><span>{footer.copyright}</span><div className="flex flex-wrap items-center gap-x-5 gap-y-1">{footer.legalLinks.map((item) => <a key={item.label} href={item.href} className="transition-colors hover:text-white/70">{item.label}</a>)}<CookiePreferencesButton /></div></div></div>
   </footer>
 }
