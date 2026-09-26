@@ -1,6 +1,6 @@
 import type { MediaDTO } from '@unlim/content-contract'
 import React, { useRef, type ReactNode } from "react";
-import { motion, type HTMLMotionProps } from "framer-motion";
+import { motion, useTransform, type HTMLMotionProps } from "framer-motion";
 import { cn } from "../../utils/cn";
 import { springSoft } from "../../lib/motion";
 import { useImageParallax } from "../../lib/useImageParallax";
@@ -69,20 +69,26 @@ export interface ImageCardProps extends Omit<HTMLMotionProps<"div">, "children">
   children?: ReactNode;
   interactive?: boolean;
   parallax?: boolean;
+  compositeOverlay?: boolean;
   fadeImage?: boolean;
   loading?: "eager" | "lazy";
 }
 
 /** Full-bleed image card with a mandatory colorized overlay. */
-export function ImageCard({ src, alt, media, sizes = "(min-width: 1024px) 50vw, 100vw", overlay, className, children, imgClassName, interactive = true, parallax = interactive, fadeImage = false, loading = "lazy", reveal = true, style, ...props }: ImageCardProps & { reveal?: RevealConfig }) {
+export function ImageCard({ src, alt, media, sizes = "(min-width: 1024px) 50vw, 100vw", overlay, className, children, imgClassName, interactive = true, parallax = interactive, compositeOverlay = false, fadeImage = false, loading = "lazy", reveal = true, style, ...props }: ImageCardProps & { reveal?: RevealConfig }) {
   const imageRef = useRef<HTMLDivElement>(null);
   const imageY = useImageParallax(imageRef, parallax ? 11 : 0);
+  // `.parallax-layer` is 136% tall and starts at -18%. Moving the overlay's
+  // painted box by the inverse layer translation keeps its 0/30/70/75/100%
+  // stops fixed to the card while image and tint share one composited layer.
+  const compositeOverlayTop = useTransform(imageY, (value) => `${13.235294 - Number.parseFloat(value)}%`);
   const revealProps = revealAttributes(reveal, style, true);
   return <motion.div
     {...props}
     {...revealProps}
     data-gsap-reveal-boundary="true"
     data-image-card="true"
+    data-composite-overlay={compositeOverlay ? "true" : undefined}
     initial={interactive ? "rest" : undefined}
     whileHover={interactive ? "hover" : undefined}
     variants={interactive ? cardVariants : undefined}
@@ -97,12 +103,14 @@ export function ImageCard({ src, alt, media, sizes = "(min-width: 1024px) 50vw, 
         transition={interactive ? { duration: 0.9, ease: [0.22, 1, 0.36, 1] } : undefined}
         style={parallax ? { y: imageY } : undefined}
         data-parallax-layer
+        data-image-composite-layer={compositeOverlay ? "true" : undefined}
         className="parallax-layer overflow-hidden"
       >
         <ProgressiveImage skeleton={!fadeImage} media={media} sizes={sizes} src={src} alt={alt} loading={loading} className={cn("h-full w-full object-cover", imgClassName)} variants={interactive ? imageVariants : undefined} transition={springSoft} />
+        {compositeOverlay && <motion.div data-image-overlay={overlay} style={{ top: compositeOverlayTop }} className="image-card-composite-overlay pointer-events-none absolute inset-x-0 z-[1]" aria-hidden="true" />}
       </motion.div>
     </div>
-    <div data-image-overlay={overlay} className="pointer-events-none absolute inset-0 z-[1]" aria-hidden="true" />
+    {!compositeOverlay && <div data-image-overlay={overlay} className="pointer-events-none absolute inset-0 z-[1]" aria-hidden="true" />}
     <div data-image-content="true" className="relative z-10 flex h-full flex-col">{children}</div>
   </motion.div>;
 }

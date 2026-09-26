@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs'
 import test from 'node:test'
 import React from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
+import { Window } from 'happy-dom'
 
 import { BenefitCard } from './BenefitCards'
 import { ImageCard } from '../ui/Card'
@@ -137,4 +138,29 @@ test('mobile photo benefits and training cards keep parallax with filter-free im
     assert.ok(saturation(strong) > saturation(light), `${tone} must peak in saturation at 75%`)
   }
   assert.match(styles, /\[data-linear-overlay="true"\] \[data-image-overlay="overlay-blue"\] \{ background: linear-gradient\(to bottom, transparent 0%, rgb\(8 18 30 \/ 12%\) 30%, rgb\(0 86 196 \/ 90%\) 70%, #0044dc 75%, #588cff 100%\)/)
+})
+
+test('mobile photo benefit paints its image and gradient inside one moving layer', () => {
+  const benefit = {
+    ...baseBenefit,
+    variant: 'chill',
+    title: 'Еда и напитки',
+    media: { url: '/food.webp', alt: 'Еда и напитки', mimeType: 'image/webp' },
+    overlay: 'overlay-sunset',
+  } as any
+  const document = new Window().document
+
+  document.body.innerHTML = renderToStaticMarkup(<BenefitCard benefit={benefit} mobile />)
+  const mobileCard = document.querySelector('[data-image-card="true"]')
+  const movingLayer = mobileCard?.querySelector('[data-image-composite-layer="true"]')
+  assert.ok(movingLayer)
+  assert.ok(movingLayer.querySelector('img[src="/food.webp"]'))
+  assert.ok(movingLayer.querySelector('[data-image-overlay="overlay-sunset"]'))
+  assert.equal(mobileCard?.querySelectorAll('[data-image-overlay]').length, 1)
+  assert.equal(Array.from(mobileCard?.children ?? []).some((child) => child.hasAttribute('data-image-overlay')), false)
+
+  document.body.innerHTML = renderToStaticMarkup(<BenefitCard benefit={benefit} />)
+  const desktopCard = document.querySelector('[data-image-card="true"]')
+  assert.equal(desktopCard?.querySelector('[data-image-composite-layer="true"]'), null)
+  assert.equal(Array.from(desktopCard?.children ?? []).some((child) => child.hasAttribute('data-image-overlay')), true)
 })
