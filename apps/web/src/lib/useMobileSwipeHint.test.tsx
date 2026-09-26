@@ -35,10 +35,10 @@ test('swipe hint completes after a touch and only clears when its animation ends
     IS_REACT_ACT_ENVIRONMENT: true,
   })
 
-  const swiperRef = { current: { initialized: true, slides: [{}, {}] } as SwiperType }
+  const swiperRef = { current: { initialized: true, slides: [] } as unknown as SwiperType }
   function Fixture() {
     const ref = useMobileSwipeHint(swiperRef, 'test-hint')
-    return <div ref={ref}><div className="swiper"><div className="swiper-wrapper"><div className="swiper-slide">Card</div></div></div></div>
+    return <div ref={ref}><div className="swiper"><div className="swiper-wrapper"><div className="swiper-slide">Card</div><div className="swiper-slide">Next card</div></div></div></div>
   }
 
   const mount = browserWindow.document.createElement('div')
@@ -49,9 +49,14 @@ test('swipe hint completes after a touch and only clears when its animation ends
     const container = mount.firstElementChild as unknown as HTMLElement
     const wrapper = container.querySelector('.swiper-wrapper') as HTMLElement
     const card = container.querySelector('.swiper-slide') as HTMLElement
+    const nextCard = container.querySelectorAll('.swiper-slide')[1] as HTMLElement
+    swiperRef.current.slides = [card, nextCard]
+    Object.defineProperty(browserWindow, 'innerWidth', { configurable: true, value: 390 })
+    Object.defineProperty(nextCard, 'getBoundingClientRect', { value: () => ({ left: 382 }) })
 
     show()
     assert.equal(container.classList.contains('swiper-hint-playing'), true)
+    assert.equal(container.style.getPropertyValue('--swiper-hint-translate'), '-187px')
     card.dispatchEvent(new browserWindow.Event('pointerdown', { bubbles: true }) as unknown as Event)
     assert.equal(container.classList.contains('swiper-hint-playing'), true)
 

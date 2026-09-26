@@ -37,7 +37,10 @@ export function useMobileSwipeHint(swiperRef: { current: SwiperType | null }, hi
         return;
       }
 
+      const distance = Math.max(0, Math.round(swiper.slides[1].getBoundingClientRect().left - window.innerWidth / 2));
       played = true;
+      if (!distance) return;
+      container.style.setProperty("--swiper-hint-translate", `${-distance}px`);
       wrapper.addEventListener("animationend", finish);
       container.classList.add("swiper-hint-playing");
     };
