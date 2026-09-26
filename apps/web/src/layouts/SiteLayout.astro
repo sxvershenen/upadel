@@ -222,6 +222,8 @@ const pageEntrance = Astro.url.pathname === '/gift'
       const scheduleScrollReveals = () => {
         const root = document.querySelector('#swup')
         if (!root) return
+        // React must finish hydrating before reveal attributes are added to its SSR markup.
+        if (root.querySelector('astro-island[client="load"]') && root.dataset.mainReady !== 'true') return
         if (revealTimer) window.clearTimeout(revealTimer)
         revealTimer = window.setTimeout(setupScrollReveals, 0)
       }
@@ -288,7 +290,7 @@ const pageEntrance = Astro.url.pathname === '/gift'
       const shortWordPattern = new RegExp(document.currentScript?.getAttribute('data-short-word-pattern') ?? '', 'giu')
       const groupedNumberPattern = new RegExp(document.currentScript?.getAttribute('data-grouped-number-pattern') ?? '', 'gu')
       const numberPattern = new RegExp(document.currentScript?.getAttribute('data-number-pattern') ?? '', 'giu')
-      const skipTypography = 'astro-island[ssr],script,style,noscript,textarea,input,select,option,code,pre,[contenteditable="true"],[data-no-typography]'
+      const skipTypography = 'astro-island:not([data-typography-ready="true"]),script,style,noscript,textarea,input,select,option,code,pre,[contenteditable="true"],[data-no-typography]'
       const typographText = (node) => {
         if (!node.nodeValue || node.parentElement?.closest(skipTypography)) return
         const formatted = node.nodeValue.replace(groupedNumberPattern, '$1\u00a0').replace(shortWordPattern, '$1$2\u00a0').replace(numberPattern, '$1\u00a0')
@@ -354,7 +356,7 @@ const pageEntrance = Astro.url.pathname === '/gift'
           if (mutation.type === 'attributes') pending.add(mutation.target)
         })
         scheduleTypography()
-      }).observe(document.body, { childList: true, characterData: true, attributes: true, attributeFilter: ['ssr'], subtree: true })
+      }).observe(document.body, { childList: true, characterData: true, attributes: true, attributeFilter: ['data-typography-ready'], subtree: true })
     })()
   </script>
 </html>
