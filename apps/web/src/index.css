@@ -55,8 +55,8 @@ html[data-route-transition="done"] .route-transition-progress > span { transform
 @keyframes swiper-swipe-hint {
   0% { translate: 0 0; animation-timing-function: ease-out; }
   66% { translate: var(--swiper-hint-translate, -108px) 0; animation-timing-function: cubic-bezier(.3, .3, .55, 1); }
-  84% { translate: 14px 0; animation-timing-function: ease-out; }
-  92% { translate: -7px 0; animation-timing-function: ease-out; }
+  87% { translate: 9px 0; animation-timing-function: ease-out; }
+  94% { translate: -3px 0; animation-timing-function: ease-out; }
   100% { translate: 0 0; }
 }
 .swiper-hint-playing > .swiper > .swiper-wrapper { animation: swiper-swipe-hint 1.4s both; }
