@@ -54,9 +54,7 @@ html[data-route-transition="done"] .route-transition-progress > span { transform
 .swiper-page-gutter > .swiper { padding-inline: var(--page-gutter); touch-action: pan-y; }
 @keyframes swiper-swipe-hint {
   0% { translate: 0 0; animation-timing-function: ease-out; }
-  66% { translate: var(--swiper-hint-translate, -108px) 0; animation-timing-function: cubic-bezier(.3, .3, .55, 1); }
-  87% { translate: 9px 0; animation-timing-function: ease-out; }
-  94% { translate: -3px 0; animation-timing-function: ease-out; }
+  64% { translate: var(--swiper-hint-translate, -108px) 0; animation-timing-function: cubic-bezier(.2, 1.25, .35, 1); }
   100% { translate: 0 0; }
 }
 .swiper-hint-playing > .swiper > .swiper-wrapper { animation: swiper-swipe-hint 1.4s both; }
