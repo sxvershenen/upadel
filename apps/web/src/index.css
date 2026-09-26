@@ -53,12 +53,12 @@ html[data-route-transition="done"] .route-transition-progress > span { transform
 .swiper-page-gutter { margin-inline: calc(-1 * var(--page-gutter)); }
 .swiper-page-gutter > .swiper { padding-inline: var(--page-gutter); touch-action: pan-y; }
 @keyframes swiper-swipe-hint {
-  0% { translate: 0 0; }
-  45% { translate: -108px 0; }
-  90% { translate: 4px 0; }
+  0% { translate: 0 0; animation-timing-function: ease-out; }
+  42% { translate: -108px 0; animation-timing-function: cubic-bezier(.3, .3, .55, 1); }
+  82% { translate: 8px 0; animation-timing-function: ease-out; }
   100% { translate: 0 0; }
 }
-.swiper-hint-playing > .swiper > .swiper-wrapper { animation: swiper-swipe-hint 1.7s cubic-bezier(.38, .2, .62, .8) both; }
+.swiper-hint-playing > .swiper > .swiper-wrapper { animation: swiper-swipe-hint 1.4s both; }
 @media (prefers-reduced-motion: reduce) { .swiper-hint-playing > .swiper > .swiper-wrapper { animation: none; } }
 
 @keyframes unlim-enter-up {
