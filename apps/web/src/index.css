@@ -54,15 +54,11 @@ html[data-route-transition="done"] .route-transition-progress > span { transform
 .swiper-page-gutter > .swiper { padding-inline: var(--page-gutter); touch-action: pan-y; }
 @keyframes swiper-swipe-hint {
   0% { translate: 0 0; }
-  36% { translate: -108px 0; }
-  48% { translate: -89px 0; }
-  59% { translate: -99px 0; }
-  68% { translate: -95px 0; }
-  84% { translate: 5px 0; }
-  92% { translate: -2px 0; }
+  45% { translate: -108px 0; }
+  90% { translate: 4px 0; }
   100% { translate: 0 0; }
 }
-.swiper-hint-playing > .swiper > .swiper-wrapper { animation: swiper-swipe-hint 2.4s ease-in-out both; }
+.swiper-hint-playing > .swiper > .swiper-wrapper { animation: swiper-swipe-hint 1.7s cubic-bezier(.38, .2, .62, .8) both; }
 @media (prefers-reduced-motion: reduce) { .swiper-hint-playing > .swiper > .swiper-wrapper { animation: none; } }
 
 @keyframes unlim-enter-up {
