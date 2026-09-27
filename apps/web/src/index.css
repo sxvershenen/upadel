@@ -54,12 +54,11 @@ html[data-route-transition="done"] .route-transition-progress > span { transform
 .swiper-page-gutter > .swiper { padding-inline: var(--page-gutter); touch-action: pan-y; }
 @keyframes swiper-swipe-hint {
   0% { translate: 0 0; animation-timing-function: ease-out; }
-  41.54% { translate: var(--swiper-hint-translate, -108px) 0; animation-timing-function: ease-out; }
-  73.33% { translate: 12px 0; animation-timing-function: cubic-bezier(.2, 1.25, .35, 1); }
+  56.64% { translate: var(--swiper-hint-translate, -108px) 0; animation-timing-function: cubic-bezier(.2, 1.25, .35, 1); }
   100% { translate: 0 0; }
 }
-/* 810ms out, 620ms return, then the existing 520ms spring settle. */
-.swiper-hint-playing > .swiper > .swiper-wrapper { animation: swiper-swipe-hint 1.95s both; }
+/* 810ms out and 620ms total return, including the existing spring easing. */
+.swiper-hint-playing > .swiper > .swiper-wrapper { animation: swiper-swipe-hint 1.43s both; }
 @media (prefers-reduced-motion: reduce) { .swiper-hint-playing > .swiper > .swiper-wrapper { animation: none; } }
 
 @keyframes unlim-enter-up {
