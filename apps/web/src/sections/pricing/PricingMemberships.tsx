@@ -12,6 +12,6 @@ export function PricingMemberships({ onSwiperChange }: { onSwiperChange?: (swipe
   const swipeHintRef = useMobileSwipeHint(swiperRef, "home-pricing-memberships");
   return <div>
     <div className="hidden gap-4 lg:grid lg:grid-cols-4">{entities.memberships.map((membership) => <MembershipCard key={membership.id} membership={membership} />)}</div>
-    <div ref={swipeHintRef} className="-mx-5 lg:hidden"><Swiper {...horizontalSwiperProps} onSwiper={(swiper) => { swiperRef.current = swiper; onSwiperChange?.(swiper); }} onSlideChange={(swiper) => onSwiperChange?.(swiper)} onResize={(swiper) => onSwiperChange?.(swiper)} slidesPerView={1} spaceBetween={12} className="swiper-breathe !px-5">{entities.memberships.map((membership) => <SwiperSlide key={membership.id} className="!h-auto"><MembershipCard membership={membership} /></SwiperSlide>)}</Swiper></div>
+    <div ref={swipeHintRef} className="-mx-5 lg:hidden"><Swiper {...horizontalSwiperProps} onSwiper={(swiper) => { swiperRef.current = swiper; onSwiperChange?.(swiper); }} onSlideChange={(swiper) => onSwiperChange?.(swiper)} onResize={(swiper) => onSwiperChange?.(swiper)} slidesPerView={1} spaceBetween={12} className="swiper-breathe pricing-memberships-swiper !px-5">{entities.memberships.map((membership) => <SwiperSlide key={membership.id} className="!h-auto"><MembershipCard membership={membership} /></SwiperSlide>)}</Swiper></div>
   </div>;
 }

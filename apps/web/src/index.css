@@ -54,11 +54,11 @@ html[data-route-transition="done"] .route-transition-progress > span { transform
 .swiper-page-gutter > .swiper { padding-inline: var(--page-gutter); touch-action: pan-y; }
 @keyframes swiper-swipe-hint {
   0% { translate: 0 0; animation-timing-function: ease-out; }
-  63.28% { translate: var(--swiper-hint-translate, -108px) 0; animation-timing-function: cubic-bezier(.2, 1.25, .35, 1); }
+  60.9% { translate: var(--swiper-hint-translate, -108px) 0; animation-timing-function: cubic-bezier(.2, 1.25, .35, 1); }
   100% { translate: 0 0; }
 }
-/* Keep the outward movement at 896ms and match the return spring to the 520ms Swiper speed. */
-.swiper-hint-playing > .swiper > .swiper-wrapper { animation: swiper-swipe-hint 1.416s both; }
+/* Keep the outward movement at 810ms and match the return spring to the 520ms Swiper speed. */
+.swiper-hint-playing > .swiper > .swiper-wrapper { animation: swiper-swipe-hint 1.33s both; }
 @media (prefers-reduced-motion: reduce) { .swiper-hint-playing > .swiper > .swiper-wrapper { animation: none; } }
 
 @keyframes unlim-enter-up {
@@ -217,6 +217,8 @@ html[data-reveal-ready] [data-reveal-visible="true"] [data-reveal-word] { --reve
 .coaches-swiper:not(.swiper-initialized) .swiper-slide { width: 100%; }
 .benefits-swiper:not(.swiper-initialized) .swiper-wrapper,
 .training-formats-swiper:not(.swiper-initialized) .swiper-wrapper { gap: 12px; }
+.pricing-rent-swiper:not(.swiper-initialized) .swiper-wrapper,
+.pricing-memberships-swiper:not(.swiper-initialized) .swiper-wrapper { gap: 12px; }
 .tournaments-swiper:not(.swiper-initialized) .swiper-wrapper { gap: 12px; }
 .tournaments-swiper:not(.swiper-initialized) .swiper-slide { width: 100%; }
 .benefits-swiper:not(.swiper-initialized) .swiper-slide { width: 100%; }
