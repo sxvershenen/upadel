@@ -7,8 +7,9 @@ test('swipe hint timing matches Swiper and pricing carousels keep their initial 
   const rentSource = readFileSync(new URL('./PricingRent.tsx', import.meta.url), 'utf8')
   const membershipsSource = readFileSync(new URL('./PricingMemberships.tsx', import.meta.url), 'utf8')
 
-  assert.match(css, /60\.9% \{ translate: var\(--swiper-hint-translate/)
-  assert.match(css, /swiper-swipe-hint 1\.33s both/)
+  assert.match(css, /41\.54% \{ translate: var\(--swiper-hint-translate/)
+  assert.match(css, /73\.33% \{ translate: 12px 0; animation-timing-function: cubic-bezier\(\.2, 1\.25, \.35, 1\); \}/)
+  assert.match(css, /swiper-swipe-hint 1\.95s both/)
   assert.match(rentSource, /className="swiper-breathe pricing-rent-swiper !px-5"/)
   assert.match(membershipsSource, /className="swiper-breathe pricing-memberships-swiper !px-5"/)
   assert.match(
