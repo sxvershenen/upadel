@@ -1,3 +1,4 @@
+import { bookingReadiness } from '@/integrations/validation';
 import config from "@payload-config";
 import { getPayload } from "payload";
 import { requireAdmin } from "@/lib/adminAuth";
@@ -13,26 +14,12 @@ export async function GET(request: Request) {
     overrideAccess: true,
     showHiddenFields: true,
   });
-  const booking = site.booking;
-  const env = booking?.credentialEnvironmentVariable;
-  const ready =
-    booking?.mode === "external-link" ? Boolean(booking.externalURL) : false;
-  const status =
-    booking?.mode === "disabled"
-      ? "Отключено"
-      : booking?.mode === "external-link"
-        ? ready
-          ? "Готово: внешняя ссылка"
-          : "Не настроено: укажите URL"
-        : booking?.providerAdapter &&
-            booking.providerAccountID &&
-            env &&
-            process.env[env]
-          ? "Конфигурация найдена, но сетевой адаптер ещё не реализован"
-          : "Не настроено: проверьте adapter, account ID и environment secret";
+  const statusLabels = { disabled: 'Отключено', 'ready-external': 'Готово: внешняя ссылка', 'ready-widget': 'Готово: виджет VivaCRM', 'missing-config': 'Не настроено: проверьте поля интеграции', 'integration-not-implemented': 'Конфигурация найдена, сетевой адаптер ещё не реализован' };
+  const integration = (value: Parameters<typeof bookingReadiness>[0]) => { const result = bookingReadiness(value); return { ready: result.ready, status: statusLabels[result.status] }; };
   return Response.json(
     {
-      booking: { ready, status },
+      booking: integration(site.booking ?? {}),
+      account: integration(site.account ?? {}),
       notifications: {
         telegram: Boolean(
           site.leadNotifications?.telegramEnabled &&

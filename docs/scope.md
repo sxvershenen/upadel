@@ -13,6 +13,7 @@
 - Code-defined page map, managed internal redirects, self-canonicals and published/indexable sitemap/robots output.
 - External analytics settings with consent-gated loaders, masked notification credentials, delivery status/retry and safe booking fallback.
 - Media size/MIME enforcement, image derivatives and usable image/video previews with usage locations.
+- CMS-managed VivaCRM booking/account widgets and individual coach/program iframe or script actions.
 
 ## Next
 
@@ -20,7 +21,6 @@
 
 ## Remaining CMS
 
-- Booking provider implementation after VivaCRM/Lunda/Padel app details are known.
 - Media usage registry updates for future relationship fields; production video transcoding/object storage after hosting is selected.
 
 ## Deferred or externally blocked

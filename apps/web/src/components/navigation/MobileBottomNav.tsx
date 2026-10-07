@@ -1,5 +1,6 @@
+import { useActionLayer } from '../../actions/ActionLayer'
 import { useState } from "react";
-import { Home, Dumbbell, Tag, Menu as MenuIcon } from "lucide-react";
+import { Home, Dumbbell, Tag, User, Menu as MenuIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import { PlayBottomSheet } from "./PlayBottomSheet";
 import { MobileMenu } from "./MobileMenu";
@@ -9,8 +10,10 @@ const icons = { Home, Dumbbell, Tag };
 
 export function MobileBottomNav() {
   const site = useSite();
-  const items = site.mobileNavigation.slice(0, 2);
-  const itemsRight = site.mobileNavigation.slice(2);
+  const { requestWidget, requestExternal } = useActionLayer();
+  const items = site.mobileNavigation.filter(item => item.href !== '/training').slice(0, 2);
+  const openAccount = () => { if (site.account?.mode === 'external-link' && site.account.externalURL) requestExternal({ href: site.account.externalURL, label: site.account.buttonLabel }); else requestWidget({ kind: 'vivacrm-script', url: site.account?.mode === 'vivacrm-widget' ? site.account.widgetURL ?? '' : '', label: site.account?.buttonLabel ?? 'Личный кабинет' }); };
+
   const [playOpen, setPlayOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -46,19 +49,7 @@ export function MobileBottomNav() {
             </motion.button>
           </div>
 
-          {itemsRight.map((item) => {
-            const Icon = icons[item.icon];
-            return (
-              <a
-                key={item.href}
-                href={item.href}
-                className="flex flex-1 flex-col items-center gap-1 py-1 text-white/60 transition-colors active:text-white"
-              >
-                <Icon size={19} strokeWidth={1.8} />
-                <span className="type-micro font-medium text-current">{item.label}</span>
-              </a>
-            );
-          })}
+          <button type="button" onClick={openAccount} aria-label={site.account?.buttonLabel ?? 'Личный кабинет'} className="flex flex-1 flex-col items-center gap-1 py-1 text-white/60 transition-colors active:text-white"><User size={19} strokeWidth={1.8} /><span className="type-micro font-medium text-current">{site.account?.mobileLabel ?? 'Кабинет'}</span></button>
           <button type="button" onClick={() => setMenuOpen(true)} className="flex flex-1 flex-col items-center gap-1 py-1 text-white/60 transition-colors active:text-white"><MenuIcon size={19} strokeWidth={1.8} /><span className="type-micro font-medium text-current">{site.mobileActions.menuLabel}</span></button>
         </div>
       </motion.nav>

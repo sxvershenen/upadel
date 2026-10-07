@@ -35,6 +35,16 @@ test('desktop header SSR emits one visible booking state before hydration', () =
   assert.doesNotMatch(bookingButton, /data-gsap-reveal/)
 })
 
+test('account control participates in utility sizing and follows the phone before booking', () => {
+  const html = renderToStaticMarkup(<SiteProvider site={site} captureContacts={false}><DesktopHeader /></SiteProvider>)
+  const account = tagWithClass(html, 'desktop-header-account-control')
+  assert.match(account, /desktop-header-utility-link/)
+  assert.doesNotMatch(account, /\bglass\b/)
+  assert.match(account, /aria-label="Личный кабинет"/)
+  assert.ok(html.indexOf('aria-label="Позвонить"') < html.indexOf('desktop-header-account-control'))
+  assert.ok(html.indexOf('desktop-header-account-control') < html.indexOf('desktop-header-booking-control'))
+})
+
 test('desktop navigation keeps a local fallback icon while a CMS icon loads', () => {
   const html = renderToStaticMarkup(<SiteProvider site={{ ...site, desktopNavigation: [{ label: 'Цены', href: '/prices', icon: { url: '/media/prices.svg' }, children: [] }] }} captureContacts={false}><DesktopHeader /></SiteProvider>)
   assert.match(html, /data-navigation-icon="prices"/)

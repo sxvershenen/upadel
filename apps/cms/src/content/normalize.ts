@@ -1,3 +1,4 @@
+import { widgetURL } from '@unlim/content-contract'
 import type { ActionDTO, BrandLogoMode, MediaDTO, PageHeroDTO, PageSEO, SiteDTO } from '@unlim/content-contract'
 
 import type { Media, SiteSetting } from '../payload-types'
@@ -51,8 +52,8 @@ export function pageHeroDTO(value: unknown, kind: string, origin: string): PageH
 }
 
 export function actionDTO(value: unknown): ActionDTO {
-  const action = (value ?? {}) as { href?: string | null; leadType?: ActionDTO['leadType']; label?: string | null; mode?: ActionDTO['mode'] }
-  return { href: action.href, leadType: action.leadType, label: action.label, mode: action.mode ?? 'none' }
+  const action = (value ?? {}) as { href?: string | null; leadType?: ActionDTO['leadType']; label?: string | null; widgetKind?: ActionDTO['widgetKind']; widgetURL?: string | null; mode?: ActionDTO['mode'] }
+  return { widgetKind: action.widgetKind, widgetURL: action.mode === 'embed-widget' ? widgetURL(action.widgetURL, action.widgetKind ?? 'iframe') : undefined, href: action.href, leadType: action.leadType, label: action.label, mode: action.mode ?? 'none' }
 }
 
 export function seoDTO(value: unknown, origin: string): PageSEO {
@@ -109,9 +110,10 @@ export function siteDTO(site: SiteSetting, origin: string, partners: Array<Recor
     },
     partners: partners.map((item) => ({ id: String(item.id), name: String(item.name), logo: mediaDTO(item.logo, origin), websiteURL: item.websiteURL as string | null })),
     booking: {
-      mode: site.booking?.mode ?? 'disabled', externalURL: site.booking?.externalURL, buttonLabel: site.booking?.buttonLabel ?? '',
+      widgetURL: widgetURL(site.booking?.widgetURL, 'vivacrm-script'), mode: site.booking?.mode ?? 'disabled', externalURL: site.booking?.externalURL, buttonLabel: site.booking?.buttonLabel ?? '',
       ready: booking.ready, status: booking.status,
     },
+    account: { mode: site.account?.mode ?? 'disabled', widgetURL: widgetURL(site.account?.widgetURL, 'vivacrm-script'), externalURL: site.account?.externalURL, buttonLabel: site.account?.buttonLabel ?? 'Личный кабинет', mobileLabel: site.account?.mobileLabel ?? 'Кабинет', ...bookingReadiness(site.account ?? {}) },
     contactConfirmation: {
       avatar: mediaDTO(confirmation?.avatar, origin, 'thumbnail'), dialogTitle: confirmation?.dialogTitle ?? 'Связаться с клубом', cancelLabel: confirmation?.cancelLabel ?? 'Отмена', continueLabel: confirmation?.continueLabel ?? 'Продолжить',
       formTitle: confirmation?.formTitle ?? 'Оставить заявку', submitLabel: confirmation?.submitLabel ?? 'Отправить', successTitle: confirmation?.successTitle ?? 'Заявка отправлена', successText: confirmation?.successText ?? '', consentLabel: confirmation?.consentLabel ?? '', leadEndpoint: new URL('/api/public/leads', process.env.PUBLIC_CONTENT_URL ?? process.env.PUBLIC_CMS_URL ?? origin).toString(), policyHref: confirmation?.policyHref ?? '/policy',

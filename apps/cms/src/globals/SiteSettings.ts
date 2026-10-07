@@ -1,3 +1,4 @@
+import { createWidgetURLField } from '../fields/widget'
 import type { GlobalConfig } from 'payload'
 
 import { authenticated } from '../fields/access'
@@ -90,13 +91,12 @@ export const SiteSettings: GlobalConfig = {
               name: 'mobileNavigation',
               type: 'array',
               label: 'Основная mobile-навигация',
-              maxRows: 3,
+              maxRows: 2,
               defaultValue: [
                 { label: 'Главная', href: '/', icon: 'Home' },
-                { label: 'Тренировки', href: '/training', icon: 'Dumbbell' },
                 { label: 'Цены', href: '/prices', icon: 'Tag' },
               ],
-              admin: { description: 'Центральная кнопка «Играть» и кнопка меню остаются code-defined.' },
+              admin: { description: 'Два слота слева. «Играть», «Кабинет» и меню остаются code-defined.' },
               fields: [
                 { name: 'label', type: 'text', label: 'Название', required: true },
                 { name: 'href', type: 'text', label: 'Ссылка', required: true, validate: validateInternalLink },
@@ -363,14 +363,15 @@ export const SiteSettings: GlobalConfig = {
           ],
         },
         {
-          label: 'Бронирование',
+          label: 'Бронирование и ЛК',
           fields: [
             {
               name: 'booking',
               type: 'group',
               label: 'Центральный адаптер бронирования',
-              admin: { description: 'HTML и JavaScript не принимаются. Секреты хранятся только в environment variables.' },
+              admin: { description: 'Для VivaCRM вставьте URL или тег script установки. Сохраняется только проверенный URL; произвольный JavaScript не исполняется.' },
               fields: [
+                createWidgetURLField('Виджет VivaCRM: URL или script', 'vivacrm-widget', 'vivacrm-script'),
                 {
                   name: 'mode',
                   type: 'select',
@@ -380,6 +381,7 @@ export const SiteSettings: GlobalConfig = {
                   options: [
                     { label: 'Отключено', value: 'disabled' },
                     { label: 'Безопасная внешняя ссылка', value: 'external-link' },
+                    { label: 'Виджет VivaCRM (скрипт)', value: 'vivacrm-widget' },
                     { label: 'Code-defined provider adapter', value: 'provider-adapter' },
                   ],
                 },
@@ -390,7 +392,7 @@ export const SiteSettings: GlobalConfig = {
                   admin: { condition: (_, siblingData) => siblingData.mode === 'external-link' },
                   validate: (value: unknown, options: unknown) => {
                     const mode = (options as { siblingData?: { mode?: unknown } }).siblingData?.mode
-                    return mode !== 'external-link' || validateHTTPSURL(value) === true
+                    return mode !== 'external-link' || Boolean(value) && validateHTTPSURL(value) === true
                       ? true
                       : 'Для внешнего режима укажите корректный https:// URL.'
                   },
@@ -427,6 +429,16 @@ export const SiteSettings: GlobalConfig = {
                 },
                 { name: 'buttonLabel', type: 'text', label: 'Базовая подпись кнопки', defaultValue: 'Забронировать' },
                 { name: 'bookingStatusHelp', type: 'ui', admin: { components: { Field: '/components/admin/IntegrationStatus#IntegrationStatus' } } },
+              ],
+            },
+            {
+              name: 'account', type: 'group', label: 'Личный кабинет',
+              fields: [
+                { name: 'mode', type: 'select', label: 'Режим', defaultValue: 'disabled', required: true, options: [{ label: 'Отключено', value: 'disabled' }, { label: 'Виджет VivaCRM', value: 'vivacrm-widget' }, { label: 'Внешняя ссылка', value: 'external-link' }] },
+                createWidgetURLField('Виджет VivaCRM: URL или script', 'vivacrm-widget', 'vivacrm-script'),
+                { name: 'externalURL', type: 'text', label: 'Ссылка на ЛК', admin: { condition: (_, data) => data.mode === 'external-link' }, validate: (value: unknown, options: any) => options.siblingData?.mode !== 'external-link' || Boolean(value) && validateHTTPSURL(value) || 'Укажите https:// URL личного кабинета.' },
+                { name: 'buttonLabel', type: 'text', label: 'Подпись кнопки', defaultValue: 'Личный кабинет' },
+                { name: 'mobileLabel', type: 'text', label: 'Подпись в нижней навигации', defaultValue: 'Кабинет' },
               ],
             },
           ],

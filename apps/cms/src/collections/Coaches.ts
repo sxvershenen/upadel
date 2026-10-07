@@ -133,7 +133,7 @@ export const Coaches: CollectionConfig = {
               required: true,
             },
             {
-              ...createActionField('action', 'Действие профиля'),
+              ...createActionField('action', 'Действие профиля', true),
               defaultValue: { label: 'Выбрать тренера', mode: 'booking' },
             },
           ],

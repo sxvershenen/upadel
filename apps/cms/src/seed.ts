@@ -1815,7 +1815,7 @@ async function seed() {
             tint: defaultHeroTint,
             titleFontSize: defaultHeroTitleFontSize,
             primaryAction: { label: 'Забронировать', mode: 'booking' },
-            secondaryAction: { label: 'Пробное занятие', mode: 'trial-booking' },
+            secondaryAction: { label: 'Личный кабинет', mode: 'account' },
             socialProof: { ratingLabel: '4.9 · 500+ игроков', caption: 'Рейтинг клуба на Новой Риге', coaches: coaches.slice(0, 3).map(({ id }) => id) },
             stats: [
               { value: '3 корта', label: 'Jubo Super Panoramic' }, { value: '11.5 м', label: 'Высота до балок' },
@@ -1939,7 +1939,7 @@ async function seed() {
           brandName: 'UNLIM RIGA PADEL', brandLogoMode: 'prefix', headerSubtitle: 'Новорижское шоссе 3к1',
           desktopNavigation: requiredPageLinks.filter(({ href }) => href !== '/training' && href !== '/coaches').map((item) => item.href === '/prices' ? { ...item, children: priceNavigationChildren.map((child) => ({ ...child })) } : item),
           mobileNavigation: [
-            { label: 'Главная', href: '/', icon: 'Home' }, { label: 'Тренировки', href: '/training', icon: 'Dumbbell' }, { label: 'Цены', href: '/prices', icon: 'Tag' },
+            { label: 'Главная', href: '/', icon: 'Home' }, { label: 'Цены', href: '/prices', icon: 'Tag' },
           ],
           mobileMenuNavigation: [...requiredPageLinks],
           mobileActions: { playLabel: 'Играть', menuLabel: 'Меню', menuTitle: 'Меню', quickActionsTitle: 'Быстрые действия', bookCourtLabel: 'Забронировать корт', callLabel: 'Позвонить в клуб', directionsLabel: 'Проложить маршрут' },
@@ -1960,7 +1960,8 @@ async function seed() {
           copyright: '© 2026 Unlim Riga Padel. Все права защищены.',
           cookieNotice: { text: 'Используем cookies, чтобы бронирование и подбор тренировок работали быстрее.', acceptLabel: 'Хорошо' },
           contactConfirmation,
-          booking: { mode: 'disabled', buttonLabel: 'Забронировать' },
+          booking: { mode: 'vivacrm-widget', widgetURL: 'https://supadb.vivacrm.ru/storage/v1/object/public/widgets/3ffc4681-890e-4d27-9676-1a5a7c246b17.js', buttonLabel: 'Забронировать' },
+          account: { mode: 'vivacrm-widget', widgetURL: 'https://supadb.vivacrm.ru/storage/v1/object/public/widgets/8e5e55da-bb08-4d93-9572-047f3d99b3b8.js', buttonLabel: 'Личный кабинет', mobileLabel: 'Кабинет' },
         } as never,
       })
       stats.globalsPublished += 1

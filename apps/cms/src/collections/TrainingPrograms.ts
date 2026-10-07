@@ -54,7 +54,7 @@ export const TrainingPrograms: CollectionConfig = {
               ],
             },
             { name: 'priceFrom', type: 'number', label: 'Цена от, ₽', min: 0, required: true },
-            createActionField('action', 'Действие'),
+            createActionField('action', 'Действие', true),
           ],
         },
         { label: 'SEO', fields: [seoField] },

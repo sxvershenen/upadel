@@ -1,3 +1,4 @@
+import { widgetURL } from '@unlim/content-contract'
 export const validateMetricaCounterID = (value: unknown): true | string =>
   !value || typeof value === 'string' && /^\d{1,20}$/.test(value)
     ? true : 'ID Метрики должен содержать только цифры.'
@@ -13,6 +14,7 @@ export const validateWebmasterVerification = (value: unknown): true | string =>
 export type BookingConfig = {
   credentialEnvironmentVariable?: unknown
   externalURL?: unknown
+  widgetURL?: unknown
   mode?: unknown
   providerAccountID?: unknown
   providerAdapter?: unknown
@@ -23,6 +25,7 @@ export function bookingReadiness(config: BookingConfig, env: Record<string, stri
   if (config.mode === 'external-link') return typeof config.externalURL === 'string' && /^https:\/\//.test(config.externalURL)
     ? { ready: true, status: 'ready-external' as const }
     : { ready: false, status: 'missing-config' as const }
+  if (config.mode === 'vivacrm-widget') return widgetURL(config.widgetURL, 'vivacrm-script') ? { ready: true, status: 'ready-widget' as const } : { ready: false, status: 'missing-config' as const }
   const envName = typeof config.credentialEnvironmentVariable === 'string' ? config.credentialEnvironmentVariable : ''
   if (!config.providerAdapter || !config.providerAccountID || !envName || !env[envName]) return { ready: false, status: 'missing-config' as const }
   return { ready: false, status: 'integration-not-implemented' as const }

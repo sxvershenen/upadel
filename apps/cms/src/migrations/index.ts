@@ -1,3 +1,5 @@
+import * as bookingWidgets from './20261007_180000_booking_widgets'
+import * as bookingWidgetContent from './20261007_180100_booking_widget_content'
 import * as migration_20260922_120000_seo_content_truth from './20260922_120000_seo_content_truth'
 import * as migration_20260922_020000_responsive_media from './20260922_020000_responsive_media'
 import * as migration_20260922_160100_hero_tint from './20260922_160100_hero_tint'
@@ -116,4 +118,6 @@ export const migrations = [
   { up: migration_20260922_180000_hero_tint_reference.up, down: migration_20260922_180000_hero_tint_reference.down, name: '20260922_180000_hero_tint_reference' },
   { up: migration_20260922_190000_hero_tint_stops.up, down: migration_20260922_190000_hero_tint_stops.down, name: '20260922_190000_hero_tint_stops' },
   { up: migration_20260922_200000_hero_tint_mobile_reference.up, down: migration_20260922_200000_hero_tint_mobile_reference.down, name: '20260922_200000_hero_tint_mobile_reference' },
+  { name: '20261007_180000_booking_widgets', up: bookingWidgets.up, down: bookingWidgets.down },
+  { name: '20261007_180100_booking_widget_content', up: bookingWidgetContent.up, down: bookingWidgetContent.down },
 ];

@@ -442,8 +442,23 @@ export interface Coach {
   reviewsCount: number;
   priceFrom: number;
   action: {
+    widgetKind?: ('iframe' | 'vivacrm-script') | null;
+    /**
+     * Вставьте https:// URL, iframe или script VivaCRM. Сохраняется только адрес; HTML и атрибуты не исполняются.
+     */
+    widgetURL?: string | null;
     label?: string | null;
-    mode: 'none' | 'booking' | 'trial-booking' | 'internal-link' | 'external-link' | 'phone' | 'email' | 'lead-form';
+    mode:
+      | 'none'
+      | 'booking'
+      | 'account'
+      | 'embed-widget'
+      | 'trial-booking'
+      | 'internal-link'
+      | 'external-link'
+      | 'phone'
+      | 'email'
+      | 'lead-form';
     /**
      * Для внутренней ссылки используйте /path или #anchor; внешняя должна начинаться с https://.
      */
@@ -560,7 +575,16 @@ export interface RentalRate {
     | null;
   action: {
     label?: string | null;
-    mode: 'none' | 'booking' | 'trial-booking' | 'internal-link' | 'external-link' | 'phone' | 'email' | 'lead-form';
+    mode:
+      | 'none'
+      | 'booking'
+      | 'account'
+      | 'trial-booking'
+      | 'internal-link'
+      | 'external-link'
+      | 'phone'
+      | 'email'
+      | 'lead-form';
     /**
      * Для внутренней ссылки используйте /path или #anchor; внешняя должна начинаться с https://.
      */
@@ -598,8 +622,23 @@ export interface TrainingProgram {
   icon: 'User' | 'Users' | 'Baby';
   priceFrom: number;
   action: {
+    widgetKind?: ('iframe' | 'vivacrm-script') | null;
+    /**
+     * Вставьте https:// URL, iframe или script VivaCRM. Сохраняется только адрес; HTML и атрибуты не исполняются.
+     */
+    widgetURL?: string | null;
     label?: string | null;
-    mode: 'none' | 'booking' | 'trial-booking' | 'internal-link' | 'external-link' | 'phone' | 'email' | 'lead-form';
+    mode:
+      | 'none'
+      | 'booking'
+      | 'account'
+      | 'embed-widget'
+      | 'trial-booking'
+      | 'internal-link'
+      | 'external-link'
+      | 'phone'
+      | 'email'
+      | 'lead-form';
     /**
      * Для внутренней ссылки используйте /path или #anchor; внешняя должна начинаться с https://.
      */
@@ -666,7 +705,16 @@ export interface Membership {
   };
   action: {
     label?: string | null;
-    mode: 'none' | 'booking' | 'trial-booking' | 'internal-link' | 'external-link' | 'phone' | 'email' | 'lead-form';
+    mode:
+      | 'none'
+      | 'booking'
+      | 'account'
+      | 'trial-booking'
+      | 'internal-link'
+      | 'external-link'
+      | 'phone'
+      | 'email'
+      | 'lead-form';
     /**
      * Для внутренней ссылки используйте /path или #anchor; внешняя должна начинаться с https://.
      */
@@ -705,7 +753,16 @@ export interface Tournament {
   totalSlots: number;
   action: {
     label?: string | null;
-    mode: 'none' | 'booking' | 'trial-booking' | 'internal-link' | 'external-link' | 'phone' | 'email' | 'lead-form';
+    mode:
+      | 'none'
+      | 'booking'
+      | 'account'
+      | 'trial-booking'
+      | 'internal-link'
+      | 'external-link'
+      | 'phone'
+      | 'email'
+      | 'lead-form';
     /**
      * Для внутренней ссылки используйте /path или #anchor; внешняя должна начинаться с https://.
      */
@@ -1572,6 +1629,8 @@ export interface CoachesSelect<T extends boolean = true> {
   action?:
     | T
     | {
+        widgetKind?: T;
+        widgetURL?: T;
         label?: T;
         mode?: T;
         href?: T;
@@ -1683,6 +1742,8 @@ export interface TrainingProgramsSelect<T extends boolean = true> {
   action?:
     | T
     | {
+        widgetKind?: T;
+        widgetURL?: T;
         label?: T;
         mode?: T;
         href?: T;
@@ -2203,7 +2264,7 @@ export interface SiteSetting {
       }[]
     | null;
   /**
-   * Центральная кнопка «Играть» и кнопка меню остаются code-defined.
+   * Два слота слева. «Играть», «Кабинет» и меню остаются code-defined.
    */
   mobileNavigation?:
     | {
@@ -2350,10 +2411,14 @@ export interface SiteSetting {
     vkEnabled?: boolean | null;
   };
   /**
-   * HTML и JavaScript не принимаются. Секреты хранятся только в environment variables.
+   * Для VivaCRM вставьте URL или тег script установки. Сохраняется только проверенный URL; произвольный JavaScript не исполняется.
    */
   booking: {
-    mode: 'disabled' | 'external-link' | 'provider-adapter';
+    /**
+     * URL или тег script установки VivaCRM. Сохраняется только проверенный адрес.
+     */
+    widgetURL?: string | null;
+    mode: 'disabled' | 'external-link' | 'vivacrm-widget' | 'provider-adapter';
     externalURL?: string | null;
     providerAdapter?: ('vivacrm' | 'lunda' | 'padel-app') | null;
     providerAccountID?: string | null;
@@ -2362,6 +2427,16 @@ export interface SiteSetting {
      */
     credentialEnvironmentVariable?: string | null;
     buttonLabel?: string | null;
+  };
+  account: {
+    mode: 'disabled' | 'vivacrm-widget' | 'external-link';
+    /**
+     * URL или тег script установки VivaCRM. Сохраняется только проверенный адрес.
+     */
+    widgetURL?: string | null;
+    externalURL?: string | null;
+    buttonLabel?: string | null;
+    mobileLabel?: string | null;
   };
   _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
@@ -2494,7 +2569,16 @@ export interface Homepage {
     };
     primaryAction: {
       label?: string | null;
-      mode: 'none' | 'booking' | 'trial-booking' | 'internal-link' | 'external-link' | 'phone' | 'email' | 'lead-form';
+      mode:
+        | 'none'
+        | 'booking'
+        | 'account'
+        | 'trial-booking'
+        | 'internal-link'
+        | 'external-link'
+        | 'phone'
+        | 'email'
+        | 'lead-form';
       /**
        * Для внутренней ссылки используйте /path или #anchor; внешняя должна начинаться с https://.
        */
@@ -2503,7 +2587,16 @@ export interface Homepage {
     };
     secondaryAction: {
       label?: string | null;
-      mode: 'none' | 'booking' | 'trial-booking' | 'internal-link' | 'external-link' | 'phone' | 'email' | 'lead-form';
+      mode:
+        | 'none'
+        | 'booking'
+        | 'account'
+        | 'trial-booking'
+        | 'internal-link'
+        | 'external-link'
+        | 'phone'
+        | 'email'
+        | 'lead-form';
       /**
        * Для внутренней ссылки используйте /path или #anchor; внешняя должна начинаться с https://.
        */
@@ -2559,6 +2652,7 @@ export interface Homepage {
             mode:
               | 'none'
               | 'booking'
+              | 'account'
               | 'trial-booking'
               | 'internal-link'
               | 'external-link'
@@ -2600,6 +2694,7 @@ export interface Homepage {
             mode:
               | 'none'
               | 'booking'
+              | 'account'
               | 'trial-booking'
               | 'internal-link'
               | 'external-link'
@@ -2644,7 +2739,16 @@ export interface Homepage {
       ('indigo' | 'deep-blue' | 'dark' | 'lime' | 'lime-soft' | 'sky' | 'lavender' | 'sunset' | 'navy-gold') | null;
     action: {
       label?: string | null;
-      mode: 'none' | 'booking' | 'trial-booking' | 'internal-link' | 'external-link' | 'phone' | 'email' | 'lead-form';
+      mode:
+        | 'none'
+        | 'booking'
+        | 'account'
+        | 'trial-booking'
+        | 'internal-link'
+        | 'external-link'
+        | 'phone'
+        | 'email'
+        | 'lead-form';
       /**
        * Для внутренней ссылки используйте /path или #anchor; внешняя должна начинаться с https://.
        */
@@ -2665,7 +2769,16 @@ export interface Homepage {
     title?: string | null;
     action: {
       label?: string | null;
-      mode: 'none' | 'booking' | 'trial-booking' | 'internal-link' | 'external-link' | 'phone' | 'email' | 'lead-form';
+      mode:
+        | 'none'
+        | 'booking'
+        | 'account'
+        | 'trial-booking'
+        | 'internal-link'
+        | 'external-link'
+        | 'phone'
+        | 'email'
+        | 'lead-form';
       /**
        * Для внутренней ссылки используйте /path или #anchor; внешняя должна начинаться с https://.
        */
@@ -2681,7 +2794,16 @@ export interface Homepage {
     title?: string | null;
     action: {
       label?: string | null;
-      mode: 'none' | 'booking' | 'trial-booking' | 'internal-link' | 'external-link' | 'phone' | 'email' | 'lead-form';
+      mode:
+        | 'none'
+        | 'booking'
+        | 'account'
+        | 'trial-booking'
+        | 'internal-link'
+        | 'external-link'
+        | 'phone'
+        | 'email'
+        | 'lead-form';
       /**
        * Для внутренней ссылки используйте /path или #anchor; внешняя должна начинаться с https://.
        */
@@ -2922,7 +3044,16 @@ export interface TrainingPage {
   }[];
   action: {
     label?: string | null;
-    mode: 'none' | 'booking' | 'trial-booking' | 'internal-link' | 'external-link' | 'phone' | 'email' | 'lead-form';
+    mode:
+      | 'none'
+      | 'booking'
+      | 'account'
+      | 'trial-booking'
+      | 'internal-link'
+      | 'external-link'
+      | 'phone'
+      | 'email'
+      | 'lead-form';
     /**
      * Для внутренней ссылки используйте /path или #anchor; внешняя должна начинаться с https://.
      */
@@ -3008,7 +3139,16 @@ export interface GiftPage {
   }[];
   action: {
     label?: string | null;
-    mode: 'none' | 'booking' | 'trial-booking' | 'internal-link' | 'external-link' | 'phone' | 'email' | 'lead-form';
+    mode:
+      | 'none'
+      | 'booking'
+      | 'account'
+      | 'trial-booking'
+      | 'internal-link'
+      | 'external-link'
+      | 'phone'
+      | 'email'
+      | 'lead-form';
     /**
      * Для внутренней ссылки используйте /path или #anchor; внешняя должна начинаться с https://.
      */
@@ -3747,12 +3887,22 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   booking?:
     | T
     | {
+        widgetURL?: T;
         mode?: T;
         externalURL?: T;
         providerAdapter?: T;
         providerAccountID?: T;
         credentialEnvironmentVariable?: T;
         buttonLabel?: T;
+      };
+  account?:
+    | T
+    | {
+        mode?: T;
+        widgetURL?: T;
+        externalURL?: T;
+        buttonLabel?: T;
+        mobileLabel?: T;
       };
   _status?: T;
   updatedAt?: T;

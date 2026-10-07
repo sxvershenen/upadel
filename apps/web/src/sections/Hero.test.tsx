@@ -15,7 +15,7 @@ const content = {
   home: { hero: {
     seoHeading: 'Премиальный крытый падел-клуб', titleLine: 'Первая тренировка', titleConnector: 'за', titleAccent: '1 990 ₽', description: 'с испанскими панорамными кортами',
     primaryAction: { mode: 'booking', label: 'Забронировать' },
-    secondaryAction: { mode: 'trial-booking', label: 'Попробовать' },
+    secondaryAction: { mode: 'account', label: 'Личный кабинет' },
     socialProof: { coachPhotos: [], ratingLabel: '4.9', caption: 'Рейтинг' }, stats: [],
   } },
 } as any
@@ -23,11 +23,13 @@ const content = {
 test('hero CTAs have one SSR entrance owner and no nested GSAP reveal', () => {
   const html = renderToStaticMarkup(<ContentProvider content={content}><Hero /></ContentProvider>)
   const primary = html.match(/<div data-hero-cta="primary"[\s\S]*?<\/div>/)?.[0] ?? ''
-  const secondary = html.match(/<button[^>]*data-hero-cta="secondary"[^>]*>[\s\S]*?Попробовать[\s\S]*?<\/button>/)?.[0] ?? ''
+  const secondary = html.match(/<button[^>]*data-hero-cta="secondary"[^>]*>[\s\S]*?Личный кабинет[\s\S]*?<\/button>/)?.[0] ?? ''
   assert.match(primary, /<button/)
   assert.match(primary, /Забронировать/)
   assert.doesNotMatch(primary, /data-gsap-reveal/)
   assert.match(secondary, /glass/)
+  assert.doesNotMatch(secondary, /<svg|data-button-decoration/)
+  assert.match(primary, /lucide-calendar-check/)
   assert.doesNotMatch(secondary, /data-gsap-reveal/)
   assert.doesNotMatch(html, /<div data-hero-cta="secondary"/)
 })

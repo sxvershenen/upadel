@@ -9,3 +9,8 @@ export function TelegramIcon({ size = 16, ...props }: ContactIconProps) {
 export function PhoneIcon({ size = 16, ...props }: ContactIconProps) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false" {...props}><path d="M6.3 2.6c.7-.4 1.6-.1 2 .6l2.1 3.9c.3.6.2 1.3-.3 1.7l-1.7 1.4c1.2 2.6 3.3 4.7 5.9 5.9l1.4-1.7c.4-.5 1.1-.6 1.7-.3l3.9 2.1c.7.4 1 1.3.6 2l-1 1.9c-.4.8-1.3 1.3-2.2 1.2C10.9 21.1 2.9 13.1 1.8 5.5c-.1-.9.4-1.8 1.2-2.2l1.9-1c.4-.2 1-.1 1.4.3Z" /></svg>
 }
+
+
+export function PersonIcon({ size = 18, className }: { size?: number; className?: string }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false" className={className}><circle cx="12" cy="7" r="4" /><path d="M4 20a8 8 0 0 1 16 0v1H4v-1Z" /></svg>
+}

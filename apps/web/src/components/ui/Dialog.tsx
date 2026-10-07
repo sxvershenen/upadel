@@ -48,7 +48,7 @@ export function Dialog({ open, onClose, title, children, scrollable = true, mobi
 
   function trapFocus(event: KeyboardEvent<HTMLDivElement>) {
     if (event.key !== "Tab" || !dialogRef.current) return;
-    const focusable = Array.from(dialogRef.current.querySelectorAll<HTMLElement>('a[href], button:not(:disabled), input:not(:disabled):not([tabindex="-1"]), textarea:not(:disabled), select:not(:disabled), [tabindex]:not([tabindex="-1"])'));
+    const focusable = Array.from(dialogRef.current.querySelectorAll<HTMLElement>('iframe, a[href], button:not(:disabled), input:not(:disabled):not([tabindex="-1"]), textarea:not(:disabled), select:not(:disabled), [tabindex]:not([tabindex="-1"])'));
     if (!focusable.length) return;
     const first = focusable[0];
     const last = focusable[focusable.length - 1];

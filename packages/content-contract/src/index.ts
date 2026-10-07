@@ -1,6 +1,7 @@
+export * from './widgets'
 import type { CatalogPagination, CatalogQuery } from './catalog'
 export * from './catalog'
-export const homepageDTOversion = 16 as const
+export const homepageDTOversion = 17 as const
 
 export const publicRouteRegistry = [
   { path: '/', parent: null, template: 'homepage', globalSlug: 'homepage' },
@@ -87,11 +88,15 @@ export const defaultHeroTint: HeroTintDTO = {
 
 export const defaultHeroTitleFontSize: HeroTitleFontSizeDTO = { mobile: 48, desktop: 102 }
 
+export type BookingDTO = { mode: 'disabled' | 'external-link' | 'provider-adapter' | 'vivacrm-widget'; externalURL?: string | null; widgetURL?: string | null; buttonLabel: string; ready: boolean; status: 'disabled' | 'ready-external' | 'ready-widget' | 'missing-config' | 'integration-not-implemented' }
+
 export type ActionDTO = {
   href?: string | null
   leadType?: 'membership' | 'gift' | 'trial' | 'consultation' | 'other' | null
   label?: string | null
-  mode: 'none' | 'booking' | 'trial-booking' | 'internal-link' | 'external-link' | 'phone' | 'email' | 'lead-form'
+  widgetKind?: import('./widgets').WidgetKind | null
+  widgetURL?: string | null
+  mode: 'account' | 'embed-widget' | 'none' | 'booking' | 'trial-booking' | 'internal-link' | 'external-link' | 'phone' | 'email' | 'lead-form'
 }
 
 export type TournamentFormat = 'americano' | 'groups-knockout' | 'round-robin-playoff' | 'other'
@@ -149,7 +154,9 @@ export type HomepageDTO = {
     footer: { image?: MediaDTO | null; about: string; stats: Array<{ value: string; label: string }>; legalEntity: string; navigation: Array<{ label: string; href: string; column: '1' | '2' }>; socialLinks: Array<{ provider: 'telegram' | 'vk' | 'instagram' | 'video'; label: string; url: string }>; legalLinks: Array<{ label: string; href: string }>; copyright: string; cookieNotice: { text: string; acceptLabel: string; rejectLabel: string; manageLabel: string } }
     analytics: { mode: 'disabled' | 'consent-required' | 'first-party'; endpoint: string; schemaVersion: 1; vendors: { yandexMetrica: { enabled: boolean; counterId?: string | null; webvisor: boolean }; ga4: { enabled: boolean; measurementId?: string | null }; webmasterVerification?: string | null } }
     partners: Array<{ id: string; name: string; logo?: MediaDTO | null; websiteURL?: string | null }>
-    booking: { mode: 'disabled' | 'external-link' | 'provider-adapter'; externalURL?: string | null; buttonLabel: string; ready: boolean; status: 'disabled' | 'ready-external' | 'missing-config' | 'integration-not-implemented' }
+    account?: BookingDTO & { mobileLabel?: string }
+    booking: BookingDTO
+
     contactConfirmation: {
       avatar?: MediaDTO | null
       cancelLabel: string

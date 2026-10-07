@@ -17,8 +17,8 @@ export function IntegrationStatus() {
     void statusCache.request('booking', async () => {
       const response = await fetch('/api/admin/integrations/status')
       if (!response.ok) throw new Error('status')
-      const data = await response.json() as { booking?: { status?: string } }
-      return data.booking?.status ?? 'Статус недоступен'
+      const data = await response.json() as { booking?: { status?: string }; account?: { status?: string } }
+      return `Бронирование: ${data.booking?.status ?? 'Статус недоступен'}. ЛК: ${data.account?.status ?? 'Статус недоступен'}`
     }).then((nextText) => {
       if (!cancelled) setText(nextText)
     }).catch(() => {

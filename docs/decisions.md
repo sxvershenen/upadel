@@ -31,9 +31,9 @@ The primary goal is a confirmed booking when the booking provider can report it.
 
 Never label a click as a confirmed booking or call.
 
-## D6 — Booking integration — open
+## D6 — Booking integration — accepted
 
-Provider is not selected; VivaCRM is currently most likely. “First provider” means the one concrete service connected for MVP. Build a provider-independent CTA/config adapter, but wait for real VivaCRM/Lunda/Padel app integration details before implementing the connection. Do not accept arbitrary CMS-injected HTML/JS.
+VivaCRM booking and personal-account installation URLs are CMS-managed in Site Settings → «Бронирование и ЛК». Load scripts on demand through the shared provider adapter; accept only public VivaCRM installation scripts. Coach and training-program actions may override central booking with a validated iframe URL or VivaCRM script. Installation tags are reduced to URLs; arbitrary HTML/JS is never executed. Iframes open in the shared dialog with an external-link fallback. The green homepage CTA keeps booking; the secondary glass CTA opens the personal account without an icon.
 
 ## D7 — Analytics — accepted
 

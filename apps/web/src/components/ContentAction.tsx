@@ -33,7 +33,7 @@ type Props = {
 
 export function ContentAction({ action, children, sourceEntity, sourcePage, onAction, modalDelayMs = 0, ...buttonProps }: Props) {
   const site = useSite()
-  const { requestContact, requestExternal, requestLead } = useActionLayer()
+  const { requestContact, requestExternal, requestLead, requestWidget } = useActionLayer()
   const label = children ?? action.label ?? site.booking.buttonLabel
   let href = action.href ?? undefined
 
@@ -44,13 +44,22 @@ export function ContentAction({ action, children, sourceEntity, sourcePage, onAc
   }
 
   const analyticsObject = action.mode === 'lead-form' ? 'form' : sourcePage?.startsWith('/coaches') ? 'coach' : sourcePage?.startsWith('/tournaments') ? 'tournament' : sourcePage?.startsWith('/blog') ? 'article' : undefined
-  const analyticsProps = { 'data-analytics-action': action.mode === 'booking' || action.mode === 'trial-booking' ? 'booking' : action.mode === 'phone' ? 'phone' : action.mode === 'email' ? 'email' : action.mode === 'lead-form' ? 'lead' : action.mode === 'external-link' ? 'external' : action.mode === 'internal-link' ? 'internal' : undefined, 'data-analytics-object-type': analyticsObject, 'data-analytics-object-id': sourceEntity }
+  const analyticsProps = { 'data-analytics-action': action.mode === 'booking' || action.mode === 'trial-booking' || action.mode === 'embed-widget' ? 'booking' : action.mode === 'phone' ? 'phone' : action.mode === 'email' ? 'email' : action.mode === 'lead-form' ? 'lead' : action.mode === 'external-link' ? 'external' : action.mode === 'internal-link' ? 'internal' : undefined, 'data-analytics-object-type': analyticsObject, 'data-analytics-object-id': sourceEntity }
   const openAfterCurrentSurfaceCloses = (open: () => void) => {
     onAction?.()
     if (modalDelayMs > 0) window.setTimeout(open, modalDelayMs)
     else open()
   }
   if (action.mode === 'phone' || action.mode === 'email') { const contactMode = action.mode; return <Button {...buttonProps} {...analyticsProps} onClick={() => openAfterCurrentSurfaceCloses(() => requestContact(contactMode))}>{label}</Button> }
+  const bookingConfig = action.mode === 'account' ? site.account : site.booking
+  if (action.mode === 'account' || action.mode === 'booking' || action.mode === 'trial-booking' || action.mode === 'embed-widget') {
+    const individual = action.mode === 'embed-widget'
+    if (individual || bookingConfig?.mode === 'vivacrm-widget') return <Button {...buttonProps} {...analyticsProps} onClick={() => openAfterCurrentSurfaceCloses(() => requestWidget({ kind: individual ? action.widgetKind ?? 'iframe' : 'vivacrm-script', url: (individual ? action.widgetURL : bookingConfig?.widgetURL) ?? '', label: action.label ?? bookingConfig?.buttonLabel ?? 'Запись' }))}>{label}</Button>
+    if (action.mode === 'account') {
+      const url = bookingConfig?.externalURL
+      return <Button {...buttonProps} onClick={() => openAfterCurrentSurfaceCloses(() => url && bookingConfig?.mode === 'external-link' ? requestExternal({ href: url, label: action.label }) : requestWidget({ kind: 'vivacrm-script', url: '', label: 'Личный кабинет' }))}>{label}</Button>
+    }
+  }
   const leadType = action.mode === 'lead-form' ? action.leadType ?? 'other' : action.mode === 'trial-booking' && !href ? 'trial' : action.mode === 'booking' && !site.booking.ready ? 'consultation' : null
   if (leadType) return <Button {...buttonProps} {...analyticsProps} onClick={() => openAfterCurrentSurfaceCloses(() => requestLead({ type: leadType, sourcePage: sourcePage ?? window.location.pathname, sourceEntity }))}>{label}</Button>
 

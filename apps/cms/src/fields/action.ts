@@ -1,11 +1,16 @@
 import type { GroupField } from 'payload'
+import { createWidgetURLField } from './widget'
 
-export function createActionField(name: string, label: string): GroupField {
+export function createActionField(name: string, label: string, allowWidget = false): GroupField {
   return {
     name,
     type: 'group',
     label,
     fields: [
+      ...(allowWidget ? [
+        { name: 'widgetKind', type: 'select' as const, label: 'Тип виджета', defaultValue: 'iframe', options: [{ label: 'iframe', value: 'iframe' }, { label: 'Скрипт VivaCRM', value: 'vivacrm-script' }], admin: { condition: (_: unknown, data: Record<string, unknown>) => data.mode === 'embed-widget' } },
+        createWidgetURLField('Виджет: URL или код установки', 'embed-widget'),
+      ] : []),
       {
         name: 'label',
         type: 'text',
@@ -20,6 +25,8 @@ export function createActionField(name: string, label: string): GroupField {
         options: [
           { label: 'Нет действия', value: 'none' },
           { label: 'Центральное бронирование', value: 'booking' },
+          { label: 'Личный кабинет', value: 'account' },
+          ...(allowWidget ? [{ label: 'Индивидуальный виджет', value: 'embed-widget' }] : []),
           { label: 'Запись на пробную тренировку', value: 'trial-booking' },
           { label: 'Внутренняя ссылка или якорь', value: 'internal-link' },
           { label: 'Внешняя ссылка', value: 'external-link' },
