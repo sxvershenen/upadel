@@ -97,11 +97,11 @@ test('phone update changes only the two benefits and preserves later CMS edits a
 })
 
 test('card refinements consolidate equipment copy while preserving custom records, actions and cancellations', async () => {
-  const { applyOpeningCardRefinements, applyOpeningEventRefinements, applyOpeningPhoneRefinements, applyOpeningVisualRefinements } = await import('./openingRefinements')
+  const { applyOpeningCardRefinements, applyOpeningEventRefinements, applyOpeningFinalRefinements, applyOpeningOfferImageRefinements, applyOpeningPhoneRefinements, applyOpeningVisualRefinements } = await import('./openingRefinements')
   const cancellation = { title: 'Отмена', content: { root: { children: [{ text: 'За 24 часа' }] } } }
   const globals: Record<string, any> = {
-    homepage: { openingContentVersion: 'opening-november-2026-v5', benefitsSection: { cards: [{ variant: 'online-booking', meshTone: 'indigo', action: { mode: 'internal-link', href: '/prices' } }, { variant: 'community', media: 7, meshTone: 'dark' }] }, methodistBanner: { title: 'Робопушка', price: 3000 }, offersSection: { cards: [{ enabled: false }] } },
-    'prices-page': { rules: [cancellation, { title: 'Инвентарь' }, { title: 'Стандарты Unlim Riga' }] },
+    homepage: { openingContentVersion: 'opening-november-2026-v5', benefitsSection: { cards: [{ variant: 'online-booking', meshTone: 'indigo', action: { mode: 'internal-link', href: '/prices' } }, { variant: 'community', media: 7, meshTone: 'dark' }] }, methodistBanner: { title: 'Робопушка', price: 3000 }, offersSection: { cards: [{ variant: 'tournament-venue', title: 'Ваше мероприятие', enabled: true, image: 9, action: { mode: 'none' } }, { enabled: false }] } },
+    'prices-page': { rules: [cancellation, { title: 'Инвентарь' }, { title: 'Стандарты Unlim Riga', content: { root: { children: [{ text: 'Корзина мячей — 800 ₽ / час.' }] } } }] },
   }
   const records: any[] = [
     { id: 1, seedKey: 'prototype:rental-rate:day', description: 'Спокойные часы. При аренде корта мячи и ракетки оплачиваются отдельно.' },
@@ -109,6 +109,7 @@ test('card refinements consolidate equipment copy while preserving custom record
     { id: 3, seedKey: 'prototype:training:kids', description: 'Обучение. В детскую группу включены и мячи, и ракетки.' },
     { id: 4, seedKey: 'prototype:rental-rate:standards', includedItems: [{ text: 'Лаунж-пространство с кофе' }, { text: 'Полотенца' }] },
     { id: 5, seedKey: 'custom-editor', description: 'Авторское описание' },
+    { id: 6, seedKey: 'opening:rental-rate:memberships', description: 'Скидки для постоянных игроков' },
   ]
   let writes = 0
   const payload = {
@@ -134,10 +135,46 @@ test('card refinements consolidate equipment copy while preserving custom record
   assert.equal(home.benefitsSection.cards[1].media, 7)
   assert.equal(home.methodistBanner.meshTone, 'deep-blue')
   assert.equal(home.methodistBanner.price, 3000)
-  assert.equal(home.offersSection.cards[0].enabled, false)
+  assert.equal(home.offersSection.cards[0].enabled, true)
+  assert.equal(home.offersSection.cards[0].action.mode, 'none')
   home.methodistBanner.title = 'Редактор изменил'
   const before = writes
   for (const apply of [applyOpeningContent, applyOpeningRefinements, applyOpeningVisualRefinements, applyOpeningEventRefinements, applyOpeningPhoneRefinements, applyOpeningCardRefinements]) assert.equal(await apply(payload as never), false)
   assert.equal(writes, before)
   assert.equal(home.methodistBanner.title, 'Редактор изменил')
+  assert.equal(await applyOpeningFinalRefinements(payload as never), true)
+  assert.equal(records.find((r) => r.id === 6).description, 'Скидки для постоянных игроков.')
+  assert.equal(globals.homepage.methodistBanner.description, 'Отрабатывайте удары и точность в своём темпе.\nАрендуйте робопушку для самостоятельной тренировки на падел-корте.')
+  assert.equal(globals.homepage.openingContentVersion, 'opening-november-2026-v7')
+  assert.match(JSON.stringify(globals['prices-page'].rules), /Корзина\u00a0мячей/)
+  assert.equal(await applyOpeningOfferImageRefinements(payload as never), true)
+  assert.equal(globals.homepage.offersSection.cards[0].image, 60)
+  assert.equal(globals.homepage.offersSection.cards[0].action.mode, 'none')
+  assert.equal(globals.homepage.offersSection.cards[1].enabled, false)
+  assert.equal(globals.homepage.openingContentVersion, 'opening-november-2026-v8')
+  const writesAfterFinal = writes
+  globals.homepage.methodistBanner.title = 'Второе изменение редактора'
+  assert.equal(await applyOpeningCardRefinements(payload as never), false)
+  assert.equal(await applyOpeningFinalRefinements(payload as never), false)
+  assert.equal(await applyOpeningOfferImageRefinements(payload as never), false)
+  assert.equal(writes, writesAfterFinal)
+  assert.equal(globals.homepage.methodistBanner.title, 'Второе изменение редактора')
+})
+
+test('wide offer image updater migrates only its own source path once after a version was already applied', async () => {
+  const { applyOpeningOfferImageRefinements } = await import('./openingRefinements')
+  const home = { openingContentVersion: 'opening-november-2026-v8', offersSection: { cards: [{ title: 'Editor title' }] } }
+  const media = { id: 60, seedKey: 'opening-media:corporate-tournament-wide:v8', sourceURL: 'apps/web/public/images/opening/corporate-tournament-wide-v2.png' }
+  let writes = 0
+  const payload = {
+    findGlobal: async () => structuredClone(home),
+    find: async () => ({ docs: [media] }),
+    update: async ({ data }: any) => { writes++; Object.assign(media, data) },
+  }
+
+  assert.equal(await applyOpeningOfferImageRefinements(payload as never), true)
+  assert.equal(media.sourceURL, 'apps/web/public/images/opening/corporate-tournament-wide-v2.webp')
+  assert.equal(home.offersSection.cards[0].title, 'Editor title')
+  assert.equal(await applyOpeningOfferImageRefinements(payload as never), false)
+  assert.equal(writes, 1)
 })

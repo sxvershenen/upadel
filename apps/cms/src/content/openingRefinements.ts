@@ -4,13 +4,16 @@ import { fileURLToPath } from 'node:url'
 import type { Payload, PayloadRequest } from 'payload'
 
 const revision = 'opening-november-2026-v2'
+const finalRevision = 'opening-november-2026-v7'
+const offerImageRevision = 'opening-november-2026-v8'
+const completedRevisions = [finalRevision, offerImageRevision]
 const richText = (text: string) => ({ root: { type: 'root', version: 1, direction: 'ltr' as const, format: '' as const, indent: 0, children: [{ type: 'paragraph', version: 1, direction: 'ltr' as const, format: '' as const, indent: 0, children: [{ type: 'text', version: 1, text, format: 0, detail: 0, mode: 'normal', style: '' }] }] } })
 
 /** Apply the owner's follow-up once; preserve subsequent editor changes. */
 export async function applyOpeningRefinements(payload: Payload, req?: PayloadRequest): Promise<boolean> {
   const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
   const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
-  if ([revision, visualRevision, eventRevision, phoneRevision, cardRevision].includes(home.openingContentVersion ?? '')) return false
+  if ([revision, visualRevision, eventRevision, phoneRevision, cardRevision, ...completedRevisions].includes(home.openingContentVersion ?? '')) return false
   if (home.openingContentVersion !== 'opening-november-2026-v1') throw new Error('Apply the first opening content update before its refinements.')
   const site = await payload.findGlobal({ ...options, slug: 'site-settings', draft: false })
   const telegram = site.socialLinks?.find((link) => link.url?.includes('t.me/'))?.url
@@ -71,7 +74,7 @@ const visualRevision = 'opening-november-2026-v3'
 export async function applyOpeningVisualRefinements(payload: Payload, req?: PayloadRequest): Promise<boolean> {
   const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
   const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
-  if ([visualRevision, eventRevision, phoneRevision, cardRevision].includes(home.openingContentVersion ?? '')) return false
+  if ([visualRevision, eventRevision, phoneRevision, cardRevision, ...completedRevisions].includes(home.openingContentVersion ?? '')) return false
   if (home.openingContentVersion !== revision) throw new Error('Apply opening refinements before the visual update.')
   const publicRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../web/public/images/opening')
   const media = async (name: string, extension: 'png' | 'webp', alt: string) => {
@@ -99,7 +102,7 @@ const eventRevision = 'opening-november-2026-v4'
 export async function applyOpeningEventRefinements(payload: Payload, req?: PayloadRequest): Promise<boolean> {
   const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
   const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
-  if ([eventRevision, phoneRevision, cardRevision].includes(home.openingContentVersion ?? '')) return false
+  if ([eventRevision, phoneRevision, cardRevision, ...completedRevisions].includes(home.openingContentVersion ?? '')) return false
   if (home.openingContentVersion !== visualRevision) throw new Error('Apply the visual refinements before updating events.')
   const seedKey = 'opening-media:corporate-tournament:v4'
   let photo = (await payload.find({ ...options, collection: 'media', where: { seedKey: { equals: seedKey } }, pagination: false })).docs[0]
@@ -120,7 +123,7 @@ const phoneRevision = 'opening-november-2026-v5'
 export async function applyOpeningPhoneRefinements(payload: Payload, req?: PayloadRequest): Promise<boolean> {
   const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
   const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
-  if ([phoneRevision, cardRevision].includes(home.openingContentVersion ?? '')) return false
+  if ([phoneRevision, cardRevision, ...completedRevisions].includes(home.openingContentVersion ?? '')) return false
   if (home.openingContentVersion !== eventRevision) throw new Error('Apply event refinements before updating phone benefits.')
   const seedKey = 'opening-media:booking-hand:v5'
   let hand = (await payload.find({ ...options, collection: 'media', where: { seedKey: { equals: seedKey } }, pagination: false })).docs[0]
@@ -139,7 +142,7 @@ const cardRevision = 'opening-november-2026-v6'
 export async function applyOpeningCardRefinements(payload: Payload, req?: PayloadRequest): Promise<boolean> {
   const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
   const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
-  if (home.openingContentVersion === cardRevision) return false
+  if ([cardRevision, ...completedRevisions].includes(home.openingContentVersion ?? '')) return false
   if (home.openingContentVersion !== phoneRevision) throw new Error('Apply phone refinements before updating the card recipes.')
   const seedKey = 'opening-media:booking-one-hand:v6'
   let phone = (await payload.find({ ...options, collection: 'media', where: { seedKey: { equals: seedKey } }, pagination: false })).docs[0]
@@ -170,5 +173,70 @@ export async function applyOpeningCardRefinements(payload: Payload, req?: Payloa
     methodistBanner: { ...home.methodistBanner, meshTone: 'deep-blue' },
     openingContentVersion: cardRevision, _status: 'published',
   } })
+  return true
+}
+
+/** Apply the final copy refinements once; later CMS edits remain authoritative. */
+export async function applyOpeningFinalRefinements(payload: Payload, req?: PayloadRequest): Promise<boolean> {
+  const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
+  const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
+  if (completedRevisions.includes(home.openingContentVersion ?? '')) return false
+  if (home.openingContentVersion !== cardRevision) throw new Error('Apply card refinements before final copy updates.')
+
+  const membership = (await payload.find({ ...options, collection: 'rental-rates', where: { seedKey: { equals: 'opening:rental-rate:memberships' } }, pagination: false })).docs[0]
+  if (membership?.description) {
+    const description = `${membership.description.trim().replace(/[.!?…]+$/, '')}.`
+    if (description !== membership.description) await payload.update({ ...options, collection: 'rental-rates', id: membership.id, draft: false, data: { description, _status: 'published' } } as never)
+  }
+
+  const standards = (await payload.find({ ...options, collection: 'rental-rates', where: { seedKey: { equals: 'prototype:rental-rate:standards' } }, pagination: false })).docs[0]
+  if (standards?.includedItems) {
+    const existingItems = standards.includedItems
+    const includedItems = existingItems.map((item) => ({ ...item, text: item.text.replace(/(корзина)[\s\u00a0]+(мячей)/gi, '$1\u00a0$2') }))
+    if (includedItems.some((item, index) => item.text !== existingItems[index]?.text)) {
+      await payload.update({ ...options, collection: 'rental-rates', id: standards.id, draft: false, data: { includedItems, _status: 'published' } })
+    }
+  }
+
+  const prices = await payload.findGlobal({ ...options, slug: 'prices-page', draft: false })
+  const replaceText = (node: any): any => {
+    if (Array.isArray(node)) return node.map(replaceText)
+    if (!node || typeof node !== 'object') return node
+    return Object.fromEntries(Object.entries(node).map(([key, value]) => [key, key === 'text' && typeof value === 'string' ? value.replace(/(корзина)[\s\u00a0]+(мячей)/gi, '$1\u00a0$2') : replaceText(value)]))
+  }
+  const rules = (prices.rules ?? []).map((rule) => ({ ...rule, content: replaceText(rule.content) }))
+  if (JSON.stringify(rules) !== JSON.stringify(prices.rules ?? [])) {
+    await payload.updateGlobal({ ...options, slug: 'prices-page', draft: false, data: { rules, _status: 'published' } })
+  }
+
+  await payload.updateGlobal({ ...options, slug: 'homepage', draft: false, data: {
+    methodistBanner: { ...home.methodistBanner, description: 'Отрабатывайте удары и точность в своём темпе.\nАрендуйте робопушку для самостоятельной тренировки на падел-корте.' },
+    openingContentVersion: finalRevision, _status: 'published',
+  } })
+  return true
+}
+
+/** Replace only the seed-owned event photo once; preserve later offer edits. */
+export async function applyOpeningOfferImageRefinements(payload: Payload, req?: PayloadRequest): Promise<boolean> {
+  const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
+  const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
+  const seedKey = 'opening-media:corporate-tournament-wide:v8'
+  if (home.openingContentVersion === offerImageRevision) {
+    const existingPhoto = (await payload.find({ ...options, collection: 'media', where: { seedKey: { equals: seedKey } }, pagination: false })).docs[0]
+    if (existingPhoto?.sourceURL === 'apps/web/public/images/opening/corporate-tournament-wide-v2.png') {
+      await payload.update({ ...options, collection: 'media', id: existingPhoto.id, data: { sourceURL: 'apps/web/public/images/opening/corporate-tournament-wide-v2.webp' } })
+      return true
+    }
+    return false
+  }
+  if (home.openingContentVersion !== finalRevision) throw new Error('Apply final opening copy refinements before replacing the offer image.')
+
+  let photo = (await payload.find({ ...options, collection: 'media', where: { seedKey: { equals: seedKey } }, pagination: false })).docs[0]
+  if (!photo) {
+    const bytes = await readFile(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../web/public/images/opening/corporate-tournament-wide-v2.webp'))
+    photo = await payload.create({ ...options, collection: 'media', data: { seedKey, alt: 'Победительница поднимает кубок в окружении игроков на падел-корте', credit: 'AI-generated for UNLIM RIGA PADEL', sourceURL: 'apps/web/public/images/opening/corporate-tournament-wide-v2.webp' }, file: { data: bytes, mimetype: 'image/webp', name: 'opening-corporate-tournament-wide-v2.webp', size: bytes.byteLength } })
+  }
+  const cards = (home.offersSection?.cards ?? []).map((card) => card.variant === 'tournament-venue' || card.title === 'Ваше мероприятие' ? { ...card, image: photo.id } : card)
+  await payload.updateGlobal({ ...options, slug: 'homepage', draft: false, data: { offersSection: { ...home.offersSection, cards }, openingContentVersion: offerImageRevision, _status: 'published' } })
   return true
 }

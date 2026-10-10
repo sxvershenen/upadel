@@ -30,7 +30,7 @@ export function MethodistBanner() {
       <div className="relative z-10 flex flex-col gap-6 md:flex-row md:items-end md:justify-between md:gap-10">
         <div className="min-w-0 max-w-[760px]">
           <Typography as="h2" role="section" reveal={false} className="text-white">{banner.title}</Typography>
-          <Typography role="body" reveal={false} className="mt-4 max-w-[580px] text-white">{banner.description}</Typography>
+          <Typography role="body" reveal={false} className="mt-4 max-w-[580px] whitespace-pre-line text-white">{banner.description}</Typography>
         </div>
         {banner.price != null && <Price data-robot-banner-price size="standard" value={banner.price} suffix="/ час" tone="light" className="shrink-0 self-end text-right [&>div]:justify-end" />}
       </div>

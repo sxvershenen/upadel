@@ -1,0 +1,11 @@
+Use case: photorealistic-natural
+Asset type: wide full-bleed photo for a padel club offer card
+Primary request: candid reportage photograph of ordinary padel players celebrating a small club tournament after a woman wins a modest trophy
+Scene/backdrop: indoor modern padel court with glass walls and green turf, a small group of players nearby
+Subject: a smiling woman in practical sports clothes holds a small trophy proudly at shoulder level, around the height of her face; teammates around her clap and smile
+Style/medium: natural documentary sports photography, believable ordinary people, no fashion gloss or staged advertising polish
+Composition/framing: wide 2.35:1 landscape designed for a moving 4:1 center crop. Keep the entire trophy, the woman's full head and all surrounding faces within the central 40% of image height (roughly y=30%-70%); hold the trophy beside her face at shoulder height, never above her head. Waist-up framing, eye-level camera, woman near center, generous clean space above and below the group for crop movement
+Lighting/mood: believable bright indoor sports lighting, candid joyful atmosphere
+Color palette: natural sports-club greens and neutral athletic clothing
+Constraints: trophy and faces must remain fully visible under moderate vertical cropping and zoom; no text, logos or watermark
+Avoid: trophy near top edge, raised arm above head, cropped faces, glamour models, fashion styling, empty court, close-up framing, fisheye distortion

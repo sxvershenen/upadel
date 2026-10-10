@@ -15,11 +15,15 @@ test('zero offers remove the entire section; one fills the width and two split o
   const one = render([offer])
   assert.match(one, /data-offers-section/)
   assert.doesNotMatch(one, /min-\[1041px\]:grid-cols-2/)
+  assert.match(one, /md:aspect-\[4\/1\]/)
+  assert.match(one, /offer-card--wide/)
   const two = render([offer, { ...offer, id: '2' }])
   assert.match(two, /min-\[1041px\]:grid-cols-2/)
+  assert.doesNotMatch(two, /offer-card--wide/)
   const document = new Window().document
   document.body.innerHTML = two
   assert.equal(document.querySelectorAll('[data-offer-card]').length, 2)
+  assert.ok([...document.querySelectorAll('[data-offer-card]')].every((card) => card.className.includes('md:aspect-[2/1]')))
   assert.ok([...document.querySelectorAll('[data-offer-card]')].every((card) => !card.className.includes('md:grid-cols-2')))
 })
 

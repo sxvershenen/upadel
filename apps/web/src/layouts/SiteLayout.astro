@@ -4,7 +4,7 @@ import type { MediaDTO, SiteDTO } from '@unlim/content-contract'
 import { SiteChromeIsland } from '../components/navigation/SiteChromeIsland'
 import { GlobalPageTransition } from '../transition-demo/GlobalPageTransition'
 import { resolveCanonicalURL, serializeStructuredData, type StructuredDataNode } from '../seo/structuredData'
-import { GROUPED_NUMBER_PATTERN_SOURCE, NUMBER_PATTERN_SOURCE, SHORT_WORD_PATTERN_SOURCE } from '../lib/typography'
+import { BALL_BASKET_PATTERN_SOURCE, FINAL_WORD_PATTERN_SOURCE, GROUPED_NUMBER_PATTERN_SOURCE, NUMBER_PATTERN_SOURCE, SHORT_WORD_PATTERN_SOURCE } from '../lib/typography'
 
 interface Props {
   description?: string
@@ -123,7 +123,7 @@ const pageEntrance = Astro.url.pathname === '/gift'
       <slot />
     </div>
   </body>
-  <script is:inline data-grouped-number-pattern={GROUPED_NUMBER_PATTERN_SOURCE} data-number-pattern={NUMBER_PATTERN_SOURCE} data-short-word-pattern={SHORT_WORD_PATTERN_SOURCE}>
+  <script is:inline data-ball-basket-pattern={BALL_BASKET_PATTERN_SOURCE} data-final-word-pattern={FINAL_WORD_PATTERN_SOURCE} data-grouped-number-pattern={GROUPED_NUMBER_PATTERN_SOURCE} data-number-pattern={NUMBER_PATTERN_SOURCE} data-short-word-pattern={SHORT_WORD_PATTERN_SOURCE}>
     (() => {
       const pageEntrance = document.querySelector('#swup')?.getAttribute('data-page-entrance')
       if (['gift', 'detail', 'article'].includes(pageEntrance ?? '') && !location.hash) {
@@ -290,10 +290,19 @@ const pageEntrance = Astro.url.pathname === '/gift'
       const shortWordPattern = new RegExp(document.currentScript?.getAttribute('data-short-word-pattern') ?? '', 'giu')
       const groupedNumberPattern = new RegExp(document.currentScript?.getAttribute('data-grouped-number-pattern') ?? '', 'gu')
       const numberPattern = new RegExp(document.currentScript?.getAttribute('data-number-pattern') ?? '', 'giu')
+      const ballBasketPattern = new RegExp(document.currentScript?.getAttribute('data-ball-basket-pattern') ?? '', 'giu')
+      const finalWordPattern = new RegExp(document.currentScript?.getAttribute('data-final-word-pattern') ?? '', 'u')
       const skipTypography = 'astro-island:not([data-typography-ready="true"]),script,style,noscript,textarea,input,select,option,code,pre,[contenteditable="true"],[data-no-typography]'
       const typographText = (node) => {
         if (!node.nodeValue || node.parentElement?.closest(skipTypography)) return
-        const formatted = node.nodeValue.replace(groupedNumberPattern, '$1\u00a0').replace(shortWordPattern, '$1$2\u00a0').replace(numberPattern, '$1\u00a0')
+        const isProse = node.parentElement?.closest('.type-body, .type-body-sm, .type-editorial, .type-hero-lead')
+        const finalWordMatch = isProse ? finalWordPattern.exec(node.nodeValue) : null
+        const finalWordPrefix = finalWordMatch ? node.nodeValue.slice(0, finalWordMatch.index) : ''
+        const finalWordCount = finalWordPrefix.trim().split(/[ \t\r\n\u00a0]+/u).filter(Boolean).length
+        let formatted = finalWordMatch && finalWordCount >= 2 && /[\p{L}\p{M}]$/u.test(finalWordPrefix.trimEnd())
+          ? `${finalWordPrefix}\u00a0${finalWordMatch[1]}${finalWordMatch[2]}`
+          : node.nodeValue
+        formatted = formatted.replace(groupedNumberPattern, '$1\u00a0').replace(shortWordPattern, '$1$2\u00a0').replace(numberPattern, '$1\u00a0').replace(ballBasketPattern, '$1\u00a0$2')
         if (formatted !== node.nodeValue) node.nodeValue = formatted
       }
       const typograph = (root) => {
