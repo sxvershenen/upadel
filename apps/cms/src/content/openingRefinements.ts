@@ -10,7 +10,7 @@ const richText = (text: string) => ({ root: { type: 'root', version: 1, directio
 export async function applyOpeningRefinements(payload: Payload, req?: PayloadRequest): Promise<boolean> {
   const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
   const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
-  if ([revision, visualRevision, eventRevision].includes(home.openingContentVersion ?? '')) return false
+  if ([revision, visualRevision, eventRevision, phoneRevision].includes(home.openingContentVersion ?? '')) return false
   if (home.openingContentVersion !== 'opening-november-2026-v1') throw new Error('Apply the first opening content update before its refinements.')
   const site = await payload.findGlobal({ ...options, slug: 'site-settings', draft: false })
   const telegram = site.socialLinks?.find((link) => link.url?.includes('t.me/'))?.url
@@ -71,7 +71,7 @@ const visualRevision = 'opening-november-2026-v3'
 export async function applyOpeningVisualRefinements(payload: Payload, req?: PayloadRequest): Promise<boolean> {
   const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
   const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
-  if ([visualRevision, eventRevision].includes(home.openingContentVersion ?? '')) return false
+  if ([visualRevision, eventRevision, phoneRevision].includes(home.openingContentVersion ?? '')) return false
   if (home.openingContentVersion !== revision) throw new Error('Apply opening refinements before the visual update.')
   const publicRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../web/public/images/opening')
   const media = async (name: string, extension: 'png' | 'webp', alt: string) => {
@@ -99,7 +99,7 @@ const eventRevision = 'opening-november-2026-v4'
 export async function applyOpeningEventRefinements(payload: Payload, req?: PayloadRequest): Promise<boolean> {
   const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
   const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
-  if (home.openingContentVersion === eventRevision) return false
+  if ([eventRevision, phoneRevision].includes(home.openingContentVersion ?? '')) return false
   if (home.openingContentVersion !== visualRevision) throw new Error('Apply the visual refinements before updating events.')
   const seedKey = 'opening-media:corporate-tournament:v4'
   let photo = (await payload.find({ ...options, collection: 'media', where: { seedKey: { equals: seedKey } }, pagination: false })).docs[0]
@@ -111,5 +111,24 @@ export async function applyOpeningEventRefinements(payload: Payload, req?: Paylo
   const primary = previous.find((card) => card.variant === 'tournament-venue') ?? previous[0]
   const cards = [{ ...primary, enabled: true, variant: primary?.variant ?? 'event', title: 'Ваше мероприятие', badge: 'Корпоративные и частные мероприятия', description: 'Корпоративные турниры, праздники и частные события — соберите свою компанию на корте.', image: photo.id, meshTone: 'deep-blue' as const, icon: 'Trophy' as const, action: { mode: 'none' as const } }, ...previous.filter((card) => card !== primary).map((card) => ({ ...card, enabled: false }))]
   await payload.updateGlobal({ ...options, slug: 'homepage', draft: false, data: { offersSection: { ...home.offersSection, cards }, openingContentVersion: eventRevision, _status: 'published' } })
+  return true
+}
+
+const phoneRevision = 'opening-november-2026-v5'
+
+/** Update only the two phone benefits once; keep their links and all editor changes afterwards. */
+export async function applyOpeningPhoneRefinements(payload: Payload, req?: PayloadRequest): Promise<boolean> {
+  const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
+  const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
+  if (home.openingContentVersion === phoneRevision) return false
+  if (home.openingContentVersion !== eventRevision) throw new Error('Apply event refinements before updating phone benefits.')
+  const seedKey = 'opening-media:booking-hand:v5'
+  let hand = (await payload.find({ ...options, collection: 'media', where: { seedKey: { equals: seedKey } }, pagination: false })).docs[0]
+  if (!hand) {
+    const bytes = await readFile(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../web/public/images/opening/booking-hand.png'))
+    hand = await payload.create({ ...options, collection: 'media', data: { seedKey, alt: 'Руки держат телефон и нажимают кнопку «В ИГРУ» в интерфейсе бронирования падел-корта', credit: 'AI-generated for UNLIM RIGA PADEL', sourceURL: 'apps/web/public/images/opening/booking-hand.png' }, file: { data: bytes, mimetype: 'image/png', name: 'opening-booking-hand.png', size: bytes.byteLength } })
+  }
+  const cards = (home.benefitsSection?.cards ?? []).map((card) => card.variant === 'online-booking' ? { ...card, meshTone: 'indigo' as const, media: hand.id } : card.variant === 'community' ? { ...card, meshTone: 'dark' as const } : card)
+  await payload.updateGlobal({ ...options, slug: 'homepage', draft: false, data: { benefitsSection: { ...home.benefitsSection, cards }, openingContentVersion: phoneRevision, _status: 'published' } })
   return true
 }

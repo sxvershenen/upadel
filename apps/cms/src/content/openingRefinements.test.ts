@@ -71,3 +71,27 @@ test('visual update reuses media, preserves card links and skips all opening upd
   assert.equal(writes, before)
   assert.equal(home.methodistBanner.title, 'Редактор изменил')
 })
+
+test('phone update changes only the two benefits and preserves later CMS edits across every updater', async () => {
+  const { applyOpeningEventRefinements, applyOpeningPhoneRefinements, applyOpeningVisualRefinements } = await import('./openingRefinements')
+  const home: any = { openingContentVersion: 'opening-november-2026-v4', benefitsSection: { title: 'Преимущества', cards: [{ id: 'booking', variant: 'online-booking', title: 'Бронь', action: { mode: 'internal-link', href: '/prices' }, media: 2, meshTone: 'sky' }, { id: 'community', variant: 'community', title: 'Комьюнити', action: { mode: 'external-link', href: 'https://t.me/unlimpadel' }, media: 3, meshTone: 'sky' }, { id: 'kids', variant: 'kids-wide', title: 'Дети', meshTone: 'sky' }] }, offersSection: { cards: [{ enabled: false }] } }
+  let writes = 0
+  const payload = { findGlobal: async () => structuredClone(home), find: async () => ({ docs: [{ id: 50 }] }), updateGlobal: async ({ data }: any) => { writes++; Object.assign(home, data) } }
+  assert.equal(await applyOpeningPhoneRefinements(payload as never), true)
+  const [booking, community, kids] = home.benefitsSection.cards
+  assert.equal(booking.media, 50)
+  assert.equal(booking.meshTone, 'indigo')
+  assert.equal(booking.action.href, '/prices')
+  assert.equal(community.media, 3)
+  assert.equal(community.meshTone, 'dark')
+  assert.equal(community.action.href, 'https://t.me/unlimpadel')
+  assert.equal(kids.meshTone, 'sky')
+  assert.equal(home.offersSection.cards[0].enabled, false)
+  community.meshTone = 'indigo'
+  booking.title = 'Редактор изменил'
+  const before = writes
+  for (const apply of [applyOpeningContent, applyOpeningRefinements, applyOpeningVisualRefinements, applyOpeningEventRefinements, applyOpeningPhoneRefinements]) assert.equal(await apply(payload as never), false)
+  assert.equal(writes, before)
+  assert.equal(community.meshTone, 'indigo')
+  assert.equal(booking.title, 'Редактор изменил')
+})

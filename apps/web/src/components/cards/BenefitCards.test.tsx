@@ -56,9 +56,8 @@ test('kids card is an internal link to the training page', () => {
   assert.match(html, /cursor-pointer/)
 })
 
-test('mesh benefit illustrations shrink below the 1380px breakpoint', () => {
+test('non-phone mesh benefit illustrations shrink below the 1380px breakpoint', () => {
   const variants = [
-    ['online-booking', 'max-[1380px]:h-[210px]'],
     ['coaches-metric', 'max-[1380px]:h-[270px]'],
     ['kids-wide', 'max-[1380px]:h-[240px]'],
     ['parking', 'max-[1380px]:h-[240px]'],
@@ -73,6 +72,28 @@ test('mesh benefit illustrations shrink below the 1380px breakpoint', () => {
       supportingText: variant === 'kids-wide' ? 'Детские ракетки' : null,
     } as any} />)
     assert.ok(html.includes(responsiveClass), `${variant} is missing ${responsiveClass}`)
+  }
+})
+
+test('phone benefits scale with card height and retain their illustration-specific crop', () => {
+  for (const variant of ['online-booking', 'community']) {
+    const document = new Window().document
+    document.body.innerHTML = renderToStaticMarkup(<BenefitCard benefit={{ ...baseBenefit, variant, title: variant, media: { url: '/phone.png', alt: '', mimeType: 'image/png' } } as any} />)
+    const phone = document.querySelector('.benefit-phone')!
+    assert.ok(phone.className.includes(variant === 'community' ? 'h-[92%]' : 'h-[120%]'))
+    assert.ok(phone.className.includes(variant === 'community' ? '-bottom-6 -right-6' : '-bottom-[32%] -right-[90px]'))
+    assert.match(phone.className, /origin-bottom/)
+    assert.doesNotMatch(phone.className, /max-\[1380px\]:h-/)
+    assert.match(document.querySelector('.arrow-action')!.className, /bg-ink text-white/)
+  }
+})
+
+test('benefit typography follows CMS mesh tone instead of the recipe', () => {
+  for (const [variant, tone, expected] of [['community', 'dark', 'text-white'], ['online-booking', 'indigo', 'text-white'], ['online-booking', 'lime-soft', 'text-[#244500]'], ['community', 'indigo', 'text-white']]) {
+    const document = new Window().document
+    document.body.innerHTML = renderToStaticMarkup(<BenefitCard benefit={{ ...baseBenefit, variant, meshTone: tone, title: 'Карточка' } as any} />)
+    assert.ok(document.querySelector('h3')!.className.includes(expected))
+    assert.ok(document.querySelector('p')!.className.includes(tone === 'lime-soft' ? 'text-[#3f6212]' : 'text-white'))
   }
 })
 
