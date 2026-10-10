@@ -4,7 +4,7 @@ import { Badge } from '../components/ui/Badge'
 import { motion } from 'framer-motion'
 import { useContent } from '../content/ContentContext'
 import { useImageParallax } from '../lib/useImageParallax'
-import { SurfaceCard } from '../components/ui/Card'
+import { SurfaceCard, imageOverlayForMesh } from '../components/ui/Card'
 import { Reveal } from '../components/ui/Reveal'
 import { ProgressiveImage } from '../components/ui/ProgressiveImage'
 import { Typography } from '../components/ui/Typography'
@@ -22,9 +22,9 @@ export function MethodistBanner() {
           {banner.decorativeMedia && <ProgressiveImage media={banner.decorativeMedia} loading="lazy" decoding="async" sizes="100vw" className="h-full w-full object-cover object-[35%_center] md:object-center" />}
         </motion.div>
       </div>
-      <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,6,10,.4)_0%,rgba(4,6,10,.2)_40%,rgba(4,6,10,.8)_100%)]" />
+      <div aria-hidden="true" data-image-overlay={imageOverlayForMesh(banner.meshTone)} className="pointer-events-none absolute inset-0" />
       <div className="relative z-10 flex items-start justify-between gap-4" data-robot-banner-top>
-        <span aria-hidden="true" className="se-2 flex h-12 w-12 shrink-0 items-center justify-center bg-white/20 text-white"><Icon size={24} strokeWidth={1.8} /></span>
+        <span aria-hidden="true" className="se-2 flex h-12 w-12 shrink-0 items-center justify-center glass-overlay text-white"><Icon size={24} strokeWidth={1.8} /></span>
         {banner.eyebrow && <Badge tone="glass" reveal={false}>{banner.eyebrow}</Badge>}
       </div>
       <div className="relative z-10 flex flex-col gap-6 md:flex-row md:items-end md:justify-between md:gap-10">
@@ -32,7 +32,7 @@ export function MethodistBanner() {
           <Typography as="h2" role="section" reveal={false} className="text-white">{banner.title}</Typography>
           <Typography role="body" reveal={false} className="mt-4 max-w-[580px] text-white">{banner.description}</Typography>
         </div>
-        {banner.price != null && <Price data-robot-banner-price value={banner.price} suffix="/ час" tone="light" className="shrink-0 self-end text-right [&>div]:justify-end" />}
+        {banner.price != null && <Price data-robot-banner-price size="standard" value={banner.price} suffix="/ час" tone="light" className="shrink-0 self-end text-right [&>div]:justify-end" />}
       </div>
     </SurfaceCard></Reveal>
   </section>

@@ -2,6 +2,8 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import React from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
+import { Window } from 'happy-dom'
+import { RentalRateCard } from '../components/cards/RentPricingCards'
 import { Prices } from './ThematicPage'
 
 const dto = {
@@ -49,4 +51,17 @@ test('Prices displays the white membership offer after rates and keeps standards
   assert.match(html, /Цена по запросу/)
   assert.doesNotMatch(html, /Отдельная карточка стандартов|Персональная программа/)
   assert.equal((html.match(/bg-white/g) ?? []).length, 3)
+})
+
+test('rental cards keep title and time at the top and description with the price at the bottom', () => {
+  const document = new Window().document
+  document.body.innerHTML = renderToStaticMarkup(<RentalRateCard rate={{ id: 'morning', title: 'Утро', eyebrow: 'Выгодные часы', timeLabel: '07:00–09:00', description: 'Спокойные часы для игры', price: 3500, priceSuffix: '/ час', cardVariant: 'rate', includedItems: [], action: { mode: 'none' } }} />)
+  const heading = document.querySelector('[data-rate-heading]')!
+  const details = document.querySelector('[data-rate-details]')!
+  assert.match(heading.textContent!, /Утро.*07:00–09:00/)
+  assert.equal(heading.querySelector('p'), null)
+  assert.match(details.className, /mt-auto/)
+  assert.match(details.querySelector('p')!.textContent!, /Спокойные часы/)
+  assert.ok(details.querySelector('.type-price'))
+  assert.ok(details.querySelector('.arrow-action'))
 })

@@ -273,7 +273,7 @@ export const clubFields: Field[] = [
           { name: 'title', type: 'text', label: 'Заголовок' },
           { name: 'description', type: 'textarea', label: 'Описание' },
           { name: 'image', type: 'upload', relationTo: 'media', filterOptions: imageOnlyFilter, label: 'Изображение' },
-          { name: 'meshTone', type: 'select', label: 'Синий mesh-градиент', defaultValue: 'deep-blue', options: meshToneOptions.filter(({ value }) => value === 'deep-blue' || value === 'indigo') },
+          { name: 'meshTone', type: 'select', label: 'Тон цветного слоя поверх фотографии', defaultValue: 'deep-blue', options: meshToneOptions.filter(({ value }) => value === 'deep-blue' || value === 'indigo') },
           {
             name: 'icon',
             type: 'select',
@@ -353,7 +353,7 @@ export const servicesFields: Field[] = [
       },
       { name: 'decorativeMedia', type: 'upload', relationTo: 'media', filterOptions: imageOnlyFilter, label: 'Фотография тренировки' },
       { name: 'price', type: 'number', label: 'Аренда робопушки, ₽ / час', min: 0, defaultValue: 3000 },
-      { name: 'meshTone', type: 'select', label: 'Mesh-тон', defaultValue: 'lavender', options: [...meshToneOptions], admin: { hidden: true } },
+      { name: 'meshTone', type: 'select', label: 'Тон цветного слоя поверх фотографии', defaultValue: 'deep-blue', options: [...meshToneOptions], admin: { description: 'Глубокий синий — overlay-blue; остальные тона используют соответствующий цветной overlay из UI-kit.' } },
       { ...createActionField('action', 'Кнопка'), admin: { hidden: true }, defaultValue: { label: 'Получить консультацию', mode: 'phone' } },
     ],
   },

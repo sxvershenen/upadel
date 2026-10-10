@@ -10,7 +10,7 @@ const richText = (text: string) => ({ root: { type: 'root', version: 1, directio
 export async function applyOpeningRefinements(payload: Payload, req?: PayloadRequest): Promise<boolean> {
   const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
   const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
-  if ([revision, visualRevision, eventRevision, phoneRevision].includes(home.openingContentVersion ?? '')) return false
+  if ([revision, visualRevision, eventRevision, phoneRevision, cardRevision].includes(home.openingContentVersion ?? '')) return false
   if (home.openingContentVersion !== 'opening-november-2026-v1') throw new Error('Apply the first opening content update before its refinements.')
   const site = await payload.findGlobal({ ...options, slug: 'site-settings', draft: false })
   const telegram = site.socialLinks?.find((link) => link.url?.includes('t.me/'))?.url
@@ -71,7 +71,7 @@ const visualRevision = 'opening-november-2026-v3'
 export async function applyOpeningVisualRefinements(payload: Payload, req?: PayloadRequest): Promise<boolean> {
   const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
   const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
-  if ([visualRevision, eventRevision, phoneRevision].includes(home.openingContentVersion ?? '')) return false
+  if ([visualRevision, eventRevision, phoneRevision, cardRevision].includes(home.openingContentVersion ?? '')) return false
   if (home.openingContentVersion !== revision) throw new Error('Apply opening refinements before the visual update.')
   const publicRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../web/public/images/opening')
   const media = async (name: string, extension: 'png' | 'webp', alt: string) => {
@@ -99,7 +99,7 @@ const eventRevision = 'opening-november-2026-v4'
 export async function applyOpeningEventRefinements(payload: Payload, req?: PayloadRequest): Promise<boolean> {
   const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
   const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
-  if ([eventRevision, phoneRevision].includes(home.openingContentVersion ?? '')) return false
+  if ([eventRevision, phoneRevision, cardRevision].includes(home.openingContentVersion ?? '')) return false
   if (home.openingContentVersion !== visualRevision) throw new Error('Apply the visual refinements before updating events.')
   const seedKey = 'opening-media:corporate-tournament:v4'
   let photo = (await payload.find({ ...options, collection: 'media', where: { seedKey: { equals: seedKey } }, pagination: false })).docs[0]
@@ -120,7 +120,7 @@ const phoneRevision = 'opening-november-2026-v5'
 export async function applyOpeningPhoneRefinements(payload: Payload, req?: PayloadRequest): Promise<boolean> {
   const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
   const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
-  if (home.openingContentVersion === phoneRevision) return false
+  if ([phoneRevision, cardRevision].includes(home.openingContentVersion ?? '')) return false
   if (home.openingContentVersion !== eventRevision) throw new Error('Apply event refinements before updating phone benefits.')
   const seedKey = 'opening-media:booking-hand:v5'
   let hand = (await payload.find({ ...options, collection: 'media', where: { seedKey: { equals: seedKey } }, pagination: false })).docs[0]
@@ -130,5 +130,45 @@ export async function applyOpeningPhoneRefinements(payload: Payload, req?: Paylo
   }
   const cards = (home.benefitsSection?.cards ?? []).map((card) => card.variant === 'online-booking' ? { ...card, meshTone: 'indigo' as const, media: hand.id } : card.variant === 'community' ? { ...card, meshTone: 'dark' as const } : card)
   await payload.updateGlobal({ ...options, slug: 'homepage', draft: false, data: { benefitsSection: { ...home.benefitsSection, cards }, openingContentVersion: phoneRevision, _status: 'published' } })
+  return true
+}
+
+const cardRevision = 'opening-november-2026-v6'
+
+/** Keep equipment terms in standards; replace the rejected booking photo once. */
+export async function applyOpeningCardRefinements(payload: Payload, req?: PayloadRequest): Promise<boolean> {
+  const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
+  const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
+  if (home.openingContentVersion === cardRevision) return false
+  if (home.openingContentVersion !== phoneRevision) throw new Error('Apply phone refinements before updating the card recipes.')
+  const seedKey = 'opening-media:booking-one-hand:v6'
+  let phone = (await payload.find({ ...options, collection: 'media', where: { seedKey: { equals: seedKey } }, pagination: false })).docs[0]
+  if (!phone) {
+    const bytes = await readFile(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../web/public/images/opening/booking-one-hand.png'))
+    phone = await payload.create({ ...options, collection: 'media', data: { seedKey, alt: 'Правая рука держит телефон: большой палец нажимает «В ИГРУ» в минималистичном интерфейсе бронирования', credit: 'AI-generated for UNLIM RIGA PADEL', sourceURL: 'apps/web/public/images/opening/booking-one-hand.png' }, file: { data: bytes, mimetype: 'image/png', name: 'opening-booking-one-hand.png', size: bytes.byteLength } })
+  }
+  const cleanEquipment = (text: string) => text.replace(/При аренде корта мячи и ракетки оплачиваются отдельно\./g, '').replace(/В индивидуальную тренировку входят мячи[.;]\s*(?:Аренда|аренда) ракетки оплачивается отдельно\./g, '').replace(/В детскую группу включены и мячи, и ракетки\./g, '').trim()
+  for (const [collection, keys] of [['rental-rates', ['prototype:rental-rate:day', 'prototype:rental-rate:prime', 'prototype:rental-rate:trial']], ['training-programs', ['prototype:training:individual', 'prototype:training:kids']]] as const) {
+    for (const key of keys) {
+      const item = (await payload.find({ ...options, collection, where: { seedKey: { equals: key } }, pagination: false })).docs[0]
+      if (item?.description) {
+        const description = cleanEquipment(item.description)
+        if (description && description !== item.description) await payload.update({ ...options, collection, id: item.id, draft: false, data: { description, _status: 'published' } } as never)
+      }
+    }
+  }
+  const standards = (await payload.find({ ...options, collection: 'rental-rates', where: { seedKey: { equals: 'prototype:rental-rate:standards' } }, pagination: false })).docs[0]
+  if (standards?.includedItems) await payload.update({ ...options, collection: 'rental-rates', id: standards.id, draft: false, data: { includedItems: standards.includedItems.map((item) => ({ ...item, text: item.text.replace(/с[\s\u00a0]+кофе/gi, 'с едой и напитками') })), _status: 'published' } })
+  const prices = await payload.findGlobal({ ...options, slug: 'prices-page', draft: false })
+  const equipment = 'При аренде корта мячи и ракетки оплачиваются отдельно. В индивидуальную тренировку входят мячи; аренда ракетки оплачивается отдельно. В детскую группу включены и мячи, и ракетки. Корзина мячей — 800 ₽ / час. Аренда ракетки — 500 ₽ / час.'
+  const comfort = 'Комфортные раздевалки и душ, лаунж-пространство с едой и напитками и полотенца для гостей клуба.'
+  const rules = (prices.rules ?? []).filter((rule) => !/инвентарь/i.test(rule.title)).map((rule) => /Стандарты Unlim Riga/i.test(rule.title) ? { ...rule, content: richText(`${equipment} ${comfort}`) } : rule)
+  if (!rules.some((rule) => /Стандарты Unlim Riga/i.test(rule.title))) rules.push({ title: 'Стандарты Unlim Riga', icon: 'ShowerHead', content: richText(`${equipment} ${comfort}`) })
+  await payload.updateGlobal({ ...options, slug: 'prices-page', draft: false, data: { rules, _status: 'published' } })
+  await payload.updateGlobal({ ...options, slug: 'homepage', draft: false, data: {
+    benefitsSection: { ...home.benefitsSection, cards: (home.benefitsSection?.cards ?? []).map((card) => card.variant === 'online-booking' ? { ...card, media: phone.id } : card) },
+    methodistBanner: { ...home.methodistBanner, meshTone: 'deep-blue' },
+    openingContentVersion: cardRevision, _status: 'published',
+  } })
   return true
 }

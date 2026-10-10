@@ -59,6 +59,15 @@ export function DarkMeshCard(props: Omit<SurfaceCardProps, "tone">) {
 }
 
 export type ImageOverlay = "overlay-lime" | "overlay-blue" | "overlay-cyan" | "overlay-violet" | "overlay-sunset" | "overlay-emerald" | "overlay-dark";
+/** Image-backed recipes use the same CMS palette as mesh surfaces. */
+export function imageOverlayForMesh(tone?: string | null): ImageOverlay {
+  if (tone === 'lime' || tone === 'lime-soft') return 'overlay-lime';
+  if (tone === 'indigo' || tone === 'lavender') return 'overlay-violet';
+  if (tone === 'sunset') return 'overlay-sunset';
+  if (tone === 'sky') return 'overlay-cyan';
+  if (tone === 'dark' || tone === 'navy-gold') return 'overlay-dark';
+  return 'overlay-blue';
+}
 export interface ImageCardProps extends Omit<HTMLMotionProps<"div">, "children"> {
   media?: MediaDTO | null;
   sizes?: string;

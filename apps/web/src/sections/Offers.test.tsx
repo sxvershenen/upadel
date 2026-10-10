@@ -23,12 +23,15 @@ test('zero offers remove the entire section; one fills the width and two split o
   assert.ok([...document.querySelectorAll('[data-offer-card]')].every((card) => !card.className.includes('md:grid-cols-2')))
 })
 
-test('none action never injects a fallback CTA, arrow or clickable card', () => {
+test('none action retains the original decorative arrow and image hover without injecting a CTA', () => {
   const document = new Window().document
   document.body.innerHTML = renderToStaticMarkup(<OfferCard offer={offer} />)
   assert.equal(document.querySelectorAll('button,a').length, 0)
-  assert.doesNotMatch(document.body.innerHTML, /Обсудить|cursor-pointer|card-spring/)
-  assert.match(document.body.innerHTML, /mesh-deep-blue/)
+  assert.doesNotMatch(document.body.innerHTML, /Обсудить/)
+  assert.ok(document.querySelector('.arrow-action'))
+  assert.ok(document.querySelector('[data-parallax-layer] img'))
+  assert.ok(document.querySelector('[data-image-overlay="overlay-blue"]'))
+  assert.match(document.querySelector('[data-offer-card]')!.className, /card-spring/)
 })
 
 test('empty optional fields still render a card without empty headings, badge or image', () => {
@@ -43,4 +46,10 @@ test('CTA uses only the configured CMS label and disappears when its label is em
   const context = (label: string) => <ContentProvider content={{ site: { contactConfirmation: { channels: [] } }, home: { offers: [] } } as any}><OfferCard offer={{ ...offer, action: { mode: 'internal-link', href: '/contacts', label } }} /></ContentProvider>
   assert.match(renderToStaticMarkup(context('Условия мероприятия')), /Условия мероприятия/)
   assert.doesNotMatch(renderToStaticMarkup(context('')), /<button|<a\s/)
+})
+
+test('offer image uses the CMS color and never returns a split photo panel', () => {
+  const html = renderToStaticMarkup(<OfferCard offer={{ ...offer, meshTone: 'indigo' }} wide />)
+  assert.match(html, /data-image-overlay="overlay-violet"/)
+  assert.doesNotMatch(html, /md:grid-cols-2/)
 })

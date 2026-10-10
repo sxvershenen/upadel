@@ -28,7 +28,17 @@ export function RentalRateCard({ rate, sourcePage, layout = 'compact' }: { rate:
   } else if (rate.cardVariant === 'standards') {
     card = <MeshCard interactive={false} reveal={false} tone={(rate.meshTone ?? 'dark') as MeshTone} className="flex h-full min-h-[570px] flex-col p-7 md:p-8"><span className="type-eyebrow text-white/50">{rate.eyebrow}</span><h3 className="type-title-large mt-5 text-white">{rate.title}</h3><span className="type-ui mt-2 block text-white/60">{rate.timeLabel}</span><p className="type-body-sm mt-5 text-white/65">{rate.description}</p><ul className="mt-8 flex flex-col gap-3 border-t border-white/15 pt-7">{rate.includedItems.map((item) => <li key={item} className="type-body-sm flex items-start gap-3 text-white/80"><span className="se-1 flex h-7 w-7 shrink-0 items-center justify-center bg-white/10 text-white/75"><Check size={15} /></span>{item}</li>)}</ul><div className="mt-auto flex justify-end pt-6"><ArrowAction tone="glass" /></div></MeshCard>
   } else {
-    card = <WhiteCard interactive={false} reveal={false} className={`flex h-full ${layout === 'wide' ? 'min-h-[270px]' : 'min-h-[360px]'} flex-col justify-between p-7 md:p-8`}><div className="flex items-start justify-between gap-3"><span className="type-eyebrow text-ink-soft">{rate.eyebrow}</span>{rate.badge && <Badge tone={rate.badgeTone as BadgeTone}>{rate.badge}</Badge>}</div><div className="mt-6"><h3 className="type-title-large text-ink">{rate.title}</h3><span className="type-ui mt-2 block text-ink-soft">{rate.timeLabel}</span><p className="type-body-sm mt-4 max-w-[410px] text-ink-soft">{rate.description}</p></div><div className="mt-8 flex items-end justify-between border-t border-ink/10 pt-5">{rate.price != null ? <Price label={rate.priceLabel ?? ''} value={rate.price} suffix={rate.priceSuffix ?? undefined} /> : rate.priceLabel && <Price value={rate.priceLabel} />}<ArrowAction tone="light" cardHover className="bg-surface-muted text-ink" /></div></WhiteCard>
+    card = <WhiteCard interactive={false} reveal={false} className={`flex h-full ${layout === 'wide' ? 'min-h-[270px]' : 'min-h-[360px]'} flex-col p-7 md:p-8`}>
+      <div data-rate-heading>
+        <div className="flex items-start justify-between gap-3"><span className="type-eyebrow text-ink-soft">{rate.eyebrow}</span>{rate.badge && <Badge tone={rate.badgeTone as BadgeTone}>{rate.badge}</Badge>}</div>
+        <h3 className="type-title-large mt-6 text-ink">{rate.title}</h3>
+        {rate.timeLabel && <span className="type-ui mt-2 block text-ink-soft">{rate.timeLabel}</span>}
+      </div>
+      <div data-rate-details className="mt-auto pt-16">
+        {rate.description && <p className="type-body-sm max-w-[410px] text-ink-soft">{rate.description}</p>}
+        <div className="mt-5 flex items-end justify-between border-t border-ink/10 pt-5">{rate.price != null ? <Price label={rate.priceLabel ?? ''} value={rate.price} suffix={rate.priceSuffix ?? undefined} /> : rate.priceLabel && <Price value={rate.priceLabel} />}<ArrowAction tone="light" cardHover className="bg-surface-muted text-ink" /></div>
+      </div>
+    </WhiteCard>
   }
   return <CardAction action={rate.action} title={rate.title} sourcePage={sourcePage}>{card}</CardAction>
 }

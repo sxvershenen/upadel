@@ -95,3 +95,49 @@ test('phone update changes only the two benefits and preserves later CMS edits a
   assert.equal(community.meshTone, 'indigo')
   assert.equal(booking.title, 'Редактор изменил')
 })
+
+test('card refinements consolidate equipment copy while preserving custom records, actions and cancellations', async () => {
+  const { applyOpeningCardRefinements, applyOpeningEventRefinements, applyOpeningPhoneRefinements, applyOpeningVisualRefinements } = await import('./openingRefinements')
+  const cancellation = { title: 'Отмена', content: { root: { children: [{ text: 'За 24 часа' }] } } }
+  const globals: Record<string, any> = {
+    homepage: { openingContentVersion: 'opening-november-2026-v5', benefitsSection: { cards: [{ variant: 'online-booking', meshTone: 'indigo', action: { mode: 'internal-link', href: '/prices' } }, { variant: 'community', media: 7, meshTone: 'dark' }] }, methodistBanner: { title: 'Робопушка', price: 3000 }, offersSection: { cards: [{ enabled: false }] } },
+    'prices-page': { rules: [cancellation, { title: 'Инвентарь' }, { title: 'Стандарты Unlim Riga' }] },
+  }
+  const records: any[] = [
+    { id: 1, seedKey: 'prototype:rental-rate:day', description: 'Спокойные часы. При аренде корта мячи и ракетки оплачиваются отдельно.' },
+    { id: 2, seedKey: 'prototype:training:individual', description: 'Техника с тренером. В индивидуальную тренировку входят мячи. Аренда ракетки оплачивается отдельно.' },
+    { id: 3, seedKey: 'prototype:training:kids', description: 'Обучение. В детскую группу включены и мячи, и ракетки.' },
+    { id: 4, seedKey: 'prototype:rental-rate:standards', includedItems: [{ text: 'Лаунж-пространство с кофе' }, { text: 'Полотенца' }] },
+    { id: 5, seedKey: 'custom-editor', description: 'Авторское описание' },
+  ]
+  let writes = 0
+  const payload = {
+    findGlobal: async ({ slug }: any) => structuredClone(globals[slug]),
+    find: async ({ collection, where }: any) => ({ docs: collection === 'media' ? [{ id: 60 }] : records.filter((r) => r.seedKey === where.seedKey.equals) }),
+    update: async ({ id, data }: any) => { writes++; Object.assign(records.find((r) => r.id === id), data) },
+    updateGlobal: async ({ slug, data }: any) => { writes++; Object.assign(globals[slug], data) },
+  }
+  assert.equal(await applyOpeningCardRefinements(payload as never), true)
+  assert.equal(records[0].description, 'Спокойные часы.')
+  assert.equal(records[1].description, 'Техника с тренером.')
+  assert.equal(records[2].description, 'Обучение.')
+  assert.equal(records[3].includedItems[0].text, 'Лаунж-пространство с едой и напитками')
+  assert.equal(records[3].includedItems[1].text, 'Полотенца')
+  assert.equal(records[4].description, 'Авторское описание')
+  assert.deepEqual(globals['prices-page'].rules[0], cancellation)
+  assert.equal(globals['prices-page'].rules.length, 2)
+  assert.match(JSON.stringify(globals['prices-page'].rules[1].content), /800.*500.*едой и напитками/)
+  const home = globals.homepage
+  assert.equal(home.benefitsSection.cards[0].media, 60)
+  assert.equal(home.benefitsSection.cards[0].meshTone, 'indigo')
+  assert.equal(home.benefitsSection.cards[0].action.href, '/prices')
+  assert.equal(home.benefitsSection.cards[1].media, 7)
+  assert.equal(home.methodistBanner.meshTone, 'deep-blue')
+  assert.equal(home.methodistBanner.price, 3000)
+  assert.equal(home.offersSection.cards[0].enabled, false)
+  home.methodistBanner.title = 'Редактор изменил'
+  const before = writes
+  for (const apply of [applyOpeningContent, applyOpeningRefinements, applyOpeningVisualRefinements, applyOpeningEventRefinements, applyOpeningPhoneRefinements, applyOpeningCardRefinements]) assert.equal(await apply(payload as never), false)
+  assert.equal(writes, before)
+  assert.equal(home.methodistBanner.title, 'Редактор изменил')
+})

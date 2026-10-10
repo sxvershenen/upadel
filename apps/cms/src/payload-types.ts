@@ -2769,6 +2769,9 @@ export interface Homepage {
     description?: string | null;
     decorativeMedia?: (number | null) | Media;
     price?: number | null;
+    /**
+     * Глубокий синий — overlay-blue; остальные тона используют соответствующий цветной overlay из UI-kit.
+     */
     meshTone?:
       ('indigo' | 'deep-blue' | 'dark' | 'lime' | 'lime-soft' | 'sky' | 'lavender' | 'sunset' | 'navy-gold') | null;
     action: {

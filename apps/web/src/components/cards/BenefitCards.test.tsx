@@ -80,11 +80,12 @@ test('phone benefits scale with card height and retain their illustration-specif
     const document = new Window().document
     document.body.innerHTML = renderToStaticMarkup(<BenefitCard benefit={{ ...baseBenefit, variant, title: variant, media: { url: '/phone.png', alt: '', mimeType: 'image/png' } } as any} />)
     const phone = document.querySelector('.benefit-phone')!
-    assert.ok(phone.className.includes(variant === 'community' ? 'h-[92%]' : 'h-[120%]'))
-    assert.ok(phone.className.includes(variant === 'community' ? '-bottom-6 -right-6' : '-bottom-[32%] -right-[90px]'))
+    assert.ok(phone.className.includes(variant === 'community' ? 'h-[92%]' : 'h-[108%]'))
+    assert.ok(phone.className.includes(variant === 'community' ? '-bottom-6 -right-6' : '-bottom-[22%] -right-2'))
     assert.match(phone.className, /origin-bottom/)
     assert.doesNotMatch(phone.className, /max-\[1380px\]:h-/)
     assert.match(document.querySelector('.arrow-action')!.className, /bg-ink text-white/)
+    if (variant === 'online-booking') assert.match(document.querySelector('[data-booking-image-zone]')!.className, /left-\[58%\].*overflow-hidden/)
   }
 })
 
@@ -198,4 +199,9 @@ test('community shares the light mesh benefit recipe with explicit contrast and 
   assert.doesNotMatch(document.querySelector('.lucide-users')!.parentElement!.className, /glass-overlay/)
   assert.doesNotMatch(document.querySelector('h3')!.className, /text-white/)
   assert.doesNotMatch(document.querySelector('p')!.className, /text-white/)
+})
+
+test('navy-gold mesh has an opaque base instead of falling through to a transparent surface', () => {
+  const styles = readFileSync(new URL('../../styles/surfaces.css', import.meta.url), 'utf8')
+  assert.match(styles, /\.mesh-navy-gold\s*\{[^}]*linear-gradient\(150deg, #0b1327 0%, #020509 100%\)/)
 })
