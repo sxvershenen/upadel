@@ -18,6 +18,7 @@ export const Memberships: CollectionConfig = {
   },
   admin: {
     defaultColumns: ['title', 'isActive', 'cardVariant', 'priceLabel', 'showOnHomepage', 'homepageOrder', '_status'],
+    description: 'Переключатель разделов на /prices показывается, если есть хотя бы один опубликованный активный абонемент. Если отключить последний или снять с публикации все активные записи, скроется весь переключатель — не только раздел «Абонементы». Чтобы вернуть его, включите и опубликуйте абонемент; записи и их данные сохраняются. На главной при отсутствии таких записей останутся «Аренда» и «Тренировки»; чтобы добавить абонемент, включите «Показывать на главной» и задайте допустимый порядок.',
     group: 'Услуги',
     useAsTitle: 'title',
   },
@@ -61,7 +62,7 @@ export const Memberships: CollectionConfig = {
       ],
     },
     createActionField('action', 'Действие'),
-    { name: 'isActive', type: 'checkbox', label: 'Показывать тариф на сайте', defaultValue: true, admin: { position: 'sidebar', description: 'Включённые опубликованные тарифы возвращают вкладку «Абонементы» на /prices; на главной также нужен флаг показа и порядок.' } },
+    { name: 'isActive', type: 'checkbox', label: 'Показывать тариф на сайте', defaultValue: true, admin: { position: 'sidebar', description: 'Для переключателя разделов на /prices нужен хотя бы один опубликованный активный абонемент. Отключение последнего скроет весь переключатель, но запись и её данные сохранятся. Для главной дополнительно нужны флаг «Показывать на главной» и допустимый порядок.' } },
     {
       name: 'showOnHomepage',
       type: 'checkbox',
