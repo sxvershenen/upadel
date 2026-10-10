@@ -1,0 +1,14 @@
+---
+import PublicErrorPage from '../components/PublicErrorPage.astro'
+import SiteLayout from '../layouts/SiteLayout.astro'
+import { publicRouteError } from '../lib/publicRouteError'
+
+export const prerender = false
+
+const error = publicRouteError({ status: 404 })
+Astro.response.status = error.status
+---
+
+<SiteLayout title={error.title} description={error.message} robots="noindex,nofollow">
+  <PublicErrorPage {...error} />
+</SiteLayout>
