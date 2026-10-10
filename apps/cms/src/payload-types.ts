@@ -2705,36 +2705,33 @@ export interface Homepage {
   };
   offersSection?: {
     /**
-     * До двух карточек: текущая раскладка состоит из двух равных колонок.
+     * До двух карточек. Одна включённая карточка занимает всю ширину на ПК; если выключены обе, секция исчезает. Поля можно оставлять пустыми.
      */
     cards?:
       | {
-          variant: 'tournament-venue' | 'event';
-          badge: string;
-          title: string;
-          description: string;
+          enabled?: boolean | null;
+          variant?: ('tournament-venue' | 'event') | null;
+          badge?: string | null;
+          title?: string | null;
+          description?: string | null;
           image?: (number | null) | Media;
-          overlay:
-            | 'overlay-lime'
-            | 'overlay-blue'
-            | 'overlay-cyan'
-            | 'overlay-violet'
-            | 'overlay-sunset'
-            | 'overlay-emerald'
-            | 'overlay-dark';
-          icon: 'Trophy' | 'PartyPopper';
-          action: {
+          meshTone?: ('indigo' | 'deep-blue') | null;
+          icon?: ('Trophy' | 'PartyPopper') | null;
+          action?: {
             label?: string | null;
-            mode:
-              | 'none'
-              | 'booking'
-              | 'account'
-              | 'trial-booking'
-              | 'internal-link'
-              | 'external-link'
-              | 'phone'
-              | 'email'
-              | 'lead-form';
+            mode?:
+              | (
+                  | 'none'
+                  | 'booking'
+                  | 'account'
+                  | 'trial-booking'
+                  | 'internal-link'
+                  | 'external-link'
+                  | 'phone'
+                  | 'email'
+                  | 'lead-form'
+                )
+              | null;
             /**
              * Для внутренней ссылки используйте /path или #anchor; внешняя должна начинаться с https://.
              */
@@ -4150,12 +4147,13 @@ export interface HomepageSelect<T extends boolean = true> {
         cards?:
           | T
           | {
+              enabled?: T;
               variant?: T;
               badge?: T;
               title?: T;
               description?: T;
               image?: T;
-              overlay?: T;
+              meshTone?: T;
               icon?: T;
               action?:
                 | T

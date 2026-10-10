@@ -8,6 +8,15 @@ import { tournamentCard } from './catalogProjection'
 import { resolveHomepageArticles } from '../hooks/resolveHomepageArticles'
 import { homepageCollectionLimits, resolveHomepageEntities } from '../hooks/resolveHomepageEntities'
 
+/** Visibility is resolved in CMS; disabled content never enters the public DTO. */
+export function projectOffers(cards: NonNullable<import('../payload-types').Homepage['offersSection']>['cards'], origin: string): HomepageDTO['home']['offers'] {
+  return (cards ?? []).filter((card) => card.enabled !== false).map((card, index) => ({
+    id: card.id ?? `offer-${index}`, variant: card.variant ?? 'event', badge: card.badge ?? '', title: card.title ?? '',
+    description: card.description ?? '', image: mediaDTO(card.image, origin),
+    meshTone: card.meshTone ?? 'deep-blue', icon: card.icon, action: actionDTO(card.action),
+  }))
+}
+
 function relationTitle(value: unknown): string {
   return typeof value === 'object' && value !== null && 'title' in value ? String(value.title) : ''
 }
@@ -124,7 +133,7 @@ export async function createHomepageProjection(
         eyebrow: homepage.benefitsSection?.eyebrow ?? '', title: homepage.benefitsSection?.title ?? '',
         cards: (homepage.benefitsSection?.cards ?? []).map((card) => ({ id: card.id ?? card.variant, variant: card.variant, eyebrow: card.eyebrow, title: card.title, description: card.description ?? '', supportingText: card.supportingText, media: mediaDTO(card.media, origin), overlay: card.overlay, meshTone: card.meshTone, action: actionDTO(card.action) })),
       },
-      offers: (homepage.offersSection?.cards ?? []).map((card) => ({ id: card.id ?? card.variant, variant: card.variant, badge: card.badge, title: card.title, description: card.description, image: mediaDTO(card.image, origin), overlay: card.overlay, icon: card.icon, action: actionDTO(card.action) })),
+      offers: projectOffers(homepage.offersSection?.cards, origin),
       courtsSection: { titleLineOne: homepage.courtsSection?.titleLineOne ?? '', titleLineTwo: homepage.courtsSection?.titleLineTwo ?? '', background: mediaDTO(homepage.courtsSection?.backgroundMedia, origin, 'hero'), backgroundAlt: homepage.courtsSection?.backgroundAlt ?? '' },
       pricingSection: { eyebrow: homepage.pricingSection.eyebrow ?? '', title: homepage.pricingSection.title ?? '', defaultTab: homepage.pricingSection.defaultTab, rentTabLabel: homepage.pricingSection.rentTabLabel ?? '', trainingTabLabel: homepage.pricingSection.trainingTabLabel ?? '', membershipsTabLabel: homepage.pricingSection.membershipsTabLabel ?? '' },
       methodistBanner: { eyebrow: homepage.methodistBanner.eyebrow ?? '', icon: homepage.methodistBanner.icon ?? 'Target', price: homepage.methodistBanner.price, title: homepage.methodistBanner.title ?? '', description: homepage.methodistBanner.description ?? '', decorativeMedia: mediaDTO(homepage.methodistBanner.decorativeMedia, origin), meshTone: homepage.methodistBanner.meshTone ?? 'lavender', action: actionDTO(homepage.methodistBanner.action) },

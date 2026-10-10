@@ -10,7 +10,7 @@ const richText = (text: string) => ({ root: { type: 'root', version: 1, directio
 export async function applyOpeningRefinements(payload: Payload, req?: PayloadRequest): Promise<boolean> {
   const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
   const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
-  if (home.openingContentVersion === revision || home.openingContentVersion === visualRevision) return false
+  if ([revision, visualRevision, eventRevision].includes(home.openingContentVersion ?? '')) return false
   if (home.openingContentVersion !== 'opening-november-2026-v1') throw new Error('Apply the first opening content update before its refinements.')
   const site = await payload.findGlobal({ ...options, slug: 'site-settings', draft: false })
   const telegram = site.socialLinks?.find((link) => link.url?.includes('t.me/'))?.url
@@ -71,7 +71,7 @@ const visualRevision = 'opening-november-2026-v3'
 export async function applyOpeningVisualRefinements(payload: Payload, req?: PayloadRequest): Promise<boolean> {
   const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
   const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
-  if (home.openingContentVersion === visualRevision) return false
+  if ([visualRevision, eventRevision].includes(home.openingContentVersion ?? '')) return false
   if (home.openingContentVersion !== revision) throw new Error('Apply opening refinements before the visual update.')
   const publicRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../web/public/images/opening')
   const media = async (name: string, extension: 'png' | 'webp', alt: string) => {
@@ -90,5 +90,26 @@ export async function applyOpeningVisualRefinements(payload: Payload, req?: Payl
     methodistBanner: { ...home.methodistBanner, decorativeMedia: robot },
     openingContentVersion: visualRevision, _status: 'published',
   } })
+  return true
+}
+
+const eventRevision = 'opening-november-2026-v4'
+
+/** Keep the second offer editable but hidden; subsequent runs preserve editor choices. */
+export async function applyOpeningEventRefinements(payload: Payload, req?: PayloadRequest): Promise<boolean> {
+  const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
+  const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
+  if (home.openingContentVersion === eventRevision) return false
+  if (home.openingContentVersion !== visualRevision) throw new Error('Apply the visual refinements before updating events.')
+  const seedKey = 'opening-media:corporate-tournament:v4'
+  let photo = (await payload.find({ ...options, collection: 'media', where: { seedKey: { equals: seedKey } }, pagination: false })).docs[0]
+  if (!photo) {
+    const bytes = await readFile(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../web/public/images/opening/corporate-tournament.webp'))
+    photo = await payload.create({ ...options, collection: 'media', data: { seedKey, alt: 'Участники корпоративного падел-турнира празднуют победу девушки с кубком', credit: 'AI-generated for UNLIM RIGA PADEL', sourceURL: 'apps/web/public/images/opening/corporate-tournament.webp' }, file: { data: bytes, mimetype: 'image/webp', name: 'opening-corporate-tournament.webp', size: bytes.byteLength } })
+  }
+  const previous = home.offersSection?.cards ?? []
+  const primary = previous.find((card) => card.variant === 'tournament-venue') ?? previous[0]
+  const cards = [{ ...primary, enabled: true, variant: primary?.variant ?? 'event', title: 'Ваше мероприятие', badge: 'Корпоративные и частные мероприятия', description: 'Корпоративные турниры, праздники и частные события — соберите свою компанию на корте.', image: photo.id, meshTone: 'deep-blue' as const, icon: 'Trophy' as const, action: { mode: 'none' as const } }, ...previous.filter((card) => card !== primary).map((card) => ({ ...card, enabled: false }))]
+  await payload.updateGlobal({ ...options, slug: 'homepage', draft: false, data: { offersSection: { ...home.offersSection, cards }, openingContentVersion: eventRevision, _status: 'published' } })
   return true
 }

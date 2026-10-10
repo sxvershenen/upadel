@@ -1,7 +1,7 @@
 export * from './widgets'
 import type { CatalogPagination, CatalogQuery } from './catalog'
 export * from './catalog'
-export const homepageDTOversion = 19 as const
+export const homepageDTOversion = 20 as const
 
 export const publicRouteRegistry = [
   { path: '/', parent: null, template: 'homepage', globalSlug: 'homepage' },
@@ -177,7 +177,7 @@ export type HomepageDTO = {
   home: {
     hero: { openingNotice?: { title: string; caption: string }; seoHeading: string; titleLine: string; titleConnector: string; titleAccent: string; description: string; desktopMedia?: MediaDTO | null; mobileMedia?: MediaDTO | null; desktopPoster?: MediaDTO | null; mobilePoster?: MediaDTO | null; tint: HeroTintDTO; titleFontSize: HeroTitleFontSizeDTO; primaryAction: ActionDTO; secondaryAction: ActionDTO; socialProof: { ratingLabel: string; caption: string; coachPhotos: MediaDTO[] }; stats: Array<{ value: string; label: string }> }
     benefits: { eyebrow: string; title: string; cards: Array<{ id: string; variant: 'parking' | 'lockers' | 'shower' | 'chill' | 'online-booking' | 'coaches-metric' | 'community' | 'kids-wide'; eyebrow?: string | null; title: string; description: string; supportingText?: string | null; media?: MediaDTO | null; overlay?: string | null; meshTone?: string | null; action: ActionDTO }> }
-    offers: Array<{ id: string; variant: 'tournament-venue' | 'event'; badge: string; title: string; description: string; image?: MediaDTO | null; overlay: string; icon: 'Trophy' | 'PartyPopper'; action: ActionDTO }>
+    offers: Array<{ id: string; variant: 'tournament-venue' | 'event'; badge: string; title: string; description: string; image?: MediaDTO | null; meshTone?: string | null; icon?: 'Trophy' | 'PartyPopper' | null; action: ActionDTO }>
     courtsSection: { titleLineOne: string; titleLineTwo: string; background?: MediaDTO | null; backgroundAlt: string }
     pricingSection: { eyebrow: string; title: string; defaultTab: 'rent' | 'training' | 'memberships'; rentTabLabel: string; trainingTabLabel: string; membershipsTabLabel: string }
     methodistBanner: { eyebrow?: string; icon?: 'Target' | 'Bot' | 'Zap'; title: string; description: string; price?: number | null; decorativeMedia?: MediaDTO | null; meshTone: string; action: ActionDTO }
@@ -477,13 +477,13 @@ export function parseHomepageDTO(value: unknown): HomepageDTO {
     if (!Array.isArray(dto.entities[key])) throw new Error(`Homepage DTO entity list ${key} is invalid.`)
   }
   const suppliedOverlays = [
-    ...dto.home.offers.map(({ overlay }) => overlay),
     ...dto.home.benefits.cards.flatMap(({ overlay }) => overlay ? [overlay] : []),
     ...dto.entities.tournaments.flatMap(({ imageOverlay }) => imageOverlay ? [imageOverlay] : []),
     ...dto.entities.trainingPrograms.map(({ overlay }) => overlay),
   ]
   const suppliedMeshes = [
     dto.home.methodistBanner.meshTone,
+    ...dto.home.offers.flatMap(({ meshTone }) => meshTone ? [meshTone] : []),
     ...dto.home.benefits.cards.flatMap(({ meshTone }) => meshTone ? [meshTone] : []),
     ...dto.entities.tournaments.flatMap(({ meshStyle }) => meshStyle ? [meshStyle] : []),
     ...dto.entities.rentalRates.flatMap(({ meshTone }) => meshTone ? [meshTone] : []),
