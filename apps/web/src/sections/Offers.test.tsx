@@ -17,6 +17,10 @@ test('zero offers remove the entire section; one fills the width and two split o
   assert.doesNotMatch(one, /min-\[1041px\]:grid-cols-2/)
   assert.match(one, /md:aspect-\[4\/1\]/)
   assert.match(one, /offer-card--wide/)
+  const oneDocument = new Window().document
+  oneDocument.body.innerHTML = one
+  assert.ok(oneDocument.querySelector('[data-offer-card] h3')!.classList.contains('type-section'))
+  assert.ok(oneDocument.querySelector('[data-offer-card] p')!.classList.contains('type-body'))
   const two = render([offer, { ...offer, id: '2' }])
   assert.match(two, /min-\[1041px\]:grid-cols-2/)
   assert.doesNotMatch(two, /offer-card--wide/)
@@ -24,6 +28,8 @@ test('zero offers remove the entire section; one fills the width and two split o
   document.body.innerHTML = two
   assert.equal(document.querySelectorAll('[data-offer-card]').length, 2)
   assert.ok([...document.querySelectorAll('[data-offer-card]')].every((card) => card.className.includes('md:aspect-[2/1]')))
+  assert.ok([...document.querySelectorAll('[data-offer-card] h3')].every((heading) => heading.classList.contains('type-title-card')))
+  assert.ok([...document.querySelectorAll('[data-offer-card] p')].every((paragraph) => paragraph.classList.contains('type-body-sm')))
   assert.ok([...document.querySelectorAll('[data-offer-card]')].every((card) => !card.className.includes('md:grid-cols-2')))
 })
 

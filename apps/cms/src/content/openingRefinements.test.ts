@@ -178,3 +178,62 @@ test('wide offer image updater migrates only its own source path once after a ve
   assert.equal(await applyOpeningOfferImageRefinements(payload as never), false)
   assert.equal(writes, 1)
 })
+
+test('supplied photo and robot copy updates preserve other CMS edits and skip after their version is applied', async () => {
+  const { applyOpeningRobotCopyRefinements, applyOpeningSuppliedPhotoRefinements, applyOpeningOfferImageRefinements } = await import('./openingRefinements')
+  const home: any = {
+    openingContentVersion: 'opening-november-2026-v8',
+    offersSection: { title: 'Events', cards: [
+      { id: 'event', variant: 'tournament-venue', title: 'Editor offer title', description: 'Editor offer description', enabled: true, badge: 'Editor badge', image: 8, meshTone: 'indigo', action: { mode: 'none', label: '' } },
+      { id: 'disabled', enabled: false, title: 'Hidden offer', image: 9 },
+    ] },
+    methodistBanner: { title: 'Editor robot title', description: 'line one\nline two', eyebrow: 'Editor badge', icon: 'Bot', decorativeMedia: 10, price: 3500, meshTone: 'deep-blue', action: { mode: 'none' } },
+  }
+  const media: any[] = []
+  let nextId = 20
+  let writes = 0
+  const payload = {
+    findGlobal: async () => structuredClone(home),
+    find: async ({ where }: any) => ({ docs: media.filter((item) => item.seedKey === where.seedKey.equals) }),
+    create: async ({ data, file }: any) => {
+      const item = { id: nextId++, ...data, name: file.name, mimeType: file.mimetype }
+      media.push(item)
+      return item
+    },
+    updateGlobal: async ({ data }: any) => { writes++; Object.assign(home, data) },
+  }
+  assert.equal(await applyOpeningSuppliedPhotoRefinements(payload as never), true)
+  assert.equal(home.offersSection.cards[0].image, 20)
+  assert.equal(home.offersSection.cards[0].title, 'Editor offer title')
+  assert.equal(home.offersSection.cards[0].description, 'Editor offer description')
+  assert.equal(home.offersSection.cards[0].badge, 'Editor badge')
+  assert.equal(home.offersSection.cards[0].meshTone, 'indigo')
+  assert.deepEqual(home.offersSection.cards[0].action, { mode: 'none', label: '' })
+  assert.deepEqual(home.offersSection.cards[1], { id: 'disabled', enabled: false, title: 'Hidden offer', image: 9 })
+  assert.equal(home.methodistBanner.decorativeMedia, 21)
+  assert.equal(home.methodistBanner.title, 'Editor robot title')
+  assert.equal(home.methodistBanner.description, 'line one\nline two')
+  assert.equal(home.methodistBanner.eyebrow, 'Editor badge')
+  assert.equal(home.methodistBanner.icon, 'Bot')
+  assert.equal(home.methodistBanner.price, 3500)
+  assert.equal(home.openingContentVersion, 'opening-november-2026-v9')
+  assert.equal(media[0].sourceURL, 'apps/web/public/images/opening/opening-offer-medal-group-v9.webp')
+  assert.equal(media[0].mimeType, 'image/webp')
+  assert.equal(media[1].sourceURL, 'apps/web/public/images/opening/robot-independent-practice-v9.webp')
+  assert.equal(await applyOpeningRobotCopyRefinements(payload as never), true)
+  assert.equal(home.methodistBanner.description, 'Отрабатывайте удары и точность в своём темпе.')
+  assert.equal(home.methodistBanner.title, 'Editor robot title')
+  assert.equal(home.methodistBanner.eyebrow, 'Editor badge')
+  assert.equal(home.methodistBanner.icon, 'Bot')
+  assert.equal(home.openingContentVersion, 'opening-november-2026-v10')
+  home.methodistBanner.title = 'Editor changed after v10'
+  home.methodistBanner.eyebrow = 'Custom badge after v10'
+  const before = writes
+  assert.equal(await applyOpeningSuppliedPhotoRefinements(payload as never), false)
+  assert.equal(await applyOpeningOfferImageRefinements(payload as never), false)
+  assert.equal(await applyOpeningRobotCopyRefinements(payload as never), false)
+  assert.equal(writes, before)
+  assert.equal(home.methodistBanner.description, 'Отрабатывайте удары и точность в своём темпе.')
+  assert.equal(home.methodistBanner.title, 'Editor changed after v10')
+  assert.equal(home.methodistBanner.eyebrow, 'Custom badge after v10')
+})

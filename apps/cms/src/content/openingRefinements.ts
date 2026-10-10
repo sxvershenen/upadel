@@ -6,7 +6,9 @@ import type { Payload, PayloadRequest } from 'payload'
 const revision = 'opening-november-2026-v2'
 const finalRevision = 'opening-november-2026-v7'
 const offerImageRevision = 'opening-november-2026-v8'
-const completedRevisions = [finalRevision, offerImageRevision]
+const suppliedPhotosRevision = 'opening-november-2026-v9'
+const suppliedRobotCopyRevision = 'opening-november-2026-v10'
+const completedRevisions = [finalRevision, offerImageRevision, suppliedPhotosRevision, suppliedRobotCopyRevision]
 const richText = (text: string) => ({ root: { type: 'root', version: 1, direction: 'ltr' as const, format: '' as const, indent: 0, children: [{ type: 'paragraph', version: 1, direction: 'ltr' as const, format: '' as const, indent: 0, children: [{ type: 'text', version: 1, text, format: 0, detail: 0, mode: 'normal', style: '' }] }] } })
 
 /** Apply the owner's follow-up once; preserve subsequent editor changes. */
@@ -221,6 +223,7 @@ export async function applyOpeningOfferImageRefinements(payload: Payload, req?: 
   const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
   const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
   const seedKey = 'opening-media:corporate-tournament-wide:v8'
+  if ([suppliedPhotosRevision, suppliedRobotCopyRevision].includes(home.openingContentVersion ?? '')) return false
   if (home.openingContentVersion === offerImageRevision) {
     const existingPhoto = (await payload.find({ ...options, collection: 'media', where: { seedKey: { equals: seedKey } }, pagination: false })).docs[0]
     if (existingPhoto?.sourceURL === 'apps/web/public/images/opening/corporate-tournament-wide-v2.png') {
@@ -238,5 +241,45 @@ export async function applyOpeningOfferImageRefinements(payload: Payload, req?: 
   }
   const cards = (home.offersSection?.cards ?? []).map((card) => card.variant === 'tournament-venue' || card.title === 'Ваше мероприятие' ? { ...card, image: photo.id } : card)
   await payload.updateGlobal({ ...options, slug: 'homepage', draft: false, data: { offersSection: { ...home.offersSection, cards }, openingContentVersion: offerImageRevision, _status: 'published' } })
+  return true
+}
+
+/** Replace only the two requested media references while preserving their CMS copy and actions. */
+export async function applyOpeningSuppliedPhotoRefinements(payload: Payload, req?: PayloadRequest): Promise<boolean> {
+  const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
+  const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
+  if ([suppliedPhotosRevision, suppliedRobotCopyRevision].includes(home.openingContentVersion ?? '')) return false
+  if (home.openingContentVersion !== offerImageRevision) throw new Error('Apply the wide offer photo before replacing supplied opening images.')
+
+  const media = async (seedKey: string, fileName: string, alt: string) => {
+    let item = (await payload.find({ ...options, collection: 'media', where: { seedKey: { equals: seedKey } }, pagination: false })).docs[0]
+    if (!item) {
+      const bytes = await readFile(path.resolve(path.dirname(fileURLToPath(import.meta.url)), `../../../web/public/images/opening/${fileName}`))
+      item = await payload.create({ ...options, collection: 'media', data: { seedKey, alt, credit: 'Предоставлено владельцем UNLIM RIGA PADEL', sourceURL: `apps/web/public/images/opening/${fileName}` }, file: { data: bytes, mimetype: 'image/webp', name: fileName, size: bytes.byteLength } })
+    }
+    return item
+  }
+  const offerPhoto = await media('opening-media:offer-medal-group:v9', 'opening-offer-medal-group-v9.webp', 'Игроки с медалями на синем падел-корте')
+  const robotPhoto = await media('opening-media:robot-independent-practice:v9', 'robot-independent-practice-v9.webp', 'Два игрока тренируются с робопушкой на синем падел-корте')
+
+  const cards = (home.offersSection?.cards ?? []).map((card) => card.variant === 'tournament-venue' || card.title === 'Ваше мероприятие' ? { ...card, image: offerPhoto.id } : card)
+  await payload.updateGlobal({ ...options, slug: 'homepage', draft: false, data: {
+    offersSection: { ...home.offersSection, cards },
+    methodistBanner: { ...home.methodistBanner, decorativeMedia: robotPhoto.id },
+    openingContentVersion: suppliedPhotosRevision, _status: 'published',
+  } })
+  return true
+}
+
+/** Keep the owner's final one-sentence robot description as a versioned CMS edit. */
+export async function applyOpeningRobotCopyRefinements(payload: Payload, req?: PayloadRequest): Promise<boolean> {
+  const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
+  const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
+  if (home.openingContentVersion === suppliedRobotCopyRevision) return false
+  if (home.openingContentVersion !== suppliedPhotosRevision) throw new Error('Apply the supplied opening photos before updating the robot copy.')
+  await payload.updateGlobal({ ...options, slug: 'homepage', draft: false, data: {
+    methodistBanner: { ...home.methodistBanner, description: 'Отрабатывайте удары и точность в своём темпе.' },
+    openingContentVersion: suppliedRobotCopyRevision, _status: 'published',
+  } })
   return true
 }
