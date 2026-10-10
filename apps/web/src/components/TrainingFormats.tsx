@@ -2,8 +2,6 @@ import React, { useRef } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import type { Swiper as SwiperType } from 'swiper'
 
-import type { RentalRate } from './cards/RentPricingCards'
-import { RentalRateCard } from './cards/RentPricingCards'
 import type { Training } from './cards/TrainingCard'
 import { TrainingCard } from './cards/TrainingCard'
 import { horizontalSwiperProps } from '../lib/swiper'
@@ -11,31 +9,20 @@ import { useMobileSwipeHint } from '../lib/useMobileSwipeHint'
 
 type TrainingFormatsProps = {
   programs: Training[]
-  offers?: RentalRate[]
   sourcePage?: string
   onSwiperChange?: (swiper: SwiperType) => void
 }
 
-export function TrainingFormats({ programs, offers = [], sourcePage, onSwiperChange }: TrainingFormatsProps) {
+export function TrainingFormats({ programs, sourcePage, onSwiperChange }: TrainingFormatsProps) {
   const swiperRef = useRef<SwiperType | null>(null)
   const swipeHintRef = useMobileSwipeHint(swiperRef, sourcePage === '/training' ? 'training-formats' : 'home-pricing-training')
-  const formats = [
-    ...programs.map((program) => ({ kind: 'program' as const, item: program })),
-    ...offers.map((item) => ({ kind: 'trial' as const, item })),
-  ]
-
-  const renderCard = (entry: (typeof formats)[number], mobile: boolean) => entry.kind === 'program' ? (
-    <TrainingCard training={entry.item} interactive={!mobile} />
-  ) : (
-    <RentalRateCard rate={entry.item} sourcePage={sourcePage} sourceEntity={entry.item.title} layout="compact" />
-  )
 
   return (
     <div>
-      <div className={`hidden gap-4 md:grid ${offers.length ? 'md:grid-cols-2 lg:grid-cols-3' : 'md:grid-cols-3'}`}>
-        {formats.map((entry) => (
-          <div key={`${entry.kind}-${entry.item.id}`} className="h-full">
-            {renderCard(entry, false)}
+      <div className="hidden gap-4 md:grid md:grid-cols-3">
+        {programs.map((program) => (
+          <div key={program.id} className="h-full">
+            <TrainingCard training={program} />
           </div>
         ))}
       </div>
@@ -50,10 +37,10 @@ export function TrainingFormats({ programs, offers = [], sourcePage, onSwiperCha
           spaceBetween={12}
           className="training-formats-swiper swiper-breathe"
         >
-          {formats.map((entry) => (
-            <SwiperSlide key={`${entry.kind}-${entry.item.id}`} className="!h-auto">
+          {programs.map((program) => (
+            <SwiperSlide key={program.id} className="!h-auto">
               <div className="h-full min-h-[500px]">
-                {renderCard(entry, true)}
+                <TrainingCard training={program} interactive={false} />
               </div>
             </SwiperSlide>
           ))}

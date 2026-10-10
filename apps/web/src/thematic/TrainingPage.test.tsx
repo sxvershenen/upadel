@@ -83,17 +83,6 @@ const mockDTO: TrainingPageDTO = {
       action: { label: 'Записаться', mode: 'trial-booking' },
     },
   ],
-  offers: [{
-    id: 'trial-1',
-    title: 'Индивидуальная тренировка',
-    eyebrow: 'Специальное предложение',
-    timeLabel: '60 минут',
-    description: 'Мячи включены, аренда ракетки оплачивается отдельно.',
-    includedItems: [],
-    cardVariant: 'trial',
-    meshTone: 'deep-blue',
-    price: 9000, priceLabel: 'от', priceSuffix: '/ час', action: { label: 'Записаться на тренировку', mode: 'booking' },
-  }],
   coaches: [
     {
       id: 'c1',
@@ -113,6 +102,18 @@ const mockDTO: TrainingPageDTO = {
     },
   ],
 }
+
+const rentalOffer = {
+    id: 'trial-1',
+    title: 'Индивидуальная тренировка',
+    eyebrow: 'Специальное предложение',
+    timeLabel: '60 минут',
+    description: 'Мячи включены, аренда ракетки оплачивается отдельно.',
+    includedItems: [],
+    cardVariant: 'trial',
+    meshTone: 'deep-blue',
+    price: 9000, priceLabel: 'от', priceSuffix: '/ час', action: { label: 'Записаться на тренировку', mode: 'booking' },
+} satisfies import('@unlim/content-contract').HomepageDTO['entities']['rentalRates'][number]
 
 test('typograph utility glues prepositions with non-breaking spaces', () => {
   assert.equal(typograph('по паделу в Москве'), 'по\u00A0паделу в\u00A0Москве')
@@ -143,10 +144,9 @@ test('TrainingPage renders Swiss layout with methodology pillars, formats, coach
   assert.match(plainText, /Индивидуальная тренировка/)
   assert.match(html, /training-formats-swiper/)
 
-  // Special offer card (compact) with unboxed eyebrow and standard button
-  assert.match(plainText, /Индивидуальная тренировка/)
-  assert.match(html, /type-eyebrow text-white\/65[^>]*>Специальное предложение/)
-  assert.match(plainText, /Записаться на тренировку/)
+  // Rental promotions belong to rental prices, not the training formats.
+  assert.doesNotMatch(plainText, /Специальное предложение|Для постоянных игроков/)
+  assert.ok(plainText.indexOf('Тренеры клуба') < plainText.indexOf('Методика UNLIM'))
 
   // Coaches section with SectionHeader and IconButton navigation
   assert.match(plainText, /Тренеры клуба/)
@@ -185,7 +185,7 @@ test('training swipers keep the mobile gutter and hint separate from Swiper stat
   assert.match(formatsSource, /slidesPerView=\{1\}/)
   assert.match(formatsSource, /className="training-formats-swiper swiper-breathe"/)
   assert.match(formatsSource, /className="swiper-page-gutter md:hidden"/)
-  assert.match(pageSource, /<TrainingFormats programs=\{dto\.programs\} offers=\{dto\.offers\}/)
+  assert.match(pageSource, /<TrainingFormats programs=\{dto\.programs\}/)
   assert.match(pricingTrainingSource, /<TrainingFormats programs=\{entities\.trainingPrograms\}/)
   assert.match(pageSource, /<CoachesSection/)
   assert.match(homepageCoachesSource, /<CoachesSection/)
@@ -230,7 +230,7 @@ test('coach dialog reuses the loaded photo without a second progressive reveal a
 })
 
 test('RentalRateCard shows the new price and one accessible action over the entire compact card', () => {
-  const html = renderToStaticMarkup(<SiteProvider site={mockSite as any}><RentalRateCard rate={mockDTO.offers[0]} layout="compact" /></SiteProvider>)
+  const html = renderToStaticMarkup(<SiteProvider site={mockSite as any}><RentalRateCard rate={rentalOffer} layout="compact" /></SiteProvider>)
   assert.match(html, /Индивидуальная тренировка/)
   assert.match(html, /9\s*000(?:&nbsp;|\s)*₽/)
   assert.match(html, /аренда ракетки оплачивается отдельно/)
@@ -240,7 +240,7 @@ test('RentalRateCard shows the new price and one accessible action over the enti
 })
 
 test('RentalRateCard wide format remains a smaller reusable card with the same price and action', () => {
-  const html = renderToStaticMarkup(<SiteProvider site={mockSite as any}><RentalRateCard rate={mockDTO.offers[0]} layout="wide" /></SiteProvider>)
+  const html = renderToStaticMarkup(<SiteProvider site={mockSite as any}><RentalRateCard rate={rentalOffer} layout="wide" /></SiteProvider>)
   assert.match(html, /min-h-\[270px\]/)
   assert.match(html, /9\s*000(?:&nbsp;|\s)*₽/)
   assert.match(html, /aria-label="Записаться на тренировку"/)

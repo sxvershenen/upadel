@@ -82,6 +82,7 @@ export const PricesPage = createThematicPage({
       fields: [
         { name: 'title', type: 'text', label: 'Заголовок', required: true },
         { name: 'content', type: 'richText', label: 'Текст', required: true },
+        { name: 'icon', type: 'select', label: 'Иконка', defaultValue: 'ClipboardCheck', options: [{ label: 'Абонементы', value: 'CreditCard' }, { label: 'Бронирование', value: 'CalendarCheck' }, { label: 'Отмены и переносы', value: 'RefreshCw' }, { label: 'Инвентарь', value: 'PackageCheck' }, { label: 'Комфорт клуба', value: 'ShowerHead' }, { label: 'Общие правила', value: 'ClipboardCheck' }] },
       ],
     },
   ],

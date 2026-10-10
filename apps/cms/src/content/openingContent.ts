@@ -3,6 +3,8 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createLocalReq, type CollectionSlug, type Payload, type PayloadRequest } from 'payload'
 
+import { applyOpeningRefinements } from './openingRefinements'
+
 const revision = 'opening-november-2026-v1'
 const publicRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../web/public')
 const equipment = {
@@ -18,7 +20,7 @@ const richText = (text: string) => ({ root: { type: 'root', version: 1, directio
 export async function applyOpeningContent(payload: Payload, req?: PayloadRequest): Promise<boolean> {
   const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
   const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
-  if (home.openingContentVersion === revision) return false
+  if (home.openingContentVersion?.startsWith('opening-november-2026-v')) return false
   // This updater also runs on later releases, without reseeding unrelated editor records.
   if (!home.seedVersion) throw new Error('Initialize CMS content before applying the opening update.')
 
@@ -129,7 +131,9 @@ export async function applyOpeningContentTransaction(payload: Payload): Promise<
   if (transactionID == null) throw new Error('Opening content update requires a database transaction.')
   try {
     const req = await createLocalReq({ req: { transactionID } }, payload)
-    const changed = await applyOpeningContent(payload, req)
+    const initialChanged = await applyOpeningContent(payload, req)
+    const refinementsChanged = await applyOpeningRefinements(payload, req)
+    const changed = initialChanged || refinementsChanged
     await payload.db.commitTransaction(transactionID)
     return changed
   } catch (error) {

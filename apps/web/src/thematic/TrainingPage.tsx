@@ -33,7 +33,28 @@ export function TrainingPage({ dto }: { dto: TrainingPageDTO }) {
 
   return (
     <article className="container-page">
-      {/* 1. Swiss Methodology Pillars */}
+      {/* Training formats */}
+      <section className="py-12 md:py-20" aria-labelledby="training-formats-title">
+        <SectionHeader
+          titleId="training-formats-title"
+          eyebrow={dto.programsEyebrow}
+          title={dto.programsTitle}
+          className="mb-8"
+        />
+
+        <TrainingFormats programs={dto.programs} sourcePage="/training" />
+      </section>
+
+      {/* Coaches */}
+      <CoachesSection
+        coaches={coaches}
+        eyebrow={dto.coachesEyebrow}
+        title={dto.coachesTitle}
+        titleId="coaches-title"
+        catalogAction={{ href: '/coaches', desktopLabel: dto.coachesDesktopActionLabel, mobileLabel: dto.coachesMobileActionLabel }}
+      />
+
+      {/* Methodology after coaches */}
       <section className="py-12 md:py-20" aria-labelledby="methodology-title">
         <SectionHeader titleId="methodology-title" eyebrow={dto.infographicEyebrow} title={dto.infographicTitle} />
 
@@ -64,28 +85,7 @@ export function TrainingPage({ dto }: { dto: TrainingPageDTO }) {
         </div>
       </section>
 
-      {/* 2. Training Formats */}
-      <section className="py-12 md:py-20" aria-labelledby="training-formats-title">
-        <SectionHeader
-          titleId="training-formats-title"
-          eyebrow={dto.programsEyebrow}
-          title={dto.programsTitle}
-          className="mb-8"
-        />
-
-        <TrainingFormats programs={dto.programs} offers={dto.offers} sourcePage="/training" />
-      </section>
-
-      {/* 3. Coaches Section - Swiss Swiper matching homepage style */}
-      <CoachesSection
-        coaches={coaches}
-        eyebrow={dto.coachesEyebrow}
-        title={dto.coachesTitle}
-        titleId="coaches-title"
-        catalogAction={{ href: '/coaches', desktopLabel: dto.coachesDesktopActionLabel, mobileLabel: dto.coachesMobileActionLabel }}
-      />
-
-      {/* 4. Knowledge base: first visit on the left, FAQ on the right */}
+      {/* First visit and FAQ */}
       <section className="py-12 md:py-20" aria-label={dto.knowledgeTitle}>
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-0 lg:divide-x lg:divide-ink/10">
           <div className="lg:pr-16">

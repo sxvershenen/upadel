@@ -1,3 +1,4 @@
+import { TermsList } from '../components/TermsList'
 import React, { useEffect, useRef, useState } from 'react'
 import type { MediaDTO, ThematicPageDTO } from '@unlim/content-contract'
 import {
@@ -519,28 +520,7 @@ export function GiftLandingPage({ dto, publicOrigin: _publicOrigin = 'https://un
               </Typography>
             </Reveal>
 
-            <div className="mt-8 border-y border-ink/10" data-gift-terms-list>
-              {pageTerms.map((term, idx) => {
-                const Icon = term.icon
-                return (
-                <Reveal key={term.title} delay={idx * 0.05} className="border-b border-ink/10 last:border-b-0">
-                  <div className="flex items-start gap-3 py-5">
-                    <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center text-ink-soft" aria-hidden="true">
-                      <Icon size={18} strokeWidth={1.8} />
-                    </span>
-                    <div className="min-w-0">
-                      <Typography as="h3" role="body" className="font-medium text-ink">
-                        {typograph(term.title)}
-                      </Typography>
-                      <Typography role="body-small" tone="subtle" className="mt-1.5 leading-relaxed">
-                        {typograph(term.text)}
-                      </Typography>
-                    </div>
-                  </div>
-                </Reveal>
-                )
-              })}
-            </div>
+            <TermsList gift items={pageTerms.map((term) => ({ ...term, title: typograph(term.title), text: typograph(term.text) }))} />
           </div>
 
           {/* Справа: FAQ без карточной обёртки */}

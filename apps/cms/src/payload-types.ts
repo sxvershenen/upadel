@@ -564,7 +564,7 @@ export interface RentalRate {
   priceSuffix?: string | null;
   badge?: string | null;
   badgeTone?: ('lime' | 'lime-soft' | 'sunset' | 'gold' | 'muted' | 'glass' | 'outline-light') | null;
-  cardVariant: 'rate' | 'trial' | 'standards';
+  cardVariant: 'rate' | 'trial' | 'standards' | 'membership-offer';
   meshTone?:
     ('indigo' | 'deep-blue' | 'dark' | 'lime' | 'lime-soft' | 'sky' | 'lavender' | 'sunset' | 'navy-gold') | null;
   includedItems?:
@@ -2649,14 +2649,22 @@ export interface Homepage {
     eyebrow?: string | null;
     title?: string | null;
     /**
-     * До семи карточек: предел текущей desktop-сетки и mobile swiper.
+     * До восьми карточек: desktop-сетка и mobile swiper.
      */
     cards?:
       | {
-          variant: 'parking' | 'lockers' | 'shower' | 'chill' | 'online-booking' | 'coaches-metric' | 'kids-wide';
+          variant:
+            | 'parking'
+            | 'lockers'
+            | 'shower'
+            | 'chill'
+            | 'online-booking'
+            | 'coaches-metric'
+            | 'community'
+            | 'kids-wide';
           eyebrow?: string | null;
           title: string;
-          description: string;
+          description?: string | null;
           supportingText?: string | null;
           media?: (number | null) | Media;
           overlay?:
@@ -2758,6 +2766,8 @@ export interface Homepage {
     membershipsTabLabel?: string | null;
   };
   methodistBanner: {
+    eyebrow?: string | null;
+    icon?: ('Target' | 'Bot' | 'Zap') | null;
     title?: string | null;
     description?: string | null;
     decorativeMedia?: (number | null) | Media;
@@ -3009,6 +3019,7 @@ export interface PricesPage {
           };
           [k: string]: unknown;
         };
+        icon?: ('CreditCard' | 'CalendarCheck' | 'RefreshCw' | 'PackageCheck' | 'ShowerHead' | 'ClipboardCheck') | null;
         id?: string | null;
       }[]
     | null;
@@ -4178,6 +4189,8 @@ export interface HomepageSelect<T extends boolean = true> {
   methodistBanner?:
     | T
     | {
+        eyebrow?: T;
+        icon?: T;
         title?: T;
         description?: T;
         decorativeMedia?: T;
@@ -4358,6 +4371,7 @@ export interface PricesPageSelect<T extends boolean = true> {
     | {
         title?: T;
         content?: T;
+        icon?: T;
         id?: T;
       };
   heroImage?: T;

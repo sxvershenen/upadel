@@ -41,6 +41,7 @@ export const RentalRates: CollectionConfig = {
         { label: 'Обычный тариф', value: 'rate' },
         { label: 'Предложение тренировок / абонементов', value: 'trial' },
         { label: 'Стандарты сервиса', value: 'standards' },
+        { label: 'Специальные абонементы — белая карточка', value: 'membership-offer' },
       ],
     },
     { name: 'meshTone', type: 'select', label: 'Mesh-тон', options: [...meshToneOptions] },

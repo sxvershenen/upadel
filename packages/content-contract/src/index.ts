@@ -1,7 +1,7 @@
 export * from './widgets'
 import type { CatalogPagination, CatalogQuery } from './catalog'
 export * from './catalog'
-export const homepageDTOversion = 18 as const
+export const homepageDTOversion = 19 as const
 
 export const publicRouteRegistry = [
   { path: '/', parent: null, template: 'homepage', globalSlug: 'homepage' },
@@ -176,11 +176,11 @@ export type HomepageDTO = {
   }
   home: {
     hero: { openingNotice?: { title: string; caption: string }; seoHeading: string; titleLine: string; titleConnector: string; titleAccent: string; description: string; desktopMedia?: MediaDTO | null; mobileMedia?: MediaDTO | null; desktopPoster?: MediaDTO | null; mobilePoster?: MediaDTO | null; tint: HeroTintDTO; titleFontSize: HeroTitleFontSizeDTO; primaryAction: ActionDTO; secondaryAction: ActionDTO; socialProof: { ratingLabel: string; caption: string; coachPhotos: MediaDTO[] }; stats: Array<{ value: string; label: string }> }
-    benefits: { eyebrow: string; title: string; cards: Array<{ id: string; variant: 'parking' | 'lockers' | 'shower' | 'chill' | 'online-booking' | 'coaches-metric' | 'kids-wide'; eyebrow?: string | null; title: string; description: string; supportingText?: string | null; media?: MediaDTO | null; overlay?: string | null; meshTone?: string | null; action: ActionDTO }> }
+    benefits: { eyebrow: string; title: string; cards: Array<{ id: string; variant: 'parking' | 'lockers' | 'shower' | 'chill' | 'online-booking' | 'coaches-metric' | 'community' | 'kids-wide'; eyebrow?: string | null; title: string; description: string; supportingText?: string | null; media?: MediaDTO | null; overlay?: string | null; meshTone?: string | null; action: ActionDTO }> }
     offers: Array<{ id: string; variant: 'tournament-venue' | 'event'; badge: string; title: string; description: string; image?: MediaDTO | null; overlay: string; icon: 'Trophy' | 'PartyPopper'; action: ActionDTO }>
     courtsSection: { titleLineOne: string; titleLineTwo: string; background?: MediaDTO | null; backgroundAlt: string }
     pricingSection: { eyebrow: string; title: string; defaultTab: 'rent' | 'training' | 'memberships'; rentTabLabel: string; trainingTabLabel: string; membershipsTabLabel: string }
-    methodistBanner: { title: string; description: string; price?: number | null; decorativeMedia?: MediaDTO | null; meshTone: string; action: ActionDTO }
+    methodistBanner: { eyebrow?: string; icon?: 'Target' | 'Bot' | 'Zap'; title: string; description: string; price?: number | null; decorativeMedia?: MediaDTO | null; meshTone: string; action: ActionDTO }
     coachesSection: { eyebrow: string; title: string }
     tournamentsSection: { eyebrow: string; title: string }
     gallerySection: { eyebrow: string; title: string; action: ActionDTO }
@@ -193,7 +193,7 @@ export type HomepageDTO = {
     articles: Array<{ id: string; slug: string; image: MediaDTO; category: string; readingTimeMinutes: number; title: string; excerpt: string }>
     articleRows: Array<{ id: string; slug: string; title: string; excerpt: string }>
     courts: Array<{ id: string; slug: string; title: string; eyebrow?: string | null; description?: string | null; cardVariant: 'panoramic' | 'metrics' | 'damping' | 'surface'; metrics?: Array<{ value: string; label: string; icon: 'PanelTop' | 'Lightbulb' | 'Activity' | 'Layers3' }> | null }>
-    rentalRates: Array<{ id: string; title: string; eyebrow?: string | null; timeLabel?: string | null; description: string; price?: number | null; priceLabel?: string | null; priceSuffix?: string | null; badge?: string | null; badgeTone?: string | null; cardVariant: 'rate' | 'trial' | 'standards'; meshTone?: string | null; includedItems: string[]; action: ActionDTO }>
+    rentalRates: Array<{ id: string; title: string; eyebrow?: string | null; timeLabel?: string | null; description: string; price?: number | null; priceLabel?: string | null; priceSuffix?: string | null; badge?: string | null; badgeTone?: string | null; cardVariant: 'rate' | 'trial' | 'membership-offer' | 'standards'; meshTone?: string | null; includedItems: string[]; action: ActionDTO }>
     trainingPrograms: Array<{ id: string; slug: string; title: string; badge: string; description: string; image: MediaDTO; overlay: string; icon: 'User' | 'Users' | 'Baby'; priceFrom: number; action: ActionDTO }>
     memberships: Array<{ id: string; title: string; badge?: string | null; badgeTone?: string | null; description: string; cardVariant: 'gift' | 'package' | 'featured-package' | 'resident'; meshTone?: string | null; price?: number | null; oldPrice?: number | null; priceLabel?: string | null; benefits: string[]; giftAmountLimits?: { minimum?: number | null; maximum?: number | null } | null; action: ActionDTO }>
     gallery: Array<{ id: string; title: string; media: MediaDTO; caption?: string | null }>
@@ -242,7 +242,7 @@ export type PricesPageDTO = ThematicPageBase & {
   termsTitle: string
   faqTitle: string
   faq: Array<{ question: string; answer: string }>
-  rules: Array<{ title: string; contentHTML: string }>
+  rules: Array<{ title: string; contentHTML: string; icon?: string }>
   rentalRates: HomepageDTO['entities']['rentalRates']
   trainingPrograms: HomepageDTO['entities']['trainingPrograms']
   memberships: HomepageDTO['entities']['memberships']
@@ -268,7 +268,6 @@ export type TrainingPageDTO = ThematicPageBase & {
   faq: Array<{ question: string; answer: string }>
   action: ActionDTO
   programs: HomepageDTO['entities']['trainingPrograms']
-  offers: HomepageDTO['entities']['rentalRates']
   coaches?: HomepageDTO['entities']['coaches']
 }
 export type GiftPageDTO = ThematicPageBase & {

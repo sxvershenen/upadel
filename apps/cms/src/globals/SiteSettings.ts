@@ -181,7 +181,7 @@ export const SiteSettings: GlobalConfig = {
             { name: 'emailFieldLabel', type: 'text', label: 'Подпись email', defaultValue: 'Email' },
             { name: 'phoneDisplay', type: 'text', label: 'Телефон', defaultValue: '+7 985 835-00-55' },
             { name: 'phoneValue', type: 'text', label: 'Телефон для ссылки', defaultValue: '+79858350055' },
-            { name: 'email', type: 'email', label: 'Email', defaultValue: 'hello@unlimriga.club' },
+            { name: 'email', type: 'email', label: 'Email', defaultValue: 'info@unlimpadel.ru' },
             { name: 'transit', type: 'text', label: 'Как добраться', defaultValue: 'Мякинино · 12 мин пешком' },
             { name: 'parking', type: 'text', label: 'Парковка', defaultValue: '50 бесплатных мест у входа' },
             { name: 'openingHours', type: 'text', label: 'Режим работы', defaultValue: 'Ежедневно 07:00–23:00' },

@@ -1,3 +1,4 @@
+import * as openingRefinements from './20261010_190000_opening_refinements'
 import * as openingContentFields from './20261010_180000_opening_content_fields'
 import * as bookingWidgets from './20261007_180000_booking_widgets'
 import * as bookingWidgetContent from './20261007_180100_booking_widget_content'
@@ -122,4 +123,5 @@ export const migrations = [
   { name: '20261007_180000_booking_widgets', up: bookingWidgets.up, down: bookingWidgets.down },
   { name: '20261007_180100_booking_widget_content', up: bookingWidgetContent.up, down: bookingWidgetContent.down },
   { name: '20261010_180000_opening_content_fields', up: openingContentFields.up, down: openingContentFields.down },
+  { name: '20261010_190000_opening_refinements', up: openingRefinements.up, down: openingRefinements.down },
 ];

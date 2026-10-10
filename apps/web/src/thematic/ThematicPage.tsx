@@ -1,5 +1,6 @@
+import { TermsList } from '../components/TermsList'
 import type { PricesPageDTO, ThematicPageDTO } from '@unlim/content-contract'
-import { Car, Clock, Layers3, Lightbulb, MapPin, PanelTop, Thermometer, Train } from 'lucide-react'
+import { CalendarCheck, ClipboardCheck, CreditCard, PackageCheck, RefreshCw, ShowerHead, Car, Clock, Layers3, Lightbulb, MapPin, PanelTop, Thermometer, Train } from 'lucide-react'
 import { useState, type CSSProperties } from 'react'
 
 import { MembershipCard } from '../components/cards/MembershipCards'
@@ -17,7 +18,7 @@ export function Prices({ dto }: { dto: PricesPageDTO }) {
     { id: 'rent' as const, label: dto.tabs.rent, panelId: 'price-panel-rent' },
     ...(dto.memberships.length ? [{ id: 'memberships' as const, label: dto.tabs.memberships, panelId: 'price-panel-memberships' }] : []),
   ]
-  const standardRates = dto.rentalRates.filter(({ cardVariant }) => cardVariant !== 'trial')
+  const standardRates = dto.rentalRates.filter(({ cardVariant }) => cardVariant === 'rate' || cardVariant === 'membership-offer')
   const [active, setActive] = useState<(typeof tabs)[number]['id']>('rent')
   const visibleActive = dto.memberships.length ? active : 'rent'
   return <>
@@ -31,10 +32,7 @@ export function Prices({ dto }: { dto: PricesPageDTO }) {
       <section className="mt-16 grid gap-8 lg:grid-cols-2 lg:gap-0 lg:divide-x lg:divide-ink/10" aria-label={dto.termsTitle}>
         <div className="lg:pr-16">
           <Typography as="h2" role="section" className="font-semibold text-ink">{dto.termsTitle}</Typography>
-          <div className="mt-8 border-y border-ink/10">{dto.rules.map((rule) => <div key={rule.title} className="border-b border-ink/10 py-5 last:border-b-0">
-            <Typography as="h3" role="body" className="font-medium text-ink">{rule.title}</Typography>
-            <div className="article-content mt-1.5 text-ink-soft" dangerouslySetInnerHTML={{ __html: rule.contentHTML }} />
-          </div>)}</div>
+          <TermsList items={dto.rules.map((rule) => ({ ...rule, icon: ({ CreditCard, CalendarCheck, RefreshCw, PackageCheck, ShowerHead, ClipboardCheck } as Record<string, typeof CreditCard>)[rule.icon ?? ''] ?? ClipboardCheck }))} />
         </div>
         <div className="lg:pl-16"><Typography as="h2" role="section" className="font-semibold text-ink">{dto.faqTitle}</Typography><div className="mt-8"><Accordion items={(dto.faq ?? []).map(({ question, answer }) => ({ q: question, a: answer }))} /></div></div>
       </section>

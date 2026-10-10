@@ -40,15 +40,13 @@ export async function createThematicPageProjection(payload: Payload, options: { 
 
   if (kind === 'prices') {
     const [rates, programs, memberships] = await Promise.all([publishedCollection(payload, 'rental-rates', preview), publishedCollection(payload, 'training-programs', preview), publishedCollection(payload, 'memberships', preview)])
-    return parseThematicPageDTO({ ...base, kind, termsTitle: page.termsTitle ?? '', faqTitle: page.faqTitle ?? '', faq: (page.faq ?? []).map(({ question, answer }: Row) => ({ question: String(question ?? ''), answer: String(answer ?? '') })), tabs: { rent: page.rentTabLabel, training: page.trainingTabLabel, memberships: page.membershipsTabLabel }, rules: (page.rules ?? []).map((item: Row) => ({ title: String(item.title), contentHTML: richContentHTML(item.content) })), rentalRates: rates.docs.map(rentalRate), trainingPrograms: programs.docs.map((item) => program(item, origin)), memberships: memberships.docs.map(membership) })
+    return parseThematicPageDTO({ ...base, kind, termsTitle: page.termsTitle ?? '', faqTitle: page.faqTitle ?? '', faq: (page.faq ?? []).map(({ question, answer }: Row) => ({ question: String(question ?? ''), answer: String(answer ?? '') })), tabs: { rent: page.rentTabLabel, training: page.trainingTabLabel, memberships: page.membershipsTabLabel }, rules: (page.rules ?? []).map((item: Row) => ({ title: String(item.title), contentHTML: richContentHTML(item.content), icon: item.icon ?? 'ClipboardCheck' })), rentalRates: rates.docs.map(rentalRate), trainingPrograms: programs.docs.map((item) => program(item, origin)), memberships: memberships.docs.map(membership) })
   }
   if (kind === 'training') {
-    const [programs, rates, coachesDocs] = await Promise.all([
+    const [programs, coachesDocs] = await Promise.all([
       publishedCollection(payload, 'training-programs', preview),
-      publishedCollection(payload, 'rental-rates', preview),
       publishedCollection(payload, 'coaches', preview, undefined, 'homepageOrder'),
     ])
-    const offers = rates.docs.filter((item) => item.cardVariant === 'trial')
     return parseThematicPageDTO({
       ...base,
       kind,
@@ -71,7 +69,6 @@ export async function createThematicPageProjection(payload: Payload, options: { 
       faq: (page.faq ?? []).map(({ question, answer }: Row) => ({ question: String(question ?? ''), answer: String(answer ?? '') })),
       action: actionDTO(page.action),
       programs: programs.docs.map((item) => program(item, origin)),
-      offers: offers.map(rentalRate),
       coaches: coachesDocs.docs.map((item) => coachItem(item, origin)),
     })
   }

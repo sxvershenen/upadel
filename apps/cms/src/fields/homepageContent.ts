@@ -215,8 +215,8 @@ export const clubFields: Field[] = [
         name: 'cards',
         type: 'array',
         label: 'Карточки',
-        maxRows: 7,
-        admin: { description: 'До семи карточек: предел текущей desktop-сетки и mobile swiper.' },
+        maxRows: 8,
+        admin: { description: 'До восьми карточек: desktop-сетка и mobile swiper.' },
         validate: (value) => validateUniqueRowsByKey(value, 'variant', 'Каждый benefit recipe можно использовать один раз.'),
         fields: [
           {
@@ -231,12 +231,13 @@ export const clubFields: Field[] = [
               { label: 'Лаунж', value: 'chill' },
               { label: 'Онлайн-бронирование', value: 'online-booking' },
               { label: 'Тренеры — метрика', value: 'coaches-metric' },
-              { label: 'Детская академия — широкая', value: 'kids-wide' },
+              { label: 'Комьюнити клуба', value: 'community' },
+              { label: 'Детская академия', value: 'kids-wide' },
             ],
           },
           { name: 'eyebrow', type: 'text', label: 'Надзаголовок' },
           { name: 'title', type: 'text', label: 'Заголовок', required: true },
-          { name: 'description', type: 'textarea', label: 'Описание', required: true },
+          { name: 'description', type: 'textarea', label: 'Описание' },
           { name: 'supportingText', type: 'text', label: 'Дополнительная строка' },
           { name: 'media', type: 'upload', relationTo: 'media', filterOptions: imageOnlyFilter, label: 'Изображение или декоративное медиа' },
           { name: 'overlay', type: 'select', label: 'Тон изображения', options: [...imageOverlayOptions] },
@@ -337,6 +338,8 @@ export const servicesFields: Field[] = [
     type: 'group',
     label: 'Тренировочная робопушка',
     fields: [
+      { name: 'eyebrow', type: 'text', label: 'Надзаголовок', defaultValue: 'Самостоятельная практика' },
+      { name: 'icon', type: 'select', label: 'Иконка', defaultValue: 'Target', options: [{ label: 'Точность', value: 'Target' }, { label: 'Робот', value: 'Bot' }, { label: 'Энергия', value: 'Zap' }] },
       {
         name: 'title',
         type: 'text',
