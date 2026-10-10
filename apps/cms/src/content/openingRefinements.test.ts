@@ -41,3 +41,33 @@ test('refinements update only requested content, preserve cancellation rules and
 test('refinements refuse missing initial update before writing', async () => {
   await assert.rejects(applyOpeningRefinements({ findGlobal: async () => ({}) } as never), /first opening content/)
 })
+
+test('visual update reuses media, preserves card links and skips all opening updates after later editor changes', async () => {
+  const { applyOpeningVisualRefinements } = await import('./openingRefinements')
+  const home: any = { openingContentVersion: 'opening-november-2026-v2', benefitsSection: { cards: [{ variant: 'community', title: 'Комьюнити', action: { mode: 'external-link', href: 'https://t.me/unlimpadel' } }, { variant: 'parking', title: 'Парковка' }] }, methodistBanner: { title: 'Робопушка', price: 3000, eyebrow: 'Практика', icon: 'Target' } }
+  const offer: any = { id: 20, action: { mode: 'phone' }, priceLabel: 'Цена по запросу' }
+  let writes = 0
+  const payload = {
+    findGlobal: async () => structuredClone(home),
+    find: async ({ collection, where }: any) => ({ docs: collection === 'rental-rates' ? [offer] : [{ id: where.seedKey.equals.includes('robot') ? 11 : 12 }] }),
+    update: async ({ data }: any) => { writes++; Object.assign(offer, data) },
+    updateGlobal: async ({ data }: any) => { writes++; Object.assign(home, data) },
+  }
+  assert.equal(await applyOpeningVisualRefinements(payload as never), true)
+  assert.equal(home.methodistBanner.decorativeMedia, 11)
+  assert.equal(home.methodistBanner.price, 3000)
+  assert.equal(home.methodistBanner.icon, 'Target')
+  assert.equal(home.benefitsSection.cards[0].media, 12)
+  assert.equal(home.benefitsSection.cards[0].meshTone, 'sky')
+  assert.equal(home.benefitsSection.cards[0].action.href, 'https://t.me/unlimpadel')
+  assert.equal(home.benefitsSection.cards[1].title, 'Парковка')
+  assert.equal(offer.title, 'Абонементы')
+  assert.equal(offer.action.mode, 'phone')
+  home.methodistBanner.title = 'Редактор изменил'
+  const before = writes
+  assert.equal(await applyOpeningVisualRefinements(payload as never), false)
+  assert.equal(await applyOpeningRefinements(payload as never), false)
+  assert.equal(await applyOpeningContent(payload as never), false)
+  assert.equal(writes, before)
+  assert.equal(home.methodistBanner.title, 'Редактор изменил')
+})

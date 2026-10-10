@@ -246,3 +246,11 @@ test('RentalRateCard wide format remains a smaller reusable card with the same p
   assert.match(html, /aria-label="Записаться на тренировку"/)
   assert.equal((html.match(/<button/g) ?? []).length, 1)
 })
+
+test('homepage membership strip omits the eyebrow, giant card height and duplicate price label', () => {
+  const html = renderToStaticMarkup(<RentalRateCard rate={{ ...rentalOffer, title: 'Абонементы', description: 'Скидки для постоянных игроков', cardVariant: 'membership-offer', price: null, priceLabel: 'Цена по запросу', action: { mode: 'none' } }} layout="strip" />)
+  assert.match(html, /Скидки для постоянных игроков/)
+  assert.match(html, /type-title-compact/)
+  assert.equal((html.match(/Цена по запросу/g) ?? []).length, 1)
+  assert.doesNotMatch(html, /type-eyebrow|Специальное предложение|min-h-\[500px\]|min-h-\[270px\]/)
+})

@@ -3,7 +3,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createLocalReq, type CollectionSlug, type Payload, type PayloadRequest } from 'payload'
 
-import { applyOpeningRefinements } from './openingRefinements'
+import { applyOpeningRefinements, applyOpeningVisualRefinements } from './openingRefinements'
 
 const revision = 'opening-november-2026-v1'
 const publicRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../web/public')
@@ -133,7 +133,8 @@ export async function applyOpeningContentTransaction(payload: Payload): Promise<
     const req = await createLocalReq({ req: { transactionID } }, payload)
     const initialChanged = await applyOpeningContent(payload, req)
     const refinementsChanged = await applyOpeningRefinements(payload, req)
-    const changed = initialChanged || refinementsChanged
+    const visualChanged = await applyOpeningVisualRefinements(payload, req)
+    const changed = initialChanged || refinementsChanged || visualChanged
     await payload.db.commitTransaction(transactionID)
     return changed
   } catch (error) {

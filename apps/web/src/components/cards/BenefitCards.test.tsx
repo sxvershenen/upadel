@@ -164,3 +164,17 @@ test('mobile photo benefit paints its image and gradient inside one moving layer
   assert.equal(desktopCard?.querySelector('[data-image-composite-layer="true"]'), null)
   assert.equal(Array.from(desktopCard?.children ?? []).some((child) => child.hasAttribute('data-image-overlay')), true)
 })
+
+test('community shares the light mesh benefit recipe with explicit contrast and a decorative phone', () => {
+  const html = renderToStaticMarkup(<BenefitCard benefit={{ ...baseBenefit, variant: 'community', title: 'Комьюнити клуба', meshTone: 'sky', media: { url: '/community-chat.png', alt: 'Чат клуба', mimeType: 'image/png' } } as any} />)
+  assert.match(html, /mesh-sky/)
+  assert.match(html, /community-phone/)
+  assert.match(html, /bg-\[color-mix\(in_oklab,#ffffff_70%,transparent\)\]/)
+  assert.match(html, /type-title-card text-\[#0b3a5c\]/)
+  assert.match(html, /type-body-sm mt-2 text-\[#0b3a5c\]/)
+  const document = new Window().document
+  document.body.innerHTML = html
+  assert.doesNotMatch(document.querySelector('.lucide-users')!.parentElement!.className, /glass-overlay/)
+  assert.doesNotMatch(document.querySelector('h3')!.className, /text-white/)
+  assert.doesNotMatch(document.querySelector('p')!.className, /text-white/)
+})

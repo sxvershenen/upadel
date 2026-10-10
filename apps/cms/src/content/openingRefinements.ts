@@ -10,7 +10,7 @@ const richText = (text: string) => ({ root: { type: 'root', version: 1, directio
 export async function applyOpeningRefinements(payload: Payload, req?: PayloadRequest): Promise<boolean> {
   const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
   const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
-  if (home.openingContentVersion === revision) return false
+  if (home.openingContentVersion === revision || home.openingContentVersion === visualRevision) return false
   if (home.openingContentVersion !== 'opening-november-2026-v1') throw new Error('Apply the first opening content update before its refinements.')
   const site = await payload.findGlobal({ ...options, slug: 'site-settings', draft: false })
   const telegram = site.socialLinks?.find((link) => link.url?.includes('t.me/'))?.url
@@ -62,5 +62,33 @@ export async function applyOpeningRefinements(payload: Payload, req?: PayloadReq
     methodistBanner: { ...home.methodistBanner, eyebrow: 'Самостоятельная практика', icon: 'Target', decorativeMedia: robot.id },
     openingContentVersion: revision, _status: 'published',
   } } as never)
+  return true
+}
+
+const visualRevision = 'opening-november-2026-v3'
+
+/** Replace the two owner-rejected visuals and simplify membership copy once. */
+export async function applyOpeningVisualRefinements(payload: Payload, req?: PayloadRequest): Promise<boolean> {
+  const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
+  const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
+  if (home.openingContentVersion === visualRevision) return false
+  if (home.openingContentVersion !== revision) throw new Error('Apply opening refinements before the visual update.')
+  const publicRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../web/public/images/opening')
+  const media = async (name: string, extension: 'png' | 'webp', alt: string) => {
+    const seedKey = `opening-media:${name}:v3`
+    const existing = (await payload.find({ ...options, collection: 'media', where: { seedKey: { equals: seedKey } }, pagination: false })).docs[0]
+    if (existing) return existing.id
+    const bytes = await readFile(path.join(publicRoot, `${name}.${extension}`))
+    return (await payload.create({ ...options, collection: 'media', data: { seedKey, alt, credit: 'AI-generated for UNLIM RIGA PADEL', sourceURL: `apps/web/public/images/opening/${name}.${extension}` }, file: { data: bytes, mimetype: `image/${extension}`, name: `opening-${name}.${extension}`, size: bytes.byteLength } })).id
+  }
+  const robot = await media('robot-candid', 'webp', 'Девушка отрабатывает удар против робопушки на синем крытом падел-корте')
+  const phone = await media('community-chat', 'png', 'iPhone с групповым чатом клуба: игроки договариваются о встрече на корте')
+  const offer = (await payload.find({ ...options, collection: 'rental-rates', where: { seedKey: { equals: 'opening:rental-rate:memberships' } }, pagination: false })).docs[0]
+  if (offer) await payload.update({ ...options, collection: 'rental-rates', id: offer.id, draft: false, data: { title: 'Абонементы', description: 'Скидки для постоянных игроков', _status: 'published' } })
+  await payload.updateGlobal({ ...options, slug: 'homepage', draft: false, data: {
+    benefitsSection: { ...home.benefitsSection, cards: (home.benefitsSection?.cards ?? []).map((card) => card.variant === 'community' ? { ...card, meshTone: 'sky' as const, media: phone } : card) },
+    methodistBanner: { ...home.methodistBanner, decorativeMedia: robot },
+    openingContentVersion: visualRevision, _status: 'published',
+  } })
   return true
 }

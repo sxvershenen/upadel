@@ -9,9 +9,14 @@ import { CardAction } from './CardAction'
 
 export type RentalRate = HomepageDTO['entities']['rentalRates'][number]
 
-export function RentalRateCard({ rate, sourcePage, layout = 'compact' }: { rate: RentalRate; sourceEntity?: string; sourcePage?: string; layout?: 'wide' | 'compact' }) {
+export function RentalRateCard({ rate, sourcePage, layout = 'compact' }: { rate: RentalRate; sourceEntity?: string; sourcePage?: string; layout?: 'wide' | 'compact' | 'strip' }) {
   let card
-  if (rate.cardVariant === 'trial') {
+  if (layout === 'strip' && rate.cardVariant === 'membership-offer') {
+    card = <WhiteCard interactive={false} reveal={false} className="flex h-full flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between md:px-7">
+      <div className="min-w-0"><Typography as="h3" role="title-compact" reveal={false} className="font-semibold text-ink">{rate.title}</Typography>{rate.description && <Typography role="body-small" reveal={false} className="mt-1 text-ink-soft">{rate.description}</Typography>}</div>
+      <div className="flex shrink-0 items-center justify-between gap-4 sm:justify-end"><Typography role="body-small" reveal={false} className="font-semibold text-ink">{rate.priceLabel}</Typography><ArrowAction tone="light" size="sm" cardHover className="bg-surface-muted text-ink" /></div>
+    </WhiteCard>
+  } else if (rate.cardVariant === 'trial') {
     card = <MeshCard interactive={false} reveal={false} tone={(rate.meshTone ?? 'deep-blue') as MeshTone} className={`relative flex h-full flex-col justify-between overflow-hidden p-6 text-white md:p-7 ${layout === 'wide' ? 'min-h-[270px]' : 'min-h-[500px]'}`}>
       <Typography reveal={false} role="eyebrow" className="text-white/65">{rate.eyebrow}</Typography>
       <div className="mt-7"><Typography reveal={false} as="h3" role="title-card" className="text-white">{rate.title}</Typography><Typography reveal={false} role="body-small" className="mt-3 text-white/75">{rate.description}</Typography></div>
