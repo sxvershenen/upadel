@@ -83,17 +83,17 @@ const mockDTO: TrainingPageDTO = {
       action: { label: 'Записаться', mode: 'trial-booking' },
     },
   ],
-  trial: {
+  offers: [{
     id: 'trial-1',
-    title: 'Пробная тренировка за 1 990 ₽',
+    title: 'Индивидуальная тренировка',
     eyebrow: 'Специальное предложение',
     timeLabel: '60 минут',
-    description: '60 минут индивидуального внимания тренера + корт + профессиональная ракетка включены.',
+    description: 'Мячи включены, аренда ракетки оплачивается отдельно.',
     includedItems: [],
     cardVariant: 'trial',
     meshTone: 'deep-blue',
-    action: { label: 'Записаться на пробную', mode: 'trial-booking' },
-  },
+    price: 9000, priceLabel: 'от', priceSuffix: '/ час', action: { label: 'Записаться на тренировку', mode: 'booking' },
+  }],
   coaches: [
     {
       id: 'c1',
@@ -144,9 +144,9 @@ test('TrainingPage renders Swiss layout with methodology pillars, formats, coach
   assert.match(html, /training-formats-swiper/)
 
   // Special offer card (compact) with unboxed eyebrow and standard button
-  assert.match(plainText, /Пробная тренировка за 1 990 ₽/)
-  assert.match(html, /<span class="type-eyebrow text-white\/65">Специальное предложение<\/span>/)
-  assert.match(plainText, /Записаться на пробную/)
+  assert.match(plainText, /Индивидуальная тренировка/)
+  assert.match(html, /type-eyebrow text-white\/65[^>]*>Специальное предложение/)
+  assert.match(plainText, /Записаться на тренировку/)
 
   // Coaches section with SectionHeader and IconButton navigation
   assert.match(plainText, /Тренеры клуба/)
@@ -185,7 +185,7 @@ test('training swipers keep the mobile gutter and hint separate from Swiper stat
   assert.match(formatsSource, /slidesPerView=\{1\}/)
   assert.match(formatsSource, /className="training-formats-swiper swiper-breathe"/)
   assert.match(formatsSource, /className="swiper-page-gutter md:hidden"/)
-  assert.match(pageSource, /<TrainingFormats programs=\{dto\.programs\} trial=\{dto\.trial\}/)
+  assert.match(pageSource, /<TrainingFormats programs=\{dto\.programs\} offers=\{dto\.offers\}/)
   assert.match(pricingTrainingSource, /<TrainingFormats programs=\{entities\.trainingPrograms\}/)
   assert.match(pageSource, /<CoachesSection/)
   assert.match(homepageCoachesSource, /<CoachesSection/)
@@ -229,35 +229,20 @@ test('coach dialog reuses the loaded photo without a second progressive reveal a
   assert.doesNotMatch(css, /\[data-dialog-surface="true"\][\s\S]{0,100}transform: none !important/)
 })
 
-test('RentalRateCard renders compact layout with unboxed eyebrow, bottom-edge background images, and standard action button', () => {
-  const html = renderToStaticMarkup(
-    <SiteProvider site={mockSite as any}>
-      <RentalRateCard rate={mockDTO.trial!} layout="compact" />
-    </SiteProvider>
-  )
-
-  // Unboxed eyebrow without pill badge wrapper
-  assert.match(html, /<span class="type-eyebrow text-white\/65">Специальное предложение<\/span>/)
-  // Standard button label
-  assert.match(html, /<span>Записаться на пробную<\/span>/)
-  // Compact card keeps only one enlarged ball and a full-width action.
-  assert.doesNotMatch(html, /padel-racket\.webp/)
-  assert.match(html, /bottom-20 -right-36/)
-  assert.match(html, /w-full/)
+test('RentalRateCard shows the new price and one accessible action over the entire compact card', () => {
+  const html = renderToStaticMarkup(<SiteProvider site={mockSite as any}><RentalRateCard rate={mockDTO.offers[0]} layout="compact" /></SiteProvider>)
+  assert.match(html, /Индивидуальная тренировка/)
+  assert.match(html, /9\s*000(?:&nbsp;|\s)*₽/)
+  assert.match(html, /аренда ракетки оплачивается отдельно/)
+  assert.match(html, /aria-label="Записаться на тренировку"/)
+  assert.equal((html.match(/<button/g) ?? []).length, 1)
+  assert.match(html, /min-h-\[500px\]/)
 })
 
-test('RentalRateCard preserves wide layout for homepage with 2-column text and large images', () => {
-  const html = renderToStaticMarkup(
-    <SiteProvider site={mockSite as any}>
-      <RentalRateCard rate={mockDTO.trial!} layout="wide" />
-    </SiteProvider>
-  )
-
-  // Wide layout has max-w on text column
-  assert.match(html, /max-w-\[82%\] md:max-w-\[60%\]/)
-  // Full button text preserved on wide
-  assert.match(html, /Записаться на пробную/)
-  // Larger images raised higher
-  assert.match(html, /h-\[340px\]/)
-  assert.match(html, /h-\[210px\]/)
+test('RentalRateCard wide format remains a smaller reusable card with the same price and action', () => {
+  const html = renderToStaticMarkup(<SiteProvider site={mockSite as any}><RentalRateCard rate={mockDTO.offers[0]} layout="wide" /></SiteProvider>)
+  assert.match(html, /min-h-\[270px\]/)
+  assert.match(html, /9\s*000(?:&nbsp;|\s)*₽/)
+  assert.match(html, /aria-label="Записаться на тренировку"/)
+  assert.equal((html.match(/<button/g) ?? []).length, 1)
 })

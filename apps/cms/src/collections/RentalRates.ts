@@ -39,7 +39,7 @@ export const RentalRates: CollectionConfig = {
       required: true,
       options: [
         { label: 'Обычный тариф', value: 'rate' },
-        { label: 'Пробная тренировка', value: 'trial' },
+        { label: 'Предложение тренировок / абонементов', value: 'trial' },
         { label: 'Стандарты сервиса', value: 'standards' },
       ],
     },
@@ -60,7 +60,7 @@ export const RentalRates: CollectionConfig = {
       defaultValue: false,
       admin: { position: 'sidebar' },
     },
-    createHomepageOrderField(4),
+    createHomepageOrderField(5),
   ],
   hooks: { beforeValidate: [clearHiddenHomepageOrder] },
   versions: { drafts: { autosave: true, schedulePublish: true }, maxPerDoc: 50 },

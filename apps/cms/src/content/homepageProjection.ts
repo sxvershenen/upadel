@@ -104,6 +104,7 @@ export async function createHomepageProjection(
     site: siteDTO(siteSettings, origin, entities.partners),
     home: {
       hero: {
+        openingNotice: { title: homepage.hero.openingNotice?.title ?? '', caption: homepage.hero.openingNotice?.caption ?? '' },
         seoHeading: homepage.hero.seoHeading ?? 'Премиальный крытый падел-клуб', titleLine: homepage.hero.titleLine ?? '', titleConnector: homepage.hero.titleConnector ?? '', titleAccent: homepage.hero.titleAccent ?? '',
         description: homepage.hero.description ?? '', desktopMedia: homeHeroMedia,
         mobileMedia: mediaDTO(homepage.hero.mobileMedia, origin, 'hero'), desktopPoster: mediaDTO(homepage.hero.desktopVideoPoster, origin),
@@ -126,7 +127,7 @@ export async function createHomepageProjection(
       offers: (homepage.offersSection?.cards ?? []).map((card) => ({ id: card.id ?? card.variant, variant: card.variant, badge: card.badge, title: card.title, description: card.description, image: mediaDTO(card.image, origin), overlay: card.overlay, icon: card.icon, action: actionDTO(card.action) })),
       courtsSection: { titleLineOne: homepage.courtsSection?.titleLineOne ?? '', titleLineTwo: homepage.courtsSection?.titleLineTwo ?? '', background: mediaDTO(homepage.courtsSection?.backgroundMedia, origin, 'hero'), backgroundAlt: homepage.courtsSection?.backgroundAlt ?? '' },
       pricingSection: { eyebrow: homepage.pricingSection.eyebrow ?? '', title: homepage.pricingSection.title ?? '', defaultTab: homepage.pricingSection.defaultTab, rentTabLabel: homepage.pricingSection.rentTabLabel ?? '', trainingTabLabel: homepage.pricingSection.trainingTabLabel ?? '', membershipsTabLabel: homepage.pricingSection.membershipsTabLabel ?? '' },
-      methodistBanner: { title: homepage.methodistBanner.title ?? '', description: homepage.methodistBanner.description ?? '', decorativeMedia: mediaDTO(homepage.methodistBanner.decorativeMedia, origin), meshTone: homepage.methodistBanner.meshTone ?? 'lavender', action: actionDTO(homepage.methodistBanner.action) },
+      methodistBanner: { price: homepage.methodistBanner.price, title: homepage.methodistBanner.title ?? '', description: homepage.methodistBanner.description ?? '', decorativeMedia: mediaDTO(homepage.methodistBanner.decorativeMedia, origin), meshTone: homepage.methodistBanner.meshTone ?? 'lavender', action: actionDTO(homepage.methodistBanner.action) },
       coachesSection: { eyebrow: homepage.coachesSection?.eyebrow ?? '', title: homepage.coachesSection?.title ?? '' },
       tournamentsSection: { eyebrow: homepage.tournamentsSection?.eyebrow ?? '', title: homepage.tournamentsSection?.title ?? '' },
       gallerySection: { eyebrow: homepage.gallerySection.eyebrow ?? '', title: homepage.gallerySection.title ?? '', action: actionDTO(homepage.gallerySection.action) },

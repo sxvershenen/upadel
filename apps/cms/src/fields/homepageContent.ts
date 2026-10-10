@@ -151,9 +151,9 @@ export const heroFields: Field[] = [
       {
         type: 'row',
         fields: [
-          { name: 'titleLine', type: 'text', label: 'Первая строка', defaultValue: 'Первая тренировка', admin: { width: '50%' } },
-          { name: 'titleConnector', type: 'text', label: 'Связка', defaultValue: 'за', admin: { width: '20%' } },
-          { name: 'titleAccent', type: 'text', label: 'Акцент', defaultValue: '1 990 ₽', admin: { width: '30%' } },
+          { name: 'titleLine', type: 'text', label: 'Первая строка', defaultValue: '2 часа', admin: { width: '50%' } },
+          { name: 'titleConnector', type: 'text', label: 'Связка', defaultValue: 'по цене', admin: { width: '20%' } },
+          { name: 'titleAccent', type: 'text', label: 'Акцент', defaultValue: 'одного', admin: { width: '30%' } },
         ],
       },
       {
@@ -194,6 +194,10 @@ export const heroFields: Field[] = [
       heroActionField('primaryAction', 'Основная кнопка', { label: 'Забронировать', mode: 'booking' }),
       heroActionField('secondaryAction', 'Вторая кнопка', { label: 'Пробное занятие', mode: 'trial-booking' }),
       heroSocialProofField,
+      { name: 'openingNotice', type: 'group', label: 'Открытие и спецпредложение', fields: [
+        { name: 'title', type: 'text', label: 'Первая строка', defaultValue: 'Открытие в ноябре' },
+        { name: 'caption', type: 'text', label: 'Вторая строка', defaultValue: 'Спец. оффер с 01.11 до 15.11' },
+      ] },
       heroStatsField,
     ],
   },
@@ -331,24 +335,25 @@ export const servicesFields: Field[] = [
   {
     name: 'methodistBanner',
     type: 'group',
-    label: 'Баннер методиста',
+    label: 'Тренировочная робопушка',
     fields: [
       {
         name: 'title',
         type: 'text',
         label: 'Заголовок',
-        defaultValue: 'Не знаете, с чего начать или какого тренера выбрать?',
+        defaultValue: 'Тренировочная робопушка',
       },
       {
         name: 'description',
         type: 'textarea',
         label: 'Описание',
         defaultValue:
-          'Наш старший методист подберёт программу и напарников по вашему спортивному бэкграунду — бесплатная консультация занимает 10 минут.',
+          'Отрабатывайте удары и точность в своём темпе. Арендуйте робопушку для самостоятельной тренировки на падел-корте.',
       },
-      { name: 'decorativeMedia', type: 'upload', relationTo: 'media', filterOptions: imageOnlyFilter, label: 'Декоративное изображение' },
-      { name: 'meshTone', type: 'select', label: 'Mesh-тон', defaultValue: 'lavender', options: [...meshToneOptions] },
-      { ...createActionField('action', 'Кнопка'), defaultValue: { label: 'Получить консультацию', mode: 'phone' } },
+      { name: 'decorativeMedia', type: 'upload', relationTo: 'media', filterOptions: imageOnlyFilter, label: 'Фотография тренировки' },
+      { name: 'price', type: 'number', label: 'Аренда робопушки, ₽ / час', min: 0, defaultValue: 3000 },
+      { name: 'meshTone', type: 'select', label: 'Mesh-тон', defaultValue: 'lavender', options: [...meshToneOptions], admin: { hidden: true } },
+      { ...createActionField('action', 'Кнопка'), admin: { hidden: true }, defaultValue: { label: 'Получить консультацию', mode: 'phone' } },
     ],
   },
 ]

@@ -1,54 +1,30 @@
-import { Compass } from "lucide-react";
-import { motion } from "framer-motion";
-import { Reveal } from "../components/ui/Reveal";
-import { ContentAction } from "../components/ContentAction";
-import { useContent } from "../content/ContentContext";
-import { ArrowAction } from "../components/ui/ArrowAction";
-import { springSoft } from "../lib/motion";
-import { ProgressiveImage } from "../components/ui/ProgressiveImage";
-
-const meshClasses: Record<string, string> = {
-  indigo: "mesh-indigo", "deep-blue": "mesh-deep-blue", dark: "mesh-dark", lime: "mesh-lime",
-  "lime-soft": "mesh-lime-soft", sky: "mesh-sky", lavender: "mesh-lavender", sunset: "mesh-sunset", "navy-gold": "mesh-navy-gold",
-};
+import { useRef } from 'react'
+import { motion } from 'framer-motion'
+import { useContent } from '../content/ContentContext'
+import { useImageParallax } from '../lib/useImageParallax'
+import { SurfaceCard } from '../components/ui/Card'
+import { Reveal } from '../components/ui/Reveal'
+import { ProgressiveImage } from '../components/ui/ProgressiveImage'
+import { Typography } from '../components/ui/Typography'
+import { Price } from '../components/ui/Price'
 
 export function MethodistBanner() {
-  const { home } = useContent();
-  const banner = home.methodistBanner;
-  return (
-    <section className="container-page pb-20 md:pb-28">
-      <Reveal>
-        <motion.div initial="rest" whileHover="hover" variants={{ rest: { y: 0, scale: 1 }, hover: { y: -5, scale: 1.012 } }} transition={springSoft} className={`se-4 ${meshClasses[banner.meshTone] ?? "mesh-lavender"} relative isolate flex flex-col overflow-hidden p-6 text-white md:p-8`}>
-          <ProgressiveImage
-            skeleton={false}
-            src={banner.decorativeMedia?.url}
-            alt=""
-            aria-hidden="true"
-            loading="lazy"
-            decoding="async"
-            variants={{ rest: { scale: 1, rotate: 0, y: 0 }, hover: { scale: 1.05, rotate: 4, y: -7 } }}
-            transition={springSoft}
-            className="pointer-events-none absolute -bottom-28 right-[-8%] z-0 h-[230px] w-auto opacity-95 md:right-[10%] md:h-[290px]"
-          />
-          <span className="se-1 absolute right-6 top-6 z-10 flex h-11 w-11 items-center justify-center bg-white/15 md:right-8 md:top-8">
-            <Compass size={20} />
-          </span>
-          <div className="relative z-10 flex max-w-[720px] flex-col gap-4 pr-14 md:pr-20">
-            <h3 className="type-title-large font-semibold text-white">
-              {banner.title}
-            </h3>
-            <p className="type-body-sm text-white/70">
-              {banner.description}
-            </p>
-          </div>
-          <ContentAction action={banner.action} variant="secondary" size="lg" className="absolute bottom-8 right-8 z-10 hidden !bg-white !text-ink hover:!bg-white md:flex" />
-          <ArrowAction
-            tone="glass"
-            size="md"
-            className="absolute bottom-6 right-6 z-10 !bg-white/15 !text-white md:hidden"
-          />
+  const banner = useContent().home.methodistBanner
+  const backgroundRef = useRef<HTMLDivElement>(null)
+  const backgroundY = useImageParallax(backgroundRef, 17)
+  return <section className="container-page pb-20 md:pb-28">
+    <Reveal><SurfaceCard interactive={false} reveal={false} className="relative isolate flex min-h-[480px] flex-col justify-end overflow-hidden bg-ink p-7 text-white md:min-h-[560px] md:p-12">
+      <div ref={backgroundRef} data-parallax-viewport className="parallax-viewport absolute inset-0">
+        <motion.div data-parallax-layer style={{ y: backgroundY }} className="parallax-layer-wide overflow-hidden">
+          {banner.decorativeMedia && <ProgressiveImage media={banner.decorativeMedia} loading="lazy" decoding="async" sizes="100vw" className="h-full w-full object-cover" />}
         </motion.div>
-      </Reveal>
-    </section>
-  );
+      </div>
+      <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,6,10,.35)_0%,rgba(4,6,10,.6)_45%,rgba(4,6,10,.88)_100%)]" />
+      <div className="relative z-10 max-w-[720px]">
+        <Typography as="h2" role="section" reveal={false} className="text-white">{banner.title}</Typography>
+        <Typography role="body" reveal={false} className="mt-5 max-w-[580px] text-white/75">{banner.description}</Typography>
+        {banner.price != null && <div className="mt-7"><Price value={banner.price} suffix="/ час" tone="light" /></div>}
+      </div>
+    </SurfaceCard></Reveal>
+  </section>
 }

@@ -7,7 +7,7 @@ import { useImageParallax } from "../../lib/useImageParallax";
 import { revealAttributes, type RevealConfig } from "./revealAttributes";
 import { ProgressiveImage } from "./ProgressiveImage";
 
-const cardVariants = { rest: { y: 0, scale: 1 }, hover: { y: -5, scale: 1.012 } };
+export const cardVariants = { rest: { y: 0, scale: 1 }, hover: { y: -5, scale: 1.012 } };
 const imageVariants = { rest: { scale: 1.04 }, hover: { scale: 1.095 } };
 
 const meshMap = {

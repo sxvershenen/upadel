@@ -1,5 +1,5 @@
 import { useState, type CSSProperties } from "react";
-import { CalendarCheck, MapPin, Star, Users } from "lucide-react";
+import { CalendarCheck, CalendarDays, MapPin, Star, Users } from "lucide-react";
 import { ContentAction } from "../components/ContentAction";
 import { useContent } from "../content/ContentContext";
 import { SplitTextReveal } from "../components/ui/SplitTextReveal";
@@ -74,6 +74,16 @@ function SocialProof({ className }: { className?: string }) {
   );
 }
 
+function OpeningNotice({ className }: { className?: string }) {
+  const notice = useContent().home.hero.openingNotice;
+  if (!notice?.title && !notice?.caption) return null;
+  return <div data-hero-opening-notice="" className={cn("glass-overlay se-3 flex min-h-[52px] items-center gap-3 px-3.5 py-2 text-white", className)}>
+    <CalendarDays size={22} className="shrink-0 text-lime" />
+    <div className="h-7 w-px bg-white/20" />
+    <div className="flex flex-col gap-0.5"><span className="type-caption font-semibold text-white">{notice.title}</span><span className="type-micro text-white/70">{notice.caption}</span></div>
+  </div>;
+}
+
 function HeroAddress({ className }: { className?: string }) {
   const { site } = useContent();
   const content = <><MapPin size={16} className="shrink-0 text-lime" /><span className="flex flex-col"><span className="type-micro text-white/50">{site.contacts.labels.address}</span><span className="type-caption font-semibold text-white">{site.contacts.address}</span></span></>;
@@ -106,12 +116,14 @@ export function Hero() {
 
       {replaceBrand && <HeroAddress className="absolute right-4 top-20 z-10 md:bottom-8 md:right-8 md:top-auto" />}
 
-      <div className="container-page absolute inset-x-0 top-[84px] z-10 md:hidden">
+      <div className="container-page absolute inset-x-0 top-[84px] z-10 flex flex-col items-start gap-2 md:hidden">
         <SocialProof className="w-fit max-w-full" />
+        <OpeningNotice className="w-fit max-w-full" />
       </div>
 
       <div className="container-page relative z-10 flex h-full flex-col justify-end pb-[calc(104px+env(safe-area-inset-bottom))] pt-32 sm:pb-9 lg:pb-12">
         <div className="flex max-w-[980px] flex-col">
+          <OpeningNotice className="mb-6 hidden w-fit md:flex" />
           <div
             data-hero-title=""
             className="type-hero font-semibold text-white"

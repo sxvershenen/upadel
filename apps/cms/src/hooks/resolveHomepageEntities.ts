@@ -3,7 +3,7 @@ import type { Payload } from 'payload'
 export const homepageCollectionLimits = {
   coaches: 8,
   courts: 4,
-  'rental-rates': 4,
+  'rental-rates': 5,
   'training-programs': 5,
   memberships: 4,
   tournaments: 3,

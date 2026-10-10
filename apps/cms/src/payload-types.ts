@@ -594,7 +594,7 @@ export interface RentalRate {
   isActive?: boolean | null;
   showOnHomepage?: boolean | null;
   /**
-   * Уникальный номер от 1 до 4; меньшие значения выводятся раньше.
+   * Уникальный номер от 1 до 5; меньшие значения выводятся раньше.
    */
   homepageOrder?: number | null;
   updatedAt: string;
@@ -721,6 +721,9 @@ export interface Membership {
     href?: string | null;
     leadType?: ('membership' | 'gift' | 'trial' | 'consultation' | 'other') | null;
   };
+  /**
+   * Включённые опубликованные тарифы возвращают вкладку «Абонементы» на /prices; на главной также нужен флаг показа и порядок.
+   */
   isActive?: boolean | null;
   showOnHomepage?: boolean | null;
   /**
@@ -737,20 +740,22 @@ export interface Membership {
  */
 export interface Tournament {
   id: number;
-  title: string;
-  description: string;
+  title?: string | null;
+  description?: string | null;
   /**
    * Не зависит от статуса черновик/опубликовано.
    */
-  lifecycle: 'upcoming' | 'active' | 'finished' | 'cancelled';
-  startsAt: string;
-  endsAt: string;
-  levelFrom: '1.0' | '1.5' | '2.0' | '2.5' | '3.0' | '3.5' | '4.0' | '4.5' | '5.0' | '5.5' | '6.0' | '6.5' | '7.0';
-  levelTo: '1.0' | '1.5' | '2.0' | '2.5' | '3.0' | '3.5' | '4.0' | '4.5' | '5.0' | '5.5' | '6.0' | '6.5' | '7.0';
-  format: 'americano' | 'groups-knockout' | 'round-robin-playoff' | 'other';
+  lifecycle?: ('upcoming' | 'active' | 'finished' | 'cancelled') | null;
+  startsAt?: string | null;
+  endsAt?: string | null;
+  levelFrom?:
+    ('1.0' | '1.5' | '2.0' | '2.5' | '3.0' | '3.5' | '4.0' | '4.5' | '5.0' | '5.5' | '6.0' | '6.5' | '7.0') | null;
+  levelTo?:
+    ('1.0' | '1.5' | '2.0' | '2.5' | '3.0' | '3.5' | '4.0' | '4.5' | '5.0' | '5.5' | '6.0' | '6.5' | '7.0') | null;
+  format?: ('americano' | 'groups-knockout' | 'round-robin-playoff' | 'other') | null;
   customFormat?: string | null;
-  participantMode: 'players' | 'pairs';
-  totalSlots: number;
+  participantMode?: ('players' | 'pairs') | null;
+  totalSlots?: number | null;
   action: {
     label?: string | null;
     mode:
@@ -779,7 +784,7 @@ export interface Tournament {
      */
     phoneValue?: string | null;
   };
-  visualStyle: 'image' | 'mesh';
+  visualStyle?: ('image' | 'mesh') | null;
   image?: (number | null) | Media;
   imageOverlay?:
     | (
@@ -797,13 +802,13 @@ export interface Tournament {
    */
   meshStyle?:
     ('indigo' | 'deep-blue' | 'dark' | 'lime' | 'lime-soft' | 'sky' | 'lavender' | 'sunset' | 'navy-gold') | null;
-  icon: 'PartyPopper' | 'Trophy' | 'Medal';
+  icon?: ('PartyPopper' | 'Trophy' | 'Medal') | null;
   /**
    * Строки можно перетаскивать. Нумерация на сайте следует этому порядку.
    */
   participants?:
     | {
-        name: string;
+        name?: string | null;
         /**
          * Оставьте пустым для индивидуального формата.
          */
@@ -811,7 +816,7 @@ export interface Tournament {
         level?:
           | ('1.0' | '1.5' | '2.0' | '2.5' | '3.0' | '3.5' | '4.0' | '4.5' | '5.0' | '5.5' | '6.0' | '6.5' | '7.0')
           | null;
-        status: 'confirmed' | 'waitlist';
+        status?: ('confirmed' | 'waitlist') | null;
         id?: string | null;
       }[]
     | null;
@@ -820,34 +825,40 @@ export interface Tournament {
    */
   standings?:
     | {
-        name: string;
+        name?: string | null;
         partnerName?: string | null;
-        matches: number;
-        points: number;
-        difference: string;
+        matches?: number | null;
+        points?: number | null;
+        difference?: string | null;
         award?: string | null;
         id?: string | null;
       }[]
     | null;
-  entryFee: string;
-  prizeLabel: string;
-  prize: string;
+  /**
+   * Единственная цена участия для карточки и страницы. Например: от 4 000 ₽ / участник.
+   */
+  entryFee?: string | null;
+  /**
+   * Только призы; стоимость участия задаётся отдельно.
+   */
+  prizeLabel?: string | null;
+  prize?: string | null;
   /**
    * Место определяется порядком строк.
    */
   prizes?:
     | {
-        title: string;
-        reward: string;
-        description: string;
+        title?: string | null;
+        reward?: string | null;
+        description?: string | null;
         id?: string | null;
       }[]
     | null;
   useDefaultFaq?: boolean | null;
   faqs?:
     | {
-        question: string;
-        answer: string;
+        question?: string | null;
+        answer?: string | null;
         id?: string | null;
       }[]
     | null;
@@ -872,25 +883,25 @@ export interface Tournament {
   useDefaultChecklist?: boolean | null;
   checklist?:
     | {
-        text: string;
+        text?: string | null;
         id?: string | null;
       }[]
     | null;
   useDefaultPerks?: boolean | null;
   perks?:
     | {
-        icon: 'Sparkles' | 'Droplets' | 'ShowerHead' | 'Camera';
-        title: string;
-        description: string;
+        icon?: ('Sparkles' | 'Droplets' | 'ShowerHead' | 'Camera') | null;
+        title?: string | null;
+        description?: string | null;
         id?: string | null;
       }[]
     | null;
   useDefaultMatchday?: boolean | null;
   matchday?:
     | {
-        timing: string;
-        title: string;
-        description: string;
+        timing?: string | null;
+        title?: string | null;
+        description?: string | null;
         id?: string | null;
       }[]
     | null;
@@ -913,7 +924,15 @@ export interface Tournament {
   /**
    * Стабильный адрес латиницей: например, artem-volkov. Не меняйте после публикации без редиректа.
    */
-  slug: string;
+  slug?: string | null;
+  /**
+   * Выключите для информационной карточки без перехода.
+   */
+  cardLinkEnabled?: boolean | null;
+  /**
+   * HTTPS-ссылка, например на пост VK. Если пусто — открывается страница турнира.
+   */
+  cardURL?: string | null;
   seedKey?: string | null;
   /**
    * Главная читает эту же запись; отдельной копии карточки нет.
@@ -1922,6 +1941,8 @@ export interface TournamentsSelect<T extends boolean = true> {
         socialImage?: T;
       };
   slug?: T;
+  cardLinkEnabled?: T;
+  cardURL?: T;
   seedKey?: T;
   showOnHomepage?: T;
   homepageOrder?: T;
@@ -2490,6 +2511,7 @@ export interface TournamentDefault {
  */
 export interface Homepage {
   id: number;
+  openingContentVersion?: string | null;
   seedVersion?: string | null;
   /**
    * Перетаскивайте секции и меняйте видимость. Разметка остаётся в коде; карточки тренеров, турниров и статей разрешаются из их коллекций.
@@ -2610,6 +2632,10 @@ export interface Homepage {
        * Используются фотографии существующих тренеров; медиа не копируется.
        */
       coaches?: (number | Coach)[] | null;
+    };
+    openingNotice?: {
+      title?: string | null;
+      caption?: string | null;
     };
     stats?:
       | {
@@ -2735,6 +2761,7 @@ export interface Homepage {
     title?: string | null;
     description?: string | null;
     decorativeMedia?: (number | null) | Media;
+    price?: number | null;
     meshTone?:
       ('indigo' | 'deep-blue' | 'dark' | 'lime' | 'lime-soft' | 'sky' | 'lavender' | 'sunset' | 'navy-gold') | null;
     action: {
@@ -2952,6 +2979,15 @@ export interface PricesPage {
   eyebrow: string;
   title: string;
   intro: string;
+  termsTitle?: string | null;
+  faqTitle?: string | null;
+  faq?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
   rentTabLabel: string;
   trainingTabLabel: string;
   membershipsTabLabel: string;
@@ -3954,6 +3990,7 @@ export interface TournamentDefaultsSelect<T extends boolean = true> {
  * via the `definition` "homepage_select".
  */
 export interface HomepageSelect<T extends boolean = true> {
+  openingContentVersion?: T;
   seedVersion?: T;
   sections?:
     | T
@@ -4055,6 +4092,12 @@ export interface HomepageSelect<T extends boolean = true> {
               caption?: T;
               coaches?: T;
             };
+        openingNotice?:
+          | T
+          | {
+              title?: T;
+              caption?: T;
+            };
         stats?:
           | T
           | {
@@ -4138,6 +4181,7 @@ export interface HomepageSelect<T extends boolean = true> {
         title?: T;
         description?: T;
         decorativeMedia?: T;
+        price?: T;
         meshTone?: T;
         action?:
           | T
@@ -4297,6 +4341,15 @@ export interface PricesPageSelect<T extends boolean = true> {
   eyebrow?: T;
   title?: T;
   intro?: T;
+  termsTitle?: T;
+  faqTitle?: T;
+  faq?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
   rentTabLabel?: T;
   trainingTabLabel?: T;
   membershipsTabLabel?: T;

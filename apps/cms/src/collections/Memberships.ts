@@ -17,7 +17,7 @@ export const Memberships: CollectionConfig = {
     update: authenticated,
   },
   admin: {
-    defaultColumns: ['title', 'cardVariant', 'price', 'showOnHomepage', 'homepageOrder', '_status'],
+    defaultColumns: ['title', 'isActive', 'cardVariant', 'priceLabel', 'showOnHomepage', 'homepageOrder', '_status'],
     group: 'Услуги',
     useAsTitle: 'title',
   },
@@ -42,7 +42,7 @@ export const Memberships: CollectionConfig = {
     { name: 'meshTone', type: 'select', label: 'Mesh-тон', options: [...meshToneOptions] },
     { name: 'price', type: 'number', label: 'Цена, ₽', min: 0 },
     { name: 'oldPrice', type: 'number', label: 'Старая цена, ₽', min: 0 },
-    { name: 'priceLabel', type: 'text', label: 'Подпись цены или размер скидки' },
+    { name: 'priceLabel', type: 'text', label: 'Подпись цены', defaultValue: 'Цена по запросу' },
     {
       name: 'benefits',
       type: 'array',
@@ -61,7 +61,7 @@ export const Memberships: CollectionConfig = {
       ],
     },
     createActionField('action', 'Действие'),
-    { name: 'isActive', type: 'checkbox', label: 'Активен', defaultValue: true, admin: { position: 'sidebar' } },
+    { name: 'isActive', type: 'checkbox', label: 'Показывать тариф на сайте', defaultValue: true, admin: { position: 'sidebar', description: 'Включённые опубликованные тарифы возвращают вкладку «Абонементы» на /prices; на главной также нужен флаг показа и порядок.' } },
     {
       name: 'showOnHomepage',
       type: 'checkbox',

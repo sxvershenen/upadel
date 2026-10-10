@@ -51,6 +51,7 @@ if [[ "$FIRST_DEPLOY" == "1" ]]; then
   npm run seed:cms
   npm run admin:create
 fi
+npm run content:opening --workspace @unlim/cms
 npm run media:responsive --workspace @unlim/cms
 
 [[ ! -e "$CURRENT_LINK" || -L "$CURRENT_LINK" ]] || { echo "Current path is not a symlink: $CURRENT_LINK" >&2; exit 1; }

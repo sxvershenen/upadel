@@ -1,11 +1,13 @@
 import type { PricesPageDTO, ThematicPageDTO } from '@unlim/content-contract'
-import { CalendarCheck, Car, Clock, Layers3, Lightbulb, MapPin, PanelTop, RefreshCw, Thermometer, Train } from 'lucide-react'
+import { Car, Clock, Layers3, Lightbulb, MapPin, PanelTop, Thermometer, Train } from 'lucide-react'
 import { useState, type CSSProperties } from 'react'
 
 import { MembershipCard } from '../components/cards/MembershipCards'
 import { RentalRateCard } from '../components/cards/RentPricingCards'
 import { CourtCard } from '../components/cards/CourtCards'
 import { SiteFrame } from '../components/SiteFrame'
+import { Accordion } from '../components/ui/Accordion'
+import { Typography } from '../components/ui/Typography'
 import { Tabs } from '../components/ui/Tabs'
 import { GalleryExperience } from './GalleryExperience'
 import { PageHeader } from './PageHeader'
@@ -13,19 +15,29 @@ import { PageHeader } from './PageHeader'
 export function Prices({ dto }: { dto: PricesPageDTO }) {
   const tabs = [
     { id: 'rent' as const, label: dto.tabs.rent, panelId: 'price-panel-rent' },
-    { id: 'memberships' as const, label: dto.tabs.memberships, panelId: 'price-panel-memberships' },
+    ...(dto.memberships.length ? [{ id: 'memberships' as const, label: dto.tabs.memberships, panelId: 'price-panel-memberships' }] : []),
   ]
   const standardRates = dto.rentalRates.filter(({ cardVariant }) => cardVariant !== 'trial')
   const [active, setActive] = useState<(typeof tabs)[number]['id']>('rent')
+  const visibleActive = dto.memberships.length ? active : 'rent'
   return <>
-    <div aria-hidden="true" className="h-8 md:hidden" />
+    {tabs.length > 1 && <><div aria-hidden="true" className="h-8 md:hidden" />
     <div className="container-page sticky top-[var(--page-gutter)] z-30 pb-8 md:static md:pb-12 md:pt-8">
-      <Tabs reveal={false} layoutId="prices-tabs" aria-label="Разделы цен" tabs={tabs} value={active} onChange={setActive} className="w-full [&>button]:flex-1 md:w-auto md:[&>button]:flex-none" />
-    </div>
-    <div className="container-page pb-8 md:pb-12">
-      <section id="price-panel-rent" role="tabpanel" aria-label={dto.tabs.rent} hidden={active !== 'rent'}><div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">{standardRates.map((item) => <RentalRateCard key={item.id} rate={item} />)}</div></section>
-      <section id="price-panel-memberships" role="tabpanel" aria-label={dto.tabs.memberships} hidden={active !== 'memberships'}><div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">{dto.memberships.map((item) => <MembershipCard key={item.id} membership={item} />)}</div></section>
-      <section data-mobile-compact-list className="mt-12 grid gap-0 border-y border-ink/10 md:grid-cols-2 md:gap-4 md:border-y-0">{dto.rules.map((rule) => { const Icon = rule.title.toLowerCase().includes('отмен') || rule.title.toLowerCase().includes('перенос') ? RefreshCw : CalendarCheck; return <article key={rule.title} className="se-3 max-sm:!rounded-none flex items-start gap-3 border-b border-ink/10 bg-transparent px-0 py-5 last:border-b-0 md:block md:border-b-0 md:bg-white md:p-6"><span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center text-ink-soft md:mt-0 md:h-9 md:w-9 md:rounded-[var(--se-2)] md:bg-surface-muted md:text-ink"><Icon size={17} /></span><div className="min-w-0"><h2 className="type-body font-medium text-ink md:mt-4 md:!text-[24px] md:!leading-[1.15] md:!font-semibold md:!tracking-[-0.025em]">{rule.title}</h2><div className="article-content mt-1.5 text-ink-soft md:mt-3" dangerouslySetInnerHTML={{ __html: rule.contentHTML }} /></div></article> })}</section>
+      <Tabs reveal={false} layoutId="prices-tabs" aria-label="Разделы цен" tabs={tabs} value={visibleActive} onChange={setActive} className="w-full [&>button]:flex-1 md:w-auto md:[&>button]:flex-none" />
+    </div></>}
+    <div className="container-page pt-8 pb-8 md:pb-12">
+      <section id="price-panel-rent" role={tabs.length > 1 ? 'tabpanel' : undefined} aria-label={dto.tabs.rent} hidden={visibleActive !== 'rent'}><div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">{standardRates.map((item) => <RentalRateCard key={item.id} rate={item} />)}</div></section>
+      <section id="price-panel-memberships" role={tabs.length > 1 ? 'tabpanel' : undefined} aria-label={dto.tabs.memberships} hidden={visibleActive !== 'memberships'}><div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">{dto.memberships.map((item) => <MembershipCard key={item.id} membership={item} />)}</div></section>
+      <section className="mt-16 grid gap-8 lg:grid-cols-2 lg:gap-0 lg:divide-x lg:divide-ink/10" aria-label={dto.termsTitle}>
+        <div className="lg:pr-16">
+          <Typography as="h2" role="section" className="font-semibold text-ink">{dto.termsTitle}</Typography>
+          <div className="mt-8 border-y border-ink/10">{dto.rules.map((rule) => <div key={rule.title} className="border-b border-ink/10 py-5 last:border-b-0">
+            <Typography as="h3" role="body" className="font-medium text-ink">{rule.title}</Typography>
+            <div className="article-content mt-1.5 text-ink-soft" dangerouslySetInnerHTML={{ __html: rule.contentHTML }} />
+          </div>)}</div>
+        </div>
+        <div className="lg:pl-16"><Typography as="h2" role="section" className="font-semibold text-ink">{dto.faqTitle}</Typography><div className="mt-8"><Accordion items={(dto.faq ?? []).map(({ question, answer }) => ({ q: question, a: answer }))} /></div></div>
+      </section>
     </div>
   </>
 }

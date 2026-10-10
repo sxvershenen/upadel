@@ -68,11 +68,17 @@ function createThematicPage(args: {
 
 export const PricesPage = createThematicPage({
   slug: 'prices-page', label: 'Цены', kind: 'prices', fields: [
+    { name: 'termsTitle', type: 'text', label: 'Заголовок условий', defaultValue: 'Условия и правила' },
+    { name: 'faqTitle', type: 'text', label: 'Заголовок FAQ', defaultValue: 'Частые вопросы' },
+    { name: 'faq', type: 'array', label: 'Частые вопросы', fields: [
+      { name: 'question', type: 'text', label: 'Вопрос', required: true },
+      { name: 'answer', type: 'textarea', label: 'Ответ', required: true },
+    ] },
     { name: 'rentTabLabel', type: 'text', label: 'Вкладка аренды', required: true },
     { name: 'trainingTabLabel', type: 'text', label: 'Вкладка тренировок', required: true },
     { name: 'membershipsTabLabel', type: 'text', label: 'Вкладка абонементов', required: true },
     {
-      name: 'rules', type: 'array', label: 'Правила и условия', minRows: 1, maxRows: 6,
+      name: 'rules', type: 'array', label: 'Правила и условия', minRows: 1, maxRows: 8,
       fields: [
         { name: 'title', type: 'text', label: 'Заголовок', required: true },
         { name: 'content', type: 'richText', label: 'Текст', required: true },

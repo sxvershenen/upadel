@@ -391,7 +391,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                   <div className="flex flex-col">
                     <dt className="type-micro font-medium uppercase tracking-wider text-ink-muted flex items-center gap-1.5">
                       <Wallet size={14} className="text-ink-muted" />
-                      {typograph('Взнос')}
+                      {typograph('Стоимость участия')}
                     </dt>
                     <dd className="mt-1">
                       <span className="type-body-sm font-semibold text-ink block leading-snug">
@@ -400,6 +400,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                     </dd>
                   </div>
 
+                  {dto.item.prize && (
                   <div className="flex flex-col">
                     <dt className="type-micro font-medium uppercase tracking-wider text-ink-muted flex items-center gap-1.5">
                       <Award size={14} className="text-ink-muted" />
@@ -411,6 +412,7 @@ export function TournamentDetailPage({ dto }: { dto: TournamentDetailDTO }) {
                       </span>
                     </dd>
                   </div>
+                  )}
                 </dl>
               </div>
 

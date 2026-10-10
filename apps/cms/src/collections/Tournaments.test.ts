@@ -45,3 +45,18 @@ test('tournament editor exposes the requested tabs and removes legacy duplicate 
   assert.doesNotMatch(serialized, /scheduleLabel|levelKey|formatKey|categoryKey/)
   assert.match(serialized, /external-link/)
 })
+
+
+test('tournaments allow empty content fields and preserve stable generated slugs', async () => {
+  const hook = Tournaments.hooks!.beforeValidate![0]
+  const created = await hook({ data: {}, originalDoc: undefined } as never)
+  assert.match(created.slug, /^tournament-[a-f0-9-]+$/)
+  const updated = await hook({ data: { slug: '' }, originalDoc: { slug: 'existing-event' } } as never)
+  assert.equal(updated.slug, 'existing-event')
+  const core = (Tournaments.fields.find((field) => field.type === 'tabs') as any).tabs[0].fields
+  assert.equal(core.find((field: any) => field.name === 'title').required, undefined)
+  assert.equal(core.find((field: any) => field.name === 'description').required, undefined)
+  assert.ok(Tournaments.fields.some((field: any) => field.name === 'cardLinkEnabled'))
+  assert.ok(Tournaments.fields.some((field: any) => field.name === 'cardURL'))
+  assert.equal(formatTournamentLevel(undefined, undefined), '')
+})

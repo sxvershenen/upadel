@@ -12,13 +12,14 @@ import { useContent } from "../content/ContentContext";
 type TabId = "rent" | "training" | "memberships";
 
 export function Pricing() {
-  const { home } = useContent();
+  const { home, entities } = useContent();
   const pricingTabs = [
     { id: "rent" as const, label: home.pricingSection.rentTabLabel, panelId: "pricing-panel" },
     { id: "training" as const, label: home.pricingSection.trainingTabLabel, panelId: "pricing-panel" },
-    { id: "memberships" as const, label: home.pricingSection.membershipsTabLabel, panelId: "pricing-panel" },
+    ...(entities.memberships.length ? [{ id: "memberships" as const, label: home.pricingSection.membershipsTabLabel, panelId: "pricing-panel" }] : []),
   ];
-  const [active, setActive] = useState<TabId>(home.pricingSection.defaultTab);
+  const [active, setActive] = useState<TabId>(pricingTabs.some(({ id }) => id === home.pricingSection.defaultTab) ? home.pricingSection.defaultTab : "rent");
+  const visibleActive = pricingTabs.some(({ id }) => id === active) ? active : "rent";
   const [pricingSwiper, setPricingSwiper] = useState<SwiperType | null>(null);
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
@@ -83,7 +84,7 @@ export function Pricing() {
                 onPrev={() => pricingSwiper?.slidePrev()}
                 onNext={() => pricingSwiper?.slideNext()}
               />
-              <Tabs className="hidden md:inline-flex" layoutId="pricing-tabs-desktop" tabs={pricingTabs} value={active} onChange={changeTab} />
+              <Tabs className="hidden md:inline-flex" layoutId="pricing-tabs-desktop" tabs={pricingTabs} value={visibleActive} onChange={changeTab} />
             </div>
           }
           className="mb-4 md:mb-10"
@@ -91,7 +92,7 @@ export function Pricing() {
       </Reveal>
 
       <div className="mb-10 md:hidden">
-        <Tabs fullWidth layoutId="pricing-tabs-mobile" tabs={pricingTabs} value={active} onChange={changeTab} />
+        <Tabs fullWidth layoutId="pricing-tabs-mobile" tabs={pricingTabs} value={visibleActive} onChange={changeTab} />
       </div>
 
       <div
@@ -102,10 +103,10 @@ export function Pricing() {
         tabIndex={0}
         className="pricing-tab-panel relative grid overflow-visible"
       >
-        <div ref={panelContentRef} key={active} className="pricing-tab-panel-content col-start-1 row-start-1 w-full">
-          {active === "rent" && <PricingRent onSwiperChange={syncPricingSwiper} />}
-          {active === "training" && <PricingTraining onSwiperChange={syncPricingSwiper} />}
-          {active === "memberships" && <PricingMemberships onSwiperChange={syncPricingSwiper} />}
+        <div ref={panelContentRef} key={visibleActive} className="pricing-tab-panel-content col-start-1 row-start-1 w-full">
+          {visibleActive === "rent" && <PricingRent onSwiperChange={syncPricingSwiper} />}
+          {visibleActive === "training" && <PricingTraining onSwiperChange={syncPricingSwiper} />}
+          {visibleActive === "memberships" && <PricingMemberships onSwiperChange={syncPricingSwiper} />}
         </div>
       </div>
     </section>

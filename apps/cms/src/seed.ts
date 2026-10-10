@@ -9,6 +9,7 @@ import { defaultHeroTint, defaultHeroTitleFontSize } from '@unlim/content-contra
 import config from './payload.config'
 import { mergeRequiredNavigation, navigationChanged, normalizeDesktopNavigation, priceNavigationChildren, requiredPageLinks } from './content/requiredNavigation'
 import { padelCourtZakazSeed } from './content/padelCourtZakazSeed'
+import { applyOpeningContentTransaction } from './content/openingContent'
 import { tournamentDefaultContent } from './globals/TournamentDefaults'
 
 const seedVersion = 'prototype-v2'
@@ -1136,7 +1137,7 @@ async function seed() {
         slug: 'americano', title: 'Game Party / Americano', lifecycle: 'active', startsAt: '2026-09-20T16:30:00.000Z', endsAt: '2026-09-20T19:30:00.000Z',
         levelFrom: '2.0', levelTo: '2.0', format: 'americano', participantMode: 'players', totalSlots: 16, participants: americanoParticipants, standings: americanoStandings,
         entryFee: '2 500 ₽ / участник', description: 'Самый душевный формат для знакомства с игроками клуба. Музыкальный сет, питьевая вода и динамичные матчи.',
-        prizeLabel: 'Стоимость за участника', prize: '2 500 ₽', visualStyle: 'image', image: mediaID(images.tournamentParty),
+        prizeLabel: 'Призовой фонд', prize: '30 000 ₽', visualStyle: 'image', image: mediaID(images.tournamentParty),
         prizes: [
           { title: 'Победитель Americano', reward: 'Золотой кубок + 15 000 ₽', description: 'Кубок клуба, памятная медаль и сертификат Bullpadel.' },
           { title: 'Серебряный призёр', reward: 'Серебряная медаль + 10 000 ₽', description: 'Клубный мерч и комплект турнирных мячей Bullpadel Gold.' },
@@ -1247,7 +1248,7 @@ async function seed() {
       {
         key: 'prime', title: 'Прайм-тайм', eyebrow: 'Основное время', timeLabel: '09:00–21:00',
         description: 'Основное время клуба для игр с друзьями, регулярных матчей и самой насыщенной клубной атмосферы.',
-        price: 5000, priceLabel: 'стоимость', priceSuffix: '/ час', badge: 'Популярно', badgeTone: 'sunset', cardVariant: 'rate',
+        price: 5500, priceLabel: 'стоимость', priceSuffix: '/ час', badge: 'Популярно', badgeTone: 'sunset', cardVariant: 'rate',
       },
       {
         key: 'trial', title: 'Пробная тренировка за 1 990 ₽', eyebrow: 'Специальное предложение',
@@ -1967,6 +1968,7 @@ async function seed() {
       stats.globalsPublished += 1
     }
 
+    await applyOpeningContentTransaction(payload)
     payload.logger.info({ stats }, 'Prototype seed completed')
   } finally {
     await payload.destroy()

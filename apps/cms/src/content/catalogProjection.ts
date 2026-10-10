@@ -26,14 +26,14 @@ function coachItem(coach: Coach, origin: string): CoachCatalogItem {
 }
 
 export function tournamentCard(item: Tournament, origin: string): TournamentCardDTO {
-  const levelFrom = Number(item.levelFrom)
-  const levelTo = Number(item.levelTo)
+  const levelFrom = Number(item.levelFrom ?? 0)
+  const levelTo = Number(item.levelTo ?? 0)
   return {
-    id: String(item.id), slug: item.slug, visualStyle: item.visualStyle, image: mediaDTO(item.image, origin), imageOverlay: item.imageOverlay,
-    meshStyle: item.meshStyle, levelFrom, levelTo, levelLabel: formatTournamentLevel(levelFrom, levelTo), icon: item.icon, title: item.title,
-    startsAt: item.startsAt, endsAt: item.endsAt, scheduleLabel: formatTournamentSchedule(item.startsAt, item.endsAt), format: item.format,
-    formatLabel: resolveTournamentFormatLabel(item.format, item.customFormat), entryFee: item.entryFee, description: item.description,
-    prizeLabel: item.prizeLabel, prize: item.prize,
+    id: String(item.id), slug: item.slug ?? '', cardLinkEnabled: item.cardLinkEnabled !== false, cardURL: item.cardURL, visualStyle: item.visualStyle ?? 'mesh', image: mediaDTO(item.image, origin), imageOverlay: item.imageOverlay,
+    meshStyle: item.meshStyle, levelFrom, levelTo, levelLabel: levelFrom > 0 && levelTo > 0 ? formatTournamentLevel(levelFrom, levelTo) : '', icon: item.icon ?? 'Trophy', title: item.title ?? '',
+    startsAt: item.startsAt ?? '', endsAt: item.endsAt ?? '', scheduleLabel: formatTournamentSchedule(item.startsAt ?? '', item.endsAt ?? ''), format: item.format ?? 'other',
+    formatLabel: resolveTournamentFormatLabel(item.format, item.customFormat), entryFee: item.entryFee ?? '', description: item.description ?? '',
+    prizeLabel: item.prizeLabel ?? 'Призовой фонд', prize: item.prize ?? '',
   }
 }
 
@@ -51,14 +51,14 @@ function tournamentItem(item: Tournament, origin: string, context: TournamentCon
     : item.coordinator ?? {}
   return {
     ...tournamentCard(item, origin),
-    action: actionDTO(item.action), lifecycle: item.lifecycle, participantMode: item.participantMode, totalSlots: item.totalSlots,
-    participants: withIDs(item.participants).map(({ id, name, partnerName, level, status }) => ({ id, name, partnerName, level, status })),
-    standings: withIDs(item.standings).map(({ id, name, partnerName, matches, points, difference, award }, index) => ({ id, rank: index + 1, name, partnerName, matches, points, difference, award })),
-    prizes: withIDs(item.prizes).map(({ id, title, reward, description }, index) => ({ id, place: index + 1, title, reward, description })),
-    checklist: withIDs(item.useDefaultChecklist === false ? item.checklist : inherited.checklist).map(({ id, text }) => ({ id, text })),
-    perks: withIDs(item.useDefaultPerks === false ? item.perks : inherited.perks).map(({ id, icon, title, description }) => ({ id, icon, title, description })),
-    matchday: withIDs(item.useDefaultMatchday === false ? item.matchday : inherited.matchday).map(({ id, timing, title, description }) => ({ id, timing, title, description })),
-    faqs: withIDs(item.useDefaultFaq === false ? item.faqs : inherited.faqs).map(({ id, question, answer }) => ({ id, question, answer })),
+    action: actionDTO(item.action), lifecycle: item.lifecycle ?? 'upcoming', participantMode: item.participantMode ?? 'players', totalSlots: item.totalSlots ?? 0,
+    participants: withIDs(item.participants).map(({ id, name, partnerName, level, status }) => ({ id, name: name ?? '', partnerName, level, status: status ?? 'confirmed' })),
+    standings: withIDs(item.standings).map(({ id, name, partnerName, matches, points, difference, award }, index) => ({ id, rank: index + 1, name: name ?? '', partnerName, matches: matches ?? 0, points: points ?? 0, difference: difference ?? '', award })),
+    prizes: withIDs(item.prizes).map(({ id, title, reward, description }, index) => ({ id, place: index + 1, title: title ?? '', reward: reward ?? '', description: description ?? '' })),
+    checklist: withIDs(item.useDefaultChecklist === false ? item.checklist : inherited.checklist).map(({ id, text }) => ({ id, text: text ?? '' })),
+    perks: withIDs(item.useDefaultPerks === false ? item.perks : inherited.perks).map(({ id, icon, title, description }) => ({ id, icon: icon ?? 'Sparkles', title: title ?? '', description: description ?? '' })),
+    matchday: withIDs(item.useDefaultMatchday === false ? item.matchday : inherited.matchday).map(({ id, timing, title, description }) => ({ id, timing: timing ?? '', title: title ?? '', description: description ?? '' })),
+    faqs: withIDs(item.useDefaultFaq === false ? item.faqs : inherited.faqs).map(({ id, question, answer }) => ({ id, question: question ?? '', answer: answer ?? '' })),
     coordinator,
     regulationHTML: richContentHTML(item.regulation ?? {}),
   }
@@ -135,7 +135,7 @@ async function baseData(payload: Payload, kind: CatalogKind, origin: string, pre
 const catalogSelect = {
   blog: { id: true, slug: true, title: true, excerpt: true, category: true, previewImage: true, readingTimeMinutes: true, popularityScore: true, publishedAt: true, createdAt: true, updatedAt: true },
   coaches: { id: true, slug: true, name: true, photo: true, specialization: true, bio: true, level: true, experience: true, languages: true, rating: true, reviewsCount: true, certificates: true, priceFrom: true, action: true, levels: true, focusAreas: true, languageCodes: true },
-  tournaments: { id: true, slug: true, visualStyle: true, image: true, imageOverlay: true, meshStyle: true, levelFrom: true, levelTo: true, icon: true, title: true, startsAt: true, endsAt: true, format: true, customFormat: true, entryFee: true, description: true, prizeLabel: true, prize: true, action: true, lifecycle: true },
+  tournaments: { id: true, slug: true, cardLinkEnabled: true, cardURL: true, visualStyle: true, image: true, imageOverlay: true, meshStyle: true, levelFrom: true, levelTo: true, icon: true, title: true, startsAt: true, endsAt: true, format: true, customFormat: true, entryFee: true, description: true, prizeLabel: true, prize: true, action: true, lifecycle: true },
 } as const
 
 export async function createCatalogProjection(payload: Payload, options: { kind: CatalogKind; origin: string; preview: boolean; query?: CatalogQuery }): Promise<CatalogDTO | null> {
@@ -165,7 +165,7 @@ export async function createCatalogProjection(payload: Payload, options: { kind:
   const base = { version: homepageDTOversion, preview, generatedAt: new Date().toISOString(), page: header, site, query, pagination: { page: query.page, limit: catalogPageSize, totalDocs: result.totalDocs, totalPages } }
   if (kind === 'blog') return { ...base, kind, items: (result.docs as Article[]).map((item) => articleItem(item, origin)), categories: (categories?.docs ?? []).map(({ slug, title }) => ({ slug, title })) }
   if (kind === 'coaches') return { ...base, kind, items: (result.docs as Coach[]).map((item) => coachItem(item, origin)) }
-  return { ...base, kind, items: (result.docs as Tournament[]).map((item) => ({ ...tournamentCard(item, origin), action: actionDTO(item.action), lifecycle: item.lifecycle })) }
+  return { ...base, kind, items: (result.docs as Tournament[]).map((item) => ({ ...tournamentCard(item, origin), action: actionDTO(item.action), lifecycle: item.lifecycle ?? 'upcoming' })) }
 }
 
 export async function createDetailProjection(payload: Payload, options: { kind: CatalogKind; origin: string; preview: boolean; slug: string }): Promise<DetailDTO | null> {

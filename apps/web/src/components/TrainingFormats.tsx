@@ -11,17 +11,17 @@ import { useMobileSwipeHint } from '../lib/useMobileSwipeHint'
 
 type TrainingFormatsProps = {
   programs: Training[]
-  trial?: RentalRate | null
+  offers?: RentalRate[]
   sourcePage?: string
   onSwiperChange?: (swiper: SwiperType) => void
 }
 
-export function TrainingFormats({ programs, trial, sourcePage, onSwiperChange }: TrainingFormatsProps) {
+export function TrainingFormats({ programs, offers = [], sourcePage, onSwiperChange }: TrainingFormatsProps) {
   const swiperRef = useRef<SwiperType | null>(null)
   const swipeHintRef = useMobileSwipeHint(swiperRef, sourcePage === '/training' ? 'training-formats' : 'home-pricing-training')
   const formats = [
     ...programs.map((program) => ({ kind: 'program' as const, item: program })),
-    ...(trial ? [{ kind: 'trial' as const, item: trial }] : []),
+    ...offers.map((item) => ({ kind: 'trial' as const, item })),
   ]
 
   const renderCard = (entry: (typeof formats)[number], mobile: boolean) => entry.kind === 'program' ? (
@@ -32,7 +32,7 @@ export function TrainingFormats({ programs, trial, sourcePage, onSwiperChange }:
 
   return (
     <div>
-      <div className={`hidden gap-4 md:grid ${trial ? 'md:grid-cols-2 lg:grid-cols-4' : 'md:grid-cols-3'}`}>
+      <div className={`hidden gap-4 md:grid ${offers.length ? 'md:grid-cols-2 lg:grid-cols-3' : 'md:grid-cols-3'}`}>
         {formats.map((entry) => (
           <div key={`${entry.kind}-${entry.item.id}`} className="h-full">
             {renderCard(entry, false)}

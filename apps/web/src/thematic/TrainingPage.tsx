@@ -73,7 +73,7 @@ export function TrainingPage({ dto }: { dto: TrainingPageDTO }) {
           className="mb-8"
         />
 
-        <TrainingFormats programs={dto.programs} trial={dto.trial} sourcePage="/training" />
+        <TrainingFormats programs={dto.programs} offers={dto.offers} sourcePage="/training" />
       </section>
 
       {/* 3. Coaches Section - Swiss Swiper matching homepage style */}

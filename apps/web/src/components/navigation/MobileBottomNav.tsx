@@ -1,5 +1,6 @@
 import { useActionLayer } from '../../actions/ActionLayer'
-import { useState } from "react";
+import { quickActionsEvent } from '../../actions/quickActions'
+import { useEffect, useState } from "react";
 import { Home, Dumbbell, Tag, User, Menu as MenuIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import { PlayBottomSheet } from "./PlayBottomSheet";
@@ -16,6 +17,11 @@ export function MobileBottomNav() {
 
   const [playOpen, setPlayOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  useEffect(() => {
+    const open = () => { setMenuOpen(false); setPlayOpen(true); };
+    document.addEventListener(quickActionsEvent, open);
+    return () => document.removeEventListener(quickActionsEvent, open);
+  }, []);
 
   return (
     <>

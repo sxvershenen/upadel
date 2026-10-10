@@ -3,6 +3,7 @@ import type { Transition } from 'framer-motion'
 import React, { type ReactNode } from 'react'
 
 import { useSite } from '../content/ContentContext'
+import { openMobileQuickActions } from '../actions/quickActions'
 import { useActionLayer } from '../actions/ActionLayer'
 import type { RevealConfig } from './ui/revealAttributes'
 import { Button, ButtonLink, type ButtonSize, type ButtonVariant } from './ui/Button'
@@ -25,13 +26,14 @@ type Props = {
   sourcePage?: string
   title?: string
   layout?: boolean | 'position' | 'size' | 'preserve-aspect'
+  mobileQuickActions?: boolean
   modalDelayMs?: number
   onAction?: () => void
   transition?: Transition
   variant?: ButtonVariant
 }
 
-export function ContentAction({ action, children, sourceEntity, sourcePage, onAction, modalDelayMs = 0, ...buttonProps }: Props) {
+export function ContentAction({ action, children, sourceEntity, sourcePage, onAction, mobileQuickActions = false, modalDelayMs = 0, ...buttonProps }: Props) {
   const site = useSite()
   const { requestContact, requestExternal, requestLead, requestWidget } = useActionLayer()
   const label = children ?? action.label ?? site.booking.buttonLabel
@@ -47,6 +49,7 @@ export function ContentAction({ action, children, sourceEntity, sourcePage, onAc
   const analyticsProps = { 'data-analytics-action': action.mode === 'booking' || action.mode === 'trial-booking' || action.mode === 'embed-widget' ? 'booking' : action.mode === 'phone' ? 'phone' : action.mode === 'email' ? 'email' : action.mode === 'lead-form' ? 'lead' : action.mode === 'external-link' ? 'external' : action.mode === 'internal-link' ? 'internal' : undefined, 'data-analytics-object-type': analyticsObject, 'data-analytics-object-id': sourceEntity }
   const openAfterCurrentSurfaceCloses = (open: () => void) => {
     onAction?.()
+    if (mobileQuickActions && openMobileQuickActions()) return
     if (modalDelayMs > 0) window.setTimeout(open, modalDelayMs)
     else open()
   }
@@ -69,7 +72,7 @@ export function ContentAction({ action, children, sourceEntity, sourcePage, onAc
 
   if (href) {
     const external = href.startsWith('https://')
-    return <ButtonLink {...buttonProps} {...analyticsProps} href={href} target={external ? '_blank' : undefined} rel={external ? 'noreferrer' : undefined} onClick={onAction}>{label}</ButtonLink>
+    return <ButtonLink {...buttonProps} {...analyticsProps} href={href} target={external ? '_blank' : undefined} rel={external ? 'noreferrer' : undefined} onClick={(event) => { if (mobileQuickActions && openMobileQuickActions()) event.preventDefault(); onAction?.() }}>{label}</ButtonLink>
   }
 
   return <Button {...buttonProps} {...analyticsProps} onClick={onAction}>{label}</Button>

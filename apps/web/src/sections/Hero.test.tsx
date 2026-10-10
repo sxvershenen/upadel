@@ -108,3 +108,14 @@ test('hero renders separate desktop and mobile three-point black tints and keeps
   assert.match(html, /data-hero-title=""[^>]*style="--hero-title-font-size-mobile:42px;--hero-title-font-size-desktop:96px"/)
   assert.equal(desktopTint, 'radial-gradient(ellipse 80% 60% at 11% 22%, rgb(0 0 0 / 0%) 30%, #000000a3 70%, #000000c9 154%)')
 })
+
+
+test('opening notice reads editable CMS copy and keeps only the final word lime', () => {
+  const updated = structuredClone(content)
+  updated.home.hero = { ...updated.home.hero, titleLine: '2 часа', titleConnector: 'по цене', titleAccent: 'одного', openingNotice: { title: 'Открытие в ноябре', caption: 'Спец. оффер с 01.11 до 15.11' } }
+  const html = renderToStaticMarkup(<ContentProvider content={updated}><Hero /></ContentProvider>)
+  assert.match(html, /data-hero-opening-notice="" class="glass-overlay/)
+  assert.match(html, /Открытие в ноябре/)
+  assert.match(html, /Спец. оффер с 01.11 до 15.11/)
+  assert.match(html, /data-hero-accent="" class="inline-block text-\[#c2f542\]">одного/)
+})

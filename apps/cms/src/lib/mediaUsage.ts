@@ -119,7 +119,7 @@ function scanHomepage(target: Map<string, MediaUsage>, doc: Record<string, unkno
     ['hero.desktopVideoPoster', 'Главная → Первый экран → poster desktop'],
     ['hero.mobileVideoPoster', 'Главная → Первый экран → poster mobile'],
     ['courtsSection.backgroundMedia', 'Главная → Клуб → Корты → фоновое изображение'],
-    ['methodistBanner.decorativeMedia', 'Главная → Услуги → Баннер методиста → декоративное изображение'],
+    ['methodistBanner.decorativeMedia', 'Главная → Услуги → Тренировочная робопушка → фотография'],
   ] as const
   for (const [path, location] of refs) {
     for (const value of valuesAtPath(doc, path)) {

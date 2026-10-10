@@ -32,6 +32,8 @@ for (const first of [true, false]) test(`release activates actual new directory 
     const calls = await readFile(f.environment.AUDIT_LOG, 'utf8')
     assert.ok(calls.split('\n').filter(Boolean).every((call) => call.startsWith(f.fresh + ' | ')))
     assert.ok(calls.indexOf('run payload --workspace @unlim/cms -- migrate') < calls.indexOf('run media:responsive --workspace @unlim/cms'))
+    assert.ok(calls.indexOf('run payload --workspace @unlim/cms -- migrate') < calls.indexOf('run content:opening --workspace @unlim/cms'))
+    assert.ok(calls.indexOf('run content:opening --workspace @unlim/cms') < calls.indexOf('run media:responsive --workspace @unlim/cms'))
     if (first) assert.ok(calls.indexOf('run seed:cms') < calls.indexOf('run media:responsive --workspace @unlim/cms'))
   } finally { await rm(f.root, { recursive: true, force: true }) }
 })

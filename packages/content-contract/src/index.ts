@@ -1,7 +1,7 @@
 export * from './widgets'
 import type { CatalogPagination, CatalogQuery } from './catalog'
 export * from './catalog'
-export const homepageDTOversion = 17 as const
+export const homepageDTOversion = 18 as const
 
 export const publicRouteRegistry = [
   { path: '/', parent: null, template: 'homepage', globalSlug: 'homepage' },
@@ -111,6 +111,8 @@ export type TournamentFaqDTO = { id: string; question: string; answer: string }
 export type TournamentCardDTO = {
   id: string
   slug: string
+  cardLinkEnabled?: boolean
+  cardURL?: string | null
   visualStyle: 'image' | 'mesh'
   image?: MediaDTO | null
   imageOverlay?: string | null
@@ -173,12 +175,12 @@ export type HomepageDTO = {
     }
   }
   home: {
-    hero: { seoHeading: string; titleLine: string; titleConnector: string; titleAccent: string; description: string; desktopMedia?: MediaDTO | null; mobileMedia?: MediaDTO | null; desktopPoster?: MediaDTO | null; mobilePoster?: MediaDTO | null; tint: HeroTintDTO; titleFontSize: HeroTitleFontSizeDTO; primaryAction: ActionDTO; secondaryAction: ActionDTO; socialProof: { ratingLabel: string; caption: string; coachPhotos: MediaDTO[] }; stats: Array<{ value: string; label: string }> }
+    hero: { openingNotice?: { title: string; caption: string }; seoHeading: string; titleLine: string; titleConnector: string; titleAccent: string; description: string; desktopMedia?: MediaDTO | null; mobileMedia?: MediaDTO | null; desktopPoster?: MediaDTO | null; mobilePoster?: MediaDTO | null; tint: HeroTintDTO; titleFontSize: HeroTitleFontSizeDTO; primaryAction: ActionDTO; secondaryAction: ActionDTO; socialProof: { ratingLabel: string; caption: string; coachPhotos: MediaDTO[] }; stats: Array<{ value: string; label: string }> }
     benefits: { eyebrow: string; title: string; cards: Array<{ id: string; variant: 'parking' | 'lockers' | 'shower' | 'chill' | 'online-booking' | 'coaches-metric' | 'kids-wide'; eyebrow?: string | null; title: string; description: string; supportingText?: string | null; media?: MediaDTO | null; overlay?: string | null; meshTone?: string | null; action: ActionDTO }> }
     offers: Array<{ id: string; variant: 'tournament-venue' | 'event'; badge: string; title: string; description: string; image?: MediaDTO | null; overlay: string; icon: 'Trophy' | 'PartyPopper'; action: ActionDTO }>
     courtsSection: { titleLineOne: string; titleLineTwo: string; background?: MediaDTO | null; backgroundAlt: string }
     pricingSection: { eyebrow: string; title: string; defaultTab: 'rent' | 'training' | 'memberships'; rentTabLabel: string; trainingTabLabel: string; membershipsTabLabel: string }
-    methodistBanner: { title: string; description: string; decorativeMedia?: MediaDTO | null; meshTone: string; action: ActionDTO }
+    methodistBanner: { title: string; description: string; price?: number | null; decorativeMedia?: MediaDTO | null; meshTone: string; action: ActionDTO }
     coachesSection: { eyebrow: string; title: string }
     tournamentsSection: { eyebrow: string; title: string }
     gallerySection: { eyebrow: string; title: string; action: ActionDTO }
@@ -237,6 +239,9 @@ type ThematicPageBase = { version: typeof homepageDTOversion; preview: boolean; 
 export type PricesPageDTO = ThematicPageBase & {
   kind: 'prices'
   tabs: { rent: string; training: string; memberships: string }
+  termsTitle: string
+  faqTitle: string
+  faq: Array<{ question: string; answer: string }>
   rules: Array<{ title: string; contentHTML: string }>
   rentalRates: HomepageDTO['entities']['rentalRates']
   trainingPrograms: HomepageDTO['entities']['trainingPrograms']
@@ -263,7 +268,7 @@ export type TrainingPageDTO = ThematicPageBase & {
   faq: Array<{ question: string; answer: string }>
   action: ActionDTO
   programs: HomepageDTO['entities']['trainingPrograms']
-  trial: HomepageDTO['entities']['rentalRates'][number] | null
+  offers: HomepageDTO['entities']['rentalRates']
   coaches?: HomepageDTO['entities']['coaches']
 }
 export type GiftPageDTO = ThematicPageBase & {

@@ -1,3 +1,4 @@
+import * as openingContentFields from './20261010_180000_opening_content_fields'
 import * as bookingWidgets from './20261007_180000_booking_widgets'
 import * as bookingWidgetContent from './20261007_180100_booking_widget_content'
 import * as migration_20260922_120000_seo_content_truth from './20260922_120000_seo_content_truth'
@@ -120,4 +121,5 @@ export const migrations = [
   { up: migration_20260922_200000_hero_tint_mobile_reference.up, down: migration_20260922_200000_hero_tint_mobile_reference.down, name: '20260922_200000_hero_tint_mobile_reference' },
   { name: '20261007_180000_booking_widgets', up: bookingWidgets.up, down: bookingWidgets.down },
   { name: '20261007_180100_booking_widget_content', up: bookingWidgetContent.up, down: bookingWidgetContent.down },
+  { name: '20261010_180000_opening_content_fields', up: openingContentFields.up, down: openingContentFields.down },
 ];

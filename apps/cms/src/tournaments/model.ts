@@ -16,6 +16,7 @@ export function resolveTournamentFormatLabel(format: unknown, customFormat: unkn
 }
 
 export function formatTournamentLevel(levelFrom: unknown, levelTo: unknown): string {
+  if (levelFrom == null || levelTo == null || levelFrom === '' || levelTo === '') return ''
   const from = Number(levelFrom)
   const to = Number(levelTo)
   if (!Number.isFinite(from) || !Number.isFinite(to)) return ''

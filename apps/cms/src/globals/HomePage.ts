@@ -31,6 +31,7 @@ export const HomePage: GlobalConfig = {
     },
   },
   fields: [
+    { name: 'openingContentVersion', type: 'text', admin: { hidden: true }, access: { read: ({ req }) => Boolean(req.user) } },
     {
       name: 'seedVersion',
       type: 'text',
