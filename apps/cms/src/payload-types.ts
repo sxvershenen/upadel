@@ -67,27 +67,27 @@ export interface Config {
   };
   blocks: {};
   collections: {
-    users: User;
+    leads: Lead;
     pages: Page;
-    media: Media;
-    'article-categories': ArticleCategory;
-    articles: Article;
-    coaches: Coach;
-    courts: Court;
     'rental-rates': RentalRate;
+    coaches: Coach;
     'training-programs': TrainingProgram;
     memberships: Membership;
     tournaments: Tournament;
+    articles: Article;
+    'article-categories': ArticleCategory;
     'gallery-items': GalleryItem;
-    reviews: Review;
-    faqs: Faq;
+    media: Media;
     partners: Partner;
-    leads: Lead;
     'analytics-events': AnalyticsEvent;
     'analytics-browsers': AnalyticsBrowser;
     'analytics-sessions': AnalyticsSession;
     'analytics-daily': AnalyticsDaily;
     redirects: Redirect;
+    users: User;
+    courts: Court;
+    reviews: Review;
+    faqs: Faq;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -96,27 +96,27 @@ export interface Config {
   };
   collectionsJoins: {};
   collectionsSelect: {
-    users: UsersSelect<false> | UsersSelect<true>;
+    leads: LeadsSelect<false> | LeadsSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
-    media: MediaSelect<false> | MediaSelect<true>;
-    'article-categories': ArticleCategoriesSelect<false> | ArticleCategoriesSelect<true>;
-    articles: ArticlesSelect<false> | ArticlesSelect<true>;
-    coaches: CoachesSelect<false> | CoachesSelect<true>;
-    courts: CourtsSelect<false> | CourtsSelect<true>;
     'rental-rates': RentalRatesSelect<false> | RentalRatesSelect<true>;
+    coaches: CoachesSelect<false> | CoachesSelect<true>;
     'training-programs': TrainingProgramsSelect<false> | TrainingProgramsSelect<true>;
     memberships: MembershipsSelect<false> | MembershipsSelect<true>;
     tournaments: TournamentsSelect<false> | TournamentsSelect<true>;
+    articles: ArticlesSelect<false> | ArticlesSelect<true>;
+    'article-categories': ArticleCategoriesSelect<false> | ArticleCategoriesSelect<true>;
     'gallery-items': GalleryItemsSelect<false> | GalleryItemsSelect<true>;
-    reviews: ReviewsSelect<false> | ReviewsSelect<true>;
-    faqs: FaqsSelect<false> | FaqsSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
     partners: PartnersSelect<false> | PartnersSelect<true>;
-    leads: LeadsSelect<false> | LeadsSelect<true>;
     'analytics-events': AnalyticsEventsSelect<false> | AnalyticsEventsSelect<true>;
     'analytics-browsers': AnalyticsBrowsersSelect<false> | AnalyticsBrowsersSelect<true>;
     'analytics-sessions': AnalyticsSessionsSelect<false> | AnalyticsSessionsSelect<true>;
     'analytics-daily': AnalyticsDailySelect<false> | AnalyticsDailySelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
+    users: UsersSelect<false> | UsersSelect<true>;
+    courts: CourtsSelect<false> | CourtsSelect<true>;
+    reviews: ReviewsSelect<false> | ReviewsSelect<true>;
+    faqs: FaqsSelect<false> | FaqsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -131,17 +131,17 @@ export interface Config {
     'site-settings': SiteSetting;
     'tournament-defaults': TournamentDefault;
     homepage: Homepage;
-    'blog-page': BlogPage;
-    'coaches-page': CoachesPage;
-    'tournaments-page': TournamentsPage;
     'prices-page': PricesPage;
     'training-page': TrainingPage;
+    'coaches-page': CoachesPage;
+    'tournaments-page': TournamentsPage;
     'gift-page': GiftPage;
-    'courts-page': CourtsPage;
-    'padel-court-zakaz-page': PadelCourtZakazPage;
+    'blog-page': BlogPage;
     'gallery-page': GalleryPage;
     'about-page': AboutPage;
     'contacts-page': ContactsPage;
+    'courts-page': CourtsPage;
+    'padel-court-zakaz-page': PadelCourtZakazPage;
     'policy-page': PolicyPage;
     'oferta-page': OfertaPage;
   };
@@ -149,17 +149,17 @@ export interface Config {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
     'tournament-defaults': TournamentDefaultsSelect<false> | TournamentDefaultsSelect<true>;
     homepage: HomepageSelect<false> | HomepageSelect<true>;
-    'blog-page': BlogPageSelect<false> | BlogPageSelect<true>;
-    'coaches-page': CoachesPageSelect<false> | CoachesPageSelect<true>;
-    'tournaments-page': TournamentsPageSelect<false> | TournamentsPageSelect<true>;
     'prices-page': PricesPageSelect<false> | PricesPageSelect<true>;
     'training-page': TrainingPageSelect<false> | TrainingPageSelect<true>;
+    'coaches-page': CoachesPageSelect<false> | CoachesPageSelect<true>;
+    'tournaments-page': TournamentsPageSelect<false> | TournamentsPageSelect<true>;
     'gift-page': GiftPageSelect<false> | GiftPageSelect<true>;
-    'courts-page': CourtsPageSelect<false> | CourtsPageSelect<true>;
-    'padel-court-zakaz-page': PadelCourtZakazPageSelect<false> | PadelCourtZakazPageSelect<true>;
+    'blog-page': BlogPageSelect<false> | BlogPageSelect<true>;
     'gallery-page': GalleryPageSelect<false> | GalleryPageSelect<true>;
     'about-page': AboutPageSelect<false> | AboutPageSelect<true>;
     'contacts-page': ContactsPageSelect<false> | ContactsPageSelect<true>;
+    'courts-page': CourtsPageSelect<false> | CourtsPageSelect<true>;
+    'padel-court-zakaz-page': PadelCourtZakazPageSelect<false> | PadelCourtZakazPageSelect<true>;
     'policy-page': PolicyPageSelect<false> | PolicyPageSelect<true>;
     'oferta-page': OfertaPageSelect<false> | OfertaPageSelect<true>;
   };
@@ -198,29 +198,31 @@ export interface UserAuthOperations {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users".
+ * via the `definition` "leads".
  */
-export interface User {
+export interface Lead {
   id: number;
+  type: 'membership' | 'gift' | 'trial' | 'consultation' | 'other';
+  status: 'new' | 'contacted' | 'qualified' | 'converted' | 'rejected';
+  name: string;
+  phone?: string | null;
+  email?: string | null;
+  telegram?: string | null;
+  vk?: string | null;
+  comment?: string | null;
+  sourcePage: string;
+  sourceEntity?: string | null;
+  idempotencyKey: string;
+  notificationStatus?: ('not-configured' | 'sent' | 'partial' | 'failed') | null;
+  notifiedAt?: string | null;
+  notificationResult?: string | null;
+  analyticsAnonymousId?: string | null;
+  analyticsSessionId?: string | null;
+  analyticsChannel?: string | null;
+  analyticsDevice?: string | null;
+  analyticsLanguage?: string | null;
   updatedAt: string;
   createdAt: string;
-  email: string;
-  username: string;
-  resetPasswordToken?: string | null;
-  resetPasswordExpiration?: string | null;
-  salt?: string | null;
-  hash?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
-  sessions?:
-    | {
-        id: string;
-        createdAt?: string | null;
-        expiresAt: string;
-      }[]
-    | null;
-  password?: string | null;
-  collection: 'users';
 }
 /**
  * Маршрут для новой code-defined страницы. Публичный шаблон реализуется в приложении отдельно.
@@ -323,90 +325,53 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "article-categories".
+ * via the `definition` "rental-rates".
  */
-export interface ArticleCategory {
+export interface RentalRate {
   id: number;
-  title: string;
-  description?: string | null;
-  seo: {
-    title?: string | null;
-    description?: string | null;
-    /**
-     * Оставьте пустым, чтобы использовать основной публичный URL записи.
-     */
-    canonical?: string | null;
-    robots: 'index-follow' | 'noindex-follow' | 'noindex-nofollow';
-    /**
-     * Не заменяет фотографию карточки или preview image самой сущности.
-     */
-    socialImage?: (number | null) | Media;
-  };
-  /**
-   * Стабильный адрес латиницей: например, artem-volkov. Не меняйте после публикации без редиректа.
-   */
-  slug: string;
   seedKey?: string | null;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "articles".
- */
-export interface Article {
-  id: number;
   title: string;
-  category: number | ArticleCategory;
-  excerpt: string;
-  content: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  };
-  /**
-   * Единственный источник preview image для карточек статьи, включая главную.
-   */
-  previewImage: number | Media;
-  readingTimeMinutes: number;
-  seo: {
-    title?: string | null;
-    description?: string | null;
+  eyebrow?: string | null;
+  timeLabel?: string | null;
+  description: string;
+  price?: number | null;
+  priceLabel?: string | null;
+  priceSuffix?: string | null;
+  badge?: string | null;
+  badgeTone?: ('lime' | 'lime-soft' | 'sunset' | 'gold' | 'muted' | 'glass' | 'outline-light') | null;
+  cardVariant: 'rate' | 'trial' | 'standards' | 'membership-offer';
+  meshTone?:
+    ('indigo' | 'deep-blue' | 'dark' | 'lime' | 'lime-soft' | 'sky' | 'lavender' | 'sunset' | 'navy-gold') | null;
+  includedItems?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  action: {
+    label?: string | null;
+    mode:
+      | 'none'
+      | 'booking'
+      | 'account'
+      | 'trial-booking'
+      | 'internal-link'
+      | 'external-link'
+      | 'phone'
+      | 'email'
+      | 'lead-form';
     /**
-     * Оставьте пустым, чтобы использовать основной публичный URL записи.
+     * Для внутренней ссылки используйте /path или #anchor; внешняя должна начинаться с https://.
      */
-    canonical?: string | null;
-    robots: 'index-follow' | 'noindex-follow' | 'noindex-nofollow';
-    /**
-     * Не заменяет фотографию карточки или preview image самой сущности.
-     */
-    socialImage?: (number | null) | Media;
+    href?: string | null;
+    leadType?: ('membership' | 'gift' | 'trial' | 'consultation' | 'other') | null;
   };
+  isActive?: boolean | null;
+  showOnHomepage?: boolean | null;
   /**
-   * Стабильный адрес латиницей: например, artem-volkov. Не меняйте после публикации без редиректа.
+   * Уникальный номер от 1 до 5; меньшие значения выводятся раньше.
    */
-  slug: string;
-  seedKey?: string | null;
-  /**
-   * Необязательно. Позиция уникальна и резервируется даже черновиком; незакреплённые места заполняются новейшими опубликованными статьями.
-   */
-  homePosition?: ('1' | '2' | '3') | null;
-  publishedAt?: string | null;
-  /**
-   * Служебное поле для будущей серверной агрегации аналитики; публичные и редакторские записи запрещены.
-   */
-  popularityScore?: number | null;
+  homepageOrder?: number | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -490,111 +455,6 @@ export interface Coach {
   showOnHomepage?: boolean | null;
   /**
    * Уникальный номер от 1 до 8; меньшие значения выводятся раньше.
-   */
-  homepageOrder?: number | null;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "courts".
- */
-export interface Court {
-  id: number;
-  title: string;
-  eyebrow?: string | null;
-  description?: string | null;
-  /**
-   * Только утверждённые recipes текущей design system.
-   */
-  cardVariant: 'panoramic' | 'metrics' | 'damping' | 'surface';
-  metrics?:
-    | {
-        value: string;
-        label: string;
-        icon: 'PanelTop' | 'Lightbulb' | 'Activity' | 'Layers3';
-        id?: string | null;
-      }[]
-    | null;
-  seo: {
-    title?: string | null;
-    description?: string | null;
-    /**
-     * Оставьте пустым, чтобы использовать основной публичный URL записи.
-     */
-    canonical?: string | null;
-    robots: 'index-follow' | 'noindex-follow' | 'noindex-nofollow';
-    /**
-     * Не заменяет фотографию карточки или preview image самой сущности.
-     */
-    socialImage?: (number | null) | Media;
-  };
-  /**
-   * Стабильный адрес латиницей: например, artem-volkov. Не меняйте после публикации без редиректа.
-   */
-  slug: string;
-  seedKey?: string | null;
-  isActive?: boolean | null;
-  /**
-   * Главная использует эту же запись.
-   */
-  showOnHomepage?: boolean | null;
-  /**
-   * Уникальный номер от 1 до 4; меньшие значения выводятся раньше.
-   */
-  homepageOrder?: number | null;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "rental-rates".
- */
-export interface RentalRate {
-  id: number;
-  seedKey?: string | null;
-  title: string;
-  eyebrow?: string | null;
-  timeLabel?: string | null;
-  description: string;
-  price?: number | null;
-  priceLabel?: string | null;
-  priceSuffix?: string | null;
-  badge?: string | null;
-  badgeTone?: ('lime' | 'lime-soft' | 'sunset' | 'gold' | 'muted' | 'glass' | 'outline-light') | null;
-  cardVariant: 'rate' | 'trial' | 'standards' | 'membership-offer';
-  meshTone?:
-    ('indigo' | 'deep-blue' | 'dark' | 'lime' | 'lime-soft' | 'sky' | 'lavender' | 'sunset' | 'navy-gold') | null;
-  includedItems?:
-    | {
-        text: string;
-        id?: string | null;
-      }[]
-    | null;
-  action: {
-    label?: string | null;
-    mode:
-      | 'none'
-      | 'booking'
-      | 'account'
-      | 'trial-booking'
-      | 'internal-link'
-      | 'external-link'
-      | 'phone'
-      | 'email'
-      | 'lead-form';
-    /**
-     * Для внутренней ссылки используйте /path или #anchor; внешняя должна начинаться с https://.
-     */
-    href?: string | null;
-    leadType?: ('membership' | 'gift' | 'trial' | 'consultation' | 'other') | null;
-  };
-  isActive?: boolean | null;
-  showOnHomepage?: boolean | null;
-  /**
-   * Уникальный номер от 1 до 5; меньшие значения выводятся раньше.
    */
   homepageOrder?: number | null;
   updatedAt: string;
@@ -950,6 +810,96 @@ export interface Tournament {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "articles".
+ */
+export interface Article {
+  id: number;
+  title: string;
+  category: number | ArticleCategory;
+  excerpt: string;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Единственный источник preview image для карточек статьи, включая главную.
+   */
+  previewImage: number | Media;
+  readingTimeMinutes: number;
+  seo: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Оставьте пустым, чтобы использовать основной публичный URL записи.
+     */
+    canonical?: string | null;
+    robots: 'index-follow' | 'noindex-follow' | 'noindex-nofollow';
+    /**
+     * Не заменяет фотографию карточки или preview image самой сущности.
+     */
+    socialImage?: (number | null) | Media;
+  };
+  /**
+   * Стабильный адрес латиницей: например, artem-volkov. Не меняйте после публикации без редиректа.
+   */
+  slug: string;
+  seedKey?: string | null;
+  /**
+   * Необязательно. Позиция уникальна и резервируется даже черновиком; незакреплённые места заполняются новейшими опубликованными статьями.
+   */
+  homePosition?: ('1' | '2' | '3') | null;
+  publishedAt?: string | null;
+  /**
+   * Служебное поле для будущей серверной агрегации аналитики; публичные и редакторские записи запрещены.
+   */
+  popularityScore?: number | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "article-categories".
+ */
+export interface ArticleCategory {
+  id: number;
+  title: string;
+  description?: string | null;
+  seo: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Оставьте пустым, чтобы использовать основной публичный URL записи.
+     */
+    canonical?: string | null;
+    robots: 'index-follow' | 'noindex-follow' | 'noindex-nofollow';
+    /**
+     * Не заменяет фотографию карточки или preview image самой сущности.
+     */
+    socialImage?: (number | null) | Media;
+  };
+  /**
+   * Стабильный адрес латиницей: например, artem-volkov. Не меняйте после публикации без редиректа.
+   */
+  slug: string;
+  seedKey?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "gallery-items".
  */
 export interface GalleryItem {
@@ -981,55 +931,6 @@ export interface GalleryItem {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "reviews".
- */
-export interface Review {
-  id: number;
-  seedKey?: string | null;
-  authorName: string;
-  authorMeta: string;
-  avatar?: (number | null) | Media;
-  rating: number;
-  text: string;
-  source: 'club' | 'yandex' | 'other';
-  sourceURL?: string | null;
-  isActive?: boolean | null;
-  /**
-   * Текущий вертикальный marquee поддерживает до восьми отзывов.
-   */
-  showOnHomepage?: boolean | null;
-  /**
-   * Уникальный номер от 1 до 8; меньшие значения выводятся раньше.
-   */
-  homepageOrder?: number | null;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "faqs".
- */
-export interface Faq {
-  id: number;
-  seedKey?: string | null;
-  question: string;
-  answer: string;
-  isActive?: boolean | null;
-  /**
-   * На главной доступно до десяти вопросов.
-   */
-  showOnHomepage?: boolean | null;
-  /**
-   * Уникальный номер от 1 до 10; меньшие значения выводятся раньше.
-   */
-  homepageOrder?: number | null;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "partners".
  */
 export interface Partner {
@@ -1050,34 +951,6 @@ export interface Partner {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "leads".
- */
-export interface Lead {
-  id: number;
-  type: 'membership' | 'gift' | 'trial' | 'consultation' | 'other';
-  status: 'new' | 'contacted' | 'qualified' | 'converted' | 'rejected';
-  name: string;
-  phone?: string | null;
-  email?: string | null;
-  telegram?: string | null;
-  vk?: string | null;
-  comment?: string | null;
-  sourcePage: string;
-  sourceEntity?: string | null;
-  idempotencyKey: string;
-  notificationStatus?: ('not-configured' | 'sent' | 'partial' | 'failed') | null;
-  notifiedAt?: string | null;
-  notificationResult?: string | null;
-  analyticsAnonymousId?: string | null;
-  analyticsSessionId?: string | null;
-  analyticsChannel?: string | null;
-  analyticsDevice?: string | null;
-  analyticsLanguage?: string | null;
-  updatedAt: string;
-  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1219,6 +1092,133 @@ export interface Redirect {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users".
+ */
+export interface User {
+  id: number;
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  username: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  password?: string | null;
+  collection: 'users';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "courts".
+ */
+export interface Court {
+  id: number;
+  title: string;
+  eyebrow?: string | null;
+  description?: string | null;
+  /**
+   * Только утверждённые recipes текущей design system.
+   */
+  cardVariant: 'panoramic' | 'metrics' | 'damping' | 'surface';
+  metrics?:
+    | {
+        value: string;
+        label: string;
+        icon: 'PanelTop' | 'Lightbulb' | 'Activity' | 'Layers3';
+        id?: string | null;
+      }[]
+    | null;
+  seo: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Оставьте пустым, чтобы использовать основной публичный URL записи.
+     */
+    canonical?: string | null;
+    robots: 'index-follow' | 'noindex-follow' | 'noindex-nofollow';
+    /**
+     * Не заменяет фотографию карточки или preview image самой сущности.
+     */
+    socialImage?: (number | null) | Media;
+  };
+  /**
+   * Стабильный адрес латиницей: например, artem-volkov. Не меняйте после публикации без редиректа.
+   */
+  slug: string;
+  seedKey?: string | null;
+  isActive?: boolean | null;
+  /**
+   * Главная использует эту же запись.
+   */
+  showOnHomepage?: boolean | null;
+  /**
+   * Уникальный номер от 1 до 4; меньшие значения выводятся раньше.
+   */
+  homepageOrder?: number | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews".
+ */
+export interface Review {
+  id: number;
+  seedKey?: string | null;
+  authorName: string;
+  authorMeta: string;
+  avatar?: (number | null) | Media;
+  rating: number;
+  text: string;
+  source: 'club' | 'yandex' | 'other';
+  sourceURL?: string | null;
+  isActive?: boolean | null;
+  /**
+   * Текущий вертикальный marquee поддерживает до восьми отзывов.
+   */
+  showOnHomepage?: boolean | null;
+  /**
+   * Уникальный номер от 1 до 8; меньшие значения выводятся раньше.
+   */
+  homepageOrder?: number | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faqs".
+ */
+export interface Faq {
+  id: number;
+  seedKey?: string | null;
+  question: string;
+  answer: string;
+  isActive?: boolean | null;
+  /**
+   * На главной доступно до десяти вопросов.
+   */
+  showOnHomepage?: boolean | null;
+  /**
+   * Уникальный номер от 1 до 10; меньшие значения выводятся раньше.
+   */
+  homepageOrder?: number | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -1334,36 +1334,20 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
-        relationTo: 'users';
-        value: number | User;
+        relationTo: 'leads';
+        value: number | Lead;
       } | null)
     | ({
         relationTo: 'pages';
         value: number | Page;
       } | null)
     | ({
-        relationTo: 'media';
-        value: number | Media;
-      } | null)
-    | ({
-        relationTo: 'article-categories';
-        value: number | ArticleCategory;
-      } | null)
-    | ({
-        relationTo: 'articles';
-        value: number | Article;
+        relationTo: 'rental-rates';
+        value: number | RentalRate;
       } | null)
     | ({
         relationTo: 'coaches';
         value: number | Coach;
-      } | null)
-    | ({
-        relationTo: 'courts';
-        value: number | Court;
-      } | null)
-    | ({
-        relationTo: 'rental-rates';
-        value: number | RentalRate;
       } | null)
     | ({
         relationTo: 'training-programs';
@@ -1378,24 +1362,24 @@ export interface PayloadLockedDocument {
         value: number | Tournament;
       } | null)
     | ({
+        relationTo: 'articles';
+        value: number | Article;
+      } | null)
+    | ({
+        relationTo: 'article-categories';
+        value: number | ArticleCategory;
+      } | null)
+    | ({
         relationTo: 'gallery-items';
         value: number | GalleryItem;
       } | null)
     | ({
-        relationTo: 'reviews';
-        value: number | Review;
-      } | null)
-    | ({
-        relationTo: 'faqs';
-        value: number | Faq;
+        relationTo: 'media';
+        value: number | Media;
       } | null)
     | ({
         relationTo: 'partners';
         value: number | Partner;
-      } | null)
-    | ({
-        relationTo: 'leads';
-        value: number | Lead;
       } | null)
     | ({
         relationTo: 'analytics-events';
@@ -1416,6 +1400,22 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'redirects';
         value: number | Redirect;
+      } | null)
+    | ({
+        relationTo: 'users';
+        value: number | User;
+      } | null)
+    | ({
+        relationTo: 'courts';
+        value: number | Court;
+      } | null)
+    | ({
+        relationTo: 'reviews';
+        value: number | Review;
+      } | null)
+    | ({
+        relationTo: 'faqs';
+        value: number | Faq;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1461,26 +1461,30 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users_select".
+ * via the `definition` "leads_select".
  */
-export interface UsersSelect<T extends boolean = true> {
+export interface LeadsSelect<T extends boolean = true> {
+  type?: T;
+  status?: T;
+  name?: T;
+  phone?: T;
+  email?: T;
+  telegram?: T;
+  vk?: T;
+  comment?: T;
+  sourcePage?: T;
+  sourceEntity?: T;
+  idempotencyKey?: T;
+  notificationStatus?: T;
+  notifiedAt?: T;
+  notificationResult?: T;
+  analyticsAnonymousId?: T;
+  analyticsSessionId?: T;
+  analyticsChannel?: T;
+  analyticsDevice?: T;
+  analyticsLanguage?: T;
   updatedAt?: T;
   createdAt?: T;
-  email?: T;
-  username?: T;
-  resetPasswordToken?: T;
-  resetPasswordExpiration?: T;
-  salt?: T;
-  hash?: T;
-  loginAttempts?: T;
-  lockUntil?: T;
-  sessions?:
-    | T
-    | {
-        id?: T;
-        createdAt?: T;
-        expiresAt?: T;
-      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1507,118 +1511,38 @@ export interface PagesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media_select".
+ * via the `definition` "rental-rates_select".
  */
-export interface MediaSelect<T extends boolean = true> {
+export interface RentalRatesSelect<T extends boolean = true> {
   seedKey?: T;
-  alt?: T;
-  caption?: T;
-  credit?: T;
-  usageRights?: T;
-  sourceURL?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-  focalX?: T;
-  focalY?: T;
-  sizes?:
-    | T
-    | {
-        small?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        thumbnail?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        card?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        hero?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-      };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "article-categories_select".
- */
-export interface ArticleCategoriesSelect<T extends boolean = true> {
   title?: T;
+  eyebrow?: T;
+  timeLabel?: T;
   description?: T;
-  seo?:
+  price?: T;
+  priceLabel?: T;
+  priceSuffix?: T;
+  badge?: T;
+  badgeTone?: T;
+  cardVariant?: T;
+  meshTone?: T;
+  includedItems?:
     | T
     | {
-        title?: T;
-        description?: T;
-        canonical?: T;
-        robots?: T;
-        socialImage?: T;
+        text?: T;
+        id?: T;
       };
-  slug?: T;
-  seedKey?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "articles_select".
- */
-export interface ArticlesSelect<T extends boolean = true> {
-  title?: T;
-  category?: T;
-  excerpt?: T;
-  content?: T;
-  previewImage?: T;
-  readingTimeMinutes?: T;
-  seo?:
+  action?:
     | T
     | {
-        title?: T;
-        description?: T;
-        canonical?: T;
-        robots?: T;
-        socialImage?: T;
+        label?: T;
+        mode?: T;
+        href?: T;
+        leadType?: T;
       };
-  slug?: T;
-  seedKey?: T;
-  homePosition?: T;
-  publishedAt?: T;
-  popularityScore?: T;
+  isActive?: T;
+  showOnHomepage?: T;
+  homepageOrder?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -1668,79 +1592,6 @@ export interface CoachesSelect<T extends boolean = true> {
       };
   slug?: T;
   seedKey?: T;
-  isActive?: T;
-  showOnHomepage?: T;
-  homepageOrder?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "courts_select".
- */
-export interface CourtsSelect<T extends boolean = true> {
-  title?: T;
-  eyebrow?: T;
-  description?: T;
-  cardVariant?: T;
-  metrics?:
-    | T
-    | {
-        value?: T;
-        label?: T;
-        icon?: T;
-        id?: T;
-      };
-  seo?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        canonical?: T;
-        robots?: T;
-        socialImage?: T;
-      };
-  slug?: T;
-  seedKey?: T;
-  isActive?: T;
-  showOnHomepage?: T;
-  homepageOrder?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "rental-rates_select".
- */
-export interface RentalRatesSelect<T extends boolean = true> {
-  seedKey?: T;
-  title?: T;
-  eyebrow?: T;
-  timeLabel?: T;
-  description?: T;
-  price?: T;
-  priceLabel?: T;
-  priceSuffix?: T;
-  badge?: T;
-  badgeTone?: T;
-  cardVariant?: T;
-  meshTone?: T;
-  includedItems?:
-    | T
-    | {
-        text?: T;
-        id?: T;
-      };
-  action?:
-    | T
-    | {
-        label?: T;
-        mode?: T;
-        href?: T;
-        leadType?: T;
-      };
   isActive?: T;
   showOnHomepage?: T;
   homepageOrder?: T;
@@ -1954,6 +1805,57 @@ export interface TournamentsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "articles_select".
+ */
+export interface ArticlesSelect<T extends boolean = true> {
+  title?: T;
+  category?: T;
+  excerpt?: T;
+  content?: T;
+  previewImage?: T;
+  readingTimeMinutes?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        canonical?: T;
+        robots?: T;
+        socialImage?: T;
+      };
+  slug?: T;
+  seedKey?: T;
+  homePosition?: T;
+  publishedAt?: T;
+  popularityScore?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "article-categories_select".
+ */
+export interface ArticleCategoriesSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        canonical?: T;
+        robots?: T;
+        socialImage?: T;
+      };
+  slug?: T;
+  seedKey?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "gallery-items_select".
  */
 export interface GalleryItemsSelect<T extends boolean = true> {
@@ -1975,38 +1877,70 @@ export interface GalleryItemsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "reviews_select".
+ * via the `definition` "media_select".
  */
-export interface ReviewsSelect<T extends boolean = true> {
+export interface MediaSelect<T extends boolean = true> {
   seedKey?: T;
-  authorName?: T;
-  authorMeta?: T;
-  avatar?: T;
-  rating?: T;
-  text?: T;
-  source?: T;
+  alt?: T;
+  caption?: T;
+  credit?: T;
+  usageRights?: T;
   sourceURL?: T;
-  isActive?: T;
-  showOnHomepage?: T;
-  homepageOrder?: T;
   updatedAt?: T;
   createdAt?: T;
-  _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "faqs_select".
- */
-export interface FaqsSelect<T extends boolean = true> {
-  seedKey?: T;
-  question?: T;
-  answer?: T;
-  isActive?: T;
-  showOnHomepage?: T;
-  homepageOrder?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  _status?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        small?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        thumbnail?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        card?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        hero?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2023,33 +1957,6 @@ export interface PartnersSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "leads_select".
- */
-export interface LeadsSelect<T extends boolean = true> {
-  type?: T;
-  status?: T;
-  name?: T;
-  phone?: T;
-  email?: T;
-  telegram?: T;
-  vk?: T;
-  comment?: T;
-  sourcePage?: T;
-  sourceEntity?: T;
-  idempotencyKey?: T;
-  notificationStatus?: T;
-  notifiedAt?: T;
-  notificationResult?: T;
-  analyticsAnonymousId?: T;
-  analyticsSessionId?: T;
-  analyticsChannel?: T;
-  analyticsDevice?: T;
-  analyticsLanguage?: T;
-  updatedAt?: T;
-  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2178,6 +2085,99 @@ export interface RedirectsSelect<T extends boolean = true> {
   note?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users_select".
+ */
+export interface UsersSelect<T extends boolean = true> {
+  updatedAt?: T;
+  createdAt?: T;
+  email?: T;
+  username?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "courts_select".
+ */
+export interface CourtsSelect<T extends boolean = true> {
+  title?: T;
+  eyebrow?: T;
+  description?: T;
+  cardVariant?: T;
+  metrics?:
+    | T
+    | {
+        value?: T;
+        label?: T;
+        icon?: T;
+        id?: T;
+      };
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        canonical?: T;
+        robots?: T;
+        socialImage?: T;
+      };
+  slug?: T;
+  seedKey?: T;
+  isActive?: T;
+  showOnHomepage?: T;
+  homepageOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews_select".
+ */
+export interface ReviewsSelect<T extends boolean = true> {
+  seedKey?: T;
+  authorName?: T;
+  authorMeta?: T;
+  avatar?: T;
+  rating?: T;
+  text?: T;
+  source?: T;
+  sourceURL?: T;
+  isActive?: T;
+  showOnHomepage?: T;
+  homepageOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faqs_select".
+ */
+export interface FaqsSelect<T extends boolean = true> {
+  seedKey?: T;
+  question?: T;
+  answer?: T;
+  isActive?: T;
+  showOnHomepage?: T;
+  homepageOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2878,111 +2878,6 @@ export interface Homepage {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "blog-page".
- */
-export interface BlogPage {
-  id: number;
-  seedVersion?: string | null;
-  eyebrow: string;
-  title: string;
-  intro: string;
-  /**
-   * Если поле пустое, используется подготовленный фон страницы.
-   */
-  heroImage?: (number | null) | Media;
-  /**
-   * Картинка страницы получает спокойный grayscale-режим.
-   */
-  heroGrayscale?: boolean | null;
-  seo: {
-    title?: string | null;
-    description?: string | null;
-    /**
-     * Оставьте пустым, чтобы использовать основной публичный URL записи.
-     */
-    canonical?: string | null;
-    robots: 'index-follow' | 'noindex-follow' | 'noindex-nofollow';
-    /**
-     * Не заменяет фотографию карточки или preview image самой сущности.
-     */
-    socialImage?: (number | null) | Media;
-  };
-  _status?: ('draft' | 'published') | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "coaches-page".
- */
-export interface CoachesPage {
-  id: number;
-  seedVersion?: string | null;
-  eyebrow: string;
-  title: string;
-  intro: string;
-  /**
-   * Если поле пустое, используется подготовленный фон страницы.
-   */
-  heroImage?: (number | null) | Media;
-  /**
-   * Картинка страницы получает спокойный grayscale-режим.
-   */
-  heroGrayscale?: boolean | null;
-  seo: {
-    title?: string | null;
-    description?: string | null;
-    /**
-     * Оставьте пустым, чтобы использовать основной публичный URL записи.
-     */
-    canonical?: string | null;
-    robots: 'index-follow' | 'noindex-follow' | 'noindex-nofollow';
-    /**
-     * Не заменяет фотографию карточки или preview image самой сущности.
-     */
-    socialImage?: (number | null) | Media;
-  };
-  _status?: ('draft' | 'published') | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "tournaments-page".
- */
-export interface TournamentsPage {
-  id: number;
-  seedVersion?: string | null;
-  eyebrow: string;
-  title: string;
-  intro: string;
-  /**
-   * Если поле пустое, используется подготовленный фон страницы.
-   */
-  heroImage?: (number | null) | Media;
-  /**
-   * Картинка страницы получает спокойный grayscale-режим.
-   */
-  heroGrayscale?: boolean | null;
-  seo: {
-    title?: string | null;
-    description?: string | null;
-    /**
-     * Оставьте пустым, чтобы использовать основной публичный URL записи.
-     */
-    canonical?: string | null;
-    robots: 'index-follow' | 'noindex-follow' | 'noindex-nofollow';
-    /**
-     * Не заменяет фотографию карточки или preview image самой сущности.
-     */
-    socialImage?: (number | null) | Media;
-  };
-  _status?: ('draft' | 'published') | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "prices-page".
  */
 export interface PricesPage {
@@ -3136,6 +3031,76 @@ export interface TrainingPage {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "coaches-page".
+ */
+export interface CoachesPage {
+  id: number;
+  seedVersion?: string | null;
+  eyebrow: string;
+  title: string;
+  intro: string;
+  /**
+   * Если поле пустое, используется подготовленный фон страницы.
+   */
+  heroImage?: (number | null) | Media;
+  /**
+   * Картинка страницы получает спокойный grayscale-режим.
+   */
+  heroGrayscale?: boolean | null;
+  seo: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Оставьте пустым, чтобы использовать основной публичный URL записи.
+     */
+    canonical?: string | null;
+    robots: 'index-follow' | 'noindex-follow' | 'noindex-nofollow';
+    /**
+     * Не заменяет фотографию карточки или preview image самой сущности.
+     */
+    socialImage?: (number | null) | Media;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tournaments-page".
+ */
+export interface TournamentsPage {
+  id: number;
+  seedVersion?: string | null;
+  eyebrow: string;
+  title: string;
+  intro: string;
+  /**
+   * Если поле пустое, используется подготовленный фон страницы.
+   */
+  heroImage?: (number | null) | Media;
+  /**
+   * Картинка страницы получает спокойный grayscale-режим.
+   */
+  heroGrayscale?: boolean | null;
+  seo: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Оставьте пустым, чтобы использовать основной публичный URL записи.
+     */
+    canonical?: string | null;
+    robots: 'index-follow' | 'noindex-follow' | 'noindex-nofollow';
+    /**
+     * Не заменяет фотографию карточки или preview image самой сущности.
+     */
+    socialImage?: (number | null) | Media;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "gift-page".
  */
 export interface GiftPage {
@@ -3245,6 +3210,178 @@ export interface GiftPage {
     successText: string;
     resubmitLabel: string;
   };
+  /**
+   * Если поле пустое, используется подготовленный фон страницы.
+   */
+  heroImage?: (number | null) | Media;
+  /**
+   * Картинка страницы получает спокойный grayscale-режим.
+   */
+  heroGrayscale?: boolean | null;
+  seo: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Оставьте пустым, чтобы использовать основной публичный URL записи.
+     */
+    canonical?: string | null;
+    robots: 'index-follow' | 'noindex-follow' | 'noindex-nofollow';
+    /**
+     * Не заменяет фотографию карточки или preview image самой сущности.
+     */
+    socialImage?: (number | null) | Media;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "blog-page".
+ */
+export interface BlogPage {
+  id: number;
+  seedVersion?: string | null;
+  eyebrow: string;
+  title: string;
+  intro: string;
+  /**
+   * Если поле пустое, используется подготовленный фон страницы.
+   */
+  heroImage?: (number | null) | Media;
+  /**
+   * Картинка страницы получает спокойный grayscale-режим.
+   */
+  heroGrayscale?: boolean | null;
+  seo: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Оставьте пустым, чтобы использовать основной публичный URL записи.
+     */
+    canonical?: string | null;
+    robots: 'index-follow' | 'noindex-follow' | 'noindex-nofollow';
+    /**
+     * Не заменяет фотографию карточки или preview image самой сущности.
+     */
+    socialImage?: (number | null) | Media;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gallery-page".
+ */
+export interface GalleryPage {
+  id: number;
+  seedVersion?: string | null;
+  eyebrow: string;
+  title: string;
+  intro: string;
+  /**
+   * Если поле пустое, используется подготовленный фон страницы.
+   */
+  heroImage?: (number | null) | Media;
+  /**
+   * Картинка страницы получает спокойный grayscale-режим.
+   */
+  heroGrayscale?: boolean | null;
+  seo: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Оставьте пустым, чтобы использовать основной публичный URL записи.
+     */
+    canonical?: string | null;
+    robots: 'index-follow' | 'noindex-follow' | 'noindex-nofollow';
+    /**
+     * Не заменяет фотографию карточки или preview image самой сущности.
+     */
+    socialImage?: (number | null) | Media;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about-page".
+ */
+export interface AboutPage {
+  id: number;
+  seedVersion?: string | null;
+  eyebrow: string;
+  title: string;
+  intro: string;
+  story: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  stats?:
+    | {
+        value: string;
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Если поле пустое, используется подготовленный фон страницы.
+   */
+  heroImage?: (number | null) | Media;
+  /**
+   * Картинка страницы получает спокойный grayscale-режим.
+   */
+  heroGrayscale?: boolean | null;
+  seo: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Оставьте пустым, чтобы использовать основной публичный URL записи.
+     */
+    canonical?: string | null;
+    robots: 'index-follow' | 'noindex-follow' | 'noindex-nofollow';
+    /**
+     * Не заменяет фотографию карточки или preview image самой сущности.
+     */
+    socialImage?: (number | null) | Media;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contacts-page".
+ */
+export interface ContactsPage {
+  id: number;
+  seedVersion?: string | null;
+  eyebrow: string;
+  title: string;
+  intro: string;
+  directionsTitle: string;
+  directionsText: string;
+  arrivalNotes?:
+    | {
+        title: string;
+        text: string;
+        icon: 'Car' | 'Train' | 'Clock' | 'MapPin';
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Если поле пустое, используется подготовленный фон страницы.
    */
@@ -3506,143 +3643,6 @@ export interface PadelCourtZakazPage {
       connectionError: string;
     };
   };
-  /**
-   * Если поле пустое, используется подготовленный фон страницы.
-   */
-  heroImage?: (number | null) | Media;
-  /**
-   * Картинка страницы получает спокойный grayscale-режим.
-   */
-  heroGrayscale?: boolean | null;
-  seo: {
-    title?: string | null;
-    description?: string | null;
-    /**
-     * Оставьте пустым, чтобы использовать основной публичный URL записи.
-     */
-    canonical?: string | null;
-    robots: 'index-follow' | 'noindex-follow' | 'noindex-nofollow';
-    /**
-     * Не заменяет фотографию карточки или preview image самой сущности.
-     */
-    socialImage?: (number | null) | Media;
-  };
-  _status?: ('draft' | 'published') | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "gallery-page".
- */
-export interface GalleryPage {
-  id: number;
-  seedVersion?: string | null;
-  eyebrow: string;
-  title: string;
-  intro: string;
-  /**
-   * Если поле пустое, используется подготовленный фон страницы.
-   */
-  heroImage?: (number | null) | Media;
-  /**
-   * Картинка страницы получает спокойный grayscale-режим.
-   */
-  heroGrayscale?: boolean | null;
-  seo: {
-    title?: string | null;
-    description?: string | null;
-    /**
-     * Оставьте пустым, чтобы использовать основной публичный URL записи.
-     */
-    canonical?: string | null;
-    robots: 'index-follow' | 'noindex-follow' | 'noindex-nofollow';
-    /**
-     * Не заменяет фотографию карточки или preview image самой сущности.
-     */
-    socialImage?: (number | null) | Media;
-  };
-  _status?: ('draft' | 'published') | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "about-page".
- */
-export interface AboutPage {
-  id: number;
-  seedVersion?: string | null;
-  eyebrow: string;
-  title: string;
-  intro: string;
-  story: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  };
-  stats?:
-    | {
-        value: string;
-        label: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Если поле пустое, используется подготовленный фон страницы.
-   */
-  heroImage?: (number | null) | Media;
-  /**
-   * Картинка страницы получает спокойный grayscale-режим.
-   */
-  heroGrayscale?: boolean | null;
-  seo: {
-    title?: string | null;
-    description?: string | null;
-    /**
-     * Оставьте пустым, чтобы использовать основной публичный URL записи.
-     */
-    canonical?: string | null;
-    robots: 'index-follow' | 'noindex-follow' | 'noindex-nofollow';
-    /**
-     * Не заменяет фотографию карточки или preview image самой сущности.
-     */
-    socialImage?: (number | null) | Media;
-  };
-  _status?: ('draft' | 'published') | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "contacts-page".
- */
-export interface ContactsPage {
-  id: number;
-  seedVersion?: string | null;
-  eyebrow: string;
-  title: string;
-  intro: string;
-  directionsTitle: string;
-  directionsText: string;
-  arrivalNotes?:
-    | {
-        title: string;
-        text: string;
-        icon: 'Car' | 'Train' | 'Clock' | 'MapPin';
-        id?: string | null;
-      }[]
-    | null;
   /**
    * Если поле пустое, используется подготовленный фон страницы.
    */
@@ -4275,81 +4275,6 @@ export interface HomepageSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "blog-page_select".
- */
-export interface BlogPageSelect<T extends boolean = true> {
-  seedVersion?: T;
-  eyebrow?: T;
-  title?: T;
-  intro?: T;
-  heroImage?: T;
-  heroGrayscale?: T;
-  seo?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        canonical?: T;
-        robots?: T;
-        socialImage?: T;
-      };
-  _status?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "coaches-page_select".
- */
-export interface CoachesPageSelect<T extends boolean = true> {
-  seedVersion?: T;
-  eyebrow?: T;
-  title?: T;
-  intro?: T;
-  heroImage?: T;
-  heroGrayscale?: T;
-  seo?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        canonical?: T;
-        robots?: T;
-        socialImage?: T;
-      };
-  _status?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "tournaments-page_select".
- */
-export interface TournamentsPageSelect<T extends boolean = true> {
-  seedVersion?: T;
-  eyebrow?: T;
-  title?: T;
-  intro?: T;
-  heroImage?: T;
-  heroGrayscale?: T;
-  seo?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        canonical?: T;
-        robots?: T;
-        socialImage?: T;
-      };
-  _status?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "prices-page_select".
  */
 export interface PricesPageSelect<T extends boolean = true> {
@@ -4465,6 +4390,56 @@ export interface TrainingPageSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "coaches-page_select".
+ */
+export interface CoachesPageSelect<T extends boolean = true> {
+  seedVersion?: T;
+  eyebrow?: T;
+  title?: T;
+  intro?: T;
+  heroImage?: T;
+  heroGrayscale?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        canonical?: T;
+        robots?: T;
+        socialImage?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tournaments-page_select".
+ */
+export interface TournamentsPageSelect<T extends boolean = true> {
+  seedVersion?: T;
+  eyebrow?: T;
+  title?: T;
+  intro?: T;
+  heroImage?: T;
+  heroGrayscale?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        canonical?: T;
+        robots?: T;
+        socialImage?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "gift-page_select".
  */
 export interface GiftPageSelect<T extends boolean = true> {
@@ -4562,6 +4537,124 @@ export interface GiftPageSelect<T extends boolean = true> {
         successTitle?: T;
         successText?: T;
         resubmitLabel?: T;
+      };
+  heroImage?: T;
+  heroGrayscale?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        canonical?: T;
+        robots?: T;
+        socialImage?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "blog-page_select".
+ */
+export interface BlogPageSelect<T extends boolean = true> {
+  seedVersion?: T;
+  eyebrow?: T;
+  title?: T;
+  intro?: T;
+  heroImage?: T;
+  heroGrayscale?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        canonical?: T;
+        robots?: T;
+        socialImage?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gallery-page_select".
+ */
+export interface GalleryPageSelect<T extends boolean = true> {
+  seedVersion?: T;
+  eyebrow?: T;
+  title?: T;
+  intro?: T;
+  heroImage?: T;
+  heroGrayscale?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        canonical?: T;
+        robots?: T;
+        socialImage?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about-page_select".
+ */
+export interface AboutPageSelect<T extends boolean = true> {
+  seedVersion?: T;
+  eyebrow?: T;
+  title?: T;
+  intro?: T;
+  story?: T;
+  stats?:
+    | T
+    | {
+        value?: T;
+        label?: T;
+        id?: T;
+      };
+  heroImage?: T;
+  heroGrayscale?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        canonical?: T;
+        robots?: T;
+        socialImage?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contacts-page_select".
+ */
+export interface ContactsPageSelect<T extends boolean = true> {
+  seedVersion?: T;
+  eyebrow?: T;
+  title?: T;
+  intro?: T;
+  directionsTitle?: T;
+  directionsText?: T;
+  arrivalNotes?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        icon?: T;
+        id?: T;
       };
   heroImage?: T;
   heroGrayscale?: T;
@@ -4815,99 +4908,6 @@ export interface PadelCourtZakazPageSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "gallery-page_select".
- */
-export interface GalleryPageSelect<T extends boolean = true> {
-  seedVersion?: T;
-  eyebrow?: T;
-  title?: T;
-  intro?: T;
-  heroImage?: T;
-  heroGrayscale?: T;
-  seo?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        canonical?: T;
-        robots?: T;
-        socialImage?: T;
-      };
-  _status?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "about-page_select".
- */
-export interface AboutPageSelect<T extends boolean = true> {
-  seedVersion?: T;
-  eyebrow?: T;
-  title?: T;
-  intro?: T;
-  story?: T;
-  stats?:
-    | T
-    | {
-        value?: T;
-        label?: T;
-        id?: T;
-      };
-  heroImage?: T;
-  heroGrayscale?: T;
-  seo?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        canonical?: T;
-        robots?: T;
-        socialImage?: T;
-      };
-  _status?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "contacts-page_select".
- */
-export interface ContactsPageSelect<T extends boolean = true> {
-  seedVersion?: T;
-  eyebrow?: T;
-  title?: T;
-  intro?: T;
-  directionsTitle?: T;
-  directionsText?: T;
-  arrivalNotes?:
-    | T
-    | {
-        title?: T;
-        text?: T;
-        icon?: T;
-        id?: T;
-      };
-  heroImage?: T;
-  heroGrayscale?: T;
-  seo?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        canonical?: T;
-        robots?: T;
-        socialImage?: T;
-      };
-  _status?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "policy-page_select".
  */
 export interface PolicyPageSelect<T extends boolean = true> {
@@ -4986,24 +4986,12 @@ export interface TaskSchedulePublish {
           value: number | Page;
         } | null)
       | ({
-          relationTo: 'article-categories';
-          value: number | ArticleCategory;
-        } | null)
-      | ({
-          relationTo: 'articles';
-          value: number | Article;
+          relationTo: 'rental-rates';
+          value: number | RentalRate;
         } | null)
       | ({
           relationTo: 'coaches';
           value: number | Coach;
-        } | null)
-      | ({
-          relationTo: 'courts';
-          value: number | Court;
-        } | null)
-      | ({
-          relationTo: 'rental-rates';
-          value: number | RentalRate;
         } | null)
       | ({
           relationTo: 'training-programs';
@@ -5018,8 +5006,24 @@ export interface TaskSchedulePublish {
           value: number | Tournament;
         } | null)
       | ({
+          relationTo: 'articles';
+          value: number | Article;
+        } | null)
+      | ({
+          relationTo: 'article-categories';
+          value: number | ArticleCategory;
+        } | null)
+      | ({
           relationTo: 'gallery-items';
           value: number | GalleryItem;
+        } | null)
+      | ({
+          relationTo: 'partners';
+          value: number | Partner;
+        } | null)
+      | ({
+          relationTo: 'courts';
+          value: number | Court;
         } | null)
       | ({
           relationTo: 'reviews';
@@ -5028,27 +5032,23 @@ export interface TaskSchedulePublish {
       | ({
           relationTo: 'faqs';
           value: number | Faq;
-        } | null)
-      | ({
-          relationTo: 'partners';
-          value: number | Partner;
         } | null);
     global?:
       | (
           | 'site-settings'
           | 'tournament-defaults'
           | 'homepage'
-          | 'blog-page'
-          | 'coaches-page'
-          | 'tournaments-page'
           | 'prices-page'
           | 'training-page'
+          | 'coaches-page'
+          | 'tournaments-page'
           | 'gift-page'
-          | 'courts-page'
-          | 'padel-court-zakaz-page'
+          | 'blog-page'
           | 'gallery-page'
           | 'about-page'
           | 'contacts-page'
+          | 'courts-page'
+          | 'padel-court-zakaz-page'
           | 'policy-page'
           | 'oferta-page'
         )

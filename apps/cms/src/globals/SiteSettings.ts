@@ -169,6 +169,13 @@ export const SiteSettings: GlobalConfig = {
           ],
         },
         {
+          label: 'Юридические документы',
+          fields: [
+            { name: 'policyPageEditor', type: 'ui', admin: { components: { Field: '/components/admin/GlobalEditorPanel#PolicyGlobalEditorPanel' } } },
+            { name: 'ofertaPageEditor', type: 'ui', admin: { components: { Field: '/components/admin/GlobalEditorPanel#OfertaGlobalEditorPanel' } } },
+          ],
+        },
+        {
           label: 'Контакты',
           fields: [
             { name: 'address', type: 'text', label: 'Адрес', defaultValue: 'Новорижское шоссе, 3к1' },

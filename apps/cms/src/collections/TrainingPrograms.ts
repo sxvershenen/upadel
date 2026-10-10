@@ -21,7 +21,7 @@ export const TrainingPrograms: CollectionConfig = {
   },
   admin: {
     defaultColumns: ['title', 'priceFrom', 'isActive', 'showOnHomepage', 'homepageOrder', '_status'],
-    group: 'Услуги',
+    group: 'Услуги и цены',
     useAsTitle: 'title',
   },
   fields: [

@@ -18,7 +18,7 @@ export const Courts: CollectionConfig = {
   },
   admin: {
     defaultColumns: ['title', 'cardVariant', 'isActive', 'showOnHomepage', 'homepageOrder', '_status'],
-    group: 'Клуб',
+    group: false,
     useAsTitle: 'title',
   },
   fields: [

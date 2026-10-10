@@ -244,7 +244,7 @@ export const GiftPage = createThematicPage({
 })
 
 export const CourtsPage = createThematicPage({
-  slug: 'courts-page', label: 'Корты', kind: 'courts', fields: [
+  slug: 'courts-page', label: 'Корты', kind: 'courts', hidden: true, fields: [
     { name: 'infographicTitle', type: 'text', label: 'Заголовок инфографики', required: true },
     { name: 'infographicCopy', type: 'textarea', label: 'Пояснение инфографики', required: true },
     {

@@ -1,0 +1,50 @@
+.homepage-admin-panel {
+  display: grid;
+  gap: calc(var(--base, 20px) * 0.6);
+  padding: calc(var(--base, 20px) * 0.8);
+  border: 1px solid var(--theme-elevation-150);
+  border-radius: 4px;
+  background: var(--theme-elevation-50);
+}
+
+.homepage-admin-panel__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: calc(var(--base, 20px) * 0.7);
+}
+
+.homepage-admin-panel__header h3,
+.homepage-admin-panel__header p {
+  margin: 0;
+}
+
+.homepage-admin-panel__header p,
+.homepage-admin-panel__state {
+  color: var(--theme-elevation-700);
+}
+
+.homepage-admin-panel__record,
+.homepage-admin-panel__list-link {
+  color: var(--theme-text);
+  cursor: pointer;
+}
+
+.homepage-admin-panel__record {
+  display: block;
+  width: 100%;
+  padding: calc(var(--base, 20px) * 0.35) calc(var(--base, 20px) * 0.5);
+  border: 1px solid var(--theme-elevation-300);
+  border-radius: 3px;
+  background: var(--theme-elevation-0);
+  text-align: left;
+}
+
+.homepage-admin-panel__list {
+  display: grid;
+  gap: calc(var(--base, 20px) * 0.3);
+}
+
+.homepage-global-drawer {
+  --drawer-width: min(1040px, 96vw);
+}

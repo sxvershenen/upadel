@@ -26,7 +26,7 @@ export const Media: CollectionConfig = {
     },
     defaultColumns: ['filename', 'alt', 'mimeType', 'updatedAt'],
     description: 'Изображения: до 25 МиБ. MP4/WebM: до 100 МиБ. Видео хранится как загружено — заранее подготовьте его для веба; транскодирование и object storage отложены.',
-    group: 'Контент',
+    group: 'Медиатека',
   },
   fields: [
     {

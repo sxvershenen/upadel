@@ -18,7 +18,7 @@ export const RentalRates: CollectionConfig = {
   },
   admin: {
     defaultColumns: ['title', 'cardVariant', 'price', 'showOnHomepage', 'homepageOrder', '_status'],
-    group: 'Услуги',
+    group: 'Услуги и цены',
     useAsTitle: 'title',
   },
   fields: [

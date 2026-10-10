@@ -99,7 +99,7 @@ export const Redirects: CollectionConfig = {
     ],
     description:
       "Редиректы загружаются Astro один раз при запуске и начинают действовать после следующего restart/deploy (обычно вместе с build).",
-    group: "SEO",
+    group: 'Настройки',
     hidden: true,
     useAsTitle: "sourcePath",
   },

@@ -18,7 +18,7 @@ export const Reviews: CollectionConfig = {
   },
   admin: {
     defaultColumns: ['authorName', 'rating', 'source', 'showOnHomepage', 'homepageOrder', '_status'],
-    group: 'Сообщество',
+    group: false,
     useAsTitle: 'authorName',
   },
   fields: [

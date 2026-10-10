@@ -39,7 +39,7 @@ export const Articles: CollectionConfig = {
   },
   admin: {
     defaultColumns: ['title', 'category', 'homePosition', 'publishedAt', '_status'],
-    group: 'Контент',
+    group: 'Публикации',
     livePreview: {
       url: ({ data }) => getArticlePreviewURL(data.slug),
     },

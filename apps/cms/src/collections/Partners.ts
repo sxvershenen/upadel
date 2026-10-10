@@ -18,7 +18,7 @@ export const Partners: CollectionConfig = {
   },
   admin: {
     defaultColumns: ['name', 'showOnHomepage', 'homepageOrder', '_status'],
-    group: 'Клуб',
+    group: 'Настройки',
     useAsTitle: 'name',
   },
   fields: [

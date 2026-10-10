@@ -37,7 +37,7 @@ export const Tournaments: CollectionConfig = {
   slug: 'tournaments',
   labels: { singular: 'Турнир', plural: 'Турниры' },
   access: { create: authenticated, delete: authenticated, read: publishedOrAuthenticated, readVersions: authenticated, update: authenticated },
-  admin: { defaultColumns: ['title', 'startsAt', 'lifecycle', 'showOnHomepage', 'homepageOrder', '_status'], group: 'Клуб', useAsTitle: 'title' },
+  admin: { defaultColumns: ['title', 'startsAt', 'lifecycle', 'showOnHomepage', 'homepageOrder', '_status'], group: 'Турниры', useAsTitle: 'title' },
   fields: [
     {
       type: 'tabs',

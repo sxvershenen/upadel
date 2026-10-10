@@ -48,7 +48,7 @@ export function AdminToolsNav() {
   const router = useRouter()
   const { config } = useConfig()
   const adminRoute = config.routes.admin
-  const [navGroups, setNavGroups] = useState<{ content: Element | null; settings: Element | null }>({ content: null, settings: null })
+  const [settingsGroup, setSettingsGroup] = useState<Element | null>(null)
   const analytics: Tool = {
     href: formatAdminURL({ adminRoute, path: '/analytics' }),
     id: 'nav-analytics',
@@ -63,20 +63,19 @@ export function AdminToolsNav() {
   }
 
   useEffect(() => {
-    const findNavGroups = () => {
-      const content = document.getElementById('nav-group-Контент')?.querySelector('.nav-group__content') ?? null
+    const findSettingsGroup = () => {
       const settings = document.getElementById('nav-group-Настройки')?.querySelector('.nav-group__content') ?? null
-      setNavGroups({ content, settings })
-      return Boolean(content && settings)
+      setSettingsGroup(settings)
+      return Boolean(settings)
     }
-    if (findNavGroups()) return
-    const observer = new MutationObserver(() => { if (findNavGroups()) observer.disconnect() })
+    if (findSettingsGroup()) return
+    const observer = new MutationObserver(() => { if (findSettingsGroup()) observer.disconnect() })
     observer.observe(document.body, { childList: true, subtree: true })
     return () => observer.disconnect()
   }, [])
 
   useEffect(() => {
-    if (!navGroups.content && !navGroups.settings) return
+    if (!settingsGroup) return
     const scheduleIdle = (callback: () => void) => {
       const idle = typeof window.requestIdleCallback === 'function' ? window.requestIdleCallback.bind(window) : null
       if (idle) return idle(callback, { timeout: 1000 })
@@ -108,12 +107,12 @@ export function AdminToolsNav() {
       document.removeEventListener('focusin', prefetchNavLink)
       queue.dispose()
     }
-  }, [adminRoute, navGroups, router])
+  }, [adminRoute, settingsGroup, router])
 
   return (
     <>
-      {navGroups.settings && createPortal(<ToolLink {...analytics} pathname={pathname} />, navGroups.settings)}
-      {navGroups.content && createPortal(<ToolLink {...pageMap} pathname={pathname} />, navGroups.content)}
+      {settingsGroup && createPortal(<ToolLink {...analytics} pathname={pathname} />, settingsGroup)}
+      {settingsGroup && createPortal(<ToolLink {...pageMap} pathname={pathname} />, settingsGroup)}
     </>
   )
 }

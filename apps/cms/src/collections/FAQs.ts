@@ -16,7 +16,7 @@ export const FAQs: CollectionConfig = {
   },
   admin: {
     defaultColumns: ['question', 'showOnHomepage', 'homepageOrder', '_status'],
-    group: 'Сообщество',
+    group: false,
     useAsTitle: 'question',
   },
   fields: [

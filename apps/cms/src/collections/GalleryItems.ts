@@ -33,7 +33,7 @@ export const GalleryItems: CollectionConfig = {
       },
     },
     defaultColumns: ['title', 'showOnHomepage', 'homepageOrder', '_status'],
-    group: 'Сообщество',
+    group: 'Медиатека',
     useAsTitle: 'title',
   },
   fields: [

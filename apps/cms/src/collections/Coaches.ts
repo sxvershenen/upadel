@@ -24,7 +24,7 @@ export const Coaches: CollectionConfig = {
   },
   admin: {
     defaultColumns: ['name', 'isActive', 'showOnHomepage', 'homepageOrder', '_status'],
-    group: 'Клуб',
+    group: 'Услуги и цены',
     useAsTitle: 'name',
   },
   fields: [

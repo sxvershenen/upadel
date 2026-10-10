@@ -66,6 +66,18 @@ export const HomePage: GlobalConfig = {
           fields: communityFields,
         },
         {
+          label: 'Корты',
+          fields: [{ name: 'homepageCourts', type: 'ui', admin: { components: { Field: '/components/admin/HomepageAdminCollections#HomepageCourtsPanel' } } }],
+        },
+        {
+          label: 'Отзывы',
+          fields: [{ name: 'homepageReviews', type: 'ui', admin: { components: { Field: '/components/admin/HomepageAdminCollections#HomepageReviewsPanel' } } }],
+        },
+        {
+          label: 'FAQ',
+          fields: [{ name: 'homepageFAQs', type: 'ui', admin: { components: { Field: '/components/admin/HomepageAdminCollections#HomepageFAQsPanel' } } }],
+        },
+        {
           label: 'SEO',
           fields: [seoField],
         },

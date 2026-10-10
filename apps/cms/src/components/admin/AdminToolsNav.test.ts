@@ -2,6 +2,18 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 
 import { createPrefetchQueue, resolveAdminPrefetchHref } from './adminNavPrefetch'
+import { orderPayloadNavGroups } from './orderedNavGroups'
+
+test('orders Payload navigation groups while retaining unknown groups at the end', () => {
+  const groups = [
+    { label: 'Настройки', entities: [] },
+    { label: 'Услуги и цены', entities: [] },
+    { label: 'Обращения', entities: [] },
+    { label: 'Страницы / разделы', entities: [] },
+    { label: 'Unknown', entities: [] },
+  ]
+  assert.deepEqual(orderPayloadNavGroups(groups).map(({ label }) => label), ['Обращения', 'Страницы / разделы', 'Услуги и цены', 'Настройки', 'Unknown'])
+})
 
 test('resolves same-origin admin links without hashes', () => {
   assert.equal(

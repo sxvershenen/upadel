@@ -4,10 +4,6 @@
   gap: calc(var(--base) * .4);
 }
 
-#nav-group-Настройки {
-  order: -1;
-}
-
 .nav__link[id^='nav-']:not(.admin-tool-nav__link)::before {
   width: 16px;
   height: 16px;

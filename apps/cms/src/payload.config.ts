@@ -51,6 +51,7 @@ export default buildConfig({
   }),
   admin: {
     components: {
+      Nav: '/components/admin/OrderedPayloadNav#OrderedPayloadNav',
       afterNavLinks: ['/components/admin/AdminToolsNav#AdminToolsNav'],
       beforeDashboard: ['/components/admin/DashboardOverview#DashboardOverview'],
       views: {
@@ -81,27 +82,28 @@ export default buildConfig({
     supportedLanguages: { ru },
   },
   collections: [
-    Users,
+    Leads,
     Pages,
-    Media,
-    ArticleCategories,
-    Articles,
-    Coaches,
-    Courts,
     RentalRates,
+    Coaches,
     TrainingPrograms,
     Memberships,
     Tournaments,
+    Articles,
+    ArticleCategories,
     GalleryItems,
-    Reviews,
-    FAQs,
+    Media,
     Partners,
-    Leads,
     AnalyticsEvents,
     AnalyticsBrowsers,
     AnalyticsSessions,
     AnalyticsDaily,
     Redirects,
+    Users,
+    // Homepage-only collections remain editable through native drawers from the Homepage tabs.
+    { ...Courts, admin: { ...Courts.admin, group: false as const } },
+    { ...Reviews, admin: { ...Reviews.admin, group: false as const } },
+    { ...FAQs, admin: { ...FAQs.admin, group: false as const } },
   ].map((collection) => collection.slug === 'users' || collection.slug === 'leads' || collection.slug.startsWith('analytics-') ? collection : invalidateCollectionContent(collection)),
   db: postgresAdapter({
     pool: {
@@ -113,10 +115,18 @@ export default buildConfig({
   }),
   editor: lexicalEditor(),
   globals: [
-    SiteSettings,
-    TournamentDefaults,
-    ...[HomePage, BlogPage, CoachesPage, TournamentsPage, PricesPage, TrainingPage, GiftPage, CourtsPage, PadelCourtZakazPage, GalleryPage, AboutPage, ContactsPage, PolicyPage, OfertaPage]
-      .map((global) => ({ ...global, admin: { ...global.admin, group: 'Контент' } })),
+    { ...SiteSettings, admin: { ...SiteSettings.admin, group: 'Настройки' } },
+    { ...TournamentDefaults, label: 'Общие условия турниров', admin: { ...TournamentDefaults.admin, group: 'Турниры' } },
+    ...[HomePage, PricesPage, TrainingPage, CoachesPage, TournamentsPage, GiftPage, BlogPage, GalleryPage, AboutPage, ContactsPage, CourtsPage, PadelCourtZakazPage, PolicyPage, OfertaPage]
+      .map((global) => ({
+        ...global,
+        ...(global.slug === 'padel-court-zakaz-page' ? { label: 'Дистрибьюция кортов' } : {}),
+        admin: {
+          ...global.admin,
+          group: ['policy-page', 'oferta-page'].includes(global.slug) ? false as const : 'Страницы / разделы',
+          ...(global.slug === 'courts-page' ? { hidden: true } : {}),
+        },
+      })),
   ].map(invalidateGlobalContent),
   secret: process.env.PAYLOAD_SECRET ?? '',
   sharp,
