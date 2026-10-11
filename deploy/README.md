@@ -46,7 +46,7 @@ sudo systemctl reload nginx
 sudo certbot --nginx -d example.com -d www.example.com -d cms.example.com
 ```
 
-The example enables gzip for HTML-adjacent text assets (CSS, JavaScript, JSON and SVG); keep it enabled so the roughly 108 KB raw shared stylesheet transfers at about 21 KB before protocol overhead.
+The example enables gzip for proxied HTML-adjacent text assets (CSS, JavaScript served as either `application/javascript` or `text/javascript`, JSON and SVG); keep `gzip_proxied any` and both JavaScript MIME types so the roughly 108 KB raw shared stylesheet and browser bundles transfer compressed.
 
 Expose only SSH, HTTP and HTTPS in the firewall. Ports `3000`, `4321` and PostgreSQL stay bound to loopback/private interfaces.
 
