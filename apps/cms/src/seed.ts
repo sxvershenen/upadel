@@ -1924,6 +1924,9 @@ async function seed() {
         .filter((link: Record<string, unknown>) => link.url !== 'https://t.me' && link.url !== '#')
         .map((link: Record<string, unknown>) => link.provider === 'vk' && link.url === 'https://vk.com' ? { ...link, url: 'https://vk.ru/unlimpadel' } : link)
       if (!migratedSocialLinks.some((link: Record<string, unknown>) => link.provider === 'vk')) migratedSocialLinks.push({ provider: 'vk', label: 'VK', url: 'https://vk.ru/unlimpadel' })
+      if (!migratedSocialLinks.some((link: Record<string, unknown>) => link.provider === 'telegram' && typeof link.url === 'string' && link.url.includes('t.me/'))) {
+        migratedSocialLinks.push({ provider: 'telegram', label: 'Telegram', url: 'https://t.me/unlimpadel' })
+      }
       if (JSON.stringify(migratedFooterStats) !== JSON.stringify(currentSettings.footerStats ?? []) || JSON.stringify(migratedSocialLinks) !== JSON.stringify(currentSettings.socialLinks ?? [])) {
         await payload.updateGlobal({ slug: 'site-settings', draft: false, overrideAccess: true, data: { footerStats: migratedFooterStats, socialLinks: migratedSocialLinks, _status: 'published' } as never })
         stats.globalsPublished += 1
@@ -1956,7 +1959,10 @@ async function seed() {
           ],
           legalEntity: 'ООО «Анлим Спорт» · ИНН 5024178932 · ОГРН 1235000078451',
           footerNavigation: [...footerNavigation],
-          socialLinks: [{ provider: 'vk', label: 'VK', url: 'https://vk.ru/unlimpadel' }],
+          socialLinks: [
+            { provider: 'vk', label: 'VK', url: 'https://vk.ru/unlimpadel' },
+            { provider: 'telegram', label: 'Telegram', url: 'https://t.me/unlimpadel' },
+          ],
           legalLinks: [...legalLinks],
           copyright: '© 2026 Unlim Riga Padel. Все права защищены.',
           cookieNotice: { text: 'Используем cookies, чтобы бронирование и подбор тренировок работали быстрее.', acceptLabel: 'Хорошо' },
