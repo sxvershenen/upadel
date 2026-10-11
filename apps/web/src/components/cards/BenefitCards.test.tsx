@@ -89,6 +89,23 @@ test('phone benefits scale with card height and retain their illustration-specif
   }
 })
 
+test('phone benefit illustrations defer offscreen loads and select card-sized responsive variants', () => {
+  for (const variant of ['online-booking', 'community']) {
+    const document = new Window().document
+    document.body.innerHTML = renderToStaticMarkup(<BenefitCard benefit={{
+      ...baseBenefit,
+      variant,
+      title: variant,
+      media: { url: '/phone-1024.webp', alt: '', mimeType: 'image/webp', width: 1024, height: 1536, srcSet: '/phone-640.webp 640w, /phone-1024.webp 1024w' },
+    } as any} />)
+    const image = document.querySelector('.benefit-phone')!
+    assert.equal(image.getAttribute('loading'), 'lazy')
+    assert.equal(image.getAttribute('sizes'), '240px')
+    assert.equal(image.getAttribute('srcset'), '/phone-640.webp 640w, /phone-1024.webp 1024w')
+    assert.equal(image.getAttribute('fetchpriority'), 'low')
+  }
+})
+
 test('benefit typography follows CMS mesh tone instead of the recipe', () => {
   for (const [variant, tone, expected] of [['community', 'dark', 'text-white'], ['online-booking', 'indigo', 'text-white'], ['online-booking', 'lime-soft', 'text-[#244500]'], ['community', 'indigo', 'text-white']]) {
     const document = new Window().document
