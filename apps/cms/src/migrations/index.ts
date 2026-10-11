@@ -1,3 +1,4 @@
+import * as payloadAuthRequestedAt from './20261011_010000_payload_auth_requested_at'
 import * as offerVisibility from './20261010_200000_offer_visibility'
 import * as homepageRentalPricing from './20261011_000000_homepage_rental_pricing'
 import * as openingRefinements from './20261010_190000_opening_refinements'
@@ -128,4 +129,5 @@ export const migrations = [
   { name: '20261010_190000_opening_refinements', up: openingRefinements.up, down: openingRefinements.down },
   { name: '20261010_200000_offer_visibility', up: offerVisibility.up, down: offerVisibility.down },
   { name: '20261011_000000_homepage_rental_pricing', up: homepageRentalPricing.up, down: homepageRentalPricing.down },
+  { name: '20261011_010000_payload_auth_requested_at', up: payloadAuthRequestedAt.up, down: payloadAuthRequestedAt.down },
 ];
