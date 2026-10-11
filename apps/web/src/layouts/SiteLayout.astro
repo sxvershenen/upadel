@@ -144,9 +144,9 @@ const pageEntrance = Astro.url.pathname === '/gift'
     <title>{title}</title>
   </head>
   <body>
+    {site && <CookieNotice site={site} />}
     {enableGlobalTransitions && <GlobalPageTransition client:load />}
     {site && <SiteChromeIsland client:load site={site} />}
-    {site && <CookieNotice site={site} />}
     <div id="swup" data-swup-container data-page-entrance={pageEntrance}>
       <slot />
     </div>
