@@ -3,7 +3,7 @@ import { PartyPopper, Trophy } from "lucide-react";
 import type { HomepageDTO } from "@unlim/content-contract";
 import { ArrowAction } from "../ui/ArrowAction";
 import { Badge } from "../ui/Badge";
-import { ImageCard, MeshCard, imageOverlayForMesh, type MeshTone } from "../ui/Card";
+import { ImageCard, MeshCard, imageOverlayForMesh, imageTextTintForMesh, type MeshTone } from "../ui/Card";
 import { Typography } from "../ui/Typography";
 import { ContentAction } from "../ContentAction";
 
@@ -24,7 +24,7 @@ export function OfferCard({ offer, wide = false }: { offer: Offer; wide?: boolea
     </div>
     <div className={wide ? 'max-w-[760px] md:max-w-[900px]' : 'max-w-[500px]'}>
       {offer.title && <Typography as="h3" role={titleRole} reveal={false} className="text-white">{offer.title}</Typography>}
-      {offer.description && <Typography role={descriptionRole} reveal={false} className="mt-3 text-white/80">{offer.description}</Typography>}
+      {offer.description && <Typography role={descriptionRole} reveal={false} className="mt-3" style={{ color: imageTextTintForMesh(offer.meshTone) }}>{offer.description}</Typography>}
       {hasAction && <ContentAction action={offer.action} sourcePage="/" sourceEntity={offer.title} variant="secondary" size="sm" className="mt-5" />}
     </div>
   </div>;

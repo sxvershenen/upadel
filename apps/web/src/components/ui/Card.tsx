@@ -68,6 +68,18 @@ export function imageOverlayForMesh(tone?: string | null): ImageOverlay {
   if (tone === 'dark' || tone === 'navy-gold') return 'overlay-dark';
   return 'overlay-blue';
 }
+const imageTextTints: Record<ImageOverlay, string> = {
+  'overlay-lime': '#e7f8c5',
+  'overlay-blue': '#c7ddff',
+  'overlay-cyan': '#c9f7ff',
+  'overlay-violet': '#ead7ff',
+  'overlay-sunset': '#ffe0c2',
+  'overlay-emerald': '#c8f6e1',
+  'overlay-dark': '#d5ddea',
+};
+export function imageTextTintForMesh(tone?: string | null): string {
+  return imageTextTints[imageOverlayForMesh(tone)];
+}
 export interface ImageCardProps extends Omit<HTMLMotionProps<"div">, "children"> {
   media?: MediaDTO | null;
   sizes?: string;

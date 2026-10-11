@@ -4,7 +4,7 @@ import { Badge } from '../components/ui/Badge'
 import { motion } from 'framer-motion'
 import { useContent } from '../content/ContentContext'
 import { useImageParallax } from '../lib/useImageParallax'
-import { SurfaceCard, imageOverlayForMesh } from '../components/ui/Card'
+import { SurfaceCard, imageOverlayForMesh, imageTextTintForMesh } from '../components/ui/Card'
 import { Reveal } from '../components/ui/Reveal'
 import { ProgressiveImage } from '../components/ui/ProgressiveImage'
 import { Typography } from '../components/ui/Typography'
@@ -31,11 +31,11 @@ export function MethodistBanner() {
       <div className="relative z-10 flex min-h-0 flex-col gap-4 md:flex-row md:items-end md:justify-between md:gap-10">
         <div className="min-w-0 max-w-[760px]">
           <Typography as="h2" role="section" reveal={false} className="text-white">{banner.title}</Typography>
-          <Typography role="body" reveal={false} className="mt-3 max-w-[580px] whitespace-pre-line text-white">{banner.description}</Typography>
+          <Typography role="body" reveal={false} className="mt-3 max-w-[580px] whitespace-pre-line" style={{ color: imageTextTintForMesh(banner.meshTone) }}>{banner.description}</Typography>
         </div>
         {banner.price != null && <>
-          <div className="mt-auto flex items-center justify-between gap-4 border-t border-white/15 pt-4 md:hidden" data-robot-banner-mobile-price><span className="type-ui text-white/60">Стоимость аренды</span><Price data-robot-banner-price size="section" value={banner.price} suffix="/ час" tone="light" className="shrink-0 text-right [&>div]:justify-end" /></div>
-          <Price data-robot-banner-price-desktop size="section" value={banner.price} suffix="/ час" tone="light" className="hidden shrink-0 text-right md:block [&>div]:justify-end" />
+          <div className="mt-auto flex items-center justify-between gap-4 border-t border-white/15 pt-4 md:hidden" data-robot-banner-mobile-price><span className="type-ui text-white/60">Стоимость аренды</span><Price data-robot-banner-price size="section" value={banner.price} suffix={<span style={{ color: imageTextTintForMesh(banner.meshTone) }}>/ час</span>} tone="light" className="shrink-0 text-right [&>div]:justify-end" /></div>
+          <Price data-robot-banner-price-desktop size="section" value={banner.price} suffix={<span style={{ color: imageTextTintForMesh(banner.meshTone) }}>/ час</span>} tone="light" className="hidden shrink-0 text-right md:block [&>div]:justify-end" />
         </>}
       </div>
     </SurfaceCard></Reveal>
