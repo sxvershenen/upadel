@@ -24,18 +24,18 @@
     "content:opening": "cross-env NODE_OPTIONS=--no-deprecation payload run src/scripts/openingContent.ts"
   },
   "dependencies": {
-    "@payloadcms/db-postgres": "3.89.0",
-    "@payloadcms/next": "3.89.0",
-    "@payloadcms/richtext-lexical": "3.89.0",
-    "@payloadcms/ui": "3.89.0",
+    "@payloadcms/db-postgres": "3.90.2",
+    "@payloadcms/next": "3.90.2",
+    "@payloadcms/richtext-lexical": "3.90.2",
+    "@payloadcms/ui": "3.90.2",
     "@unlim/content-contract": "0.0.15",
     "cross-env": "7.0.3",
     "graphql": "16.11.0",
-    "next": "16.3.5",
-    "payload": "3.89.0",
+    "next": "16.3.8",
+    "payload": "3.90.2",
     "react": "19.3.0",
     "react-dom": "19.3.0",
-    "sharp": "0.35.4"
+    "sharp": "0.35.5"
   },
   "devDependencies": {
     "@types/node": "22.19.17",

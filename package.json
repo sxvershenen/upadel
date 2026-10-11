@@ -6,6 +6,11 @@
     "apps/*",
     "packages/*"
   ],
+  "overrides": {
+    "dompurify": "3.4.16",
+    "sass": "1.105.1",
+    "undici": "7.29.1"
+  },
   "scripts": {
     "dev:web": "npm run dev --workspace @unlim/web",
     "dev:cms": "npm run dev --workspace @unlim/cms",
