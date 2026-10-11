@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-# Production backup policy: keep only latest and previous archive on the VPS.
+# Keep one replaceable archive per backup cadence.
 umask 077
 
 BACKUP_DIR="${BACKUP_DIR:-/srv/backups/unlim}"
+BACKUP_NAME="${BACKUP_NAME:-daily}"
 MEDIA_DIR="${MEDIA_DIR:-/srv/unlim/shared/media}"
 ENV_FILE="${ENV_FILE:-/srv/unlim/shared/.env.production}"
 RELEASE_DIR="${RELEASE_DIR:-/srv/unlim/current}"
@@ -14,6 +15,7 @@ PGDATABASE="${PGDATABASE:-unlim}"
 PGUSER="${PGUSER:-unlim}"
 
 mkdir -p "$BACKUP_DIR"
+[[ "$BACKUP_NAME" == daily || "$BACKUP_NAME" == weekly ]] || { echo "BACKUP_NAME must be daily or weekly." >&2; exit 1; }
 lock_dir=""
 if command -v flock >/dev/null 2>&1; then
   exec 9>"$BACKUP_DIR/.backup.lock"
@@ -24,7 +26,8 @@ else
 fi
 
 work_dir="$(mktemp -d "$BACKUP_DIR/.work.XXXXXX")"
-archive_tmp="$BACKUP_DIR/.unlim-backup-latest.tar.gz.tmp"
+archive="$BACKUP_DIR/unlim-backup-${BACKUP_NAME}.tar.gz"
+archive_tmp="$BACKUP_DIR/.unlim-backup-${BACKUP_NAME}.tar.gz.tmp"
 cleanup() {
   rm -rf "$work_dir" "$archive_tmp"
   [[ -z "$lock_dir" ]] || rmdir "$lock_dir" 2>/dev/null || true
@@ -53,12 +56,9 @@ echo "Packing database, media and production configuration..."
 ln -s "$MEDIA_DIR" "$work_dir/media"
 tar -czhf "$archive_tmp" -C "$work_dir" database.dump production.env release.txt media
 
-if [[ -f "$BACKUP_DIR/unlim-backup-latest.tar.gz" ]]; then
-  mv -f "$BACKUP_DIR/unlim-backup-latest.tar.gz" "$BACKUP_DIR/unlim-backup-previous.tar.gz"
-fi
-mv -f "$archive_tmp" "$BACKUP_DIR/unlim-backup-latest.tar.gz"
-chmod 600 "$BACKUP_DIR/unlim-backup-latest.tar.gz"
+mv -f "$archive_tmp" "$archive"
+chmod 600 "$archive"
 
-echo "Backup complete: $BACKUP_DIR/unlim-backup-latest.tar.gz"
-du -h "$BACKUP_DIR/unlim-backup-latest.tar.gz"
+echo "Backup complete: $archive"
+du -h "$archive"
 df -h "$BACKUP_DIR"

@@ -5,6 +5,7 @@ Description=Weekly UNLIM production backup
 OnCalendar=Sun *-*-* 04:15:00
 Persistent=true
 RandomizedDelaySec=10min
+Unit=unlim-backup@weekly.service
 
 [Install]
 WantedBy=timers.target

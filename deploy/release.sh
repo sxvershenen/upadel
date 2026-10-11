@@ -43,7 +43,7 @@ npm run typecheck
 npm run build
 
 if [[ "$RUN_BACKUP" == "1" && -L "$CURRENT_LINK" ]]; then
-  "$deployment_dir/deploy/backup.sh"
+  BACKUP_NAME=daily "$deployment_dir/deploy/backup.sh"
 fi
 
 npm run payload --workspace @unlim/cms -- migrate

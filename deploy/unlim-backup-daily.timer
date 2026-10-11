@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily UNLIM production backup
+
+[Timer]
+OnCalendar=*-*-* 03:45:00
+Persistent=true
+RandomizedDelaySec=10min
+Unit=unlim-backup@daily.service
+
+[Install]
+WantedBy=timers.target

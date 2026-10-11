@@ -30,9 +30,11 @@ Generate independent secrets with `openssl rand -hex 32`. Keep PostgreSQL, Paylo
 Install services and timers once:
 
 ```sh
-sudo cp deploy/unlim-cms.service deploy/unlim-web.service deploy/unlim-analytics.service deploy/unlim-analytics.timer deploy/unlim-backup.service deploy/unlim-backup.timer /etc/systemd/system/
+sudo cp deploy/unlim-cms.service deploy/unlim-web.service deploy/unlim-analytics.service deploy/unlim-analytics.timer /etc/systemd/system/
+sudo cp deploy/unlim-backup.service /etc/systemd/system/unlim-backup@.service
+sudo cp deploy/unlim-backup-daily.timer deploy/unlim-backup-weekly.timer /etc/systemd/system/
 sudo systemctl daemon-reload
-sudo systemctl enable unlim-cms.service unlim-web.service unlim-analytics.timer unlim-backup.timer
+sudo systemctl enable unlim-cms.service unlim-web.service unlim-analytics.timer unlim-backup-daily.timer unlim-backup-weekly.timer
 ```
 
 Copy `deploy/nginx.conf.example` to `/etc/nginx/sites-available/unlim`, replace domains, let Certbot add certificate paths, then enable and validate it:
@@ -83,11 +85,11 @@ Verify `/urp-panel`, preview, media upload, one test lead, Telegram/VK delivery,
 
 ## 5. Restore drill
 
-Practice on a disposable database before production. A backup contains `database.dump`, `media/`, `production.env` and `release.txt`.
+Practice on a disposable database before production. A daily or weekly archive contains `database.dump`, `media/`, `production.env` and `release.txt`. Each schedule overwrites its prior archive, so the VPS retains at most two scheduled archives.
 
 ```sh
 mkdir /tmp/unlim-restore
-tar -xzf /srv/backups/unlim/unlim-backup-latest.tar.gz -C /tmp/unlim-restore
+tar -xzf /srv/backups/unlim/unlim-backup-daily.tar.gz -C /tmp/unlim-restore
 sudo systemctl stop unlim-web unlim-cms
 PGPASSWORD='database-password' pg_restore --clean --if-exists --no-owner --dbname=unlim /tmp/unlim-restore/database.dump
 rsync -a --delete /tmp/unlim-restore/media/ /srv/unlim/shared/media/

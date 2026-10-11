@@ -1,5 +1,5 @@
 [Unit]
-Description=UNLIM production backup
+Description=UNLIM %i production backup
 After=postgresql.service
 
 [Service]
@@ -8,6 +8,7 @@ User=unlim
 Group=unlim
 WorkingDirectory=/srv/unlim/current
 EnvironmentFile=/srv/unlim/shared/.env.production
+Environment=BACKUP_NAME=%i
 ExecStart=/srv/unlim/current/deploy/backup.sh
 NoNewPrivileges=true
 PrivateTmp=true
