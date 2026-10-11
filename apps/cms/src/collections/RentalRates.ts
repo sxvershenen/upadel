@@ -17,7 +17,8 @@ export const RentalRates: CollectionConfig = {
     update: authenticated,
   },
   admin: {
-    defaultColumns: ['title', 'cardVariant', 'price', 'showOnHomepage', 'homepageOrder', '_status'],
+    defaultColumns: ['title', 'price', 'showOnHomepage', 'homepageOrder', '_status'],
+    baseFilter: () => ({ cardVariant: { equals: 'rate' } }),
     group: 'Услуги и цены',
     useAsTitle: 'title',
   },
@@ -35,14 +36,11 @@ export const RentalRates: CollectionConfig = {
     {
       name: 'cardVariant',
       type: 'select',
-      label: 'Recipe карточки',
-      required: true,
-      options: [
-        { label: 'Обычный тариф', value: 'rate' },
-        { label: 'Предложение тренировок / абонементов', value: 'trial' },
-        { label: 'Стандарты сервиса', value: 'standards' },
-        { label: 'Специальные абонементы — белая карточка', value: 'membership-offer' },
-      ],
+      label: 'Тип тарифной карточки',
+      defaultValue: 'rate',
+      // Retain legacy enum values so existing versions can still be read during migration.
+      options: [{ label: 'Тариф аренды', value: 'rate' }, { label: 'Абонементы', value: 'membership-offer' }, { label: 'Стандарты', value: 'standards' }, { label: 'Пробное занятие', value: 'trial' }],
+      admin: { hidden: true },
     },
     { name: 'meshTone', type: 'select', label: 'Mesh-тон', options: [...meshToneOptions] },
     {

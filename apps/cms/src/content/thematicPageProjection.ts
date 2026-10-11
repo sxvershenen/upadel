@@ -39,8 +39,14 @@ export async function createThematicPageProjection(payload: Payload, options: { 
   }
 
   if (kind === 'prices') {
-    const [rates, programs, memberships] = await Promise.all([publishedCollection(payload, 'rental-rates', preview), publishedCollection(payload, 'training-programs', preview), publishedCollection(payload, 'memberships', preview)])
-    return parseThematicPageDTO({ ...base, kind, termsTitle: page.termsTitle ?? '', faqTitle: page.faqTitle ?? '', faq: (page.faq ?? []).map(({ question, answer }: Row) => ({ question: String(question ?? ''), answer: String(answer ?? '') })), tabs: { rent: page.rentTabLabel, training: page.trainingTabLabel, memberships: page.membershipsTabLabel }, rules: (page.rules ?? []).map((item: Row) => ({ title: String(item.title), contentHTML: richContentHTML(item.content), icon: item.icon ?? 'ClipboardCheck' })), rentalRates: rates.docs.map(rentalRate), trainingPrograms: programs.docs.map((item) => program(item, origin)), memberships: memberships.docs.map(membership) })
+    const [rates, programs, memberships, homepage] = await Promise.all([
+      publishedCollection(payload, 'rental-rates', preview, { cardVariant: { equals: 'rate' } }),
+      publishedCollection(payload, 'training-programs', preview),
+      publishedCollection(payload, 'memberships', preview),
+      payload.findGlobal({ slug: 'homepage', draft: preview, depth: 0, overrideAccess: true, showHiddenFields: false } as never) as unknown as Promise<Row>,
+    ])
+    const pricing = homepage.pricingSection ?? {}
+    return parseThematicPageDTO({ ...base, kind, termsTitle: page.termsTitle ?? '', faqTitle: page.faqTitle ?? '', faq: (page.faq ?? []).map(({ question, answer }: Row) => ({ question: String(question ?? ''), answer: String(answer ?? '') })), tabs: { rent: page.rentTabLabel, training: page.trainingTabLabel, memberships: page.membershipsTabLabel }, rules: (page.rules ?? []).map((item: Row) => ({ title: String(item.title), contentHTML: richContentHTML(item.content), icon: item.icon ?? 'ClipboardCheck' })), rentalRates: rates.docs.map(rentalRate), membershipOffer: { enabled: Boolean(pricing.membershipOffer?.enabled), showOnHomepage: Boolean(pricing.membershipOffer?.showOnHomepage), title: String(pricing.membershipOffer?.title ?? ''), eyebrow: pricing.membershipOffer?.eyebrow, description: String(pricing.membershipOffer?.description ?? ''), priceLabel: pricing.membershipOffer?.priceLabel, meshTone: pricing.membershipOffer?.meshTone, action: actionDTO(pricing.membershipOffer?.action) }, rentalStandards: { enabled: Boolean(pricing.rentalStandards?.enabled), showOnHomepage: Boolean(pricing.rentalStandards?.showOnHomepage), title: String(pricing.rentalStandards?.title ?? ''), eyebrow: pricing.rentalStandards?.eyebrow, timeLabel: pricing.rentalStandards?.timeLabel, description: String(pricing.rentalStandards?.description ?? ''), meshTone: pricing.rentalStandards?.meshTone, includedItems: (pricing.rentalStandards?.includedItems ?? []).map(({ text }: Row) => String(text)) }, trainingPrograms: programs.docs.map((item) => program(item, origin)), memberships: memberships.docs.map(membership) })
   }
   if (kind === 'training') {
     const [programs, coachesDocs] = await Promise.all([

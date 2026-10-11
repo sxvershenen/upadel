@@ -42,7 +42,7 @@ Clean-server bootstrap, Nginx, systemd and release instructions are in [`deploy/
 
 ## Product surface
 
-Public routes: `/`, `/blog`, `/prices`, `/training`, `/coaches`, `/courts`, `/tournaments`, `/about`, `/contacts`, `/policy`, `/oferta`, `/padel-court-zakaz` (with `/padel-courts` redirect), plus article and entity detail pages.
+Public routes: `/`, `/blog`, `/prices`, `/training`, `/coaches`, `/tournaments`, `/about`, `/contacts`, `/policy`, `/oferta`, `/padel-court-zakaz` (with `/padel-courts` redirect), plus article and entity detail pages. `/courts` is retired and returns 404; homepage court cards remain CMS-managed.
 
 CMS areas: pages and navigation, home sections, business entities, blog, media, leads, SEO, integrations, booking and analytics.
 

@@ -1,4 +1,5 @@
 import { LeadNotificationRetry as LeadNotificationRetry_3837e092f6ffe1851aab43a652a5df3e } from '../../../components/admin/LeadNotificationRetry'
+import { DefaultCollapsedArrayRowLabel as DefaultCollapsedArrayRowLabel_48bd8a775a1d785d789dacb46e8c6762 } from '../../../components/admin/DefaultCollapsedAccordion'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -32,6 +33,7 @@ import { PolicyGlobalEditorPanel as PolicyGlobalEditorPanel_e17a9bf367a67dd68371
 import { OfertaGlobalEditorPanel as OfertaGlobalEditorPanel_e17a9bf367a67dd68371fedfde3d34ef } from '../../../components/admin/GlobalEditorPanel'
 import { SecretTextField as SecretTextField_d8cbdd8e0062467049891f81baf1b9a1 } from '../../../components/admin/SecretTextField'
 import { IntegrationStatus as IntegrationStatus_2c35762c8ba264f9b73d6d184c279526 } from '../../../components/admin/IntegrationStatus'
+import { DefaultCollapsedFieldLabel as DefaultCollapsedFieldLabel_48bd8a775a1d785d789dacb46e8c6762 } from '../../../components/admin/DefaultCollapsedAccordion'
 import { HomepageCourtsPanel as HomepageCourtsPanel_6441cbe11148e4edeb3cf73d2c00af4e } from '../../../components/admin/HomepageAdminCollections'
 import { HomepageReviewsPanel as HomepageReviewsPanel_6441cbe11148e4edeb3cf73d2c00af4e } from '../../../components/admin/HomepageAdminCollections'
 import { HomepageFAQsPanel as HomepageFAQsPanel_6441cbe11148e4edeb3cf73d2c00af4e } from '../../../components/admin/HomepageAdminCollections'
@@ -45,6 +47,7 @@ import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 /** @type import('payload').ImportMap */
 export const importMap = {
   "/components/admin/LeadNotificationRetry#LeadNotificationRetry": LeadNotificationRetry_3837e092f6ffe1851aab43a652a5df3e,
+  "/components/admin/DefaultCollapsedAccordion#DefaultCollapsedArrayRowLabel": DefaultCollapsedArrayRowLabel_48bd8a775a1d785d789dacb46e8c6762,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#LexicalDiffComponent": LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e,
@@ -78,6 +81,7 @@ export const importMap = {
   "/components/admin/GlobalEditorPanel#OfertaGlobalEditorPanel": OfertaGlobalEditorPanel_e17a9bf367a67dd68371fedfde3d34ef,
   "/components/admin/SecretTextField#SecretTextField": SecretTextField_d8cbdd8e0062467049891f81baf1b9a1,
   "/components/admin/IntegrationStatus#IntegrationStatus": IntegrationStatus_2c35762c8ba264f9b73d6d184c279526,
+  "/components/admin/DefaultCollapsedAccordion#DefaultCollapsedFieldLabel": DefaultCollapsedFieldLabel_48bd8a775a1d785d789dacb46e8c6762,
   "/components/admin/HomepageAdminCollections#HomepageCourtsPanel": HomepageCourtsPanel_6441cbe11148e4edeb3cf73d2c00af4e,
   "/components/admin/HomepageAdminCollections#HomepageReviewsPanel": HomepageReviewsPanel_6441cbe11148e4edeb3cf73d2c00af4e,
   "/components/admin/HomepageAdminCollections#HomepageFAQsPanel": HomepageFAQsPanel_6441cbe11148e4edeb3cf73d2c00af4e,

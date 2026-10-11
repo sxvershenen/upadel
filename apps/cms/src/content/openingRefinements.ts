@@ -8,7 +8,8 @@ const finalRevision = 'opening-november-2026-v7'
 const offerImageRevision = 'opening-november-2026-v8'
 const suppliedPhotosRevision = 'opening-november-2026-v9'
 const suppliedRobotCopyRevision = 'opening-november-2026-v10'
-const completedRevisions = [finalRevision, offerImageRevision, suppliedPhotosRevision, suppliedRobotCopyRevision]
+const rentalPricingRevision = 'opening-november-2026-v11'
+const completedRevisions = [finalRevision, offerImageRevision, suppliedPhotosRevision, suppliedRobotCopyRevision, rentalPricingRevision]
 const richText = (text: string) => ({ root: { type: 'root', version: 1, direction: 'ltr' as const, format: '' as const, indent: 0, children: [{ type: 'paragraph', version: 1, direction: 'ltr' as const, format: '' as const, indent: 0, children: [{ type: 'text', version: 1, text, format: 0, detail: 0, mode: 'normal', style: '' }] }] } })
 
 /** Apply the owner's follow-up once; preserve subsequent editor changes. */
@@ -223,7 +224,7 @@ export async function applyOpeningOfferImageRefinements(payload: Payload, req?: 
   const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
   const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
   const seedKey = 'opening-media:corporate-tournament-wide:v8'
-  if ([suppliedPhotosRevision, suppliedRobotCopyRevision].includes(home.openingContentVersion ?? '')) return false
+  if ([suppliedPhotosRevision, suppliedRobotCopyRevision, rentalPricingRevision].includes(home.openingContentVersion ?? '')) return false
   if (home.openingContentVersion === offerImageRevision) {
     const existingPhoto = (await payload.find({ ...options, collection: 'media', where: { seedKey: { equals: seedKey } }, pagination: false })).docs[0]
     if (existingPhoto?.sourceURL === 'apps/web/public/images/opening/corporate-tournament-wide-v2.png') {
@@ -248,7 +249,7 @@ export async function applyOpeningOfferImageRefinements(payload: Payload, req?: 
 export async function applyOpeningSuppliedPhotoRefinements(payload: Payload, req?: PayloadRequest): Promise<boolean> {
   const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
   const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
-  if ([suppliedPhotosRevision, suppliedRobotCopyRevision].includes(home.openingContentVersion ?? '')) return false
+  if ([suppliedPhotosRevision, suppliedRobotCopyRevision, rentalPricingRevision].includes(home.openingContentVersion ?? '')) return false
   if (home.openingContentVersion !== offerImageRevision) throw new Error('Apply the wide offer photo before replacing supplied opening images.')
 
   const media = async (seedKey: string, fileName: string, alt: string) => {
@@ -275,11 +276,81 @@ export async function applyOpeningSuppliedPhotoRefinements(payload: Payload, req
 export async function applyOpeningRobotCopyRefinements(payload: Payload, req?: PayloadRequest): Promise<boolean> {
   const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
   const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
-  if (home.openingContentVersion === suppliedRobotCopyRevision) return false
+  if ([suppliedRobotCopyRevision, rentalPricingRevision].includes(home.openingContentVersion ?? '')) return false
   if (home.openingContentVersion !== suppliedPhotosRevision) throw new Error('Apply the supplied opening photos before updating the robot copy.')
   await payload.updateGlobal({ ...options, slug: 'homepage', draft: false, data: {
     methodistBanner: { ...home.methodistBanner, description: 'Отрабатывайте удары и точность в своём темпе.' },
     openingContentVersion: suppliedRobotCopyRevision, _status: 'published',
   } })
   return true
+}
+
+/** Move only the two known prototype pricing cards into homepage-owned pricing fields. */
+export async function applyRentalPricingRefinements(payload: Payload, req?: PayloadRequest): Promise<boolean> {
+  const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
+  const latestGlobalDraft = async () => {
+    const versions = await payload.findGlobalVersions({ ...options, slug: 'homepage', limit: 1, pagination: false, sort: '-updatedAt' })
+    const version = (versions.docs[0] as any)?.version
+    return version?._status === 'draft' ? version : undefined
+  }
+  const latestCollectionDraft = async (slug: 'rental-rates', item: any) => {
+    const versions = await payload.findVersions({ ...options, collection: slug, where: { parent: { equals: item.id } }, limit: 1, pagination: false, sort: '-updatedAt' })
+    const version = (versions.docs[0] as any)?.version
+    return version?._status === 'draft' ? version : undefined
+  }
+  const findSeed = async (seedKey: string, draft = false) => (await payload.find({ ...options, collection: 'rental-rates', draft, where: { seedKey: { equals: seedKey } }, pagination: false } as never)).docs[0] as any
+  const migrate = async (home: any, draft: boolean, membership: any, standards: any) => {
+    if (home.openingContentVersion === rentalPricingRevision) return false
+    if (home.openingContentVersion !== suppliedRobotCopyRevision) throw new Error('Apply opening refinements before moving rental pricing content.')
+    const oldPricing = home.pricingSection ?? {}
+    const membershipOffer = membership ? {
+      enabled: Boolean(membership.isActive), showOnHomepage: Boolean(membership.showOnHomepage),
+      title: membership.title ?? '', eyebrow: membership.eyebrow ?? '', description: membership.description ?? '',
+      priceLabel: membership.priceLabel ?? '', meshTone: membership.meshTone ?? 'dark', action: membership.action ?? { mode: 'none' },
+    } : oldPricing.membershipOffer
+    const rentalStandards = standards ? {
+      enabled: Boolean(standards.isActive), showOnHomepage: Boolean(standards.showOnHomepage),
+      title: standards.title ?? 'Стандарты Unlim Riga', eyebrow: standards.eyebrow ?? '',
+      timeLabel: standards.timeLabel ?? '', description: standards.description ?? '',
+      meshTone: standards.meshTone ?? 'dark', includedItems: standards.includedItems ?? [],
+    } : oldPricing.rentalStandards
+    const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...draftSnapshot } = home
+    await payload.updateGlobal({ ...options, slug: 'homepage', draft, data: {
+      ...(draft ? draftSnapshot : {}),
+      pricingSection: { ...oldPricing, membershipOffer, rentalStandards },
+      openingContentVersion: rentalPricingRevision, ...(draft ? { _status: 'draft' } : { _status: 'published' }),
+    } as never })
+    for (const item of [membership, standards]) if (item) {
+      const { id: _itemID, createdAt: _itemCreatedAt, updatedAt: _itemUpdatedAt, parent: _parent, ...draftItem } = item
+      await payload.update({ ...options, collection: 'rental-rates', id: item.id, draft, data: { ...(draft ? draftItem : {}), isActive: false, showOnHomepage: false, homepageOrder: null, ...(draft ? { _status: 'draft' } : {}) } } as never)
+    }
+    return true
+  }
+
+  const pendingHome = await latestGlobalDraft()
+  let pendingRates: { membership?: any; standards?: any } = {}
+  if (pendingHome?.openingContentVersion === suppliedRobotCopyRevision) {
+    const [membershipPublished, standardsPublished] = await Promise.all([findSeed('opening:rental-rate:memberships'), findSeed('prototype:rental-rate:standards')])
+    const [membershipDraft, standardsDraft] = await Promise.all([
+      membershipPublished ? latestCollectionDraft('rental-rates', membershipPublished) : undefined,
+      standardsPublished ? latestCollectionDraft('rental-rates', standardsPublished) : undefined,
+    ])
+    pendingRates = {
+      membership: membershipDraft ? { ...membershipDraft, id: membershipPublished?.id } : membershipPublished,
+      standards: standardsDraft ? { ...standardsDraft, id: standardsPublished?.id } : standardsPublished,
+    }
+  }
+  const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
+  let changed = false
+  if (home.openingContentVersion !== rentalPricingRevision) {
+    if (home.openingContentVersion !== suppliedRobotCopyRevision) throw new Error('Apply opening refinements before moving rental pricing content.')
+    const [membership, standards] = await Promise.all([findSeed('opening:rental-rate:memberships'), findSeed('prototype:rental-rate:standards')])
+    changed = await migrate(home, false, membership, standards) || changed
+  }
+  if (pendingHome?.openingContentVersion !== rentalPricingRevision) {
+    if (pendingHome?.openingContentVersion === suppliedRobotCopyRevision) {
+      changed = await migrate(pendingHome, true, pendingRates.membership, pendingRates.standards) || changed
+    }
+  }
+  return changed
 }

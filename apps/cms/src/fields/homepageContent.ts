@@ -6,6 +6,19 @@ import { imageOnlyFilter } from './media'
 import { imageOverlayOptions, meshToneOptions } from './presentation'
 import { validateUniqueRowsByKey } from './validators'
 
+function pricingActionField() {
+  const action = createActionField('action', 'Действие')
+  return {
+    ...action,
+    fields: action.fields.map((field) => 'name' in field && field.name === 'mode' ? { ...field, dbName: 'hm_mem_act_mode' } : 'name' in field && field.name === 'leadType' ? { ...field, dbName: 'hm_mem_lead_type' } : field),
+  }
+}
+
+function optionalActionField(name: string, label: string) {
+  const action = createActionField(name, label)
+  return { ...action, fields: action.fields.map((field) => ({ ...field, required: false })) }
+}
+
 function heroTintStop(name: string, label: string, defaultValue: HeroTintDeviceDTO['stop1']): Field {
   return {
     name,
@@ -283,7 +296,7 @@ export const clubFields: Field[] = [
               { label: 'Праздник', value: 'PartyPopper' },
             ],
           },
-          { ...createActionField('action', 'Действие'), fields: createActionField('action', 'Действие').fields.map((field) => ({ ...field, required: false })) },
+          optionalActionField('action', 'Действие'),
         ],
       },
     ],
@@ -309,7 +322,7 @@ export const servicesFields: Field[] = [
     label: 'Цены и абонементы',
     admin: {
       description:
-        'Карточки: RentalRates 1–4, TrainingPrograms 1–5 и Memberships 1–4. Используются только опубликованные активные записи с флагом главной.',
+        'Здесь настраиваются стандарты клуба и предложение абонементов. Арендные тарифы редактируются в разделе «Услуги и цены → Тарифы аренды»; тренировки и абонементы каталога выбираются из опубликованных активных записей с флагом главной.',
     },
     fields: [
       { name: 'eyebrow', type: 'text', label: 'Надзаголовок', defaultValue: 'Тарифы' },
@@ -329,6 +342,32 @@ export const servicesFields: Field[] = [
       { name: 'rentTabLabel', type: 'text', label: 'Название вкладки аренды', defaultValue: 'Аренда' },
       { name: 'trainingTabLabel', type: 'text', label: 'Название вкладки тренировок', defaultValue: 'Тренировки' },
       { name: 'membershipsTabLabel', type: 'text', label: 'Название вкладки абонементов', defaultValue: 'Абонементы' },
+      {
+        name: 'membershipOffer', type: 'group', label: 'Предложение абонементов',
+        fields: [
+          { name: 'enabled', type: 'checkbox', label: 'Показывать предложение', defaultValue: true },
+          { name: 'showOnHomepage', type: 'checkbox', label: 'Показывать на главной', defaultValue: true },
+          { name: 'title', type: 'text', label: 'Название', defaultValue: 'Абонементы' },
+          { name: 'eyebrow', type: 'text', label: 'Надзаголовок', defaultValue: 'Для постоянных игроков' },
+          { name: 'description', type: 'textarea', label: 'Описание', defaultValue: 'Скидки для постоянных игроков.' },
+          { name: 'priceLabel', type: 'text', label: 'Подпись цены', defaultValue: 'Условия уточняйте у администратора' },
+          { name: 'meshTone', type: 'select', dbName: 'hm_mem_mesh_tone', label: 'Тон карточки', defaultValue: 'dark', options: [...meshToneOptions] },
+          pricingActionField(),
+        ],
+      },
+      {
+        name: 'rentalStandards', type: 'group', label: 'Стандарты Unlim Riga',
+        fields: [
+          { name: 'enabled', type: 'checkbox', label: 'Показывать блок', defaultValue: true },
+          { name: 'showOnHomepage', type: 'checkbox', label: 'Показывать на главной', defaultValue: true },
+          { name: 'title', type: 'text', label: 'Название', defaultValue: 'Стандарты Unlim Riga' },
+          { name: 'eyebrow', type: 'text', label: 'Надзаголовок', defaultValue: 'Премиальный сервис' },
+          { name: 'timeLabel', type: 'text', label: 'Подпись', defaultValue: 'Включено в стоимость аренды' },
+          { name: 'description', type: 'textarea', label: 'Описание' },
+          { name: 'meshTone', type: 'select', dbName: 'hm_std_mesh_tone', label: 'Тон карточки', defaultValue: 'dark', options: [...meshToneOptions] },
+          { name: 'includedItems', type: 'array', dbName: 'hp_rental_standards_items', label: 'Что включено', maxRows: 8, fields: [{ name: 'text', type: 'text', label: 'Пункт', required: true }] },
+        ],
+      },
     ],
   },
   {

@@ -339,7 +339,7 @@ export interface RentalRate {
   priceSuffix?: string | null;
   badge?: string | null;
   badgeTone?: ('lime' | 'lime-soft' | 'sunset' | 'gold' | 'muted' | 'glass' | 'outline-light') | null;
-  cardVariant: 'rate' | 'trial' | 'standards' | 'membership-offer';
+  cardVariant?: ('rate' | 'membership-offer' | 'standards' | 'trial') | null;
   meshTone?:
     ('indigo' | 'deep-blue' | 'dark' | 'lime' | 'lime-soft' | 'sky' | 'lavender' | 'sunset' | 'navy-gold') | null;
   includedItems?:
@@ -2754,7 +2754,7 @@ export interface Homepage {
     backgroundAlt?: string | null;
   };
   /**
-   * Карточки: RentalRates 1–4, TrainingPrograms 1–5 и Memberships 1–4. Используются только опубликованные активные записи с флагом главной.
+   * Здесь настраиваются стандарты клуба и предложение абонементов. Арендные тарифы редактируются в разделе «Услуги и цены → Тарифы аренды»; тренировки и абонементы каталога выбираются из опубликованных активных записей с флагом главной.
    */
   pricingSection: {
     eyebrow?: string | null;
@@ -2763,6 +2763,50 @@ export interface Homepage {
     rentTabLabel?: string | null;
     trainingTabLabel?: string | null;
     membershipsTabLabel?: string | null;
+    membershipOffer: {
+      enabled?: boolean | null;
+      showOnHomepage?: boolean | null;
+      title?: string | null;
+      eyebrow?: string | null;
+      description?: string | null;
+      priceLabel?: string | null;
+      meshTone?:
+        ('indigo' | 'deep-blue' | 'dark' | 'lime' | 'lime-soft' | 'sky' | 'lavender' | 'sunset' | 'navy-gold') | null;
+      action: {
+        label?: string | null;
+        mode:
+          | 'none'
+          | 'booking'
+          | 'account'
+          | 'trial-booking'
+          | 'internal-link'
+          | 'external-link'
+          | 'phone'
+          | 'email'
+          | 'lead-form';
+        /**
+         * Для внутренней ссылки используйте /path или #anchor; внешняя должна начинаться с https://.
+         */
+        href?: string | null;
+        leadType?: ('membership' | 'gift' | 'trial' | 'consultation' | 'other') | null;
+      };
+    };
+    rentalStandards?: {
+      enabled?: boolean | null;
+      showOnHomepage?: boolean | null;
+      title?: string | null;
+      eyebrow?: string | null;
+      timeLabel?: string | null;
+      description?: string | null;
+      meshTone?:
+        ('indigo' | 'deep-blue' | 'dark' | 'lime' | 'lime-soft' | 'sky' | 'lavender' | 'sunset' | 'navy-gold') | null;
+      includedItems?:
+        | {
+            text: string;
+            id?: string | null;
+          }[]
+        | null;
+    };
   };
   methodistBanner: {
     eyebrow?: string | null;
@@ -4188,6 +4232,42 @@ export interface HomepageSelect<T extends boolean = true> {
         rentTabLabel?: T;
         trainingTabLabel?: T;
         membershipsTabLabel?: T;
+        membershipOffer?:
+          | T
+          | {
+              enabled?: T;
+              showOnHomepage?: T;
+              title?: T;
+              eyebrow?: T;
+              description?: T;
+              priceLabel?: T;
+              meshTone?: T;
+              action?:
+                | T
+                | {
+                    label?: T;
+                    mode?: T;
+                    href?: T;
+                    leadType?: T;
+                  };
+            };
+        rentalStandards?:
+          | T
+          | {
+              enabled?: T;
+              showOnHomepage?: T;
+              title?: T;
+              eyebrow?: T;
+              timeLabel?: T;
+              description?: T;
+              meshTone?: T;
+              includedItems?:
+                | T
+                | {
+                    text?: T;
+                    id?: T;
+                  };
+            };
       };
   methodistBanner?:
     | T

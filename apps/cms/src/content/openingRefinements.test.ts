@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { applyOpeningRefinements } from './openingRefinements'
+import { applyOpeningRefinements, applyRentalPricingRefinements } from './openingRefinements'
 import { applyOpeningContent } from './openingContent'
 
 test('refinements update only requested content, preserve cancellation rules and never reapply the first update', async () => {
@@ -40,6 +40,52 @@ test('refinements update only requested content, preserve cancellation rules and
 
 test('refinements refuse missing initial update before writing', async () => {
   await assert.rejects(applyOpeningRefinements({ findGlobal: async () => ({}) } as never), /first opening content/)
+})
+
+test('rental pricing migration preserves published and pending copy/status and is idempotent', async () => {
+  const globals: any = {
+    published: { openingContentVersion: 'opening-november-2026-v10', pricingSection: { title: 'Live pricing' } },
+    draft: { openingContentVersion: 'opening-november-2026-v10', pricingSection: { title: 'Pending pricing' }, _status: 'draft' },
+  }
+  const rates: any[] = [
+    { id: 1, seedKey: 'opening:rental-rate:memberships', title: 'Published offer', description: 'Published offer copy', isActive: true, showOnHomepage: true, priceLabel: 'Published terms', action: { mode: 'phone' } },
+    { id: 2, seedKey: 'prototype:rental-rate:standards', title: 'Published standards', description: 'Published standards copy', isActive: true, showOnHomepage: false, includedItems: [{ text: 'Published rule' }] },
+  ]
+  const pendingRates: any[] = [
+    { id: 1, seedKey: 'opening:rental-rate:memberships', title: 'Draft offer', description: 'Draft offer copy', isActive: true, showOnHomepage: false, action: { mode: 'none' }, _status: 'draft' },
+    { id: 2, seedKey: 'prototype:rental-rate:standards', title: 'Draft standards', description: 'Draft standards copy', isActive: true, showOnHomepage: true, includedItems: [{ text: 'Draft rule' }], _status: 'draft' },
+  ]
+  let draftGlobalVersion = globals.draft
+  const writes: any[] = []
+  const payload = {
+    findGlobal: async ({ draft }: any) => structuredClone(draft ? globals.draft : globals.published),
+    findGlobalVersions: async () => ({ docs: [{ version: structuredClone(draftGlobalVersion) }] }),
+    findVersions: async ({ where }: any) => ({ docs: [{ parent: where.parent.equals, version: structuredClone(pendingRates.find((item) => item.id === where.parent.equals)) }] }),
+    find: async ({ draft, where }: any) => ({ docs: structuredClone((draft ? pendingRates : rates).filter((item) => item.seedKey === where.seedKey.equals)) }),
+    updateGlobal: async ({ draft, data }: any) => {
+      writes.push({ type: 'global', draft, data })
+      Object.assign(draft ? globals.draft : globals.published, data)
+      if (draft) draftGlobalVersion = structuredClone(globals.draft)
+    },
+    update: async ({ draft, id, data }: any) => {
+      writes.push({ type: 'rate', draft, id, data })
+      Object.assign((draft ? pendingRates : rates).find((item) => item.id === id)!, data)
+    },
+  }
+  assert.equal(await applyRentalPricingRefinements(payload as never), true)
+  assert.equal(globals.published.pricingSection.title, 'Live pricing')
+  assert.equal(globals.published.pricingSection.membershipOffer.description, 'Published offer copy')
+  assert.equal(globals.published.pricingSection.rentalStandards.includedItems[0].text, 'Published rule')
+  assert.equal(globals.draft.pricingSection.title, 'Pending pricing')
+  assert.equal(globals.draft.pricingSection.membershipOffer.description, 'Draft offer copy')
+  assert.equal(globals.draft.pricingSection.rentalStandards.includedItems[0].text, 'Draft rule')
+  assert.equal(globals.draft._status, 'draft')
+  assert.equal(pendingRates[0].isActive, false)
+  assert.equal(pendingRates[0]._status, 'draft')
+  assert.ok(writes.filter((write) => write.type === 'global').every((write) => write.draft === true || write.data._status === 'published'))
+  const before = writes.length
+  assert.equal(await applyRentalPricingRefinements(payload as never), false)
+  assert.equal(writes.length, before)
 })
 
 test('visual update reuses media, preserves card links and skips all opening updates after later editor changes', async () => {

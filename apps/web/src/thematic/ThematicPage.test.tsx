@@ -8,6 +8,8 @@ import { Prices } from './ThematicPage'
 
 const dto = {
   tabs: { rent: 'Аренда', memberships: 'Абонементы' }, rentalRates: [], memberships: [],
+  membershipOffer: { enabled: false, showOnHomepage: false, title: '', description: '', action: { mode: 'none' } },
+  rentalStandards: { enabled: false, showOnHomepage: false, title: '', description: '', includedItems: [] },
   termsTitle: 'Условия и правила', faqTitle: 'Частые вопросы',
   rules: [{ title: 'Абонементы', icon: 'CreditCard', contentHTML: '<p>Цена по запросу</p>' }, { title: 'Отмена и перенос', contentHTML: '<p>За 12 часов</p>' }],
   faq: [{ question: 'Как приобрести абонемент?', answer: 'Обратитесь к администратору' }],
@@ -37,20 +39,17 @@ test('Prices returns responsive tabs when at least one membership is enabled', (
 })
 
 
-test('Prices displays the white membership offer after rates and keeps standards out of the tariff cards', () => {
+test('Prices gets the membership offer and standards from homepage pricing content', () => {
   const rate = { description: '', includedItems: [], action: { mode: 'none' } }
   const rentalRates = [
     { ...rate, id: 'morning', title: 'Утро', cardVariant: 'rate', price: 3500 },
     { ...rate, id: 'prime', title: 'Прайм-тайм', cardVariant: 'rate', price: 5500 },
-    { ...rate, id: 'offer', title: 'Специальные абонементы', cardVariant: 'membership-offer', priceLabel: 'Цена по запросу' },
-    { ...rate, id: 'standards', title: 'Отдельная карточка стандартов', cardVariant: 'standards' },
-    { ...rate, id: 'personal', title: 'Персональная программа', cardVariant: 'trial' },
   ]
-  const html = renderToStaticMarkup(<Prices dto={{ ...dto, rentalRates }} />)
+  const html = renderToStaticMarkup(<Prices dto={{ ...dto, rentalRates, membershipOffer: { enabled: true, showOnHomepage: true, title: 'Специальные абонементы', description: 'Скидки', priceLabel: 'Цена по запросу', action: { mode: 'none' } }, rentalStandards: { enabled: true, showOnHomepage: true, title: 'Стандарты Unlim Riga', description: 'Условия', includedItems: ['Корзина мячей'], action: { mode: 'none' } } }} />)
   assert.ok(html.indexOf('Прайм-тайм') < html.indexOf('Специальные абонементы'))
   assert.match(html, /Цена по запросу/)
-  assert.doesNotMatch(html, /Отдельная карточка стандартов|Персональная программа/)
-  assert.equal((html.match(/bg-white/g) ?? []).length, 3)
+  assert.match(html, /Стандарты Unlim Riga/)
+  assert.equal((html.match(/bg-white/g) ?? []).length, 4)
 })
 
 test('rental cards keep title and time at the top and description with the price at the bottom', () => {

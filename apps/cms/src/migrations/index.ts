@@ -1,4 +1,5 @@
 import * as offerVisibility from './20261010_200000_offer_visibility'
+import * as homepageRentalPricing from './20261011_000000_homepage_rental_pricing'
 import * as openingRefinements from './20261010_190000_opening_refinements'
 import * as openingContentFields from './20261010_180000_opening_content_fields'
 import * as bookingWidgets from './20261007_180000_booking_widgets'
@@ -126,4 +127,5 @@ export const migrations = [
   { name: '20261010_180000_opening_content_fields', up: openingContentFields.up, down: openingContentFields.down },
   { name: '20261010_190000_opening_refinements', up: openingRefinements.up, down: openingRefinements.down },
   { name: '20261010_200000_offer_visibility', up: offerVisibility.up, down: offerVisibility.down },
+  { name: '20261011_000000_homepage_rental_pricing', up: homepageRentalPricing.up, down: homepageRentalPricing.down },
 ];

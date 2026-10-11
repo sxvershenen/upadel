@@ -33,6 +33,7 @@ export async function resolveHomepageEntities<TSlug extends HomepageCollectionSl
         ...(!preview ? [{ _status: { equals: 'published' } }] : []),
         { showOnHomepage: { equals: true } },
         ...(requiresActive ? [{ isActive: { equals: true } }] : []),
+        ...(collection === 'rental-rates' ? [{ cardVariant: { equals: 'rate' } }] : []),
       ],
     },
   })

@@ -110,7 +110,7 @@ const rentalOffer = {
     timeLabel: '60 минут',
     description: 'Мячи включены, аренда ракетки оплачивается отдельно.',
     includedItems: [],
-    cardVariant: 'trial',
+    cardVariant: 'rate',
     meshTone: 'deep-blue',
     price: 9000, priceLabel: 'от', priceSuffix: '/ час', action: { label: 'Записаться на тренировку', mode: 'booking' },
 } satisfies import('@unlim/content-contract').HomepageDTO['entities']['rentalRates'][number]
@@ -236,7 +236,7 @@ test('RentalRateCard shows the new price and one accessible action over the enti
   assert.match(html, /аренда ракетки оплачивается отдельно/)
   assert.match(html, /aria-label="Записаться на тренировку"/)
   assert.equal((html.match(/<button/g) ?? []).length, 1)
-  assert.match(html, /min-h-\[500px\]/)
+  assert.match(html, /min-h-\[360px\]/)
 })
 
 test('RentalRateCard wide format remains a smaller reusable card with the same price and action', () => {

@@ -28,6 +28,7 @@ import { AnalyticsSessions } from './collections/AnalyticsSessions'
 import { AnalyticsDaily } from './collections/AnalyticsDaily'
 import { Redirects } from './collections/Redirects'
 import { payloadPublicURLConfig } from './config/publicURLs'
+import { applyDefaultCollapsedAccordions } from './components/admin/accordionDefaults'
 import { HomePage } from './globals/HomePage'
 import { SiteSettings } from './globals/SiteSettings'
 import { BlogPage } from './globals/BlogPage'
@@ -104,7 +105,10 @@ export default buildConfig({
     { ...Courts, admin: { ...Courts.admin, group: false as const } },
     { ...Reviews, admin: { ...Reviews.admin, group: false as const } },
     { ...FAQs, admin: { ...FAQs.admin, group: false as const } },
-  ].map((collection) => collection.slug === 'users' || collection.slug === 'leads' || collection.slug.startsWith('analytics-') ? collection : invalidateCollectionContent(collection)),
+  ].map((collection) => {
+    const withAccordionDefaults = { ...collection, fields: applyDefaultCollapsedAccordions(collection.fields) }
+    return collection.slug === 'users' || collection.slug === 'leads' || collection.slug.startsWith('analytics-') ? withAccordionDefaults : invalidateCollectionContent(withAccordionDefaults)
+  }),
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URL ?? '',
@@ -127,7 +131,7 @@ export default buildConfig({
           ...(global.slug === 'courts-page' ? { hidden: true } : {}),
         },
       })),
-  ].map(invalidateGlobalContent),
+  ].map((global) => invalidateGlobalContent({ ...global, fields: applyDefaultCollapsedAccordions(global.fields) })),
   secret: process.env.PAYLOAD_SECRET ?? '',
   sharp,
   typescript: {

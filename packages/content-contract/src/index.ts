@@ -1,7 +1,7 @@
 export * from './widgets'
 import type { CatalogPagination, CatalogQuery } from './catalog'
 export * from './catalog'
-export const homepageDTOversion = 20 as const
+export const homepageDTOversion = 21 as const
 
 export const publicRouteRegistry = [
   { path: '/', parent: null, template: 'homepage', globalSlug: 'homepage' },
@@ -11,7 +11,6 @@ export const publicRouteRegistry = [
   { path: '/prices', parent: '/', template: 'prices', globalSlug: 'prices-page' },
   { path: '/training', parent: '/', template: 'training', globalSlug: 'training-page' },
   { path: '/gift', parent: '/', template: 'gift', globalSlug: 'gift-page' },
-  { path: '/courts', parent: '/', template: 'courts', globalSlug: 'courts-page' },
   { path: '/gallery', parent: '/', template: 'gallery', globalSlug: 'gallery-page' },
   { path: '/about', parent: '/', template: 'about', globalSlug: 'about-page' },
   { path: '/policy', parent: '/', template: 'legal-policy', globalSlug: 'policy-page' },
@@ -99,6 +98,11 @@ export type ActionDTO = {
   mode: 'account' | 'embed-widget' | 'none' | 'booking' | 'trial-booking' | 'internal-link' | 'external-link' | 'phone' | 'email' | 'lead-form'
 }
 
+export type RentalRateDTO = { id: string; title: string; eyebrow?: string | null; timeLabel?: string | null; description: string; price?: number | null; priceLabel?: string | null; priceSuffix?: string | null; badge?: string | null; badgeTone?: string | null; meshTone?: string | null; includedItems: string[]; action: ActionDTO; cardVariant: 'rate' }
+export type RentalCardDTO = Omit<RentalRateDTO, 'cardVariant'> & { cardVariant: 'rate' | 'membership-offer' | 'standards' }
+export type RentalMembershipOfferDTO = { enabled: boolean; showOnHomepage: boolean; title: string; eyebrow?: string | null; description: string; priceLabel?: string | null; meshTone?: string | null; action: ActionDTO }
+export type RentalStandardsDTO = { enabled: boolean; showOnHomepage: boolean; title: string; eyebrow?: string | null; timeLabel?: string | null; description: string; meshTone?: string | null; includedItems: string[] }
+
 export type TournamentFormat = 'americano' | 'groups-knockout' | 'round-robin-playoff' | 'other'
 export type TournamentParticipantMode = 'players' | 'pairs'
 export type TournamentParticipantDTO = { id: string; name: string; partnerName?: string | null; level?: string | null; status: 'confirmed' | 'waitlist' }
@@ -179,7 +183,7 @@ export type HomepageDTO = {
     benefits: { eyebrow: string; title: string; cards: Array<{ id: string; variant: 'parking' | 'lockers' | 'shower' | 'chill' | 'online-booking' | 'coaches-metric' | 'community' | 'kids-wide'; eyebrow?: string | null; title: string; description: string; supportingText?: string | null; media?: MediaDTO | null; overlay?: string | null; meshTone?: string | null; action: ActionDTO }> }
     offers: Array<{ id: string; variant: 'tournament-venue' | 'event'; badge: string; title: string; description: string; image?: MediaDTO | null; meshTone?: string | null; icon?: 'Trophy' | 'PartyPopper' | null; action: ActionDTO }>
     courtsSection: { titleLineOne: string; titleLineTwo: string; background?: MediaDTO | null; backgroundAlt: string }
-    pricingSection: { eyebrow: string; title: string; defaultTab: 'rent' | 'training' | 'memberships'; rentTabLabel: string; trainingTabLabel: string; membershipsTabLabel: string }
+    pricingSection: { eyebrow: string; title: string; defaultTab: 'rent' | 'training' | 'memberships'; rentTabLabel: string; trainingTabLabel: string; membershipsTabLabel: string; membershipOffer: RentalMembershipOfferDTO; rentalStandards: RentalStandardsDTO }
     methodistBanner: { eyebrow?: string; icon?: 'Target' | 'Bot' | 'Zap'; title: string; description: string; price?: number | null; decorativeMedia?: MediaDTO | null; meshTone: string; action: ActionDTO }
     coachesSection: { eyebrow: string; title: string }
     tournamentsSection: { eyebrow: string; title: string }
@@ -193,7 +197,7 @@ export type HomepageDTO = {
     articles: Array<{ id: string; slug: string; image: MediaDTO; category: string; readingTimeMinutes: number; title: string; excerpt: string }>
     articleRows: Array<{ id: string; slug: string; title: string; excerpt: string }>
     courts: Array<{ id: string; slug: string; title: string; eyebrow?: string | null; description?: string | null; cardVariant: 'panoramic' | 'metrics' | 'damping' | 'surface'; metrics?: Array<{ value: string; label: string; icon: 'PanelTop' | 'Lightbulb' | 'Activity' | 'Layers3' }> | null }>
-    rentalRates: Array<{ id: string; title: string; eyebrow?: string | null; timeLabel?: string | null; description: string; price?: number | null; priceLabel?: string | null; priceSuffix?: string | null; badge?: string | null; badgeTone?: string | null; cardVariant: 'rate' | 'trial' | 'membership-offer' | 'standards'; meshTone?: string | null; includedItems: string[]; action: ActionDTO }>
+    rentalRates: RentalRateDTO[]
     trainingPrograms: Array<{ id: string; slug: string; title: string; badge: string; description: string; image: MediaDTO; overlay: string; icon: 'User' | 'Users' | 'Baby'; priceFrom: number; action: ActionDTO }>
     memberships: Array<{ id: string; title: string; badge?: string | null; badgeTone?: string | null; description: string; cardVariant: 'gift' | 'package' | 'featured-package' | 'resident'; meshTone?: string | null; price?: number | null; oldPrice?: number | null; priceLabel?: string | null; benefits: string[]; giftAmountLimits?: { minimum?: number | null; maximum?: number | null } | null; action: ActionDTO }>
     gallery: Array<{ id: string; title: string; media: MediaDTO; caption?: string | null }>
@@ -244,6 +248,8 @@ export type PricesPageDTO = ThematicPageBase & {
   faq: Array<{ question: string; answer: string }>
   rules: Array<{ title: string; contentHTML: string; icon?: string }>
   rentalRates: HomepageDTO['entities']['rentalRates']
+  membershipOffer: RentalMembershipOfferDTO
+  rentalStandards: RentalStandardsDTO
   trainingPrograms: HomepageDTO['entities']['trainingPrograms']
   memberships: HomepageDTO['entities']['memberships']
 }
