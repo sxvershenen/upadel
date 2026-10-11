@@ -6,24 +6,18 @@ import { Badge } from "../ui/Badge";
 import { ImageCard, MeshCard, imageOverlayForMesh, type MeshTone } from "../ui/Card";
 import { Typography } from "../ui/Typography";
 import { ContentAction } from "../ContentAction";
-import { useActionLayer } from "../../actions/ActionLayer";
-import { openMobileQuickActions } from "../../actions/quickActions";
 
 export type Offer = HomepageDTO["home"]["offers"][number];
 const icons = { Trophy, PartyPopper };
 
 export function OfferCard({ offer, wide = false }: { offer: Offer; wide?: boolean }) {
-  const { requestContact } = useActionLayer();
-  const isEventOffer = offer.variant === 'event';
-  const openEventContact = () => {
-    if (!openMobileQuickActions()) requestContact('phone');
-  };
+  const isEventOffer = offer.variant === 'event' || offer.variant === 'tournament-venue';
   const Icon = offer.icon ? icons[offer.icon] : null;
   const hasAction = !isEventOffer && offer.action.mode !== 'none' && Boolean(offer.action.label);
   const titleRole = wide ? 'section' : 'title-card';
   const descriptionRole = wide ? 'body' : 'body-small';
   const content = <div className="flex h-full flex-col justify-between gap-12 p-6 md:p-8">
-    {isEventOffer && <button type="button" aria-label="Ваше мероприятие — связаться с клубом" onClick={openEventContact} className="absolute inset-0 z-20 cursor-pointer appearance-none border-0 bg-transparent focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-4" />}
+    {isEventOffer && <ContentAction action={{ mode: 'phone', label: 'Связаться с клубом' }} mobileQuickActions aria-label="Ваше мероприятие — связаться с клубом" variant="primary" className="!absolute !inset-0 !z-20 !m-0 !h-full !w-full !cursor-pointer !bg-transparent !p-0 !text-transparent !shadow-none hover:!bg-transparent focus-visible:!outline-2 focus-visible:!outline-lime focus-visible:!outline-offset-4" />}
     <div className="flex items-start justify-between gap-4">
       {offer.badge ? <Badge tone="outline-light" reveal={false} icon={Icon ? <Icon size={13} className="shrink-0" /> : undefined} className="whitespace-normal leading-snug">{offer.badge}</Badge> : <span />}
       <ArrowAction tone="glass" cardHover />

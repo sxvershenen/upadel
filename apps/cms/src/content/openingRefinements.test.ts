@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { applyOpeningRefinements, applyRentalPricingRefinements } from './openingRefinements'
+import { applyOpeningOfferBadgeRefinements, applyOpeningRefinements, applyRentalPricingRefinements } from './openingRefinements'
 import { applyOpeningContent } from './openingContent'
 
 test('refinements update only requested content, preserve cancellation rules and never reapply the first update', async () => {
@@ -85,6 +85,42 @@ test('rental pricing migration preserves published and pending copy/status and i
   assert.ok(writes.filter((write) => write.type === 'global').every((write) => write.draft === true || write.data._status === 'published'))
   const before = writes.length
   assert.equal(await applyRentalPricingRefinements(payload as never), false)
+  assert.equal(writes.length, before)
+})
+
+test('event badge migration updates only the card badge in published and pending homepage content', async () => {
+  const publishedCard = { variant: 'tournament-venue', title: 'Ваше мероприятие', badge: 'Длинный старый бейдж', description: 'Опубликованный текст', image: 4, action: { mode: 'none' } }
+  const draftCard = { ...publishedCard, badge: 'Черновой старый бейдж', description: 'Черновой текст', image: 8 }
+  const globals: any = {
+    published: { openingContentVersion: 'opening-november-2026-v11', offersSection: { title: 'Опубликованный раздел', cards: [publishedCard, { title: 'Другая карточка', badge: 'Её бейдж' }] } },
+    draft: { openingContentVersion: 'opening-november-2026-v11', offersSection: { title: 'Черновик раздела', cards: [draftCard] }, _status: 'draft' },
+  }
+  let draftVersion = structuredClone(globals.draft)
+  const writes: any[] = []
+  const payload = {
+    findGlobal: async ({ draft }: any) => structuredClone(draft ? globals.draft : globals.published),
+    findGlobalVersions: async () => ({ docs: [{ version: structuredClone(draftVersion) }] }),
+    updateGlobal: async ({ draft, data }: any) => {
+      writes.push({ draft, data })
+      Object.assign(draft ? globals.draft : globals.published, data)
+      if (draft) draftVersion = structuredClone(globals.draft)
+    },
+  }
+  assert.equal(await applyOpeningOfferBadgeRefinements(payload as never), true)
+  assert.equal(globals.published.offersSection.cards[0].badge, 'Под ваш формат')
+  assert.equal(globals.published.offersSection.cards[0].description, 'Опубликованный текст')
+  assert.equal(globals.published.offersSection.cards[0].image, 4)
+  assert.equal(globals.published.offersSection.cards[1].badge, 'Её бейдж')
+  assert.equal(globals.published.offersSection.title, 'Опубликованный раздел')
+  assert.equal(globals.published.openingContentVersion, 'opening-november-2026-v12')
+  assert.equal(globals.draft.offersSection.cards[0].badge, 'Под ваш формат')
+  assert.equal(globals.draft.offersSection.cards[0].description, 'Черновой текст')
+  assert.equal(globals.draft.offersSection.cards[0].image, 8)
+  assert.equal(globals.draft.offersSection.title, 'Черновик раздела')
+  assert.equal(globals.draft.openingContentVersion, 'opening-november-2026-v12')
+  assert.equal(globals.draft._status, 'draft')
+  const before = writes.length
+  assert.equal(await applyOpeningOfferBadgeRefinements(payload as never), false)
   assert.equal(writes.length, before)
 })
 

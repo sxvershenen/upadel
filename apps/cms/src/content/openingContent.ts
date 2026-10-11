@@ -3,7 +3,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createLocalReq, type CollectionSlug, type Payload, type PayloadRequest } from 'payload'
 
-import { applyOpeningCardRefinements, applyOpeningEventRefinements, applyOpeningFinalRefinements, applyOpeningOfferImageRefinements, applyOpeningPhoneRefinements, applyOpeningRefinements, applyOpeningRobotCopyRefinements, applyOpeningSuppliedPhotoRefinements, applyOpeningVisualRefinements, applyRentalPricingRefinements } from './openingRefinements'
+import { applyOpeningCardRefinements, applyOpeningEventRefinements, applyOpeningFinalRefinements, applyOpeningOfferBadgeRefinements, applyOpeningOfferImageRefinements, applyOpeningPhoneRefinements, applyOpeningRefinements, applyOpeningRobotCopyRefinements, applyOpeningSuppliedPhotoRefinements, applyOpeningVisualRefinements, applyRentalPricingRefinements } from './openingRefinements'
 
 const revision = 'opening-november-2026-v1'
 const publicRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../web/public')
@@ -118,7 +118,7 @@ export async function applyOpeningContent(payload: Payload, req?: PayloadRequest
   await payload.updateGlobal({ ...options, slug: 'homepage', draft: false, data: {
     hero: { ...home.hero, titleLine: '2 часа', titleConnector: 'по цене', titleAccent: 'одного', openingNotice: { title: 'Открытие в ноябре', caption: 'Спец. оффер с 01.11 до 15.11' } },
     benefitsSection: { ...home.benefitsSection, cards: (home.benefitsSection?.cards ?? []).map((card) => card.variant === 'lockers' ? { ...card, eyebrow: 'Всё для падела', title: 'Спортивный магазин', description: 'Ракетки, мячи и спортивная экипировка разных брендов. Подберём инвентарь для вашего уровня и стиля игры.', media: shopImage } : card) },
-    offersSection: { ...home.offersSection, cards: (home.offersSection?.cards ?? []).map((card) => card.variant === 'tournament-venue' ? { ...card, badge: 'Корпоративные турниры', title: 'Турнир для вашей команды', description: 'Корпоративный турнир по паделу: объедините коллег на корте и проведите командный день в клубе.' } : { ...card, badge: 'Корпоративные и частные мероприятия', title: 'События в падел-клубе', description: 'Корпоративные события, праздники и частные мероприятия. Подберём формат игры и отдыха для вашей компании.' }) },
+    offersSection: { ...home.offersSection, cards: (home.offersSection?.cards ?? []).map((card) => card.variant === 'tournament-venue' ? { ...card, badge: 'Под ваш формат', title: 'Турнир для вашей команды', description: 'Корпоративный турнир по паделу: объедините коллег на корте и проведите командный день в клубе.' } : { ...card, badge: 'Под ваш формат', title: 'События в падел-клубе', description: 'Корпоративные события, праздники и частные мероприятия. Подберём формат игры и отдыха для вашей компании.' }) },
     methodistBanner: { ...home.methodistBanner, title: 'Тренировочная робопушка', description: 'Отрабатывайте удары и точность в своём темпе. Арендуйте робопушку для самостоятельной тренировки на падел-корте.', decorativeMedia: robotImage, price: 3000, action: { mode: 'none' } },
     coachesSection: { ...home.coachesSection, title: 'Тренировки', eyebrow: 'Обучение и практика' },
     openingContentVersion: revision, _status: 'published',
@@ -142,7 +142,8 @@ export async function applyOpeningContentTransaction(payload: Payload): Promise<
     const suppliedPhotosChanged = await applyOpeningSuppliedPhotoRefinements(payload, req)
     const robotCopyChanged = await applyOpeningRobotCopyRefinements(payload, req)
     const rentalPricingChanged = await applyRentalPricingRefinements(payload, req)
-    const changed = initialChanged || refinementsChanged || visualChanged || eventChanged || phoneChanged || cardChanged || finalChanged || offerImageChanged || suppliedPhotosChanged || robotCopyChanged || rentalPricingChanged
+    const offerBadgeChanged = await applyOpeningOfferBadgeRefinements(payload, req)
+    const changed = initialChanged || refinementsChanged || visualChanged || eventChanged || phoneChanged || cardChanged || finalChanged || offerImageChanged || suppliedPhotosChanged || robotCopyChanged || rentalPricingChanged || offerBadgeChanged
     await payload.db.commitTransaction(transactionID)
     return changed
   } catch (error) {

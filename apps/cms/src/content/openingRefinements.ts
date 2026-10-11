@@ -9,7 +9,8 @@ const offerImageRevision = 'opening-november-2026-v8'
 const suppliedPhotosRevision = 'opening-november-2026-v9'
 const suppliedRobotCopyRevision = 'opening-november-2026-v10'
 const rentalPricingRevision = 'opening-november-2026-v11'
-const completedRevisions = [finalRevision, offerImageRevision, suppliedPhotosRevision, suppliedRobotCopyRevision, rentalPricingRevision]
+const offerBadgeRevision = 'opening-november-2026-v12'
+const completedRevisions = [finalRevision, offerImageRevision, suppliedPhotosRevision, suppliedRobotCopyRevision, rentalPricingRevision, offerBadgeRevision]
 const richText = (text: string) => ({ root: { type: 'root', version: 1, direction: 'ltr' as const, format: '' as const, indent: 0, children: [{ type: 'paragraph', version: 1, direction: 'ltr' as const, format: '' as const, indent: 0, children: [{ type: 'text', version: 1, text, format: 0, detail: 0, mode: 'normal', style: '' }] }] } })
 
 /** Apply the owner's follow-up once; preserve subsequent editor changes. */
@@ -115,7 +116,7 @@ export async function applyOpeningEventRefinements(payload: Payload, req?: Paylo
   }
   const previous = home.offersSection?.cards ?? []
   const primary = previous.find((card) => card.variant === 'tournament-venue') ?? previous[0]
-  const cards = [{ ...primary, enabled: true, variant: primary?.variant ?? 'event', title: 'Ваше мероприятие', badge: 'Корпоративные и частные мероприятия', description: 'Корпоративные турниры, праздники и частные события — соберите свою компанию на корте.', image: photo.id, meshTone: 'deep-blue' as const, icon: 'Trophy' as const, action: { mode: 'none' as const } }, ...previous.filter((card) => card !== primary).map((card) => ({ ...card, enabled: false }))]
+  const cards = [{ ...primary, enabled: true, variant: primary?.variant ?? 'event', title: 'Ваше мероприятие', badge: 'Под ваш формат', description: 'Корпоративные турниры, праздники и частные события — соберите свою компанию на корте.', image: photo.id, meshTone: 'deep-blue' as const, icon: 'Trophy' as const, action: { mode: 'none' as const } }, ...previous.filter((card) => card !== primary).map((card) => ({ ...card, enabled: false }))]
   await payload.updateGlobal({ ...options, slug: 'homepage', draft: false, data: { offersSection: { ...home.offersSection, cards }, openingContentVersion: eventRevision, _status: 'published' } })
   return true
 }
@@ -224,7 +225,7 @@ export async function applyOpeningOfferImageRefinements(payload: Payload, req?: 
   const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
   const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
   const seedKey = 'opening-media:corporate-tournament-wide:v8'
-  if ([suppliedPhotosRevision, suppliedRobotCopyRevision, rentalPricingRevision].includes(home.openingContentVersion ?? '')) return false
+  if ([suppliedPhotosRevision, suppliedRobotCopyRevision, rentalPricingRevision, offerBadgeRevision].includes(home.openingContentVersion ?? '')) return false
   if (home.openingContentVersion === offerImageRevision) {
     const existingPhoto = (await payload.find({ ...options, collection: 'media', where: { seedKey: { equals: seedKey } }, pagination: false })).docs[0]
     if (existingPhoto?.sourceURL === 'apps/web/public/images/opening/corporate-tournament-wide-v2.png') {
@@ -249,7 +250,7 @@ export async function applyOpeningOfferImageRefinements(payload: Payload, req?: 
 export async function applyOpeningSuppliedPhotoRefinements(payload: Payload, req?: PayloadRequest): Promise<boolean> {
   const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
   const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
-  if ([suppliedPhotosRevision, suppliedRobotCopyRevision, rentalPricingRevision].includes(home.openingContentVersion ?? '')) return false
+  if ([suppliedPhotosRevision, suppliedRobotCopyRevision, rentalPricingRevision, offerBadgeRevision].includes(home.openingContentVersion ?? '')) return false
   if (home.openingContentVersion !== offerImageRevision) throw new Error('Apply the wide offer photo before replacing supplied opening images.')
 
   const media = async (seedKey: string, fileName: string, alt: string) => {
@@ -276,7 +277,7 @@ export async function applyOpeningSuppliedPhotoRefinements(payload: Payload, req
 export async function applyOpeningRobotCopyRefinements(payload: Payload, req?: PayloadRequest): Promise<boolean> {
   const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
   const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
-  if ([suppliedRobotCopyRevision, rentalPricingRevision].includes(home.openingContentVersion ?? '')) return false
+  if ([suppliedRobotCopyRevision, rentalPricingRevision, offerBadgeRevision].includes(home.openingContentVersion ?? '')) return false
   if (home.openingContentVersion !== suppliedPhotosRevision) throw new Error('Apply the supplied opening photos before updating the robot copy.')
   await payload.updateGlobal({ ...options, slug: 'homepage', draft: false, data: {
     methodistBanner: { ...home.methodistBanner, description: 'Отрабатывайте удары и точность в своём темпе.' },
@@ -300,7 +301,7 @@ export async function applyRentalPricingRefinements(payload: Payload, req?: Payl
   }
   const findSeed = async (seedKey: string, draft = false) => (await payload.find({ ...options, collection: 'rental-rates', draft, where: { seedKey: { equals: seedKey } }, pagination: false } as never)).docs[0] as any
   const migrate = async (home: any, draft: boolean, membership: any, standards: any) => {
-    if (home.openingContentVersion === rentalPricingRevision) return false
+    if ([rentalPricingRevision, offerBadgeRevision].includes(home.openingContentVersion ?? '')) return false
     if (home.openingContentVersion !== suppliedRobotCopyRevision) throw new Error('Apply opening refinements before moving rental pricing content.')
     const oldPricing = home.pricingSection ?? {}
     const membershipOffer = membership ? {
@@ -342,7 +343,7 @@ export async function applyRentalPricingRefinements(payload: Payload, req?: Payl
   }
   const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
   let changed = false
-  if (home.openingContentVersion !== rentalPricingRevision) {
+  if (![rentalPricingRevision, offerBadgeRevision].includes(home.openingContentVersion ?? '')) {
     if (home.openingContentVersion !== suppliedRobotCopyRevision) throw new Error('Apply opening refinements before moving rental pricing content.')
     const [membership, standards] = await Promise.all([findSeed('opening:rental-rate:memberships'), findSeed('prototype:rental-rate:standards')])
     changed = await migrate(home, false, membership, standards) || changed
@@ -353,4 +354,42 @@ export async function applyRentalPricingRefinements(payload: Payload, req?: Payl
     }
   }
   return changed
+}
+
+/** Shorten the event-card badge in published content and the latest pending draft. */
+export async function applyOpeningOfferBadgeRefinements(payload: Payload, req?: PayloadRequest): Promise<boolean> {
+  const options = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
+  const home = await payload.findGlobal({ ...options, slug: 'homepage', draft: false })
+  if (home.openingContentVersion === offerBadgeRevision) return false
+  if (home.openingContentVersion !== rentalPricingRevision) throw new Error('Apply rental pricing refinements before updating the offer badge.')
+
+  const updateBadge = (source: any) => {
+    let found = false
+    const cards = (source.offersSection?.cards ?? []).map((card: any) => {
+      if (card.variant !== 'event' && card.variant !== 'tournament-venue' && card.title !== 'Ваше мероприятие') return card
+      found = true
+      if (card.badge === 'Под ваш формат') return card
+      return { ...card, badge: 'Под ваш формат' }
+    })
+    return { found, offersSection: { ...source.offersSection, cards } }
+  }
+  const published = updateBadge(home)
+  if (!published.found) throw new Error('The published event offer card was not found.')
+  await payload.updateGlobal({ ...options, slug: 'homepage', draft: false, data: {
+    offersSection: published.offersSection,
+    openingContentVersion: offerBadgeRevision,
+    _status: 'published',
+  } })
+
+  const versions = await payload.findGlobalVersions({ ...options, slug: 'homepage', limit: 1, pagination: false, sort: '-updatedAt' })
+  const draft = (versions.docs[0] as any)?.version
+  if (draft?._status === 'draft' && draft.openingContentVersion === rentalPricingRevision) {
+    const pending = updateBadge(draft)
+    await payload.updateGlobal({ ...options, slug: 'homepage', draft: true, data: {
+      offersSection: pending.offersSection,
+      openingContentVersion: offerBadgeRevision,
+      _status: 'draft',
+    } as never })
+  }
+  return true
 }
