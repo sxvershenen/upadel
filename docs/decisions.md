@@ -33,7 +33,7 @@ Never label a click as a confirmed booking or call.
 
 ## D6 — Booking integration — accepted
 
-VivaCRM booking and personal-account installation URLs are CMS-managed in Site Settings → «Бронирование и ЛК». Load scripts on demand through the shared provider adapter; accept only public VivaCRM installation scripts. Coach and training-program actions may override central booking with a validated iframe URL or VivaCRM script. Installation tags are reduced to URLs; arbitrary HTML/JS is never executed. Iframes open in the shared dialog with an external-link fallback. The green homepage CTA keeps booking; the secondary glass CTA opens the personal account without an icon.
+VivaCRM booking and personal-account installation URLs are CMS-managed in Site Settings → «Бронирование и ЛК». Load scripts on demand through the shared provider adapter; accept only public VivaCRM installation scripts. Coach and training-program actions may override central booking with a validated iframe URL or VivaCRM script. Installation tags are reduced to URLs; arbitrary HTML/JS is never executed. Iframes open in the shared dialog with an external-link fallback. Homepage hero elements use three independently configured desktop slots and two mobile slots; each slot can show an action button or an info panel and choose its icon.
 
 ## D7 — Analytics — accepted
 

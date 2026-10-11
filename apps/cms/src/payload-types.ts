@@ -2668,6 +2668,145 @@ export interface Homepage {
       mobile?: number | null;
       desktop?: number | null;
     };
+    buttonsAndElements?: {
+      desktop?: {
+        slot1?: {
+          enabled?: boolean | null;
+          type?: ('button' | 'info') | null;
+          icon?: ('CalendarCheck' | 'CalendarDays' | 'UserRound' | 'ArrowUpRight' | 'Info' | 'Sparkles') | null;
+          action?: {
+            label?: string | null;
+            mode:
+              | 'none'
+              | 'booking'
+              | 'account'
+              | 'trial-booking'
+              | 'internal-link'
+              | 'external-link'
+              | 'phone'
+              | 'email'
+              | 'lead-form';
+            /**
+             * Для внутренней ссылки используйте /path или #anchor; внешняя должна начинаться с https://.
+             */
+            href?: string | null;
+            lead?: ('membership' | 'gift' | 'trial' | 'consultation' | 'other') | null;
+          };
+          title?: string | null;
+          caption?: string | null;
+        };
+        slot2?: {
+          enabled?: boolean | null;
+          type?: ('button' | 'info') | null;
+          icon?: ('CalendarCheck' | 'CalendarDays' | 'UserRound' | 'ArrowUpRight' | 'Info' | 'Sparkles') | null;
+          action?: {
+            label?: string | null;
+            mode:
+              | 'none'
+              | 'booking'
+              | 'account'
+              | 'trial-booking'
+              | 'internal-link'
+              | 'external-link'
+              | 'phone'
+              | 'email'
+              | 'lead-form';
+            /**
+             * Для внутренней ссылки используйте /path или #anchor; внешняя должна начинаться с https://.
+             */
+            href?: string | null;
+            lead?: ('membership' | 'gift' | 'trial' | 'consultation' | 'other') | null;
+          };
+          title?: string | null;
+          caption?: string | null;
+        };
+        slot3?: {
+          enabled?: boolean | null;
+          type?: ('button' | 'info') | null;
+          icon?: ('CalendarCheck' | 'CalendarDays' | 'UserRound' | 'ArrowUpRight' | 'Info' | 'Sparkles') | null;
+          action?: {
+            label?: string | null;
+            mode:
+              | 'none'
+              | 'booking'
+              | 'account'
+              | 'trial-booking'
+              | 'internal-link'
+              | 'external-link'
+              | 'phone'
+              | 'email'
+              | 'lead-form';
+            /**
+             * Для внутренней ссылки используйте /path или #anchor; внешняя должна начинаться с https://.
+             */
+            href?: string | null;
+            lead?: ('membership' | 'gift' | 'trial' | 'consultation' | 'other') | null;
+          };
+          title?: string | null;
+          caption?: string | null;
+        };
+      };
+      mobile?: {
+        slot1?: {
+          enabled?: boolean | null;
+          type?: ('button' | 'info') | null;
+          icon?: ('CalendarCheck' | 'CalendarDays' | 'UserRound' | 'ArrowUpRight' | 'Info' | 'Sparkles') | null;
+          action?: {
+            label?: string | null;
+            mode:
+              | 'none'
+              | 'booking'
+              | 'account'
+              | 'trial-booking'
+              | 'internal-link'
+              | 'external-link'
+              | 'phone'
+              | 'email'
+              | 'lead-form';
+            /**
+             * Для внутренней ссылки используйте /path или #anchor; внешняя должна начинаться с https://.
+             */
+            href?: string | null;
+            lead?: ('membership' | 'gift' | 'trial' | 'consultation' | 'other') | null;
+          };
+          title?: string | null;
+          caption?: string | null;
+        };
+        slot2?: {
+          enabled?: boolean | null;
+          type?: ('button' | 'info') | null;
+          icon?: ('CalendarCheck' | 'CalendarDays' | 'UserRound' | 'ArrowUpRight' | 'Info' | 'Sparkles') | null;
+          action?: {
+            label?: string | null;
+            mode:
+              | 'none'
+              | 'booking'
+              | 'account'
+              | 'trial-booking'
+              | 'internal-link'
+              | 'external-link'
+              | 'phone'
+              | 'email'
+              | 'lead-form';
+            /**
+             * Для внутренней ссылки используйте /path или #anchor; внешняя должна начинаться с https://.
+             */
+            href?: string | null;
+            lead?: ('membership' | 'gift' | 'trial' | 'consultation' | 'other') | null;
+          };
+          title?: string | null;
+          caption?: string | null;
+        };
+      };
+    };
+    socialProof?: {
+      ratingLabel?: string | null;
+      caption?: string | null;
+      /**
+       * Используются фотографии существующих тренеров; медиа не копируется.
+       */
+      coaches?: (number | Coach)[] | null;
+    };
     primaryAction: {
       label?: string | null;
       mode:
@@ -2703,14 +2842,6 @@ export interface Homepage {
        */
       href?: string | null;
       leadType?: ('membership' | 'gift' | 'trial' | 'consultation' | 'other') | null;
-    };
-    socialProof?: {
-      ratingLabel?: string | null;
-      caption?: string | null;
-      /**
-       * Используются фотографии существующих тренеров; медиа не копируется.
-       */
-      coaches?: (number | Coach)[] | null;
     };
     openingNotice?: {
       title?: string | null;
@@ -4203,6 +4334,110 @@ export interface HomepageSelect<T extends boolean = true> {
               mobile?: T;
               desktop?: T;
             };
+        buttonsAndElements?:
+          | T
+          | {
+              desktop?:
+                | T
+                | {
+                    slot1?:
+                      | T
+                      | {
+                          enabled?: T;
+                          type?: T;
+                          icon?: T;
+                          action?:
+                            | T
+                            | {
+                                label?: T;
+                                mode?: T;
+                                href?: T;
+                                lead?: T;
+                              };
+                          title?: T;
+                          caption?: T;
+                        };
+                    slot2?:
+                      | T
+                      | {
+                          enabled?: T;
+                          type?: T;
+                          icon?: T;
+                          action?:
+                            | T
+                            | {
+                                label?: T;
+                                mode?: T;
+                                href?: T;
+                                lead?: T;
+                              };
+                          title?: T;
+                          caption?: T;
+                        };
+                    slot3?:
+                      | T
+                      | {
+                          enabled?: T;
+                          type?: T;
+                          icon?: T;
+                          action?:
+                            | T
+                            | {
+                                label?: T;
+                                mode?: T;
+                                href?: T;
+                                lead?: T;
+                              };
+                          title?: T;
+                          caption?: T;
+                        };
+                  };
+              mobile?:
+                | T
+                | {
+                    slot1?:
+                      | T
+                      | {
+                          enabled?: T;
+                          type?: T;
+                          icon?: T;
+                          action?:
+                            | T
+                            | {
+                                label?: T;
+                                mode?: T;
+                                href?: T;
+                                lead?: T;
+                              };
+                          title?: T;
+                          caption?: T;
+                        };
+                    slot2?:
+                      | T
+                      | {
+                          enabled?: T;
+                          type?: T;
+                          icon?: T;
+                          action?:
+                            | T
+                            | {
+                                label?: T;
+                                mode?: T;
+                                href?: T;
+                                lead?: T;
+                              };
+                          title?: T;
+                          caption?: T;
+                        };
+                  };
+            };
+        socialProof?:
+          | T
+          | {
+              ratingLabel?: T;
+              caption?: T;
+              coaches?: T;
+            };
         primaryAction?:
           | T
           | {
@@ -4218,13 +4453,6 @@ export interface HomepageSelect<T extends boolean = true> {
               mode?: T;
               href?: T;
               leadType?: T;
-            };
-        socialProof?:
-          | T
-          | {
-              ratingLabel?: T;
-              caption?: T;
-              coaches?: T;
             };
         openingNotice?:
           | T

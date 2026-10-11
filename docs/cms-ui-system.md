@@ -4,7 +4,7 @@ Scope: Payload admin and the custom CMS views under `apps/cms/src/components/adm
 
 ## Control contract
 
-- Regular fields and buttons: `--admin-control-height` (`40px`), `--admin-control-radius`, `--admin-control-padding-x` (`12px`), and `--admin-control-gap` (`8px`).
+- Regular fields and buttons: `--admin-control-height` (`40px`), `--admin-control-radius` (`8px`), `--admin-control-padding-x` (`12px`), and `--admin-control-gap` (`8px`). Text fields/selects use no vertical padding inside the fixed 40px control so their baselines align.
 - Visible tab tracks use the regular `--admin-control-height` (`40px`); tab items use `--admin-tab-item-height` (`32px`) with a `4px` inset. Secondary header actions align to the regular `40px` control.
 - Page titles use `--admin-page-title-size` (`32px`) and section titles use `--admin-section-title-size` (`20px`). Page-level horizontal spacing comes from Payload `Gutter`; custom pages do not add another inline padding.
 - Page titles use the compact native-list baseline. Custom pages apply `--admin-page-title-offset` through `AdminPageFrame` and use `admin-page-title-band`; native document and list title/action rows align from the top so actions and status badges can grow downward without moving the title.

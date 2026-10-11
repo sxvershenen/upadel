@@ -1,11 +1,12 @@
-import { useState, type CSSProperties } from "react";
-import { CalendarCheck, CalendarDays, MapPin, Star, Users } from "lucide-react";
+import React, { useState, type CSSProperties } from "react";
+import { ArrowUpRight, CalendarCheck, CalendarDays, Info, MapPin, Sparkles, Star, UserRound, type LucideIcon } from "lucide-react";
 import { ContentAction } from "../components/ContentAction";
 import { useContent } from "../content/ContentContext";
 import { SplitTextReveal } from "../components/ui/SplitTextReveal";
 import { cn } from "../utils/cn";
-import { defaultHeroTint, defaultHeroTitleFontSize, type HeroTintDeviceDTO, type MediaDTO } from "@unlim/content-contract";
+import { defaultHeroTint, defaultHeroTitleFontSize, type HeroSlotDTO, type HeroTintDeviceDTO, type MediaDTO } from "@unlim/content-contract";
 import { ProgressiveImage } from "../components/ui/ProgressiveImage";
+import { typographTextValue } from "../lib/typography";
 
 export function resolveHeroParallaxTarget<T>(mobile: boolean, desktopTarget: T | null, mobileTarget: T | null) {
   return mobile ? mobileTarget ?? desktopTarget : desktopTarget ?? mobileTarget;
@@ -53,34 +54,35 @@ function SocialProof({ className }: { className?: string }) {
   return (
     <div
       data-hero-social-proof=""
-      className={cn("glass-overlay se-3 flex min-h-[52px] items-center gap-3 px-3.5 py-2 text-white", className)}
+      className={cn("glass-overlay se-3 flex min-h-[40px] min-w-0 items-center gap-2 px-3 py-2 text-white md:min-h-[52px] md:gap-3 md:px-4 md:py-2.5", className)}
     >
-      <div className="flex -space-x-2.5">
+      <div className="hidden -space-x-2.5 md:flex">
         {home.hero.socialProof.coachPhotos.map((media) => (
           <ProgressiveImage key={media.url} src={media.url} alt="" className="h-8 w-8 rounded-full object-cover" />
         ))}
       </div>
-      <div className="h-7 w-px bg-white/20" />
-      <div className="flex flex-col gap-0.5">
+      <div className="flex min-w-0 flex-col gap-0.5">
         <div className="type-caption flex items-center gap-1 font-semibold text-white">
           <Star size={12} className="fill-[#c2f542] text-[#c2f542]" />
           {home.hero.socialProof.ratingLabel}
         </div>
-        <div className="type-micro flex items-center gap-1 text-white/60">
-          <Users size={11} /> {home.hero.socialProof.caption}
-        </div>
+        <div className="type-micro truncate text-white/60">{home.hero.socialProof.caption}</div>
       </div>
     </div>
   );
 }
 
-function OpeningNotice({ className }: { className?: string }) {
-  const notice = useContent().home.hero.openingNotice;
-  if (!notice?.title && !notice?.caption) return null;
-  return <div data-hero-opening-notice="" className={cn("glass-overlay se-3 flex min-h-[52px] items-center gap-3 px-3.5 py-2 text-white", className)}>
-    <CalendarDays size={22} className="shrink-0 text-lime" />
-    <div className="h-7 w-px bg-white/20" />
-    <div className="flex flex-col gap-0.5"><span className="type-caption font-semibold text-white">{notice.title}</span><span className="type-micro text-white/70">{notice.caption}</span></div>
+const heroSlotIconMap: Record<HeroSlotDTO['icon'], LucideIcon> = { CalendarCheck, CalendarDays, UserRound, ArrowUpRight, Info, Sparkles };
+
+function HeroSlot({ slot, index }: { slot: HeroSlotDTO; index: 0 | 1 | 2 }) {
+  if (!slot.enabled) return null;
+  const Icon = heroSlotIconMap[slot.icon];
+  if (slot.type === 'button') return <div data-hero-slot={index + 1} data-hero-slot-type="button" data-hero-cta={index === 0 ? "primary" : "secondary"} className="min-w-0 flex-1 sm:flex-none">
+    <ContentAction reveal={false} action={slot.action} variant={index === 0 ? "primary" : "glass"} size="lg" icon={<Icon size={17} />} className="w-fit min-w-0 whitespace-nowrap px-4 !leading-none !text-[14px] sm:w-auto sm:px-5 sm:!text-base" />
+  </div>;
+  return <div data-hero-opening-notice="" data-hero-slot={index + 1} data-hero-slot-type="info" className="glass-overlay se-3 inline-flex min-h-[52px] w-fit max-w-[calc(50vw-24px)] flex-none items-center gap-2 py-2 pl-4 pr-4 text-white sm:max-w-none sm:gap-3 sm:px-3.5">
+    <Icon size={18} className="shrink-0 text-white" />
+    <div className="flex min-w-0 flex-col gap-0"><span className="type-caption truncate font-semibold text-white">{slot.title}</span><span className="type-micro truncate leading-tight text-white/70">{slot.caption}</span></div>
   </div>;
 }
 
@@ -104,26 +106,20 @@ export function Hero() {
       <div data-hero-tint="desktop" className="absolute inset-0 hidden md:block" style={{ background: heroTintGradient(tint.desktop) }} />
       <div data-hero-tint="mobile" className="absolute inset-0 md:hidden" style={{ background: heroTintGradient(tint.mobile, true) }} />
 
-      <div className="container-page absolute inset-x-0 top-8 z-10 md:hidden">
-        <a href="#top" className="flex items-center gap-2.5 leading-none text-white">
+      <div className="container-page absolute inset-x-0 top-8 z-10 flex items-center justify-between gap-2 md:hidden">
+        <a href="#top" className="flex min-w-0 items-center gap-2.5 leading-none text-white">
           {site.brandLogo && site.brandLogoMode !== "text" && !brandLogoFailed ? <img src={site.brandLogo.url} alt={site.brandName} onError={() => setBrandLogoFailed(true)} className={replaceBrand ? "h-9 max-w-[150px] object-contain" : "h-7 w-7 object-contain"} /> : <span className="h-2.5 w-2.5 shrink-0 rounded-[3px] bg-lime" />}
           {(!replaceBrand || !site.brandLogo || brandLogoFailed) && <span className="flex flex-col">
             <span className="text-[14px] font-semibold tracking-[0] text-white">{site.brandName}</span>
             <span className="type-micro text-white/55">{site.headerSubtitle}</span>
           </span>}
         </a>
+        <SocialProof className="w-fit max-w-[55%]" />
       </div>
-
       {replaceBrand && <HeroAddress className="absolute right-4 top-20 z-10 md:bottom-8 md:right-8 md:top-auto" />}
-
-      <div className="container-page absolute inset-x-0 top-[84px] z-10 flex flex-col items-start gap-2 md:hidden">
-        <SocialProof className="w-fit max-w-full" />
-        <OpeningNotice className="w-fit max-w-full" />
-      </div>
 
       <div className="container-page relative z-10 flex h-full flex-col justify-end pb-[calc(104px+env(safe-area-inset-bottom))] pt-32 sm:pb-9 lg:pb-12">
         <div className="flex max-w-[980px] flex-col">
-          <OpeningNotice className="mb-6 hidden w-fit md:flex" />
           <div
             data-hero-title=""
             className="type-hero font-semibold text-white"
@@ -139,16 +135,12 @@ export function Hero() {
               {hero.titleAccent}
             </span>
           </div>
-          <div data-hero-description="" className="type-hero-lead mt-5 max-w-[900px] text-white/75 sm:mt-7">
-            <h1 className="inline">{hero.seoHeading}</h1>{hero.description ? <>{" "}<span>{hero.description}</span></> : null}
+          <div data-hero-description="" data-no-typography="" className="type-hero-lead mt-5 max-w-[900px] text-white/75 sm:mt-7">
+            <h1 className="inline">{typographTextValue(hero.seoHeading)}</h1>{hero.description ? <>{" "}<span>{typographTextValue(hero.description)}</span></> : null}
           </div>
           <div data-hide-icons-narrow className="mt-6 flex flex-nowrap items-center gap-2 sm:mt-8 sm:gap-3">
-            <div data-hero-cta="primary" className="min-w-0 flex-1 sm:flex-none">
-              <ContentAction reveal={false} action={hero.primaryAction} variant="primary" size="lg" icon={<CalendarCheck size={17} />} className="w-full min-w-0 whitespace-nowrap px-4 !leading-none text-[14px] sm:w-auto sm:px-5 sm:text-base" />
-            </div>
-            <div className="min-w-0 flex-1 sm:flex-none">
-              <ContentAction data-hero-cta="secondary" reveal={false} action={hero.secondaryAction} variant="glass" size="lg" className="w-full min-w-0 whitespace-nowrap px-4 !leading-none text-[14px] sm:w-auto sm:px-5 sm:text-base" />
-            </div>
+            {hero.desktopSlots.map((slot, index) => <div key={`desktop-${index}`} className="hidden min-w-0 flex-1 md:block md:flex-none"><HeroSlot slot={slot} index={index as 0 | 1 | 2} /></div>)}
+            {hero.mobileSlots.map((slot, index) => <div key={`mobile-${index}`} className="min-w-0 flex-none md:hidden"><HeroSlot slot={slot} index={index as 0 | 1} /></div>)}
             <SocialProof className="hidden md:flex" />
           </div>
         </div>

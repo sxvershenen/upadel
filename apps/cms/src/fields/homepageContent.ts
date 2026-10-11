@@ -94,14 +94,75 @@ const heroTitleFontSizeField: Field = {
   ],
 }
 
-function heroActionField(name: 'primaryAction' | 'secondaryAction', label: string, defaultValue: Record<string, string>): Field {
-  const action = createActionField(name, label)
+function heroSlotField(name: string, label: string, device: 'desktop' | 'mobile', slotNumber: 1 | 2 | 3, defaults: { type: 'button'; icon: string; label: string; mode: string } | { type: 'info'; icon: string; title: string; caption: string }): Field {
+  const action = createActionField('action', 'Кнопка')
+  const actionFields: Field[] = action.fields.map((field) => {
+    if (!('name' in field)) return field
+    const { dbName: _legacyDBName, ...fieldWithoutDBName } = field as Field & { dbName?: string }
+    const name = field.name === 'leadType' ? 'lead' : field.name
+    const width = name === 'label' || name === 'mode' ? '50%' : undefined
+    const shortName = `hero_${device === 'desktop' ? 'd' : 'm'}${slotNumber}_${name}`
+    return {
+      ...fieldWithoutDBName,
+      name,
+      ...(name === 'lead' ? {} : { dbName: shortName }),
+      ...('type' in field && field.type === 'select' && field.name === 'mode' ? { enumName: 'hero_slot_action_mode' } : {}),
+      ...('type' in field && field.type === 'select' && field.name === 'leadType' ? { enumName: 'hero_slot_lead_type' } : {}),
+      admin: { ...field.admin, ...(width ? { width } : {}) },
+    } as Field
+  })
+  return {
+    name,
+    type: 'group',
+    label: false,
+    admin: { hideGutter: true },
+    fields: [
+      {
+        type: 'row',
+        fields: [
+          { name: 'enabled', type: 'checkbox', label: 'Показывать слот', defaultValue: true, admin: { width: '35%' } },
+          { name: 'type', dbName: `hero_${device === 'desktop' ? 'd' : 'm'}${slotNumber}_type`, type: 'select', enumName: 'hero_slot_element', label: 'Элемент', required: true, defaultValue: defaults.type, options: [{ label: 'Кнопка', value: 'button' }, { label: 'Инфо-плашка', value: 'info' }], admin: { width: '65%', condition: (_, siblingData) => siblingData.enabled !== false } },
+        ],
+      },
+      { name: 'icon', dbName: `hero_${device === 'desktop' ? 'd' : 'm'}${slotNumber}_icon`, type: 'select', enumName: 'hero_slot_icon', label: 'Иконка', required: true, defaultValue: defaults.icon, options: [{ label: 'Бронирование', value: 'CalendarCheck' }, { label: 'Календарь', value: 'CalendarDays' }, { label: 'Личный кабинет', value: 'UserRound' }, { label: 'Ссылка', value: 'ArrowUpRight' }, { label: 'Информация', value: 'Info' }, { label: 'Акцент', value: 'Sparkles' }], admin: { condition: (_, siblingData) => siblingData.enabled !== false, components: { Field: '/components/admin/HeroSlotIconField#HeroSlotIconField' } } },
+      { name: 'action', type: 'group', label: false, admin: { hideGutter: true, width: '100%', condition: (_, siblingData) => siblingData.enabled !== false && siblingData.type === 'button' }, fields: [{ type: 'row', fields: actionFields }], defaultValue: defaults.type === 'button' ? { label: defaults.label, mode: defaults.mode } : undefined },
+      { type: 'row', fields: [
+        { name: 'title', type: 'text', label: 'Заголовок', admin: { width: '50%', condition: (_, siblingData) => siblingData.enabled !== false && siblingData.type === 'info' }, defaultValue: defaults.type === 'info' ? defaults.title : undefined },
+        { name: 'caption', type: 'text', label: 'Подпись', admin: { width: '50%', condition: (_, siblingData) => siblingData.enabled !== false && siblingData.type === 'info' }, defaultValue: defaults.type === 'info' ? defaults.caption : undefined },
+      ] },
+    ],
+  }
+}
+
+function heroSlotAccordion(name: string, label: string, device: 'desktop' | 'mobile', slotNumber: 1 | 2 | 3, defaults: Parameters<typeof heroSlotField>[4]): Field {
   return {
     type: 'collapsible',
     label,
-    admin: { initCollapsed: true },
-    fields: [{ ...action, label: false, admin: { ...action.admin, hideGutter: true }, defaultValue }],
+    admin: { width: device === 'desktop' ? '33.333%' : '50%', initCollapsed: true },
+    fields: [heroSlotField(name, label, device, slotNumber, defaults)],
   }
+}
+
+const heroSlotsField: Field = {
+  type: 'collapsible',
+  label: 'Кнопки и элементы',
+  admin: { initCollapsed: true },
+  fields: [{
+    name: 'buttonsAndElements',
+    type: 'group',
+    label: false,
+    admin: { hideGutter: true },
+    fields: [
+      {
+        name: 'desktop', type: 'group', label: 'ПК',
+        fields: [{ type: 'row', fields: [heroSlotAccordion('slot1', 'Слот 1', 'desktop', 1, { type: 'button', icon: 'CalendarCheck', label: 'Забронировать', mode: 'booking' }), heroSlotAccordion('slot2', 'Слот 2', 'desktop', 2, { type: 'button', icon: 'UserRound', label: 'Личный кабинет', mode: 'account' }), heroSlotAccordion('slot3', 'Слот 3', 'desktop', 3, { type: 'info', icon: 'CalendarDays', title: 'Открытие в ноябре', caption: 'Акция с 01.11 до 15.11' })] }],
+      },
+      {
+        name: 'mobile', type: 'group', label: 'Мобильные',
+        fields: [{ type: 'row', fields: [heroSlotAccordion('slot1', 'Слот 1', 'mobile', 1, { type: 'button', icon: 'CalendarCheck', label: 'Забронировать', mode: 'booking' }), heroSlotAccordion('slot2', 'Слот 2', 'mobile', 2, { type: 'info', icon: 'CalendarDays', title: 'Открытие в ноябре', caption: 'Акция с 01.11 до 15.11' })] }],
+      },
+    ],
+  }],
 }
 
 const heroSocialProofField: Field = {
@@ -116,7 +177,7 @@ const heroSocialProofField: Field = {
       admin: { hideGutter: true },
       fields: [
         { name: 'ratingLabel', type: 'text', label: 'Рейтинг и аудитория', defaultValue: '4.9 · 500+ игроков' },
-        { name: 'caption', type: 'text', label: 'Подпись', defaultValue: 'Рейтинг клуба на Новой Риге' },
+        { name: 'caption', type: 'text', label: 'Подпись', defaultValue: 'Рейтинг на Яндекс' },
         {
           name: 'coaches',
           type: 'relationship',
@@ -204,12 +265,13 @@ export const heroFields: Field[] = [
       { name: 'mobileVideoPoster', type: 'upload', relationTo: 'media', filterOptions: imageOnlyFilter, label: 'Poster mobile-видео' },
       heroTintField,
       heroTitleFontSizeField,
-      heroActionField('primaryAction', 'Основная кнопка', { label: 'Забронировать', mode: 'booking' }),
-      heroActionField('secondaryAction', 'Вторая кнопка', { label: 'Пробное занятие', mode: 'trial-booking' }),
+      heroSlotsField,
       heroSocialProofField,
-      { name: 'openingNotice', type: 'group', label: 'Открытие и спецпредложение', fields: [
+      { name: 'primaryAction', type: 'group', admin: { hidden: true }, fields: createActionField('legacyPrimary', 'Основная кнопка').fields },
+      { name: 'secondaryAction', type: 'group', admin: { hidden: true }, fields: createActionField('legacySecondary', 'Вторая кнопка').fields },
+      { name: 'openingNotice', type: 'group', admin: { hidden: true }, fields: [
         { name: 'title', type: 'text', label: 'Первая строка', defaultValue: 'Открытие в ноябре' },
-        { name: 'caption', type: 'text', label: 'Вторая строка', defaultValue: 'Спец. оффер с 01.11 до 15.11' },
+        { name: 'caption', type: 'text', label: 'Вторая строка', defaultValue: 'Акция с 01.11 до 15.11' },
       ] },
       heroStatsField,
     ],

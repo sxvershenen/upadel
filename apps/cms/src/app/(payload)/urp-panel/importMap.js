@@ -34,6 +34,7 @@ import { OfertaGlobalEditorPanel as OfertaGlobalEditorPanel_e17a9bf367a67dd68371
 import { SecretTextField as SecretTextField_d8cbdd8e0062467049891f81baf1b9a1 } from '../../../components/admin/SecretTextField'
 import { IntegrationStatus as IntegrationStatus_2c35762c8ba264f9b73d6d184c279526 } from '../../../components/admin/IntegrationStatus'
 import { DefaultCollapsedFieldLabel as DefaultCollapsedFieldLabel_48bd8a775a1d785d789dacb46e8c6762 } from '../../../components/admin/DefaultCollapsedAccordion'
+import { HeroSlotIconField as HeroSlotIconField_703fce052b0302a3d9035b5d63ec29d7 } from '../../../components/admin/HeroSlotIconField'
 import { HomepageCourtsPanel as HomepageCourtsPanel_6441cbe11148e4edeb3cf73d2c00af4e } from '../../../components/admin/HomepageAdminCollections'
 import { HomepageReviewsPanel as HomepageReviewsPanel_6441cbe11148e4edeb3cf73d2c00af4e } from '../../../components/admin/HomepageAdminCollections'
 import { HomepageFAQsPanel as HomepageFAQsPanel_6441cbe11148e4edeb3cf73d2c00af4e } from '../../../components/admin/HomepageAdminCollections'
@@ -82,6 +83,7 @@ export const importMap = {
   "/components/admin/SecretTextField#SecretTextField": SecretTextField_d8cbdd8e0062467049891f81baf1b9a1,
   "/components/admin/IntegrationStatus#IntegrationStatus": IntegrationStatus_2c35762c8ba264f9b73d6d184c279526,
   "/components/admin/DefaultCollapsedAccordion#DefaultCollapsedFieldLabel": DefaultCollapsedFieldLabel_48bd8a775a1d785d789dacb46e8c6762,
+  "/components/admin/HeroSlotIconField#HeroSlotIconField": HeroSlotIconField_703fce052b0302a3d9035b5d63ec29d7,
   "/components/admin/HomepageAdminCollections#HomepageCourtsPanel": HomepageCourtsPanel_6441cbe11148e4edeb3cf73d2c00af4e,
   "/components/admin/HomepageAdminCollections#HomepageReviewsPanel": HomepageReviewsPanel_6441cbe11148e4edeb3cf73d2c00af4e,
   "/components/admin/HomepageAdminCollections#HomepageFAQsPanel": HomepageFAQsPanel_6441cbe11148e4edeb3cf73d2c00af4e,

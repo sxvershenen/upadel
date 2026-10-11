@@ -13,25 +13,39 @@ const content = {
     contactConfirmation: { channels: [] },
   },
   home: { hero: {
-    seoHeading: 'Премиальный крытый падел-клуб', titleLine: 'Первая тренировка', titleConnector: 'за', titleAccent: '1 990 ₽', description: 'с испанскими панорамными кортами',
-    primaryAction: { mode: 'booking', label: 'Забронировать' },
-    secondaryAction: { mode: 'account', label: 'Личный кабинет' },
-    socialProof: { coachPhotos: [], ratingLabel: '4.9', caption: 'Рейтинг' }, stats: [],
+    seoHeading: 'Премиальный крытый падел-клуб в Москве', titleLine: 'Первая тренировка', titleConnector: 'за', titleAccent: '1 990 ₽', description: 'с испанскими панорамными кортами',
+    desktopSlots: [
+      { type: 'button', enabled: true, icon: 'CalendarCheck', action: { mode: 'booking', label: 'Забронировать' } },
+      { type: 'button', enabled: true, icon: 'UserRound', action: { mode: 'account', label: 'Личный кабинет' } },
+      { type: 'info', enabled: true, icon: 'CalendarDays', title: 'Открытие в ноябре', caption: 'Акция с 01.11 до 15.11' },
+    ],
+    mobileSlots: [
+      { type: 'button', enabled: true, icon: 'CalendarCheck', action: { mode: 'booking', label: 'Забронировать' } },
+      { type: 'info', enabled: true, icon: 'CalendarDays', title: 'Открытие в ноябре', caption: 'Акция с 01.11 до 15.11' },
+    ],
+    socialProof: { coachPhotos: [], ratingLabel: '4.9', caption: 'Рейтинг на Яндекс' }, stats: [],
   } },
 } as any
 
 test('hero CTAs have one SSR entrance owner and no nested GSAP reveal', () => {
   const html = renderToStaticMarkup(<ContentProvider content={content}><Hero /></ContentProvider>)
-  const primary = html.match(/<div data-hero-cta="primary"[\s\S]*?<\/div>/)?.[0] ?? ''
-  const secondary = html.match(/<button[^>]*data-hero-cta="secondary"[^>]*>[\s\S]*?Личный кабинет[\s\S]*?<\/button>/)?.[0] ?? ''
+  const primary = html.match(/<div data-hero-slot="1" data-hero-slot-type="button" data-hero-cta="primary"[\s\S]*?<\/div>/)?.[0] ?? ''
+  const secondary = html.match(/<div data-hero-slot="2" data-hero-slot-type="button" data-hero-cta="secondary"[\s\S]*?Личный кабинет[\s\S]*?<\/div>/)?.[0] ?? ''
   assert.match(primary, /<button/)
   assert.match(primary, /Забронировать/)
   assert.doesNotMatch(primary, /data-gsap-reveal/)
   assert.match(secondary, /glass/)
-  assert.doesNotMatch(secondary, /<svg|data-button-decoration/)
+  assert.match(secondary, /lucide-user-round/)
   assert.match(primary, /lucide-calendar-check/)
   assert.doesNotMatch(secondary, /data-gsap-reveal/)
-  assert.doesNotMatch(html, /<div data-hero-cta="secondary"/)
+  assert.doesNotMatch(html, /data-gsap-reveal/)
+})
+
+test('disabled hero slots are omitted from server-rendered markup', () => {
+  const disabled = { ...content, home: { ...content.home, hero: { ...content.home.hero, mobileSlots: [{ ...content.home.hero.mobileSlots[0], enabled: false }, content.home.hero.mobileSlots[1]] } } }
+  const html = renderToStaticMarkup(<ContentProvider content={disabled}><Hero /></ContentProvider>)
+  assert.equal([...html.matchAll(/data-hero-slot="1" data-hero-slot-type="button" data-hero-cta="primary"/g)].length, 1)
+  assert.match(html, /Открытие в ноябре/)
 })
 
 test('glass hero CTA animates its own backdrop-filter layer', () => {
@@ -55,7 +69,8 @@ test('mobile hero parallax falls back to desktop media when no mobile asset is c
 test('hero keeps the offer decorative and exposes the SEO heading below it', () => {
   const html = renderToStaticMarkup(<ContentProvider content={content}><Hero /></ContentProvider>)
   assert.equal((html.match(/<h1/g) ?? []).length, 1)
-  assert.match(html, /<h1 class="inline">Премиальный крытый падел-клуб<\/h1> <span>с испанскими панорамными кортами<\/span>/)
+  assert.ok(html.includes('в\u00a0Москве'))
+  assert.ok(html.includes('data-no-typography=""'))
   assert.doesNotMatch(html, /<h1[^>]*>[\s\S]*Первая тренировка/)
 })
 
@@ -102,20 +117,28 @@ test('hero renders separate desktop and mobile three-point black tints and keeps
   assert.match(html, /data-hero-tint="mobile"/)
   assert.match(html, /radial-gradient\(ellipse 80% 60% at 11% 22%, rgb\(0 0 0 \/ 0%\) 30%, #000000a3 70%, #000000c9 154%\)/)
   assert.match(html, /radial-gradient\(ellipse 130% 50% at 50% 30%, rgb\(0 0 0 \/ 0%\) 30%, #00000063 50%, #000000d6 90%\)/)
-  assert.match(html, /data-hero-description="" class="type-hero-lead mt-5 max-w-\[900px\] text-white\/75 sm:mt-7"/)
+  assert.match(html, /<div data-hero-description="" data-no-typography="" class="type-hero-lead mt-5 max-w-\[900px\] text-white\/75 sm:mt-7"/)
+  assert.ok(html.includes('в\u00a0Москве'))
+  assert.match(readFileSync(new URL('../index.css', import.meta.url), 'utf8'), /\[data-hero-description\] \{ animation: unlim-enter-up \.58s cubic-bezier\(\.16, 1, \.3, 1\) \.18s backwards; will-change: opacity, transform; \}/)
+  assert.match(html, /data-hero-slot="3" data-hero-slot-type="info"/)
   assert.match(html, /data-hide-icons-narrow="true" class="mt-6 flex flex-nowrap items-center gap-2 sm:mt-8 sm:gap-3"/)
-  assert.match(html, /container-page absolute inset-x-0 top-8 z-10 md:hidden/)
+  assert.match(html, /container-page absolute inset-x-0 top-8 z-10 flex items-center justify-between gap-2 md:hidden/)
+  assert.match(html, /data-hero-social-proof=""[^>]*max-w-\[55%\]/)
+  assert.match(html, /Рейтинг на Яндекс/)
+  assert.doesNotMatch(html, /lucide-users/)
   assert.match(html, /data-hero-title=""[^>]*style="--hero-title-font-size-mobile:42px;--hero-title-font-size-desktop:96px"/)
   assert.equal(desktopTint, 'radial-gradient(ellipse 80% 60% at 11% 22%, rgb(0 0 0 / 0%) 30%, #000000a3 70%, #000000c9 154%)')
 })
 
 
-test('opening notice reads editable CMS copy and keeps only the final word lime', () => {
+test('mobile opening notice reads its configured slot and receives the glass entrance animation', () => {
   const updated = structuredClone(content)
-  updated.home.hero = { ...updated.home.hero, titleLine: '2 часа', titleConnector: 'по цене', titleAccent: 'одного', openingNotice: { title: 'Открытие в ноябре', caption: 'Спец. оффер с 01.11 до 15.11' } }
+  updated.home.hero = { ...updated.home.hero, titleLine: '2 часа', titleConnector: 'по цене', titleAccent: 'одного', mobileSlots: [updated.home.hero.mobileSlots[0], { type: 'info', enabled: true, icon: 'CalendarDays', title: 'Открытие в ноябре', caption: 'Акция с 01.11 до 15.11' }] }
   const html = renderToStaticMarkup(<ContentProvider content={updated}><Hero /></ContentProvider>)
-  assert.match(html, /data-hero-opening-notice="" class="glass-overlay/)
+  assert.match(html, /data-hero-opening-notice="" data-hero-slot="2" data-hero-slot-type="info"/)
   assert.match(html, /Открытие в ноябре/)
-  assert.match(html, /Спец. оффер с 01.11 до 15.11/)
+  assert.match(html, /Акция с 01.11 до 15.11/)
+  assert.match(html, /bg-white/)
+  assert.match(html, /leading-tight/)
   assert.match(html, /data-hero-accent="" class="inline-block text-\[#c2f542\]">одного/)
 })

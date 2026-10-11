@@ -1,7 +1,7 @@
 export * from './widgets'
 import type { CatalogPagination, CatalogQuery } from './catalog'
 export * from './catalog'
-export const homepageDTOversion = 21 as const
+export const homepageDTOversion = 23 as const
 
 export const publicRouteRegistry = [
   { path: '/', parent: null, template: 'homepage', globalSlug: 'homepage' },
@@ -98,6 +98,10 @@ export type ActionDTO = {
   mode: 'account' | 'embed-widget' | 'none' | 'booking' | 'trial-booking' | 'internal-link' | 'external-link' | 'phone' | 'email' | 'lead-form'
 }
 
+export type HeroSlotDTO =
+  | { type: 'button'; enabled: boolean; icon: 'CalendarCheck' | 'CalendarDays' | 'UserRound' | 'ArrowUpRight' | 'Info' | 'Sparkles'; action: ActionDTO }
+  | { type: 'info'; enabled: boolean; icon: 'CalendarCheck' | 'CalendarDays' | 'UserRound' | 'ArrowUpRight' | 'Info' | 'Sparkles'; title: string; caption: string }
+
 export type RentalRateDTO = { id: string; title: string; eyebrow?: string | null; timeLabel?: string | null; description: string; price?: number | null; priceLabel?: string | null; priceSuffix?: string | null; badge?: string | null; badgeTone?: string | null; meshTone?: string | null; includedItems: string[]; action: ActionDTO; cardVariant: 'rate' }
 export type RentalCardDTO = Omit<RentalRateDTO, 'cardVariant'> & { cardVariant: 'rate' | 'membership-offer' | 'standards' }
 export type RentalMembershipOfferDTO = { enabled: boolean; showOnHomepage: boolean; title: string; eyebrow?: string | null; description: string; priceLabel?: string | null; meshTone?: string | null; action: ActionDTO }
@@ -179,7 +183,7 @@ export type HomepageDTO = {
     }
   }
   home: {
-    hero: { openingNotice?: { title: string; caption: string }; seoHeading: string; titleLine: string; titleConnector: string; titleAccent: string; description: string; desktopMedia?: MediaDTO | null; mobileMedia?: MediaDTO | null; desktopPoster?: MediaDTO | null; mobilePoster?: MediaDTO | null; tint: HeroTintDTO; titleFontSize: HeroTitleFontSizeDTO; primaryAction: ActionDTO; secondaryAction: ActionDTO; socialProof: { ratingLabel: string; caption: string; coachPhotos: MediaDTO[] }; stats: Array<{ value: string; label: string }> }
+    hero: { seoHeading: string; titleLine: string; titleConnector: string; titleAccent: string; description: string; desktopMedia?: MediaDTO | null; mobileMedia?: MediaDTO | null; desktopPoster?: MediaDTO | null; mobilePoster?: MediaDTO | null; tint: HeroTintDTO; titleFontSize: HeroTitleFontSizeDTO; desktopSlots: [HeroSlotDTO, HeroSlotDTO, HeroSlotDTO]; mobileSlots: [HeroSlotDTO, HeroSlotDTO]; socialProof: { ratingLabel: string; caption: string; coachPhotos: MediaDTO[] }; stats: Array<{ value: string; label: string }> }
     benefits: { eyebrow: string; title: string; cards: Array<{ id: string; variant: 'parking' | 'lockers' | 'shower' | 'chill' | 'online-booking' | 'coaches-metric' | 'community' | 'kids-wide'; eyebrow?: string | null; title: string; description: string; supportingText?: string | null; media?: MediaDTO | null; overlay?: string | null; meshTone?: string | null; action: ActionDTO }> }
     offers: Array<{ id: string; variant: 'tournament-venue' | 'event'; badge: string; title: string; description: string; image?: MediaDTO | null; meshTone?: string | null; icon?: 'Trophy' | 'PartyPopper' | null; action: ActionDTO }>
     courtsSection: { titleLineOne: string; titleLineTwo: string; background?: MediaDTO | null; backgroundAlt: string }
@@ -475,6 +479,12 @@ export function parseHomepageDTO(value: unknown): HomepageDTO {
   const dto = value as Partial<HomepageDTO>
   if (dto.version !== homepageDTOversion) throw new Error(`Unsupported homepage DTO version: ${String(dto.version)}.`)
   if (!dto.site || !dto.home || !dto.entities || !Array.isArray(dto.sections)) throw new Error('Homepage DTO is incomplete.')
+  for (const [device, slots] of Object.entries({ desktop: dto.home.hero?.desktopSlots, mobile: dto.home.hero?.mobileSlots })) {
+    const expectedLength = device === 'desktop' ? 3 : 2
+    if (!Array.isArray(slots) || slots.length !== expectedLength || slots.some((slot) => !slot || !['button', 'info'].includes(slot.type) || typeof slot.enabled !== 'boolean' || !['CalendarCheck', 'CalendarDays', 'UserRound', 'ArrowUpRight', 'Info', 'Sparkles'].includes(slot.icon) || (slot.type === 'button' ? !slot.action || typeof slot.action.mode !== 'string' : typeof slot.title !== 'string' || typeof slot.caption !== 'string'))) {
+      throw new Error(`Homepage hero ${device} slots are invalid.`)
+    }
+  }
   assertDesktopNavigation(dto.site)
   if (dto.sections.some((section) => !section || !sectionKeys.has(section.key) || typeof section.visible !== 'boolean')) {
     throw new Error('Homepage DTO contains an invalid section definition.')

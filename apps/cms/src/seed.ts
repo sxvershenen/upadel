@@ -1781,7 +1781,16 @@ async function seed() {
       const migratedHero = { ...currentHero }
       if (!migratedHero.tint) migratedHero.tint = defaultHeroTint
       if (!migratedHero.titleFontSize) migratedHero.titleFontSize = defaultHeroTitleFontSize
+      if (!migratedHero.buttonsAndElements) {
+        const notice = migratedHero.openingNotice ?? { title: 'Открытие в ноябре', caption: 'Акция с 01.11 до 15.11' }
+        const book = migratedHero.primaryAction ?? { label: 'Забронировать', mode: 'booking' }
+        migratedHero.buttonsAndElements = {
+          desktop: { slot1: { enabled: true, type: 'button', icon: 'CalendarCheck', action: book }, slot2: { enabled: true, type: 'button', icon: 'UserRound', action: migratedHero.secondaryAction ?? { label: 'Личный кабинет', mode: 'account' } }, slot3: { enabled: true, type: 'info', icon: 'CalendarDays', title: notice.title, caption: notice.caption } },
+          mobile: { slot1: { enabled: true, type: 'button', icon: 'CalendarCheck', action: book }, slot2: { enabled: true, type: 'info', icon: 'CalendarDays', title: notice.title, caption: notice.caption } },
+        }
+      }
       if (!migratedHero.seoHeading) migratedHero.seoHeading = 'Премиальный крытый падел-клуб'
+      if (migratedHero.socialProof?.caption === 'Рейтинг клуба на Новой Риге') migratedHero.socialProof = { ...migratedHero.socialProof, caption: 'Рейтинг на Яндекс' }
       if (migratedHero.description === 'Премиальный крытый падел-клуб с испанскими панорамными кортами Jubo Super Panoramic, профессиональным покрытием Mondo Super XN и клубным лаунжем.' || migratedHero.description === 'Премиальный крытый падел-клуб с испанскими панорамными кортами Jubo Super Panoramic, профессиональным покрытием Mondo Super XN и клубным лаунжем.') {
         migratedHero.description = 'с испанскими панорамными кортами Jubo Super Panoramic, профессиональным покрытием PRO TURF 240 и клубным лаунжем.'
       }
@@ -1815,9 +1824,13 @@ async function seed() {
             desktopMedia: mediaID(images.hero),
             tint: defaultHeroTint,
             titleFontSize: defaultHeroTitleFontSize,
+            buttonsAndElements: {
+              desktop: { slot1: { enabled: true, type: 'button', icon: 'CalendarCheck', action: { label: 'Забронировать', mode: 'booking' } }, slot2: { enabled: true, type: 'button', icon: 'UserRound', action: { label: 'Личный кабинет', mode: 'account' } }, slot3: { enabled: true, type: 'info', icon: 'CalendarDays', title: 'Открытие в ноябре', caption: 'Акция с 01.11 до 15.11' } },
+              mobile: { slot1: { enabled: true, type: 'button', icon: 'CalendarCheck', action: { label: 'Забронировать', mode: 'booking' } }, slot2: { enabled: true, type: 'info', icon: 'CalendarDays', title: 'Открытие в ноябре', caption: 'Акция с 01.11 до 15.11' } },
+            },
             primaryAction: { label: 'Забронировать', mode: 'booking' },
             secondaryAction: { label: 'Личный кабинет', mode: 'account' },
-            socialProof: { ratingLabel: '4.9 · 500+ игроков', caption: 'Рейтинг клуба на Новой Риге', coaches: coaches.slice(0, 3).map(({ id }) => id) },
+            socialProof: { ratingLabel: '4.9 · 500+ игроков', caption: 'Рейтинг на Яндекс', coaches: coaches.slice(0, 3).map(({ id }) => id) },
             stats: [
               { value: '3 корта', label: 'Jubo Super Panoramic' }, { value: '11.5 м', label: 'Высота до балок' },
               { value: '+21°C', label: 'Климат-контроль круглый год' }, { value: '30 сек', label: 'Мгновенное бронирование' },

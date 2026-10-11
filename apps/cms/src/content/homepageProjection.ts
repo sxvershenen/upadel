@@ -1,5 +1,5 @@
 import { ContentUnavailableError } from './projectionCache'
-import { defaultHeroTint, defaultHeroTitleFontSize, homepageDTOversion, parseHomepageDTO, type HeroTitleFontSizeDTO, type HeroTintDTO, type HomepageDTO } from '@unlim/content-contract'
+import { defaultHeroTint, defaultHeroTitleFontSize, homepageDTOversion, parseHomepageDTO, type HeroSlotDTO, type HeroTitleFontSizeDTO, type HeroTintDTO, type HomepageDTO } from '@unlim/content-contract'
 import type { Payload } from 'payload'
 
 import type { ArticleCategory, Tournament } from '../payload-types'
@@ -61,6 +61,36 @@ function projectHeroTitleFontSize(value: unknown): HeroTitleFontSizeDTO {
   }
 }
 
+const heroSlotIcons = new Set<HeroSlotDTO['icon']>(['CalendarCheck', 'CalendarDays', 'UserRound', 'ArrowUpRight', 'Info', 'Sparkles'])
+
+function projectHeroSlot(value: unknown, fallback: HeroSlotDTO): HeroSlotDTO {
+  const slot = value && typeof value === 'object' ? value as Record<string, any> : {}
+  const icon = heroSlotIcons.has(slot.icon) ? slot.icon : fallback.icon
+  const enabled = slot.enabled !== false
+  if (slot.type === 'info') return { type: 'info', enabled, icon, title: String(slot.title ?? ''), caption: String(slot.caption ?? '') }
+  if (slot.type === 'button') {
+    const action = slot.action && typeof slot.action === 'object' ? { ...slot.action, leadType: slot.action.leadType ?? slot.action.lead } : slot.action
+    return { type: 'button', enabled, icon, action: actionDTO(action) }
+  }
+  return { ...fallback, enabled: false }
+}
+
+function projectHeroSlots(hero: Record<string, any>) {
+  const config = hero.buttonsAndElements ?? {}
+  const notice = hero.openingNotice ?? {}
+  return {
+    desktop: [
+      projectHeroSlot(config.desktop?.slot1, { type: 'button', enabled: true, icon: 'CalendarCheck', action: actionDTO(hero.primaryAction ?? { mode: 'booking', label: 'Забронировать' }) }),
+      projectHeroSlot(config.desktop?.slot2, { type: 'button', enabled: true, icon: 'UserRound', action: actionDTO(hero.secondaryAction ?? { mode: 'account', label: 'Личный кабинет' }) }),
+      projectHeroSlot(config.desktop?.slot3, { type: 'info', enabled: true, icon: 'CalendarDays', title: String(notice.title ?? 'Открытие в ноябре'), caption: String(notice.caption ?? 'Акция с 01.11 до 15.11') }),
+    ] as [HeroSlotDTO, HeroSlotDTO, HeroSlotDTO],
+    mobile: [
+      projectHeroSlot(config.mobile?.slot1, { type: 'button', enabled: true, icon: 'CalendarCheck', action: actionDTO(hero.primaryAction ?? { mode: 'booking', label: 'Забронировать' }) }),
+      projectHeroSlot(config.mobile?.slot2, { type: 'info', enabled: true, icon: 'CalendarDays', title: String(notice.title ?? 'Открытие в ноябре'), caption: String(notice.caption ?? 'Акция с 01.11 до 15.11') }),
+    ] as [HeroSlotDTO, HeroSlotDTO],
+  }
+}
+
 export async function createHomepageProjection(
   payload: Payload,
   options: { origin: string; preview: boolean },
@@ -96,6 +126,7 @@ export async function createHomepageProjection(
 
   const entities = Object.fromEntries(collections.map((collection, index) => [collection, entityResults[index]])) as unknown as Record<keyof typeof homepageCollectionLimits, Array<Record<string, unknown>>>
   const homeHeroMedia = mediaDTO(homepage.hero.desktopMedia, origin, 'hero')
+  const heroSlots = projectHeroSlots(homepage.hero as unknown as Record<string, any>)
   const homepageSEO = seoDTO(homepage.seo, origin)
 
   const dto: HomepageDTO = {
@@ -113,12 +144,11 @@ export async function createHomepageProjection(
     site: siteDTO(siteSettings, origin, entities.partners),
     home: {
       hero: {
-        openingNotice: { title: homepage.hero.openingNotice?.title ?? '', caption: homepage.hero.openingNotice?.caption ?? '' },
+        desktopSlots: heroSlots.desktop, mobileSlots: heroSlots.mobile,
         seoHeading: homepage.hero.seoHeading ?? 'Премиальный крытый падел-клуб', titleLine: homepage.hero.titleLine ?? '', titleConnector: homepage.hero.titleConnector ?? '', titleAccent: homepage.hero.titleAccent ?? '',
         description: homepage.hero.description ?? '', desktopMedia: homeHeroMedia,
         mobileMedia: mediaDTO(homepage.hero.mobileMedia, origin, 'hero'), desktopPoster: mediaDTO(homepage.hero.desktopVideoPoster, origin),
-        mobilePoster: mediaDTO(homepage.hero.mobileVideoPoster, origin), tint: projectHeroTint(homepage.hero.tint), titleFontSize: projectHeroTitleFontSize(homepage.hero.titleFontSize), primaryAction: actionDTO(homepage.hero.primaryAction),
-        secondaryAction: actionDTO(homepage.hero.secondaryAction),
+        mobilePoster: mediaDTO(homepage.hero.mobileVideoPoster, origin), tint: projectHeroTint(homepage.hero.tint), titleFontSize: projectHeroTitleFontSize(homepage.hero.titleFontSize),
         socialProof: {
           ratingLabel: homepage.hero.socialProof?.ratingLabel ?? '', caption: homepage.hero.socialProof?.caption ?? '',
           coachPhotos: (homepage.hero.socialProof?.coaches ?? []).flatMap((coach) => {
