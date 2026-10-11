@@ -5,6 +5,8 @@ import * as openingRefinements from './20261010_190000_opening_refinements'
 import * as openingContentFields from './20261010_180000_opening_content_fields'
 import * as bookingWidgets from './20261007_180000_booking_widgets'
 import * as bookingWidgetContent from './20261007_180100_booking_widget_content'
+import * as mediaResponsiveWidths from './20261011_030000_media_responsive_widths'
+import * as mediaDenseResponsive from './20261011_040000_media_dense_responsive'
 import * as migration_20260922_120000_seo_content_truth from './20260922_120000_seo_content_truth'
 import * as migration_20260922_020000_responsive_media from './20260922_020000_responsive_media'
 import * as migration_20260922_160100_hero_tint from './20260922_160100_hero_tint'
@@ -130,4 +132,6 @@ export const migrations = [
   { name: '20261010_200000_offer_visibility', up: offerVisibility.up, down: offerVisibility.down },
   { name: '20261011_000000_homepage_rental_pricing', up: homepageRentalPricing.up, down: homepageRentalPricing.down },
   { name: '20261011_010000_payload_auth_requested_at', up: payloadAuthRequestedAt.up, down: payloadAuthRequestedAt.down },
+  { name: '20261011_030000_media_responsive_widths', up: mediaResponsiveWidths.up, down: mediaResponsiveWidths.down },
+  { name: '20261011_040000_media_dense_responsive', up: mediaDenseResponsive.up, down: mediaDenseResponsive.down },
 ];

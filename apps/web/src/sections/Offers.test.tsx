@@ -19,12 +19,14 @@ test('zero offers remove the entire section; one fills the width and two split o
   assert.doesNotMatch(one, /min-\[1041px\]:grid-cols-2/)
   assert.match(one, /md:aspect-\[4\/1\]/)
   assert.match(one, /offer-card--wide/)
+  assert.match(one, /sizes="\(min-width: 1280px\) min\(1884px, calc\(100vw - 96px\)\), \(min-width: 768px\) calc\(100vw - 64px\), calc\(100vw - 40px\)"/)
   const oneDocument = new Window().document
   oneDocument.body.innerHTML = one
   assert.ok(oneDocument.querySelector('[data-offer-card] h3')!.classList.contains('type-section'))
   assert.ok(oneDocument.querySelector('[data-offer-card] p')!.classList.contains('type-body'))
   const two = render([offer, { ...offer, id: '2' }])
   assert.match(two, /min-\[1041px\]:grid-cols-2/)
+  assert.match(two, /sizes="\(min-width: 1280px\) min\(934px, calc\(50vw - 56px\)\), \(min-width: 1041px\) calc\(50vw - 40px\), \(min-width: 768px\) calc\(100vw - 64px\), calc\(100vw - 40px\)"/)
   assert.doesNotMatch(two, /offer-card--wide/)
   const document = new Window().document
   document.body.innerHTML = two

@@ -68,7 +68,7 @@ sudo -u unlim ./deploy/release.sh
 sudo systemctl restart unlim-cms.service unlim-web.service
 ```
 
-An existing installation is backed up before migrations. The release becomes current only after dependency installation, checks, builds, migrations and the idempotent small-image backfill succeed. Its immutable deployment path is separate from the backup helper’s RELEASE_DIR. Activation atomically replaces the current symlink; CMS starts on loopback behind Nginx.
+An existing installation is backed up before migrations. The release becomes current only after dependency installation, checks, builds, migrations and the idempotent responsive-image derivative backfill succeed. Its immutable deployment path is separate from the backup helper’s RELEASE_DIR. Activation atomically replaces the current symlink; CMS starts on loopback behind Nginx.
 
 ## 4. Verification
 

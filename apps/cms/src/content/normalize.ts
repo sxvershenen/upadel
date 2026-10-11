@@ -31,8 +31,13 @@ export function mediaDTO(value: unknown, origin: string, variant: MediaVariant =
       if (Math.abs(candidate.width / candidate.height - ratio) / ratio > .015) continue
       candidates.set(candidate.width, publicMediaURL(candidate.url, origin))
     }
+    const dense = value.sizes?.dense
+    if (dense?.url && dense.width && dense.height && Math.abs(dense.width / dense.height - ratio) / ratio <= .015) {
+      // Prefer the q75 candidate when it shares a width with the original/card derivative.
+      candidates.set(dense.width, publicMediaURL(dense.url, origin))
+    }
   }
-  if (candidates.size && width) candidates.set(width, publicMediaURL(url, origin))
+  if (candidates.size && width && !candidates.has(width)) candidates.set(width, publicMediaURL(url, origin))
   const srcSet = candidates.size > 1 ? [...candidates].sort(([a], [b]) => a - b).map(([size, src]) => `${src} ${size}w`).join(', ') : undefined
   return { alt: value.alt, height, mimeType: selected?.mimeType ?? value.mimeType, url: publicMediaURL(url, origin), width, ...(srcSet ? { srcSet } : {}) }
 }

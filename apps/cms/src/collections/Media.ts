@@ -78,10 +78,34 @@ export const Media: CollectionConfig = {
     focalPoint: true,
     imageSizes: [
       {
+        name: 'compact',
+        width: 320,
+        withoutEnlargement: true,
+        formatOptions: { format: 'webp', options: { quality: 80 } },
+      },
+      {
+        name: 'mobile',
+        width: 480,
+        withoutEnlargement: true,
+        formatOptions: { format: 'webp', options: { quality: 80 } },
+      },
+      {
         name: 'small',
         width: 640,
         withoutEnlargement: true,
         formatOptions: { format: 'webp', options: { quality: 80 } },
+      },
+      {
+        name: 'medium',
+        width: 800,
+        withoutEnlargement: true,
+        formatOptions: { format: 'webp', options: { quality: 80 } },
+      },
+      {
+        name: 'dense',
+        width: 1120,
+        withoutEnlargement: true,
+        formatOptions: { format: 'webp', options: { quality: 75 } },
       },
       {
         name: 'thumbnail',

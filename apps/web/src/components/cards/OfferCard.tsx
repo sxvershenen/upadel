@@ -29,6 +29,6 @@ export function OfferCard({ offer, wide = false }: { offer: Offer; wide?: boolea
     </div>
   </div>;
   return offer.image
-    ? <ImageCard data-offer-card reveal={false} media={offer.image} src={offer.image.url} alt={offer.image.alt} sizes={`(min-width: 1041px) ${wide ? 100 : 50}vw, 100vw`} overlay={imageOverlayForMesh(offer.meshTone)} parallax className={`h-full w-full min-w-0 min-h-[300px] aspect-[4/3] ${isEventOffer ? '' : 'cursor-default'} ${wide ? 'offer-card--wide md:aspect-[4/1]' : 'md:aspect-[2/1]'}`}>{content}</ImageCard>
+    ? <ImageCard data-offer-card reveal={false} media={offer.image} src={offer.image.url} alt={offer.image.alt} sizes={wide ? "(min-width: 1280px) min(1884px, calc(100vw - 96px)), (min-width: 768px) calc(100vw - 64px), calc(100vw - 40px)" : "(min-width: 1280px) min(934px, calc(50vw - 56px)), (min-width: 1041px) calc(50vw - 40px), (min-width: 768px) calc(100vw - 64px), calc(100vw - 40px)"} overlay={imageOverlayForMesh(offer.meshTone)} parallax className={`h-full w-full min-w-0 min-h-[300px] aspect-[4/3] ${isEventOffer ? '' : 'cursor-default'} ${wide ? 'offer-card--wide md:aspect-[4/1]' : 'md:aspect-[2/1]'}`}>{content}</ImageCard>
     : <MeshCard data-offer-card tone={(offer.meshTone ?? 'deep-blue') as MeshTone} reveal={false} className={`h-full w-full min-w-0 min-h-[300px] ${isEventOffer ? '' : 'cursor-default'}`}>{content}</MeshCard>;
 }

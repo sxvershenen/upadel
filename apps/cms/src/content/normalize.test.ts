@@ -5,14 +5,27 @@ import { mediaDTO, siteDTO } from './normalize'
 
 test('responsive media keeps source aspect ratio and excludes a differently cropped thumbnail', () => {
   const dto = mediaDTO({ alt: 'Корт', mimeType: 'image/webp', url: '/original.webp', width: 2400, height: 1600, sizes: {
+    compact: { url: '/compact.webp', width: 320, height: 213 },
+    mobile: { url: '/mobile.webp', width: 480, height: 320 },
     small: { url: '/small.webp', width: 640, height: 427 },
+    medium: { url: '/medium.webp', width: 800, height: 533 },
+    dense: { url: '/dense.webp', width: 1120, height: 747 },
     thumbnail: { url: '/square.webp', width: 480, height: 480 },
     card: { url: '/card.webp', width: 1200, height: 800 },
     hero: { url: '/hero.webp', width: 1920, height: 1280 },
   } }, 'https://cms.unlimpadel.ru', 'hero')
-  assert.equal(dto?.srcSet, 'https://cms.unlimpadel.ru/small.webp 640w, https://cms.unlimpadel.ru/card.webp 1200w, https://cms.unlimpadel.ru/hero.webp 1920w')
+  assert.equal(dto?.srcSet, 'https://cms.unlimpadel.ru/compact.webp 320w, https://cms.unlimpadel.ru/mobile.webp 480w, https://cms.unlimpadel.ru/small.webp 640w, https://cms.unlimpadel.ru/medium.webp 800w, https://cms.unlimpadel.ru/dense.webp 1120w, https://cms.unlimpadel.ru/card.webp 1200w, https://cms.unlimpadel.ru/hero.webp 1920w')
   assert.equal(dto?.width, 1920)
   assert.equal(dto?.height, 1280)
+})
+
+test('responsive media prefers the compressed dense derivative when widths overlap', () => {
+  const dto = mediaDTO({ alt: 'Магазин', mimeType: 'image/webp', url: '/original.webp', width: 1086, height: 1448, sizes: {
+    compact: { url: '/compact.webp', width: 320, height: 427 },
+    dense: { url: '/dense.webp', width: 1086, height: 1448 },
+    card: { url: '/card.webp', width: 1086, height: 1448 },
+  } }, 'https://cms.unlimpadel.ru')
+  assert.equal(dto?.srcSet, 'https://cms.unlimpadel.ru/compact.webp 320w, https://cms.unlimpadel.ru/dense.webp 1086w')
 })
 
 test('placeholder social profiles are not published or enabled as contact actions', () => {

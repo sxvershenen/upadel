@@ -72,13 +72,16 @@ test('non-phone mesh benefit illustrations shrink below the 1380px breakpoint', 
       supportingText: variant === 'kids-wide' ? 'Детские ракетки' : null,
     } as any} />)
     assert.ok(html.includes(responsiveClass), `${variant} is missing ${responsiveClass}`)
+    const document = new Window().document
+    document.body.innerHTML = html
+    assert.equal(document.querySelector('img')?.getAttribute('sizes'), variant === 'coaches-metric' ? '(min-width: 1381px) 340px, 270px' : '(min-width: 1381px) 300px, 240px')
   }
 })
 
 test('phone benefits scale with card height and retain their illustration-specific crop', () => {
   for (const variant of ['online-booking', 'community']) {
     const document = new Window().document
-    document.body.innerHTML = renderToStaticMarkup(<BenefitCard benefit={{ ...baseBenefit, variant, title: variant, media: { url: '/phone.png', alt: '', mimeType: 'image/png' } } as any} />)
+    document.body.innerHTML = renderToStaticMarkup(<BenefitCard benefit={{ ...baseBenefit, variant, title: variant, media: { url: '/phone.png', alt: '', mimeType: 'image/png', width: 640, height: 960 } } as any} />)
     const phone = document.querySelector('.benefit-phone')!
     assert.ok(phone.className.includes(variant === 'community' ? 'h-[92%]' : 'h-[108%]'))
     assert.ok(phone.className.includes(variant === 'community' ? '-bottom-6 -right-6' : '-bottom-[22%] -right-2'))
@@ -100,7 +103,7 @@ test('phone benefit illustrations defer offscreen loads and select card-sized re
     } as any} />)
     const image = document.querySelector('.benefit-phone')!
     assert.equal(image.getAttribute('loading'), 'lazy')
-    assert.equal(image.getAttribute('sizes'), '240px')
+    assert.equal(image.getAttribute('sizes'), variant === 'online-booking' ? 'max(231px, 15.84vw)' : 'max(197px, 13.49vw)')
     assert.equal(image.getAttribute('srcset'), '/phone-640.webp 640w, /phone-1024.webp 1024w')
     assert.equal(image.getAttribute('fetchpriority'), 'low')
   }
