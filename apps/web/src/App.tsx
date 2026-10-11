@@ -1,6 +1,5 @@
 import { MotionConfig } from "framer-motion";
 import { lazy, Suspense, type ComponentType } from "react";
-import { CookieBanner } from "./components/CookieBanner";
 import { Hero } from "./sections/Hero";
 import { Benefits } from "./sections/Benefits";
 import { Offers } from "./sections/Offers";
@@ -82,7 +81,6 @@ export default function App({ content, view = "home" }: AppProps) {
 
       <div data-home-section="footer"><Footer /></div>
 
-      <CookieBanner />
     </div>
     </MotionConfig>
     </ContentProvider>

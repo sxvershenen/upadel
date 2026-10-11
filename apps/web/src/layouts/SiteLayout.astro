@@ -1,6 +1,8 @@
 ---
 import '../index.css'
 import type { MediaDTO, SiteDTO } from '@unlim/content-contract'
+import { ANALYTICS_CONSENT_KEY } from '../analytics/identity'
+import CookieNotice from '../components/CookieNotice.astro'
 import { SiteChromeIsland } from '../components/navigation/SiteChromeIsland'
 import { GlobalPageTransition } from '../transition-demo/GlobalPageTransition'
 import { resolveCanonicalURL, serializeStructuredData, type StructuredDataNode } from '../seo/structuredData'
@@ -85,6 +87,28 @@ const pageEntrance = Astro.url.pathname === '/gift'
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <script is:inline define:vars={{ consentKey: ANALYTICS_CONSENT_KEY }}>
+      (() => {
+        const root = document.documentElement
+        try {
+          if (localStorage.getItem(consentKey) === 'accepted') root.setAttribute('data-analytics-consent', 'accepted')
+        } catch {}
+
+        document.addEventListener('click', (event) => {
+          const button = event.target instanceof Element ? event.target.closest('[data-cookie-consent]') : null
+          if (!button) return
+          const banner = button.closest('.cookie-notice')
+          if (!banner) return
+          banner.classList.add('cookie-notice--closing')
+          root.setAttribute('data-analytics-consent', 'accepted')
+          try { localStorage.setItem(consentKey, 'accepted') } catch {}
+          window.dispatchEvent(new CustomEvent('unlim:analytics-consent', { detail: 'accepted' }))
+          window.setTimeout(() => {
+            document.querySelectorAll('.cookie-notice').forEach((notice) => { notice.hidden = true })
+          }, 180)
+        }, { capture: true })
+      })()
+    </script>
     <link rel="icon" type="image/svg+xml" href={site?.brandLogo?.url ?? '/favicon.svg'} />
     <meta name="description" content={description} />
     {robotsContent && <meta name="robots" content={robotsContent} />}
@@ -122,6 +146,7 @@ const pageEntrance = Astro.url.pathname === '/gift'
   <body>
     {enableGlobalTransitions && <GlobalPageTransition client:load />}
     {site && <SiteChromeIsland client:load site={site} />}
+    {site && <CookieNotice site={site} />}
     <div id="swup" data-swup-container data-page-entrance={pageEntrance}>
       <slot />
     </div>

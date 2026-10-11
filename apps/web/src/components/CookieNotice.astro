@@ -1,0 +1,38 @@
+---
+import type { SiteDTO } from '@unlim/content-contract'
+import { cookieNoticeParts } from './cookieNoticeText'
+
+const { site } = Astro.props as { site: SiteDTO }
+const { before, linked, after } = cookieNoticeParts(site.footer.cookieNotice.text)
+const privacyHref = site.footer.legalLinks.find(({ label, href }) => /политик/i.test(label) || href === '/policy')?.href ?? '/policy'
+---
+
+{site.analytics.mode === 'consent-required' && <>
+  <div class="cookie-notice fixed inset-x-4 bottom-[calc(84px+env(safe-area-inset-bottom))] z-40 mx-auto hidden max-w-[680px] sm:block md:bottom-6">
+    <div class="se-3 flex flex-col items-start gap-4 bg-ink px-5 py-4 text-white sm:flex-row sm:items-start">
+      <span class="se-1 mt-0.5 flex h-9 w-9 shrink-0 items-start justify-center bg-white/10 pt-1" aria-hidden="true">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10c0-.6-.05-1.19-.16-1.77A3.5 3.5 0 0 1 17.5 6.5 3.5 3.5 0 0 1 12 2Z"/><path d="M8 14v.01M8 10v.01M12 16v.01M16 12v.01M13 8v.01"/></svg>
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="whitespace-pre-line font-sans text-[12px] leading-[1.45] text-white/80">{before}{linked && <a href={privacyHref} class="font-medium text-lime underline decoration-lime/40 underline-offset-2 transition-colors hover:text-lime-hover hover:decoration-lime focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2">{linked}</a>}{after}</p>
+      </div>
+      <div class="flex shrink-0">
+        <button type="button" data-cookie-consent class="se-2 relative inline-flex h-[var(--control-sm)] select-none items-center justify-center gap-1.5 bg-lime px-4 type-ui font-medium text-lime-ink transition-colors duration-150 hover:bg-lime-hover focus-visible:outline-2 focus-visible:outline-[var(--color-focus)] focus-visible:outline-offset-2">
+          <span>{site.footer.cookieNotice.acceptLabel}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="cookie-notice fixed inset-x-0 top-[calc(var(--page-gutter)+env(safe-area-inset-top))] z-50 mx-auto w-full max-w-[var(--container-page)] px-[var(--page-gutter)] sm:hidden">
+    <div class="se-3 bg-ink px-5 py-4 text-white shadow-xl">
+      <p class="whitespace-pre-line font-sans text-[12px] leading-[1.45] text-white/80">{before}{linked && <a href={privacyHref} class="font-medium text-lime underline decoration-lime/40 underline-offset-2 transition-colors hover:text-lime-hover hover:decoration-lime focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2">{linked}</a>}{after}</p>
+    </div>
+    <div class="mt-2 flex justify-end gap-2">
+      <button type="button" data-cookie-consent class="se-2 relative inline-flex h-[var(--control-sm)] select-none items-center justify-center gap-1.5 bg-lime px-4 type-ui font-medium text-lime-ink transition-colors duration-150 hover:bg-lime-hover focus-visible:outline-2 focus-visible:outline-[var(--color-focus)] focus-visible:outline-offset-2">
+        <span>{site.footer.cookieNotice.acceptLabel}</span>
+      </button>
+    </div>
+  </div>
+
+</>}
