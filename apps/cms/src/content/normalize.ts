@@ -103,10 +103,10 @@ export function siteDTO(site: SiteSetting, origin: string, partners: Array<Recor
     },
     footer: {
       image: mediaDTO(site.footerImage, origin), about: site.footerAbout ?? '', stats: (site.footerStats ?? []).map(({ value, label }) => ({ value, label })), legalEntity: site.legalEntity ?? '',
-      navigation: (site.footerNavigation ?? []).map(({ label, href, column }) => ({ label, href, column })), socialLinks: social.map(({ provider, label, url }) => ({ provider, label, url })), legalLinks: (site.legalLinks ?? []).map(({ label, href }) => ({ label, href })), copyright: site.copyright ?? '', cookieNotice: { text: site.cookieNotice?.text ?? '', acceptLabel: site.cookieNotice?.acceptLabel ?? 'Принять', rejectLabel: site.cookieNotice?.rejectLabel ?? 'Отклонить', manageLabel: site.cookieNotice?.manageLabel ?? 'Настроить cookies' },
+      navigation: (site.footerNavigation ?? []).map(({ label, href, column }) => ({ label, href, column })), socialLinks: social.map(({ provider, label, url }) => ({ provider, label, url })), legalLinks: (site.legalLinks ?? []).map(({ label, href }) => ({ label, href })), copyright: site.copyright ?? '', cookieNotice: { text: site.cookieNotice?.text ?? 'Используем cookies.\nАналитику можно отключить справа.', acceptLabel: site.cookieNotice?.acceptLabel ?? 'Принять', rejectLabel: site.cookieNotice?.rejectLabel ?? 'Настройки', manageLabel: site.cookieNotice?.manageLabel ?? 'Настроить cookies' },
     },
     analytics: {
-      mode: site.analytics?.mode ?? 'consent-required', endpoint: new URL('/api/public/analytics', process.env.PUBLIC_CONTENT_URL ?? process.env.PUBLIC_CMS_URL ?? origin).toString(), schemaVersion: 1,
+      mode: site.analytics?.mode ?? 'consent-required', endpoint: new URL('/api/public/analytics', origin).toString(), schemaVersion: 1,
       vendors: {
         yandexMetrica: { enabled: externalAnalyticsAllowed && site.analytics?.yandexMetricaEnabled === true && Boolean(site.analytics?.yandexMetricaCounterID), counterId: site.analytics?.yandexMetricaCounterID, webvisor: site.analytics?.yandexMetricaWebvisor === true },
         ga4: { enabled: externalAnalyticsAllowed && site.analytics?.ga4Enabled === true && Boolean(site.analytics?.ga4MeasurementID), measurementId: site.analytics?.ga4MeasurementID },
@@ -121,7 +121,7 @@ export function siteDTO(site: SiteSetting, origin: string, partners: Array<Recor
     account: { mode: site.account?.mode ?? 'disabled', widgetURL: widgetURL(site.account?.widgetURL, 'vivacrm-script'), externalURL: site.account?.externalURL, buttonLabel: site.account?.buttonLabel ?? 'Личный кабинет', mobileLabel: site.account?.mobileLabel ?? 'Кабинет', ...bookingReadiness(site.account ?? {}) },
     contactConfirmation: {
       avatar: mediaDTO(confirmation?.avatar, origin, 'thumbnail'), dialogTitle: confirmation?.dialogTitle ?? 'Связаться с клубом', cancelLabel: confirmation?.cancelLabel ?? 'Отмена', continueLabel: confirmation?.continueLabel ?? 'Продолжить',
-      formTitle: confirmation?.formTitle ?? 'Оставить заявку', submitLabel: confirmation?.submitLabel ?? 'Отправить', successTitle: confirmation?.successTitle ?? 'Заявка отправлена', successText: confirmation?.successText ?? '', consentLabel: confirmation?.consentLabel ?? '', leadEndpoint: new URL('/api/public/leads', process.env.PUBLIC_CONTENT_URL ?? process.env.PUBLIC_CMS_URL ?? origin).toString(), policyHref: confirmation?.policyHref ?? '/policy',
+      formTitle: confirmation?.formTitle ?? 'Оставить заявку', submitLabel: confirmation?.submitLabel ?? 'Отправить', successTitle: confirmation?.successTitle ?? 'Заявка отправлена', successText: confirmation?.successText ?? '', consentLabel: confirmation?.consentLabel ?? '', leadEndpoint: new URL('/api/public/leads', origin).toString(), policyHref: confirmation?.policyHref ?? '/policy',
       channels: [
         { channel: 'phone', enabled: confirmation?.phoneEnabled !== false, label: 'Телефон', displayValue: site.phoneDisplay ?? '', destination: `tel:${site.phoneValue ?? ''}` },
         { channel: 'email', enabled: confirmation?.emailEnabled !== false, label: 'Email', displayValue: site.email ?? '', destination: `mailto:${site.email ?? ''}` },

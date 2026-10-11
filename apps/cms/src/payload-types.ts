@@ -2447,6 +2447,9 @@ export interface SiteSetting {
     | null;
   copyright?: string | null;
   cookieNotice?: {
+    /**
+     * Одинаковый текст на телефоне и компьютере. Переносы строк сохраняются; лучше писать короткими строками.
+     */
     text?: string | null;
     acceptLabel?: string | null;
     rejectLabel?: string | null;

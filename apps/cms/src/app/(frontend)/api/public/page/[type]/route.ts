@@ -26,7 +26,7 @@ export async function GET(request: Request, context: { params: Promise<{ type: s
   if (preview && !validSecret(url.searchParams.get('secret'))) return Response.json({ error: 'Invalid preview credentials.' }, { status: 403, headers: { 'Cache-Control': 'no-store' } })
   try {
     const payload = await getPayload({ config })
-    const origin = publicContentOrigin(url.origin, process.env.PUBLIC_CONTENT_URL)
+    const origin = publicContentOrigin(url.origin, process.env.PUBLIC_CONTENT_URL, request.headers.get('x-unlim-public-origin'))
     const result = await projectionCache.read(`page:${type}:${origin}`, async () => type === padelCourtZakazKind
       ? await createPadelCourtZakazProjection(payload, { origin, preview })
       : await createThematicPageProjection(payload, { kind: type as ThematicPageKind, origin, preview }), preview)

@@ -29,7 +29,7 @@ export async function GET(request: Request, context: { params: Promise<{ type: s
   try {
     const payload = await getPayload({ config })
     const query = parseCatalogQuery(kind, url.searchParams)
-    const origin = publicContentOrigin(url.origin, process.env.PUBLIC_CONTENT_URL)
+    const origin = publicContentOrigin(url.origin, process.env.PUBLIC_CONTENT_URL, request.headers.get('x-unlim-public-origin'))
     const result = await projectionCache.read(`catalog:${kind}:${slug ?? ''}:${catalogQueryParams(query)}:${origin}`, async () => slug
       ? await createDetailProjection(payload, { kind, origin, preview, slug })
       : await createCatalogProjection(payload, { kind, origin, preview, query }), preview)

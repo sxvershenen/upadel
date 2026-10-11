@@ -53,6 +53,8 @@ test('site projection normalizes desktop navigation child icons', () => {
 
   assert.equal(dto.desktopNavigation[0].children?.[0].icon?.url, 'https://cms.example/rent.svg')
   assert.equal(dto.desktopNavigation[0].children?.[1].icon, null)
+  assert.equal(dto.analytics.endpoint, 'https://cms.example/api/public/analytics')
+  assert.equal(dto.contactConfirmation.leadEndpoint, 'https://cms.example/api/public/leads')
 })
 
 test('internal Payload media can be projected through a same-origin web proxy', () => {

@@ -14,7 +14,7 @@ if (!slug) throw new CatalogLoadError('Article slug is required.')
 let dto: BlogDetailDTO | null = null
 let routeError: ReturnType<typeof publicRouteError> | null = null
 try {
-  dto = await loadDetail(import.meta.env.CMS_URL, 'blog', slug) as BlogDetailDTO
+  dto = await loadDetail(import.meta.env.CMS_URL, 'blog', slug, undefined, Astro.url.origin) as BlogDetailDTO
 } catch (error) {
   routeError = publicRouteError(error)
   Astro.response.status = routeError.status

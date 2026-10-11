@@ -11,8 +11,8 @@ export function createCMSReader({ fetcher = fetch, now = Date.now, timeoutMs = 5
   let bytes = 0
   const remove = (key: string) => { bytes -= previous.get(key)?.bytes ?? 0; previous.delete(key) }
 
-  return async function read<T>(url: URL, parse: (input: unknown) => T, { preview = false, fallback = true }: { preview?: boolean; fallback?: boolean } = {}): Promise<T> {
-    const key = url.toString()
+  return async function read<T>(url: URL, parse: (input: unknown) => T, { preview = false, fallback = true, publicOrigin }: { preview?: boolean; fallback?: boolean; publicOrigin?: string } = {}): Promise<T> {
+    const key = `${url.toString()}|${publicOrigin ?? ''}`
     const sequence = Symbol(key)
     if (!preview) {
       latest.delete(key)
@@ -25,7 +25,7 @@ export function createCMSReader({ fetcher = fetch, now = Date.now, timeoutMs = 5
       const timer = setTimeout(() => controller.abort(), timeoutMs)
       try {
         let response: Response
-        try { response = await fetcher(url, { headers: { Accept: 'application/json' }, cache: 'no-store', signal: controller.signal }) }
+        try { response = await fetcher(url, { headers: { Accept: 'application/json', ...(publicOrigin ? { 'X-Unlim-Public-Origin': publicOrigin } : {}) }, cache: 'no-store', signal: controller.signal }) }
         catch { throw new CMSReadError('CMS is temporarily unreachable.', 503, true) }
         if (!response.ok) throw new CMSReadError(`CMS returned HTTP ${response.status}.`, response.status, [502, 503, 504].includes(response.status))
         let value: T

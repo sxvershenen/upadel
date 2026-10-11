@@ -1965,7 +1965,7 @@ async function seed() {
           ],
           legalLinks: [...legalLinks],
           copyright: '© 2026 Unlim Riga Padel. Все права защищены.',
-          cookieNotice: { text: 'Используем cookies, чтобы бронирование и подбор тренировок работали быстрее.', acceptLabel: 'Хорошо' },
+          cookieNotice: { text: 'Используем cookies.\nАналитику можно отключить справа.', acceptLabel: 'Хорошо', rejectLabel: 'Настройки' },
           contactConfirmation,
           booking: { mode: 'vivacrm-widget', widgetURL: 'https://supadb.vivacrm.ru/storage/v1/object/public/widgets/3ffc4681-890e-4d27-9676-1a5a7c246b17.js', buttonLabel: 'Забронировать' },
           account: { mode: 'vivacrm-widget', widgetURL: 'https://supadb.vivacrm.ru/storage/v1/object/public/widgets/8e5e55da-bb08-4d93-9572-047f3d99b3b8.js', buttonLabel: 'Личный кабинет', mobileLabel: 'Кабинет' },

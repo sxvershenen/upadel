@@ -4,7 +4,7 @@ import { PadelCourtZakazPage } from '../landing/PadelCourtZakazPage'
 import SiteLayout from '../layouts/SiteLayout.astro'
 import { courtServiceStructuredData, resolveCanonicalURL } from '../seo/structuredData'
 
-const content = await loadPadelCourtZakazPage(import.meta.env.CMS_URL)
+const content = await loadPadelCourtZakazPage(import.meta.env.CMS_URL, undefined, Astro.url.origin)
 const publicOrigin = import.meta.env.PUBLIC_SITE_URL ?? Astro.url.origin
 const canonical = resolveCanonicalURL(publicOrigin, '/padel-court-zakaz/', content.page.seo.canonical)
 ---

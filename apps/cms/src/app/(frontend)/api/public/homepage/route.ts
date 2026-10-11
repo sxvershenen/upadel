@@ -26,7 +26,7 @@ export async function GET(request: Request): Promise<Response> {
 
   try {
     const payload = await getPayload({ config })
-    const origin = publicContentOrigin(url.origin, process.env.PUBLIC_CONTENT_URL)
+    const origin = publicContentOrigin(url.origin, process.env.PUBLIC_CONTENT_URL, request.headers.get('x-unlim-public-origin'))
     const dto = await projectionCache.read(`homepage:${origin}`, () => createHomepageProjection(payload, { origin, preview: previewRequested }), previewRequested)
     return Response.json(dto, {
       headers: {

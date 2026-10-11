@@ -13,7 +13,7 @@ const kind = Astro.params.page as ThematicPageKind
 let dto: ThematicPageDTO | null = null
 let routeError: ReturnType<typeof publicRouteError> | null = null
 try {
-  dto = await loadPage(import.meta.env.CMS_URL, kind) as ThematicPageDTO
+  dto = await loadPage(import.meta.env.CMS_URL, kind, undefined, Astro.url.origin) as ThematicPageDTO
 } catch (error) {
   routeError = publicRouteError(error)
   Astro.response.status = routeError.status

@@ -12,7 +12,7 @@ const kind = 'tournaments' as const
 const query = parseCatalogQuery(kind, Astro.url.searchParams)
 let dto: CatalogDTO | null = null
 let routeError: ReturnType<typeof publicRouteError> | null = null
-try { dto = await loadCatalog(import.meta.env.CMS_URL, kind, undefined, query) }
+try { dto = await loadCatalog(import.meta.env.CMS_URL, kind, undefined, query, Astro.url.origin) }
 catch (error) { routeError = publicRouteError(error); Astro.response.status = routeError.status }
 const publicOrigin = import.meta.env.PUBLIC_SITE_URL ?? Astro.url.origin
 const filtered = Object.keys(query).some((key) => key !== 'page')

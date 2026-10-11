@@ -14,7 +14,7 @@ if (!slug) throw new CatalogLoadError('Tournament slug is required.')
 let dto: TournamentDetailDTO | null = null
 let routeError: ReturnType<typeof publicRouteError> | null = null
 try {
-  dto = await loadDetail(import.meta.env.CMS_URL, 'tournaments', slug) as TournamentDetailDTO
+  dto = await loadDetail(import.meta.env.CMS_URL, 'tournaments', slug, undefined, Astro.url.origin) as TournamentDetailDTO
 } catch (error) {
   routeError = publicRouteError(error)
   Astro.response.status = routeError.status

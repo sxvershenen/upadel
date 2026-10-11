@@ -16,6 +16,7 @@ test('configures Payload server URL and trusted CSRF origins from existing publi
 test('public content origin can use a same-origin web proxy without changing the CMS server URL', () => {
   assert.equal(publicContentOrigin('http://127.0.0.1:3000', 'http://192.168.1.20:4321/path'), 'http://192.168.1.20:4321')
   assert.equal(publicContentOrigin('http://127.0.0.1:3000', 'javascript:alert(1)'), 'http://127.0.0.1:3000')
+  assert.equal(publicContentOrigin('http://127.0.0.1:3000', undefined, 'http://localhost:4322/path'), 'http://localhost:4322')
 })
 
 test('omits unset or unsafe public URLs so local development defaults still work', () => {

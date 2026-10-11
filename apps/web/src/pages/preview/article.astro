@@ -13,7 +13,7 @@ let status = !secret ? 403 : !slug ? 400 : 200
 
 if (slug && secret) {
   try {
-    dto = await loadDetail(import.meta.env.CMS_URL, 'blog', slug, secret) as BlogDetailDTO
+    dto = await loadDetail(import.meta.env.CMS_URL, 'blog', slug, secret, Astro.url.origin) as BlogDetailDTO
   } catch (error) {
     if (error instanceof CatalogLoadError && error.status) status = error.status
     else throw error

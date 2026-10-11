@@ -14,7 +14,7 @@ if (!slug) throw new CatalogLoadError('Coach slug is required.')
 let dto: CoachDetailDTO | null = null
 let routeError: ReturnType<typeof publicRouteError> | null = null
 try {
-  dto = await loadDetail(import.meta.env.CMS_URL, 'coaches', slug) as CoachDetailDTO
+  dto = await loadDetail(import.meta.env.CMS_URL, 'coaches', slug, undefined, Astro.url.origin) as CoachDetailDTO
 } catch (error) {
   routeError = publicRouteError(error)
   Astro.response.status = routeError.status

@@ -64,9 +64,7 @@ export function CookieBanner() {
 
   if (site.analytics.mode !== "consent-required") return null;
 
-  const noticeText = site.analytics.vendors.yandexMetrica.enabled
-    ? `${site.footer.cookieNotice.text} При согласии загружается Яндекс.Метрика.`
-    : site.footer.cookieNotice.text;
+  const noticeText = site.footer.cookieNotice.text;
 
   const settingsPanel = (id: string) => (
     <AnimatePresence initial={false}>
@@ -84,10 +82,12 @@ export function CookieBanner() {
           <div className="mt-3 border-t border-white/15 pt-3">
             <CheckboxField
               tone="inverse"
+              controlPosition="end"
+              labelSize="caption"
               reveal={false}
               checked={analyticsEnabled}
               onChange={(event) => setAnalyticsEnabled(event.target.checked)}
-              label={<span>Разрешить аналитику <span className="block type-caption mt-0.5 text-white/50">Необязательные cookies для статистики посещений.</span></span>}
+              label={<span>Разрешить аналитику <span className="mt-0.5 block text-white/50">Статистика посещений.</span></span>}
             />
           </div>
         </motion.div>
@@ -106,12 +106,12 @@ export function CookieBanner() {
             transition={springSheet}
             className="fixed inset-x-4 bottom-[calc(84px+env(safe-area-inset-bottom))] z-40 mx-auto hidden max-w-[680px] sm:block md:bottom-6"
           >
-            <div className="se-3 flex flex-col items-start gap-4 bg-ink px-5 py-4 text-white sm:flex-row sm:items-center">
-              <span className="se-1 flex h-9 w-9 shrink-0 items-center justify-center bg-white/10">
+            <div className="se-3 flex flex-col items-start gap-4 bg-ink px-5 py-4 text-white sm:flex-row sm:items-start">
+              <span className="se-1 mt-0.5 flex h-9 w-9 shrink-0 items-start justify-center bg-white/10 pt-1">
                 <Cookie size={17} aria-hidden="true" />
               </span>
               <div className="min-w-0 flex-1">
-                <p className="type-body-sm leading-snug text-white/70">{noticeText}</p>
+                <p className="whitespace-pre-line font-sans text-[12px] leading-[1.45] text-white/80">{noticeText}</p>
                 {settingsPanel("cookie-desktop-settings")}
               </div>
               <div className="flex shrink-0 flex-wrap gap-2">
@@ -125,7 +125,7 @@ export function CookieBanner() {
                   aria-controls="cookie-desktop-settings"
                   onClick={toggleSettings}
                 >
-                  Настройки
+                  {site.footer.cookieNotice.rejectLabel}
                 </Button>
                 <Button variant="primary" size="sm" onClick={settingsOpen ? saveSettings : accept}>
                   {settingsOpen ? "ОК" : site.footer.cookieNotice.acceptLabel}
@@ -143,13 +143,11 @@ export function CookieBanner() {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -8, opacity: 0 }}
             transition={{ duration: 0.18, ease: "easeOut" }}
-            className="fixed inset-x-0 top-[calc(76px+env(safe-area-inset-top))] z-50 mx-auto w-full max-w-[var(--container-page)] px-[var(--page-gutter)] sm:hidden"
+            className="fixed inset-x-0 top-[calc(var(--page-gutter)+env(safe-area-inset-top))] z-50 mx-auto w-full max-w-[var(--container-page)] px-[var(--page-gutter)] sm:hidden"
           >
             <div className="se-3 bg-ink px-5 py-4 text-white shadow-xl">
-              <p className="text-[12px] leading-[1.45] text-white/80">
-                Используем cookies.<br />
-                Не хотите обработки данных?<br />
-                Измените настройки.
+              <p className="whitespace-pre-line font-sans text-[12px] leading-[1.45] text-white/80">
+                {noticeText}
               </p>
               {settingsPanel("cookie-mobile-settings")}
             </div>

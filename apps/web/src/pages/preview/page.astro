@@ -15,8 +15,8 @@ let padelDTO: PadelCourtZakazPageDTO | null = null
 let denied = !allowed || !secret
 if (allowed && secret) {
   try {
-    if (padelCourtZakaz) padelDTO = await loadPadelCourtZakazPage(import.meta.env.CMS_URL, secret)
-    else dto = await loadPage(import.meta.env.CMS_URL, type as ThematicPageKind, secret)
+    if (padelCourtZakaz) padelDTO = await loadPadelCourtZakazPage(import.meta.env.CMS_URL, secret, Astro.url.origin)
+    else dto = await loadPage(import.meta.env.CMS_URL, type as ThematicPageKind, secret, Astro.url.origin)
   } catch (error) { if (error instanceof PageLoadError && error.status === 403) denied = true; else throw error }
 }
 if (denied) Astro.response.status = 403

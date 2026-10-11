@@ -17,6 +17,17 @@ test('contacts CMS on every request so saved changes appear immediately; finite 
   time = 101; await assert.rejects(read(url, parse), CMSReadError)
 })
 
+test('keeps public media origins separate in cache and forwards the current site origin', async () => {
+  const headers: string[] = []
+  const read = createCMSReader({ fetcher: (async (_url, options) => {
+    headers.push(new Headers(options?.headers).get('x-unlim-public-origin') ?? '')
+    return Response.json({ title: 'content' })
+  }) as typeof fetch })
+  await read(url, parse, { publicOrigin: 'http://localhost:4322' })
+  await read(url, parse, { publicOrigin: 'http://127.0.0.1:4322' })
+  assert.deepEqual(headers, ['http://localhost:4322', 'http://127.0.0.1:4322'])
+})
+
 test('404/403/invalid data evict last-good and preview never uses or overwrites it', async () => {
   let mode: number | string = 'good'
   const read = createCMSReader({ fetcher: (async () => {

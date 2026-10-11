@@ -10,7 +10,7 @@ let content = null
 let denied = !previewSecret
 if (previewSecret) {
   try {
-    content = await loadHomepage({ cmsURL: import.meta.env.CMS_URL, previewSecret })
+    content = await loadHomepage({ cmsURL: import.meta.env.CMS_URL, previewSecret, publicOrigin: Astro.url.origin })
   } catch (error) {
     if (error instanceof HomepageLoadError && error.status === 403) denied = true
     else throw error
