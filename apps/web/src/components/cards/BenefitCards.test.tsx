@@ -85,7 +85,7 @@ test('phone benefits scale with card height and retain their illustration-specif
     assert.match(phone.className, /origin-bottom/)
     assert.doesNotMatch(phone.className, /max-\[1380px\]:h-/)
     assert.match(document.querySelector('.arrow-action')!.className, /bg-ink text-white/)
-    if (variant === 'online-booking') assert.match(document.querySelector('[data-booking-image-zone]')!.className, /left-\[58%\].*overflow-hidden/)
+    if (variant === 'online-booking') assert.match(document.querySelector('[data-booking-image-zone]')!.className, /left-\[52%\].*overflow-hidden/)
   }
 })
 
