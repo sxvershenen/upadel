@@ -9,6 +9,10 @@ server {
     listen [::]:80;
     server_name unlimpadel.ru www.unlimpadel.ru;
 
+    if ($host = www.unlimpadel.ru) {
+        return 301 https://unlimpadel.ru$request_uri;
+    }
+
     client_max_body_size 25m;
 
     location / {
