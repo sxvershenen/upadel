@@ -13,10 +13,7 @@ export function CookieBanner() {
 
   useEffect(() => {
     if (site.analytics.mode !== "consent-required") return;
-    if (!localStorage.getItem(ANALYTICS_CONSENT_KEY)) {
-      const timer = setTimeout(() => setVisible(true), 900);
-      return () => clearTimeout(timer);
-    }
+    if (!localStorage.getItem(ANALYTICS_CONSENT_KEY)) setVisible(true);
   }, [site.analytics.mode]);
 
   function accept() {
