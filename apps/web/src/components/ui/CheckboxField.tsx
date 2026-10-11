@@ -6,14 +6,15 @@ import { revealAttributes, type RevealConfig } from "./revealAttributes";
 export interface CheckboxFieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {
   label: ReactNode;
   error?: ReactNode;
+  tone?: "default" | "inverse";
   reveal?: RevealConfig;
 }
 
-export const CheckboxField = forwardRef<HTMLInputElement, CheckboxFieldProps>(({ label, error, reveal = true, className, ...props }, ref) => <div {...revealAttributes(reveal)}>
-  <label className="type-body-sm flex cursor-pointer items-start gap-3 text-ink-soft">
+export const CheckboxField = forwardRef<HTMLInputElement, CheckboxFieldProps>(({ label, error, tone = "default", reveal = true, className, ...props }, ref) => <div {...revealAttributes(reveal)}>
+  <label className={`type-body-sm flex cursor-pointer items-start gap-3 ${tone === "inverse" ? "text-white/80" : "text-ink-soft"}`}>
     <span className="relative mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center">
       <input ref={ref} type="checkbox" className={cn("peer absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0", className)} {...props} />
-      <span aria-hidden="true" className="se-1 flex h-5 w-5 items-center justify-center bg-control text-lime-ink transition-colors peer-checked:bg-lime peer-checked:[&>svg]:opacity-100 peer-focus-visible:outline-2 peer-focus-visible:outline-focus peer-focus-visible:outline-offset-2">
+      <span aria-hidden="true" className={cn("se-1 flex h-5 w-5 items-center justify-center text-lime-ink transition-colors peer-checked:bg-lime peer-checked:[&>svg]:opacity-100 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2", tone === "inverse" ? "border border-white/20 bg-white/10 peer-focus-visible:outline-lime" : "bg-control peer-focus-visible:outline-focus")}>
         <Check size={13} strokeWidth={3} className="opacity-0 transition-opacity" />
       </span>
     </span>
