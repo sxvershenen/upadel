@@ -4,8 +4,13 @@ import { loadHomepage } from '../content/loadHomepage'
 import SiteLayout from '../layouts/SiteLayout.astro'
 
 const content = await loadHomepage({ cmsURL: import.meta.env.CMS_URL })
+const hero = content.home.hero
+const preloadImages = [
+  { image: hero.desktopMedia ?? hero.mobileMedia, media: hero.mobileMedia ? '(min-width: 768px)' : undefined },
+  ...(hero.mobileMedia ? [{ image: hero.mobileMedia, media: '(max-width: 767px)' }] : []),
+].filter((item): item is { image: NonNullable<typeof item.image>; media: string | undefined } => Boolean(item.image))
 ---
 
-<SiteLayout site={content.site} title={content.seo.title ?? undefined} description={content.seo.description ?? undefined} canonical={content.seo.canonical} robots={content.seo.robots} socialImage={content.seo.socialImage?.url} webmasterVerification={content.site.analytics.vendors.webmasterVerification}>
+<SiteLayout site={content.site} title={content.seo.title ?? undefined} description={content.seo.description ?? undefined} canonical={content.seo.canonical} robots={content.seo.robots} socialImage={content.seo.socialImage?.url} preloadImages={preloadImages} webmasterVerification={content.site.analytics.vendors.webmasterVerification}>
   <App client:load content={content} />
 </SiteLayout>
