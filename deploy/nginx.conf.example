@@ -1,4 +1,4 @@
-gzip on;
+# Ubuntu enables gzip in the global http{} block; avoid duplicating that directive.
 gzip_vary on;
 gzip_min_length 1024;
 gzip_comp_level 5;
