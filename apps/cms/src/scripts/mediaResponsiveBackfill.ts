@@ -6,10 +6,10 @@ import { getPayload, type Payload } from 'payload'
 import config from '../payload.config'
 
 const responsiveSizes: Array<{ name: string; width: number; minSourceWidth?: number; quality?: number }> = [
-  { name: 'compact', width: 320 },
-  { name: 'mobile', width: 480 },
-  { name: 'small', width: 640 },
-  { name: 'medium', width: 800 },
+  { name: 'compact', width: 320, quality: 65 },
+  { name: 'mobile', width: 480, quality: 65 },
+  { name: 'small', width: 640, quality: 65 },
+  { name: 'medium', width: 800, quality: 65 },
   { name: 'dense', width: 1120, minSourceWidth: 800, quality: 75 },
 ] as const
 
@@ -30,24 +30,33 @@ export async function backfillResponsiveMedia(payload: Payload) {
       const source = path.join(directory, media.filename)
       const sizes = { ...(media.sizes ?? {}) } as Record<string, unknown>
       let changed = false
+      const obsoleteFiles: string[] = []
       for (const size of responsiveSizes) {
         if (media.width <= (size.minSourceWidth ?? size.width)) continue
         const existing = sizes[size.name] as { filename?: string | null } | undefined
         if (existing?.filename) {
-          try { await access(path.join(directory, path.basename(existing.filename))); continue } catch { /* repair missing derivative only */ }
+          try {
+            await access(path.join(directory, path.basename(existing.filename)))
+            if (!existing.filename.startsWith('responsive-') || existing.filename.endsWith(`-q${size.quality ?? 65}.webp`)) continue
+            obsoleteFiles.push(path.basename(existing.filename))
+          } catch { /* repair missing derivative only */ }
         }
-        const hash = createHash('sha256').update(`${media.id}:${media.filename}:${size.name}-${size.width}-v1`).digest('hex').slice(0, 12)
-        const filename = `responsive-${hash}-${size.width}.webp`
+        const quality = size.quality ?? 65
+        const hash = createHash('sha256').update(`${media.id}:${media.filename}:${size.name}-${size.width}-q${quality}-v2`).digest('hex').slice(0, 12)
+        const filename = `responsive-${hash}-${size.width}-q${quality}.webp`
         const temporary = path.join(directory, `.${filename}.${process.pid}.tmp`)
         try {
-          const info = await sharp(source).autoOrient().resize({ width: size.width, withoutEnlargement: true }).webp({ quality: size.quality ?? 80 }).toFile(temporary)
+          const info = await sharp(source).autoOrient().resize({ width: size.width, withoutEnlargement: true }).webp({ quality }).toFile(temporary)
           await rename(temporary, path.join(directory, filename))
           sizes[size.name] = { url: `/api/media/file/${filename}`, filename, width: info.width, height: info.height, mimeType: 'image/webp', filesize: info.size }
           created++
           changed = true
         } finally { await rm(temporary, { force: true }) }
       }
-      if (changed) await payload.update({ collection: 'media', id: media.id, depth: 0, overrideAccess: true, data: { sizes } as never })
+      if (changed) {
+        await payload.update({ collection: 'media', id: media.id, depth: 0, overrideAccess: true, data: { sizes } as never })
+        for (const filename of new Set(obsoleteFiles)) await rm(path.join(directory, filename), { force: true })
+      }
       else skipped++
     }
   }
