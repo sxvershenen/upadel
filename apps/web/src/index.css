@@ -105,6 +105,9 @@ img[data-progressive-native="loading"] {
   background-image: linear-gradient(105deg, transparent 32%, rgb(255 255 255 / 14%) 45%, transparent 58%);
   background-size: 220% 100%;
   filter: brightness(0);
+}
+img[data-progressive-image="loading"][data-progressive-shimmer="active"],
+img[data-progressive-native="loading"][data-progressive-shimmer="active"] {
   animation: unlim-image-skeleton 1.35s ease-in-out infinite;
 }
 img[data-progressive-image="loaded"],
@@ -125,7 +128,7 @@ img[data-progressive-image="fade-loaded"] { opacity: revert-layer; transition: o
 [data-hero-cta="secondary"] {
   animation: unlim-enter-glass .58s cubic-bezier(.16, 1, .3, 1) .42s backwards;
   backface-visibility: hidden;
-  will-change: opacity, transform, backdrop-filter;
+  will-change: opacity, transform;
 }
 [data-hero-social-proof] { animation: unlim-enter-up .6s cubic-bezier(.16, 1, .3, 1) .4s backwards; }
 [data-hero-opening-notice] { animation: unlim-enter-glass .58s cubic-bezier(.16, 1, .3, 1) .42s backwards; backface-visibility: hidden; will-change: opacity, transform, backdrop-filter; }

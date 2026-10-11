@@ -29,8 +29,8 @@ const content = {
 
 test('hero CTAs have one SSR entrance owner and no nested GSAP reveal', () => {
   const html = renderToStaticMarkup(<ContentProvider content={content}><Hero /></ContentProvider>)
-  const primary = html.match(/<div data-hero-slot="1" data-hero-slot-type="button" data-hero-cta="primary"[\s\S]*?<\/div>/)?.[0] ?? ''
-  const secondary = html.match(/<div data-hero-slot="2" data-hero-slot-type="button" data-hero-cta="secondary"[\s\S]*?Личный кабинет[\s\S]*?<\/div>/)?.[0] ?? ''
+  const primary = html.match(/<div data-hero-slot="1" data-hero-slot-type="button"[\s\S]*?<button[^>]*data-hero-cta="primary"[\s\S]*?Забронировать[\s\S]*?<\/button>/)?.[0] ?? ''
+  const secondary = html.match(/<div data-hero-slot="2" data-hero-slot-type="button"[\s\S]*?<button[^>]*data-hero-cta="secondary"[\s\S]*?Личный кабинет[\s\S]*?<\/button>/)?.[0] ?? ''
   assert.match(primary, /<button/)
   assert.match(primary, /Забронировать/)
   assert.doesNotMatch(primary, /data-gsap-reveal/)
@@ -44,7 +44,8 @@ test('hero CTAs have one SSR entrance owner and no nested GSAP reveal', () => {
 test('disabled hero slots are omitted from server-rendered markup', () => {
   const disabled = { ...content, home: { ...content.home, hero: { ...content.home.hero, mobileSlots: [{ ...content.home.hero.mobileSlots[0], enabled: false }, content.home.hero.mobileSlots[1]] } } }
   const html = renderToStaticMarkup(<ContentProvider content={disabled}><Hero /></ContentProvider>)
-  assert.equal([...html.matchAll(/data-hero-slot="1" data-hero-slot-type="button" data-hero-cta="primary"/g)].length, 1)
+  assert.equal([...html.matchAll(/data-hero-slot="1" data-hero-slot-type="button"/g)].length, 1)
+  assert.equal([...html.matchAll(/data-hero-cta="primary"/g)].length, 1)
   assert.match(html, /Открытие в ноябре/)
 })
 
@@ -55,7 +56,7 @@ test('glass hero CTA animates its own backdrop-filter layer', () => {
 
   assert.match(glassKeyframes ?? '', /translate3d\(0, 0, 0\)/)
   assert.match(secondaryRule ?? '', /animation: unlim-enter-glass/)
-  assert.match(secondaryRule ?? '', /will-change: opacity, transform, backdrop-filter/)
+  assert.match(secondaryRule ?? '', /will-change: opacity, transform/)
 })
 
 test('mobile hero parallax falls back to desktop media when no mobile asset is configured', () => {

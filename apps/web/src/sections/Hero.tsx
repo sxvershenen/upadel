@@ -77,8 +77,8 @@ const heroSlotIconMap: Record<HeroSlotDTO['icon'], LucideIcon> = { CalendarCheck
 function HeroSlot({ slot, index }: { slot: HeroSlotDTO; index: 0 | 1 | 2 }) {
   if (!slot.enabled) return null;
   const Icon = heroSlotIconMap[slot.icon];
-  if (slot.type === 'button') return <div data-hero-slot={index + 1} data-hero-slot-type="button" data-hero-cta={index === 0 ? "primary" : "secondary"} className="min-w-0 flex-1 sm:flex-none">
-    <ContentAction reveal={false} action={slot.action} variant={index === 0 ? "primary" : "glass"} size="lg" icon={<Icon size={17} />} className="w-fit min-w-0 whitespace-nowrap px-4 !leading-none !text-[14px] sm:w-auto sm:px-5 sm:!text-base" />
+  if (slot.type === 'button') return <div data-hero-slot={index + 1} data-hero-slot-type="button" className="min-w-0 flex-1 sm:flex-none">
+    <ContentAction data-hero-cta={index === 0 ? "primary" : "secondary"} reveal={false} action={slot.action} variant={index === 0 ? "primary" : "glass"} size="lg" icon={<Icon size={17} />} className="w-fit min-w-0 whitespace-nowrap px-4 !leading-none !text-[14px] sm:w-auto sm:px-5 sm:!text-base" />
   </div>;
   return <div data-hero-opening-notice="" data-hero-slot={index + 1} data-hero-slot-type="info" className="glass-overlay se-3 inline-flex min-h-[52px] w-fit max-w-[calc(50vw-24px)] flex-none items-center gap-2 py-2 pl-4 pr-4 text-white sm:max-w-none sm:gap-3 sm:px-3.5">
     <Icon size={18} className="shrink-0 text-white" />

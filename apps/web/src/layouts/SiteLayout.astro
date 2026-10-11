@@ -368,6 +368,8 @@ const pageEntrance = Astro.url.pathname === '/gift'
         if (loadingState !== 'loading' && loadingState !== 'fade-loading') return
         const loadedState = loadingState === 'fade-loading' ? 'fade-loaded' : 'loaded'
         const settle = () => {
+          image.removeAttribute('data-progressive-shimmer')
+          progressiveShimmerObserver?.unobserve(image)
           if (image.dataset[stateKey] === loadingState) image.dataset[stateKey] = loadedState
         }
         const revealDecoded = () => {
@@ -378,12 +380,28 @@ const pageEntrance = Astro.url.pathname === '/gift'
         else {
           image.addEventListener('load', revealDecoded, { once: true })
           image.addEventListener('error', settle, { once: true })
+          if (loadingState === 'loading') progressiveShimmerObserver?.observe(image)
         }
       }
+      const progressiveShimmerObserver = 'IntersectionObserver' in window
+        ? new IntersectionObserver((entries) => {
+            entries.forEach(({ target, isIntersecting }) => {
+              if (!(target instanceof HTMLImageElement)) return
+              const isLoading = target.dataset.progressiveImage === 'loading' || target.dataset.progressiveNative === 'loading'
+              if (!isIntersecting) target.removeAttribute('data-progressive-shimmer')
+              else if (isLoading) target.dataset.progressiveShimmer = 'active'
+              else progressiveShimmerObserver.unobserve(target)
+            })
+          }, { rootMargin: '300px 0px' })
+        : null
       document.querySelectorAll('img[data-progressive-native], img[data-progressive-image]').forEach(prepareProgressiveImage)
       new MutationObserver((mutations) => {
         if (mutations.some((mutation) => mutation.addedNodes.length > 0)) scheduleScrollReveals()
         mutations.forEach((mutation) => {
+          mutation.removedNodes.forEach((node) => {
+            if (node instanceof HTMLImageElement) progressiveShimmerObserver?.unobserve(node)
+            else if (node instanceof Element) node.querySelectorAll('img[data-progressive-native], img[data-progressive-image]').forEach((image) => progressiveShimmerObserver?.unobserve(image))
+          })
           mutation.addedNodes.forEach((node) => {
             pending.add(node)
             if (node instanceof HTMLImageElement) prepareProgressiveImage(node)
