@@ -136,7 +136,7 @@ const pageEntrance = Astro.url.pathname === '/gift'
     <meta name="twitter:description" content={description} />
     {socialImage && <meta name="twitter:image" content={socialImage} />}
     {siteSchemaJSON && <script type="application/ld+json" is:inline set:html={siteSchemaJSON} />}
-    {preloadImageOrigins.map((origin) => <link rel="preconnect" href={origin} crossorigin />)}
+    {preloadImageOrigins.map((origin) => <link rel="preconnect" href={origin} />)}
     {preloadImage && <link rel="preload" href={preloadImage.url} as="image" fetchpriority="high" imagesrcset={preloadImage.srcSet ?? undefined} imagesizes={preloadImage.srcSet ? '100vw' : undefined} />}
     {preloadImages.map(({ image, media }) => <link rel="preload" href={image.url} as="image" fetchpriority="low" media={media} imagesrcset={image.srcSet ?? undefined} imagesizes={image.srcSet ? '100vw' : undefined} />)}
     {webmasterVerification?.trim() && <meta name="yandex-verification" content={webmasterVerification.trim()} />}
