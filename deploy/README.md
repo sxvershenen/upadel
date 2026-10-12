@@ -33,8 +33,10 @@ Install services and timers once:
 sudo cp deploy/unlim-cms.service deploy/unlim-web.service deploy/unlim-analytics.service deploy/unlim-analytics.timer /etc/systemd/system/
 sudo cp deploy/unlim-backup.service /etc/systemd/system/unlim-backup@.service
 sudo cp deploy/unlim-backup-daily.timer deploy/unlim-backup-weekly.timer /etc/systemd/system/
+sudo install -m 755 deploy/unlim-healthcheck.sh /usr/local/sbin/unlim-healthcheck
+sudo cp deploy/unlim-healthcheck.service deploy/unlim-healthcheck.timer /etc/systemd/system/
 sudo systemctl daemon-reload
-sudo systemctl enable unlim-cms.service unlim-web.service unlim-analytics.timer unlim-backup-daily.timer unlim-backup-weekly.timer
+sudo systemctl enable unlim-cms.service unlim-web.service unlim-analytics.timer unlim-backup-daily.timer unlim-backup-weekly.timer unlim-healthcheck.timer
 ```
 
 Copy `deploy/nginx.conf.example` to `/etc/nginx/sites-available/unlim`, replace domains, let Certbot add certificate paths, then enable and validate it:
@@ -82,6 +84,20 @@ curl -fsS https://example.com/robots.txt
 ```
 
 Verify `/urp-panel`, preview, media upload, one test lead, Telegram/VK delivery, sitemap, backup creation and restore procedure before announcing launch.
+
+The health-check timer probes the local web server, Payload homepage API, and the public Nginx HTTPS virtual host every minute. After two consecutive failed checks it restarts only the affected systemd service and records the action in the journal. This recovers crashed or hung application and proxy processes; it cannot repair provider, ISP, DNS, or upstream network outages.
+
+For an existing server, install or update it with:
+
+```sh
+sudo install -m 755 deploy/unlim-healthcheck.sh /usr/local/sbin/unlim-healthcheck
+sudo cp deploy/unlim-healthcheck.service deploy/unlim-healthcheck.timer /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now unlim-healthcheck.timer
+sudo systemctl start unlim-healthcheck.service
+systemctl list-timers unlim-healthcheck.timer
+journalctl -u unlim-healthcheck.service -n 20 --no-pager
+```
 
 ## 5. Restore drill
 
