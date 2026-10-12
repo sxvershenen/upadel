@@ -34,43 +34,11 @@ export function GlobalPageTransition() {
 
   useEffect(() => {
     let disposed = false
-    let idleHandle: number | null = null
-    let idleTimer: ReturnType<typeof globalThis.setTimeout> | null = null
-    let hardTimer: ReturnType<typeof globalThis.setTimeout> | null = null
 
     const loadRuntime = createRetryableRuntimeLoader(
       () => import('./GlobalPageTransitionRuntime').then(({ GlobalPageTransitionRuntime }) => GlobalPageTransitionRuntime),
       (runtime) => { if (!disposed) setRuntime(() => runtime) },
     )
-
-    const runScheduledLoad = () => {
-      if (idleHandle !== null && typeof window.cancelIdleCallback === 'function') window.cancelIdleCallback(idleHandle)
-      if (idleTimer !== null) globalThis.clearTimeout(idleTimer)
-      if (hardTimer !== null) globalThis.clearTimeout(hardTimer)
-      idleHandle = null
-      idleTimer = null
-      hardTimer = null
-      void loadRuntime()
-    }
-
-    const scheduleRuntime = () => {
-      if (idleHandle !== null || idleTimer !== null || hardTimer !== null) return
-      hardTimer = globalThis.setTimeout(() => {
-        hardTimer = null
-        runScheduledLoad()
-      }, 900)
-      if (typeof window.requestIdleCallback === 'function') {
-        idleHandle = window.requestIdleCallback(() => {
-          idleHandle = null
-          runScheduledLoad()
-        }, { timeout: 650 })
-      } else {
-        idleTimer = globalThis.setTimeout(() => {
-          idleTimer = null
-          runScheduledLoad()
-        }, 350)
-      }
-    }
 
     const primeOnIntent = (event: Event) => {
       if (internalNavigableLink(event.target)) void loadRuntime()
@@ -129,23 +97,15 @@ export function GlobalPageTransition() {
     document.addEventListener('pointerover', primeOnIntent, { passive: true })
     document.addEventListener('focusin', primeOnIntent)
     document.addEventListener('touchstart', primeOnIntent, { passive: true })
-    document.addEventListener('unlim:main-ready', scheduleRuntime, { once: true })
     document.addEventListener('unlim:navigate', navigateProgrammatically)
-    if (document.querySelector<HTMLElement>('#swup')?.dataset.mainReady === 'true') scheduleRuntime()
-    else window.addEventListener('DOMContentLoaded', scheduleRuntime, { once: true })
 
     return () => {
       disposed = true
-      if (idleHandle !== null && typeof window.cancelIdleCallback === 'function') window.cancelIdleCallback(idleHandle)
-      if (idleTimer !== null) globalThis.clearTimeout(idleTimer)
-      if (hardTimer !== null) globalThis.clearTimeout(hardTimer)
       document.removeEventListener('pointerover', primeOnIntent)
       document.removeEventListener('focusin', primeOnIntent)
       document.removeEventListener('touchstart', primeOnIntent)
       document.removeEventListener('click', startNavigation, true)
-      document.removeEventListener('unlim:main-ready', scheduleRuntime)
       document.removeEventListener('unlim:navigate', navigateProgrammatically)
-      window.removeEventListener('DOMContentLoaded', scheduleRuntime)
       navigateRef.current = null
       runtimeReadyRef.current = false
     }

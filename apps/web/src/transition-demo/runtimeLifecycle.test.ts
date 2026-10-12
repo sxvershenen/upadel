@@ -4,7 +4,7 @@ import test from 'node:test'
 import { createPostNavigationSceneLoader } from './postNavigationScene'
 import { createRetryableRuntimeLoader, loadRuntimeForNavigation } from './runtimeLoader'
 
-test('next click retries after an idle runtime import failure without falling back', async () => {
+test('navigation intent retries after a runtime import failure without falling back', async () => {
   let attempts = 0
   const accepted: string[] = []
   const load = createRetryableRuntimeLoader(async () => {
