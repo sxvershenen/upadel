@@ -3,6 +3,7 @@
 import { FieldLabel, useCollapsible, useDocumentInfo, useRowLabel } from '@payloadcms/ui'
 import type { CollapsibleFieldClient, FieldLabelClientProps } from 'payload'
 import { useLayoutEffect, useRef } from 'react'
+import { homepageSectionRowTitle } from '../../fields/homepageSections'
 
 function CloseExpandedOnEditorOpen() {
   const { isCollapsed, toggle } = useCollapsible()
@@ -27,4 +28,9 @@ export function DefaultCollapsedArrayRowLabel() {
   const { data, rowNumber } = useRowLabel<Record<string, unknown>>()
   const title = [data?.title, data?.name, data?.label, data?.question, data?.key].find((value) => typeof value === 'string' && value.trim())
   return <><span>{typeof title === 'string' ? title : `Элемент ${String((rowNumber ?? 0) + 1).padStart(2, '0')}`}</span><CloseExpandedOnEditorOpen /></>
+}
+
+export function HomepageSectionRowLabel() {
+  const { data, rowNumber } = useRowLabel<{ section?: unknown; visible?: unknown }>()
+  return <><span>{homepageSectionRowTitle(data, rowNumber)}</span><CloseExpandedOnEditorOpen /></>
 }

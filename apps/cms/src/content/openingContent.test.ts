@@ -36,6 +36,7 @@ test('opening update applies requested facts once, unpublishes old events and pr
   assert.equal(globals['gift-page'].terms.length, 1)
   assert.match(globals['gift-page'].terms[0].text, /800 ₽.*500 ₽/)
   assert.equal(globals.homepage.benefitsSection.cards[0].action.href, 'https://varlion.su')
+  assert.equal(globals.homepage.methodistBanner.price, 1500)
   globals.homepage.hero.titleAccent = 'Редактор изменил'
   docs.memberships[0].isActive = true
   const writesBefore = writes

@@ -453,7 +453,7 @@ export const servicesFields: Field[] = [
           'Отрабатывайте удары и точность в своём темпе. Арендуйте робопушку для самостоятельной тренировки на падел-корте.',
       },
       { name: 'decorativeMedia', type: 'upload', relationTo: 'media', filterOptions: imageOnlyFilter, label: 'Фотография тренировки' },
-      { name: 'price', type: 'number', label: 'Аренда робопушки, ₽ / час', min: 0, defaultValue: 3000 },
+      { name: 'price', type: 'number', label: 'Аренда робопушки, ₽ / час', min: 0, defaultValue: 1500 },
       { name: 'meshTone', type: 'select', label: 'Тон цветного слоя поверх фотографии', defaultValue: 'deep-blue', options: [...meshToneOptions], admin: { description: 'Глубокий синий — overlay-blue; остальные тона используют соответствующий цветной overlay из UI-kit.' } },
       { ...createActionField('action', 'Кнопка'), admin: { hidden: true }, defaultValue: { label: 'Получить консультацию', mode: 'phone' } },
     ],

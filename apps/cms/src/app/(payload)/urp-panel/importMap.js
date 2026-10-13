@@ -33,6 +33,7 @@ import { PolicyGlobalEditorPanel as PolicyGlobalEditorPanel_e17a9bf367a67dd68371
 import { OfertaGlobalEditorPanel as OfertaGlobalEditorPanel_e17a9bf367a67dd68371fedfde3d34ef } from '../../../components/admin/GlobalEditorPanel'
 import { SecretTextField as SecretTextField_d8cbdd8e0062467049891f81baf1b9a1 } from '../../../components/admin/SecretTextField'
 import { IntegrationStatus as IntegrationStatus_2c35762c8ba264f9b73d6d184c279526 } from '../../../components/admin/IntegrationStatus'
+import { HomepageSectionRowLabel as HomepageSectionRowLabel_48bd8a775a1d785d789dacb46e8c6762 } from '../../../components/admin/DefaultCollapsedAccordion'
 import { DefaultCollapsedFieldLabel as DefaultCollapsedFieldLabel_48bd8a775a1d785d789dacb46e8c6762 } from '../../../components/admin/DefaultCollapsedAccordion'
 import { HeroSlotIconField as HeroSlotIconField_703fce052b0302a3d9035b5d63ec29d7 } from '../../../components/admin/HeroSlotIconField'
 import { HomepageCourtsPanel as HomepageCourtsPanel_6441cbe11148e4edeb3cf73d2c00af4e } from '../../../components/admin/HomepageAdminCollections'
@@ -41,6 +42,7 @@ import { HomepageFAQsPanel as HomepageFAQsPanel_6441cbe11148e4edeb3cf73d2c00af4e
 import { OrderedPayloadNav as OrderedPayloadNav_232b91d4bdc0607b60aa8c7a089351ce } from '../../../components/admin/OrderedPayloadNav'
 import { AdminToolsNav as AdminToolsNav_2308c1e2f5af8fc8e4e48955131dd37f } from '../../../components/admin/AdminToolsNav'
 import { DashboardOverview as DashboardOverview_6eebd759fa9848ad75ed4bee6bb4023d } from '../../../components/admin/DashboardOverview'
+import { AdminQuickSearch as AdminQuickSearch_6e625e68fb6f27450d3451cb65f83e5d } from '../../../components/admin/AdminQuickSearch'
 import { AnalyticsView as AnalyticsView_9918208d093cd4de1748f6762cdb2e6c } from '../../../components/admin/AnalyticsViewServer'
 import { PageMapView as PageMapView_1bfaa017d3f9ce17955acfd65a4af0f9 } from '../../../components/admin/PageMapViewServer'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
@@ -82,6 +84,7 @@ export const importMap = {
   "/components/admin/GlobalEditorPanel#OfertaGlobalEditorPanel": OfertaGlobalEditorPanel_e17a9bf367a67dd68371fedfde3d34ef,
   "/components/admin/SecretTextField#SecretTextField": SecretTextField_d8cbdd8e0062467049891f81baf1b9a1,
   "/components/admin/IntegrationStatus#IntegrationStatus": IntegrationStatus_2c35762c8ba264f9b73d6d184c279526,
+  "/components/admin/DefaultCollapsedAccordion#HomepageSectionRowLabel": HomepageSectionRowLabel_48bd8a775a1d785d789dacb46e8c6762,
   "/components/admin/DefaultCollapsedAccordion#DefaultCollapsedFieldLabel": DefaultCollapsedFieldLabel_48bd8a775a1d785d789dacb46e8c6762,
   "/components/admin/HeroSlotIconField#HeroSlotIconField": HeroSlotIconField_703fce052b0302a3d9035b5d63ec29d7,
   "/components/admin/HomepageAdminCollections#HomepageCourtsPanel": HomepageCourtsPanel_6441cbe11148e4edeb3cf73d2c00af4e,
@@ -90,6 +93,7 @@ export const importMap = {
   "/components/admin/OrderedPayloadNav#OrderedPayloadNav": OrderedPayloadNav_232b91d4bdc0607b60aa8c7a089351ce,
   "/components/admin/AdminToolsNav#AdminToolsNav": AdminToolsNav_2308c1e2f5af8fc8e4e48955131dd37f,
   "/components/admin/DashboardOverview#DashboardOverview": DashboardOverview_6eebd759fa9848ad75ed4bee6bb4023d,
+  "/components/admin/AdminQuickSearch#AdminQuickSearch": AdminQuickSearch_6e625e68fb6f27450d3451cb65f83e5d,
   "/components/admin/AnalyticsViewServer#AnalyticsView": AnalyticsView_9918208d093cd4de1748f6762cdb2e6c,
   "/components/admin/PageMapViewServer#PageMapView": PageMapView_1bfaa017d3f9ce17955acfd65a4af0f9,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1

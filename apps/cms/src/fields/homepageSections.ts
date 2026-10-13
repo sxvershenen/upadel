@@ -7,7 +7,7 @@ export const homepageSectionOptions = [
   { label: 'Корты', value: 'courts' },
   { label: 'Цены и абонементы', value: 'pricing' },
   { label: 'Тренеры', value: 'coaches' },
-  { label: 'Баннер методиста', value: 'methodist-banner' },
+  { label: 'Тренировка с робопушкой', value: 'methodist-banner' },
   { label: 'Турниры и лиги', value: 'tournaments' },
   { label: 'Галерея', value: 'gallery' },
   { label: 'Блог и статьи', value: 'blog' },
@@ -15,6 +15,12 @@ export const homepageSectionOptions = [
 ] as const
 
 export type HomepageSectionKey = (typeof homepageSectionOptions)[number]['value']
+
+export function homepageSectionRowTitle(data: { section?: unknown; visible?: unknown } | null | undefined, rowNumber?: number): string {
+  const selected = homepageSectionOptions.find((option) => option.value === data?.section)
+  const title = selected?.label ?? `Секция ${String((rowNumber ?? 0) + 1).padStart(2, '0')}`
+  return `${title}${data?.visible === false ? ' · скрыта' : ''}`
+}
 
 const sectionKeys = homepageSectionOptions.map(({ value }) => value)
 const sectionKeySet = new Set<string>(sectionKeys)
@@ -55,13 +61,17 @@ export const homepageSectionsField: ArrayField = {
   name: 'sections',
   type: 'array',
   label: 'Порядок секций',
+  labels: { singular: 'Секция главной', plural: 'Секции главной' },
   defaultValue: defaultHomepageSections,
   minRows: homepageSectionOptions.length,
   maxRows: homepageSectionOptions.length,
   required: true,
   admin: {
+    components: {
+      RowLabel: '/components/admin/DefaultCollapsedAccordion#HomepageSectionRowLabel',
+    },
     description:
-      'Перетаскивайте секции и меняйте видимость. Разметка остаётся в коде; карточки тренеров, турниров и статей разрешаются из их коллекций.',
+      'Перетаскивайте секции и меняйте видимость. В свёрнутой строке видно название секции и её статус. Разметка остаётся в коде; карточки тренеров, турниров и статей разрешаются из их коллекций.',
   },
   fields: [
     {

@@ -53,6 +53,7 @@ export default buildConfig({
   admin: {
     components: {
       Nav: '/components/admin/OrderedPayloadNav#OrderedPayloadNav',
+      beforeNavLinks: ['/components/admin/AdminQuickSearch#AdminQuickSearch'],
       afterNavLinks: ['/components/admin/AdminToolsNav#AdminToolsNav'],
       beforeDashboard: ['/components/admin/DashboardOverview#DashboardOverview'],
       views: {
