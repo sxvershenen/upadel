@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { filterAdminQuickSearch, type AdminQuickSearchTarget } from './adminQuickSearchModel'
+import { buildRecordSearchWhere, filterAdminQuickSearch, type AdminQuickSearchTarget } from './adminQuickSearchModel'
 
 const targets: AdminQuickSearchTarget[] = [
   { label: 'Главная', group: 'Страницы', href: '/urp-panel/globals/homepage', keywords: 'робопушка цена порядок секций' },
@@ -13,4 +13,14 @@ test('admin quick search finds destinations by title, section, and editorial key
   assert.deepEqual(filterAdminQuickSearch(targets, 'РОБОПУШКА'), [targets[0]])
   assert.deepEqual(filterAdminQuickSearch(targets, 'услуги тренеры'), [targets[2]])
   assert.deepEqual(filterAdminQuickSearch(targets, '  '), [])
+})
+
+test('record search requires every query term to match a searchable field', () => {
+  assert.deepEqual(buildRecordSearchWhere(['title', 'description'], 'РОБОПУШКА цена'), {
+    and: [
+      { or: [{ title: { contains: 'робопушка' } }, { description: { contains: 'робопушка' } }] },
+      { or: [{ title: { contains: 'цена' } }, { description: { contains: 'цена' } }] },
+    ],
+  })
+  assert.equal(buildRecordSearchWhere(['title'], '  '), null)
 })

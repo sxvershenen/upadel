@@ -3,10 +3,21 @@ export type AdminQuickSearchTarget = {
   label: string
   group: string
   keywords?: string
+  record?: boolean
 }
 
 function normalize(value: string): string {
   return value.toLocaleLowerCase('ru-RU').replaceAll('ё', 'е').trim()
+}
+
+export function buildRecordSearchWhere(fields: readonly string[], query: string) {
+  const terms = normalize(query).split(/\s+/).filter(Boolean)
+  if (!terms.length || !fields.length) return null
+  return {
+    and: terms.map((term) => ({
+      or: fields.map((field) => ({ [field]: { contains: term } })),
+    })),
+  }
 }
 
 export function filterAdminQuickSearch(targets: AdminQuickSearchTarget[], query: string): AdminQuickSearchTarget[] {

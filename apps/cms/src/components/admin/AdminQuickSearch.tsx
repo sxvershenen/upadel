@@ -2,7 +2,7 @@
 
 import { Link, useConfig } from '@payloadcms/ui'
 import { formatAdminURL } from 'payload/shared'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { filterAdminQuickSearch, type AdminQuickSearchTarget } from './adminQuickSearchModel'
 import './adminToolsNav.scss'
@@ -43,6 +43,8 @@ export function AdminQuickSearch() {
   const { config } = useConfig()
   const [query, setQuery] = useState('')
   const adminConfig = config as unknown as AdminEntityConfig
+  const [recordResults, setRecordResults] = useState<AdminQuickSearchTarget[]>([])
+  const [recordSearchStatus, setRecordSearchStatus] = useState<'idle' | 'loading' | 'failed'>('idle')
   const targets = useMemo<AdminQuickSearchTarget[]>(() => {
     const globals = adminConfig.globals
       .filter((global) => !global.admin?.hidden)
@@ -68,26 +70,66 @@ export function AdminQuickSearch() {
   }, [adminConfig.collections, adminConfig.globals, adminConfig.routes.admin])
   const results = useMemo(() => filterAdminQuickSearch(targets, query), [query, targets])
 
+  useEffect(() => {
+    const normalizedQuery = query.trim()
+    if (normalizedQuery.length < 2) {
+      setRecordResults([])
+      setRecordSearchStatus('idle')
+      return
+    }
+
+    const controller = new AbortController()
+    setRecordResults([])
+    setRecordSearchStatus('loading')
+    const timer = window.setTimeout(async () => {
+      try {
+        const response = await fetch(`/api/admin/quick-search?q=${encodeURIComponent(normalizedQuery)}`, {
+          credentials: 'same-origin',
+          signal: controller.signal,
+        })
+        if (!response.ok) throw new Error('Search request failed')
+        const payload = await response.json() as { results?: AdminQuickSearchTarget[] }
+        setRecordResults(Array.isArray(payload.results) ? payload.results : [])
+        setRecordSearchStatus('idle')
+      } catch {
+        if (!controller.signal.aborted) {
+          setRecordResults([])
+          setRecordSearchStatus('failed')
+        }
+      }
+    }, 250)
+
+    return () => {
+      window.clearTimeout(timer)
+      controller.abort()
+    }
+  }, [query])
+
+  const combinedResults = useMemo(() => {
+    const navigable = results.filter((target) => !recordResults.some((record) => record.href === target.href))
+    return [...recordResults, ...navigable].slice(0, 12)
+  }, [recordResults, results])
+
   return (
     <div className="admin-quick-search">
-      <label className="admin-quick-search__label" htmlFor="admin-quick-search-input">Найти раздел</label>
+      <label className="admin-quick-search__label" htmlFor="admin-quick-search-input">Найти в админке</label>
       <input
         autoComplete="off"
         className="admin-quick-search__input"
         id="admin-quick-search-input"
         onChange={(event) => setQuery(event.target.value)}
-        placeholder="Например, робопушка"
+        placeholder="Например, робопушка или тариф"
         type="search"
         value={query}
       />
       {query.trim() && (
         <div className="admin-quick-search__results" aria-label="Результаты поиска">
-          {results.length ? results.map((target) => (
+          {combinedResults.length ? combinedResults.map((target) => (
             <Link className="admin-quick-search__result" href={target.href} key={target.href}>
               <span className="admin-quick-search__result-title">{target.label}</span>
-              <span className="admin-quick-search__result-group">{target.group}</span>
+              <span className="admin-quick-search__result-group">{target.record ? `Запись · ${target.group}` : target.group}</span>
             </Link>
-          )) : <p className="admin-quick-search__empty">Раздел не найден.</p>}
+          )) : query.trim().length < 2 ? <p className="admin-quick-search__empty">Введите ещё символ.</p> : recordSearchStatus === 'loading' ? <p className="admin-quick-search__empty">Ищем записи…</p> : recordSearchStatus === 'failed' ? <p className="admin-quick-search__empty">Не удалось выполнить поиск.</p> : <p className="admin-quick-search__empty">Ничего не найдено.</p>}
         </div>
       )}
     </div>
