@@ -391,6 +391,14 @@
     box-sizing: border-box;
   }
 
+  .template-default .admin-quick-search input.search-filter__input {
+    box-sizing: border-box;
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    border-radius: var(--admin-control-radius);
+  }
+
   .template-default .search-bar .search-filter input {
     height: var(--admin-control-height);
     box-sizing: border-box;

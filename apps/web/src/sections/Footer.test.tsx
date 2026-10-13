@@ -18,7 +18,10 @@ const site = {
       { label: 'Тренировки', href: '/training', column: '2' },
     ],
     socialLinks: [{ provider: 'telegram', label: 'Telegram', url: 'https://t.me/unlim' }],
-    legalLinks: [],
+    legalLinks: [
+      { label: 'Политика конфиденциальности', href: '/policy' },
+      { label: 'Публичная оферта', href: '/oferta' },
+    ],
     copyright: '© UNLIM',
     cookieNotice: { text: '', acceptLabel: '', rejectLabel: '', manageLabel: '' },
   },
@@ -39,26 +42,14 @@ const site = {
   analytics: { mode: 'disabled', vendors: {} },
 } as any
 
-test('footer renders separate legal lines, centered CMS navigation and icon-only actions', () => {
+test('footer centers legal links and credits OCHK.OOO', () => {
   const html = renderToStaticMarkup(<SiteProvider site={site} captureContacts={false}><Footer /></SiteProvider>)
 
-  assert.match(html, /data-footer-legal[^>]*><span>ООО «Анлим Спорт»<\/span><span>ИНН 5024178932 · ОГРН 1235000078451<\/span>/)
-  assert.match(html, /<nav aria-label="Навигация в подвале"/)
-  assert.match(html, />О клубе<\/a>/)
-  assert.match(html, />Тренировки<\/a>/)
-  assert.match(html, /<button[^>]*aria-label="Позвонить"[^>]*data-analytics-action="phone"/)
-  assert.match(html, /<a[^>]*aria-label="Построить маршрут"[^>]*href="https:\/\/yandex\.ru\/maps\/example"[^>]*data-analytics-action="directions"/)
-  const bookingAction = html.match(/<a[^>]*aria-label="Забронировать корт"[^>]*>/)?.[0] ?? ''
-  assert.match(bookingAction, /href="https:\/\/booking\.example"/)
-  assert.match(bookingAction, /data-analytics-action="booking"/)
-  assert.match(html, /data-footer-actions[\s\S]*aria-label="Telegram"/)
-  assert.doesNotMatch(html, />Позвонить<|>Построить маршрут<|>Забронировать корт</)
-})
-
-test('footer booking action keeps the consultation fallback when booking is not ready', () => {
-  const fallbackSite = { ...site, booking: { mode: 'disabled', ready: false, buttonLabel: 'Забронировать корт' } }
-  const html = renderToStaticMarkup(<SiteProvider site={fallbackSite} captureContacts={false}><Footer /></SiteProvider>)
-
-  assert.match(html, /<button[^>]*aria-label="Забронировать корт"[^>]*data-analytics-action="booking"/)
-  assert.doesNotMatch(html, /href="https:\/\/booking\.example"/)
+  const legalRow = html.match(/<div class="type-caption grid grid-cols-1[\s\S]*?<\/div><\/div><\/footer>/)?.[0] ?? ''
+  assert.match(legalRow, /© UNLIM/)
+  assert.match(legalRow, /href="\/policy"[^>]*>Политика конфиденциальности<\/a>/)
+  assert.match(legalRow, /href="\/oferta"[^>]*>Публичная оферта<\/a>/)
+  assert.match(legalRow, /href="https:\/\/ochk\.ooo"[^>]*>Разработано OCHK\.OOO<\/a>/)
+  assert.match(legalRow, /sm:grid-cols-\[minmax\(0,1fr\)_auto_minmax\(0,1fr\)\]/)
+  assert.match(legalRow, /justify-center/)
 })

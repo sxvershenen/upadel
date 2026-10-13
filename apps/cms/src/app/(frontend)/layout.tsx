@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 
 export const metadata: Metadata = {
   description: 'UNLIM RIGA PADEL content management system.',
+  robots: { index: false, follow: false },
   title: 'UNLIM Riga Padel CMS',
 }
 
