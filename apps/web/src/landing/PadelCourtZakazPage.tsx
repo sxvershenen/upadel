@@ -81,6 +81,7 @@ export function CourtModelTabs({ badge, models, onSelectModel }: { badge: string
   const [activeModel, setActiveModel] = useState<ModelId>(models[0]?.id ?? 'consultation')
   const [showTabHint, setShowTabHint] = useState(false)
   const tabsRef = useRef<HTMLDivElement>(null)
+  const preloadedImagesRef = useRef<HTMLImageElement[]>([])
 
   useEffect(() => {
     const tabsNode = tabsRef.current
@@ -90,6 +91,58 @@ export function CourtModelTabs({ badge, models, onSelectModel }: { badge: string
     window.addEventListener('resize', syncHint)
     return () => window.removeEventListener('resize', syncHint)
   }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    let idleHandle: number | undefined
+    let timeoutHandle: number | undefined
+    const idleWindow = window as typeof window & {
+      requestIdleCallback?: (callback: IdleRequestCallback, options?: IdleRequestOptions) => number
+      cancelIdleCallback?: (handle: number) => void
+    }
+
+    const preloadImages = () => {
+      if (cancelled) return
+
+      const images = models
+        .filter((model) => model.id !== models[0]?.id && model.image.url)
+        .map((model) => {
+          const image = new Image()
+          image.decoding = 'async'
+          image.fetchPriority = 'low'
+          image.sizes = '(min-width: 1024px) 55vw, 100vw'
+          if (model.image.srcSet) image.srcset = model.image.srcSet
+          image.src = model.image.url
+          return image
+        })
+
+      preloadedImagesRef.current = images
+      void Promise.all(images.map((image) => image.decode().catch(() => undefined)))
+    }
+
+    const schedulePreload = () => {
+      if (cancelled) return
+      if (idleWindow.requestIdleCallback) {
+        idleHandle = idleWindow.requestIdleCallback(preloadImages, { timeout: 2500 })
+      } else {
+        timeoutHandle = window.setTimeout(preloadImages, 800)
+      }
+    }
+
+    if (document.readyState === 'complete') {
+      schedulePreload()
+    } else {
+      window.addEventListener('load', schedulePreload, { once: true })
+    }
+
+    return () => {
+      cancelled = true
+      window.removeEventListener('load', schedulePreload)
+      if (idleHandle !== undefined) idleWindow.cancelIdleCallback?.(idleHandle)
+      if (timeoutHandle !== undefined) window.clearTimeout(timeoutHandle)
+      preloadedImagesRef.current = []
+    }
+  }, [models])
 
   const handleTabChange = (val: string) => {
     const id = val as ModelId
