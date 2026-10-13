@@ -1,4 +1,5 @@
 import { CalendarDays, CheckCircle2, Gauge, Medal, PartyPopper, Trophy } from 'lucide-react'
+import React from 'react'
 import type { HomepageDTO, TournamentCatalogItem } from '@unlim/content-contract'
 import { ArrowAction } from '../ui/ArrowAction'
 import { Badge } from '../ui/Badge'
@@ -36,7 +37,7 @@ export function TournamentCard({ tournament, loading = 'eager', reveal = true }:
   const href = tournamentCardHref(tournament)
   const body = <TournamentBody tournament={tournament} linked={Boolean(href)} />
   const card = tournament.visualStyle === 'image' && tournament.image
-    ? <ImageCard interactive={Boolean(href)} parallax loading={loading} reveal={reveal} media={tournament.image} src={tournament.image.url} alt={tournament.image.alt} overlay={(tournament.imageOverlay ?? 'overlay-dark') as ImageOverlay} className="aspect-[3/4] h-full">{body}</ImageCard>
-    : <MeshCard interactive={Boolean(href)} reveal={reveal} tone={(tournament.meshStyle ?? 'deep-blue') as MeshTone} className="aspect-[3/4] h-full">{body}</MeshCard>
+    ? <ImageCard interactive={Boolean(href)} hoverable parallax loading={loading} reveal={reveal} media={tournament.image} src={tournament.image.url} alt={tournament.image.alt} overlay={(tournament.imageOverlay ?? 'overlay-dark') as ImageOverlay} className="aspect-[3/4] h-full">{body}</ImageCard>
+    : <MeshCard interactive={Boolean(href)} hoverable reveal={reveal} tone={(tournament.meshStyle ?? 'deep-blue') as MeshTone} className="aspect-[3/4] h-full">{body}</MeshCard>
   return href ? <a href={href} target={href.startsWith('https:') ? '_blank' : undefined} rel={href.startsWith('https:') ? 'noreferrer' : undefined} className="block h-full">{card}</a> : <div className="h-full">{card}</div>
 }

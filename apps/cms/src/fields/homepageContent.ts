@@ -379,34 +379,19 @@ export const clubFields: Field[] = [
 
 export const servicesFields: Field[] = [
   {
-    name: 'pricingSection',
-    type: 'group',
-    label: 'Цены и абонементы',
-    admin: {
-      description:
-        'Здесь настраиваются стандарты клуба и предложение абонементов. Арендные тарифы редактируются в разделе «Услуги и цены → Тарифы аренды»; тренировки и абонементы каталога выбираются из опубликованных активных записей с флагом главной.',
-    },
-    fields: [
-      { name: 'eyebrow', type: 'text', label: 'Надзаголовок', defaultValue: 'Тарифы' },
-      { name: 'title', type: 'text', label: 'Заголовок', defaultValue: 'Цены и абонементы' },
-      {
-        name: 'defaultTab',
-        type: 'select',
-        label: 'Вкладка по умолчанию',
-        defaultValue: 'rent',
-        required: true,
-        options: [
-          { label: 'Аренда', value: 'rent' },
-          { label: 'Тренировки', value: 'training' },
-          { label: 'Абонементы', value: 'memberships' },
-        ],
-      },
-      { name: 'rentTabLabel', type: 'text', label: 'Название вкладки аренды', defaultValue: 'Аренда' },
-      { name: 'trainingTabLabel', type: 'text', label: 'Название вкладки тренировок', defaultValue: 'Тренировки' },
-      { name: 'membershipsTabLabel', type: 'text', label: 'Название вкладки абонементов', defaultValue: 'Абонементы' },
-      {
-        name: 'membershipOffer', type: 'group', label: 'Предложение абонементов',
-        fields: [
+    type: 'collapsible', label: 'Цены и абонементы', admin: { initCollapsed: true },
+    fields: [{
+      name: 'pricingSection', type: 'group', label: false, admin: { hideGutter: true, description: 'Здесь настраиваются предложение абонементов и стандарты клуба. Арендные тарифы редактируются в «Услуги и цены → Тарифы аренды»; тренировки и абонементы каталога выбираются из опубликованных активных записей с флагом главной.' },
+      fields: [
+        { type: 'collapsible', label: 'Заголовок и названия вкладок', admin: { initCollapsed: true }, fields: [{ type: 'row', fields: [
+          { name: 'eyebrow', type: 'text', label: 'Надзаголовок', defaultValue: 'Тарифы' },
+          { name: 'title', type: 'text', label: 'Заголовок', defaultValue: 'Цены и абонементы' },
+          { name: 'defaultTab', type: 'select', label: 'Вкладка по умолчанию', defaultValue: 'rent', required: true, options: [{ label: 'Аренда', value: 'rent' }, { label: 'Тренировки', value: 'training' }, { label: 'Абонементы', value: 'memberships' }] },
+          { name: 'rentTabLabel', type: 'text', label: 'Название вкладки аренды', defaultValue: 'Аренда' },
+          { name: 'trainingTabLabel', type: 'text', label: 'Название вкладки тренировок', defaultValue: 'Тренировки' },
+          { name: 'membershipsTabLabel', type: 'text', label: 'Название вкладки абонементов', defaultValue: 'Абонементы' },
+        ] }] },
+        { type: 'collapsible', label: 'Предложение абонементов', admin: { initCollapsed: true }, fields: [{ name: 'membershipOffer', type: 'group', label: false, admin: { hideGutter: true }, fields: [
           { name: 'enabled', type: 'checkbox', label: 'Показывать предложение', defaultValue: true },
           { name: 'showOnHomepage', type: 'checkbox', label: 'Показывать на главной', defaultValue: true },
           { name: 'title', type: 'text', label: 'Название', defaultValue: 'Абонементы' },
@@ -415,11 +400,8 @@ export const servicesFields: Field[] = [
           { name: 'priceLabel', type: 'text', label: 'Подпись цены', defaultValue: 'Условия уточняйте у администратора' },
           { name: 'meshTone', type: 'select', dbName: 'hm_mem_mesh_tone', label: 'Тон карточки', defaultValue: 'dark', options: [...meshToneOptions] },
           pricingActionField(),
-        ],
-      },
-      {
-        name: 'rentalStandards', type: 'group', label: 'Стандарты Unlim Riga',
-        fields: [
+        ] }] },
+        { type: 'collapsible', label: 'Стандарты клуба', admin: { initCollapsed: true }, fields: [{ name: 'rentalStandards', type: 'group', label: false, admin: { hideGutter: true }, fields: [
           { name: 'enabled', type: 'checkbox', label: 'Показывать блок', defaultValue: true },
           { name: 'showOnHomepage', type: 'checkbox', label: 'Показывать на главной', defaultValue: true },
           { name: 'title', type: 'text', label: 'Название', defaultValue: 'Стандарты Unlim Riga' },
@@ -428,15 +410,14 @@ export const servicesFields: Field[] = [
           { name: 'description', type: 'textarea', label: 'Описание' },
           { name: 'meshTone', type: 'select', dbName: 'hm_std_mesh_tone', label: 'Тон карточки', defaultValue: 'dark', options: [...meshToneOptions] },
           { name: 'includedItems', type: 'array', dbName: 'hp_rental_standards_items', label: 'Что включено', maxRows: 8, fields: [{ name: 'text', type: 'text', label: 'Пункт', required: true }] },
-        ],
-      },
-    ],
+        ] }] },
+      ],
+    }],
   },
   {
-    name: 'methodistBanner',
-    type: 'group',
-    label: 'Тренировочная робопушка',
-    fields: [
+    type: 'collapsible', label: 'Тренировочная робопушка', admin: { initCollapsed: true },
+    fields: [{ name: 'methodistBanner', type: 'group', label: false, admin: { hideGutter: true }, fields: [
+      { type: 'collapsible', label: 'Текст и фотография', admin: { initCollapsed: true }, fields: [{ type: 'row', fields: [
       { name: 'eyebrow', type: 'text', label: 'Надзаголовок', defaultValue: 'Самостоятельная практика' },
       { name: 'icon', type: 'select', label: 'Иконка', defaultValue: 'Target', options: [{ label: 'Точность', value: 'Target' }, { label: 'Робот', value: 'Bot' }, { label: 'Энергия', value: 'Zap' }] },
       {
@@ -453,10 +434,13 @@ export const servicesFields: Field[] = [
           'Отрабатывайте удары и точность в своём темпе. Арендуйте робопушку для самостоятельной тренировки на падел-корте.',
       },
       { name: 'decorativeMedia', type: 'upload', relationTo: 'media', filterOptions: imageOnlyFilter, label: 'Фотография тренировки' },
+      ] }] },
+      { type: 'collapsible', label: 'Цена и оформление', admin: { initCollapsed: true }, fields: [{ type: 'row', fields: [
       { name: 'price', type: 'number', label: 'Аренда робопушки, ₽ / час', min: 0, defaultValue: 1500 },
       { name: 'meshTone', type: 'select', label: 'Тон цветного слоя поверх фотографии', defaultValue: 'deep-blue', options: [...meshToneOptions], admin: { description: 'Глубокий синий — overlay-blue; остальные тона используют соответствующий цветной overlay из UI-kit.' } },
       { ...createActionField('action', 'Кнопка'), admin: { hidden: true }, defaultValue: { label: 'Получить консультацию', mode: 'phone' } },
-    ],
+      ] }] },
+    ] }],
   },
 ]
 

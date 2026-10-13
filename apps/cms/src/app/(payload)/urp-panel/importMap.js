@@ -40,9 +40,9 @@ import { HomepageCourtsPanel as HomepageCourtsPanel_6441cbe11148e4edeb3cf73d2c00
 import { HomepageReviewsPanel as HomepageReviewsPanel_6441cbe11148e4edeb3cf73d2c00af4e } from '../../../components/admin/HomepageAdminCollections'
 import { HomepageFAQsPanel as HomepageFAQsPanel_6441cbe11148e4edeb3cf73d2c00af4e } from '../../../components/admin/HomepageAdminCollections'
 import { OrderedPayloadNav as OrderedPayloadNav_232b91d4bdc0607b60aa8c7a089351ce } from '../../../components/admin/OrderedPayloadNav'
+import { AdminQuickSearch as AdminQuickSearch_6e625e68fb6f27450d3451cb65f83e5d } from '../../../components/admin/AdminQuickSearch'
 import { AdminToolsNav as AdminToolsNav_2308c1e2f5af8fc8e4e48955131dd37f } from '../../../components/admin/AdminToolsNav'
 import { DashboardOverview as DashboardOverview_6eebd759fa9848ad75ed4bee6bb4023d } from '../../../components/admin/DashboardOverview'
-import { AdminQuickSearch as AdminQuickSearch_6e625e68fb6f27450d3451cb65f83e5d } from '../../../components/admin/AdminQuickSearch'
 import { AnalyticsView as AnalyticsView_9918208d093cd4de1748f6762cdb2e6c } from '../../../components/admin/AnalyticsViewServer'
 import { PageMapView as PageMapView_1bfaa017d3f9ce17955acfd65a4af0f9 } from '../../../components/admin/PageMapViewServer'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
@@ -91,9 +91,9 @@ export const importMap = {
   "/components/admin/HomepageAdminCollections#HomepageReviewsPanel": HomepageReviewsPanel_6441cbe11148e4edeb3cf73d2c00af4e,
   "/components/admin/HomepageAdminCollections#HomepageFAQsPanel": HomepageFAQsPanel_6441cbe11148e4edeb3cf73d2c00af4e,
   "/components/admin/OrderedPayloadNav#OrderedPayloadNav": OrderedPayloadNav_232b91d4bdc0607b60aa8c7a089351ce,
+  "/components/admin/AdminQuickSearch#AdminQuickSearch": AdminQuickSearch_6e625e68fb6f27450d3451cb65f83e5d,
   "/components/admin/AdminToolsNav#AdminToolsNav": AdminToolsNav_2308c1e2f5af8fc8e4e48955131dd37f,
   "/components/admin/DashboardOverview#DashboardOverview": DashboardOverview_6eebd759fa9848ad75ed4bee6bb4023d,
-  "/components/admin/AdminQuickSearch#AdminQuickSearch": AdminQuickSearch_6e625e68fb6f27450d3451cb65f83e5d,
   "/components/admin/AnalyticsViewServer#AnalyticsView": AnalyticsView_9918208d093cd4de1748f6762cdb2e6c,
   "/components/admin/PageMapViewServer#PageMapView": PageMapView_1bfaa017d3f9ce17955acfd65a4af0f9,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1

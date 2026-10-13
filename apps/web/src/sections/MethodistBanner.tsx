@@ -18,7 +18,7 @@ export function MethodistBanner() {
   const backgroundRef = useRef<HTMLDivElement>(null)
   const backgroundY = useImageParallax(backgroundRef, 6)
   return <section className="container-page pb-20 md:pb-28" data-robot-banner>
-    <Reveal><SurfaceCard interactive={false} reveal={false} className="relative isolate flex h-[500px] flex-col justify-between overflow-hidden bg-ink p-6 text-white md:h-[560px] md:p-8 lg:p-10">
+    <Reveal><SurfaceCard interactive={false} hoverable reveal={false} className="relative isolate flex h-[500px] flex-col justify-between overflow-hidden bg-ink p-6 text-white md:h-[560px] md:p-8 lg:p-10">
       <div ref={backgroundRef} data-parallax-viewport className="parallax-viewport absolute inset-0">
         <motion.div data-parallax-layer style={{ y: backgroundY, top: '-10%', height: '120%' }} className="parallax-layer overflow-hidden">
           {banner.decorativeMedia && <ProgressiveImage media={banner.decorativeMedia} loading="lazy" decoding="async" sizes={imageSizes} className="h-full w-full object-cover object-[62%_center] md:object-[50%_15%]" />}

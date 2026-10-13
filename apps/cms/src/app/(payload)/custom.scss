@@ -622,18 +622,24 @@
   }
 
   .template-default .btn--withPopup .popup-button {
+    display: inline-flex;
     width: var(--admin-control-height);
     min-width: var(--admin-control-height);
     flex: 0 0 var(--admin-control-height);
+    align-items: center;
+    justify-content: center;
     padding: 0 !important;
     border: 0 !important;
     border-inline-start: 1px solid color-mix(in srgb, currentColor 28%, transparent) !important;
   }
 
-  .template-default .btn--withPopup .popup-button .btn__content {
-    width: 100%;
-    min-width: 0;
-    gap: 0;
+  .template-default .btn--withPopup .popup-button > svg,
+  .template-default .btn--withPopup .popup-button > .icon {
+    display: block;
+    width: 18px;
+    height: 18px;
+    flex: 0 0 18px;
+    margin: 0;
   }
 
   /* The document toolbar has two icon controls next to the publish action.

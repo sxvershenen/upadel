@@ -42,6 +42,8 @@ test('informational tournament has one fee, no link, arrow, fake date or level',
   assert.doesNotMatch(html, /<a |arrow-action|Уровень|lucide-calendar-days/)
   assert.equal((html.match(/4 000/g) ?? []).length, 1)
   assert.match(html, /Регулярные турниры/)
+  assert.match(html, /data-card-hoverable="true"/)
+  assert.doesNotMatch(html, /cursor-pointer/)
 })
 
 test('tournament links respect disable switch, custom HTTPS URL and internal fallback', () => {

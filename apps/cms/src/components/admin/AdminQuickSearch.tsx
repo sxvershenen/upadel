@@ -112,16 +112,17 @@ export function AdminQuickSearch() {
 
   return (
     <div className="admin-quick-search">
-      <label className="admin-quick-search__label" htmlFor="admin-quick-search-input">Найти в админке</label>
-      <input
-        autoComplete="off"
-        className="admin-quick-search__input"
-        id="admin-quick-search-input"
-        onChange={(event) => setQuery(event.target.value)}
-        placeholder="Например, робопушка или тариф"
-        type="search"
-        value={query}
-      />
+      <div className="search-filter">
+        <input
+          aria-label="Поиск в админке"
+          autoComplete="off"
+          className="search-filter__input"
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Поиск в админке"
+          type="search"
+          value={query}
+        />
+      </div>
       {query.trim() && (
         <div className="admin-quick-search__results" aria-label="Результаты поиска">
           {combinedResults.length ? combinedResults.map((target) => (

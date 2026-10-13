@@ -22,10 +22,11 @@ const meshTextTone: Record<MeshTone, string> = {
 type SurfaceCardProps = HTMLMotionProps<"div"> & {
   tone?: "white" | "glass" | MeshTone;
   interactive?: boolean;
+  hoverable?: boolean;
   reveal?: RevealConfig;
 };
 
-export function SurfaceCard({ tone = "white", interactive = true, reveal = true, className, children, style, ...props }: SurfaceCardProps) {
+export function SurfaceCard({ tone = "white", interactive = true, hoverable = interactive, reveal = true, className, children, style, ...props }: SurfaceCardProps) {
   const isMesh = tone in meshMap;
   const toneClass = tone === "white" ? "bg-white text-ink" : tone === "glass" ? "glass text-white" : cn("relative isolate overflow-hidden", meshMap[tone as MeshTone], meshTextTone[tone as MeshTone]);
   const revealProps = revealAttributes(reveal, style, true);
@@ -33,11 +34,12 @@ export function SurfaceCard({ tone = "white", interactive = true, reveal = true,
     {...props}
     {...revealProps}
     data-gsap-reveal-boundary="true"
-    initial={interactive ? "rest" : undefined}
-    whileHover={interactive ? "hover" : undefined}
-    variants={interactive ? cardVariants : undefined}
-    transition={interactive ? springSoft : undefined}
-    className={cn("group/card se-3", interactive && "card-spring cursor-pointer", isMesh && "group/mesh", toneClass, className)}
+    initial={hoverable ? "rest" : undefined}
+    whileHover={hoverable ? "hover" : undefined}
+    variants={hoverable ? cardVariants : undefined}
+    transition={hoverable ? springSoft : undefined}
+    data-card-hoverable={hoverable ? "true" : undefined}
+    className={cn("group/card se-3", hoverable && "card-spring", interactive && "cursor-pointer", isMesh && "group/mesh", toneClass, className)}
   >{children}</motion.div>;
 }
 
@@ -89,6 +91,7 @@ export interface ImageCardProps extends Omit<HTMLMotionProps<"div">, "children">
   imgClassName?: string;
   children?: ReactNode;
   interactive?: boolean;
+  hoverable?: boolean;
   parallax?: boolean;
   compositeOverlay?: boolean;
   fadeImage?: boolean;
@@ -96,7 +99,7 @@ export interface ImageCardProps extends Omit<HTMLMotionProps<"div">, "children">
 }
 
 /** Full-bleed image card with a mandatory colorized overlay. */
-export function ImageCard({ src, alt, media, sizes = "(min-width: 1024px) 50vw, 100vw", overlay, className, children, imgClassName, interactive = true, parallax = interactive, compositeOverlay = false, fadeImage = false, loading = "lazy", reveal = true, style, ...props }: ImageCardProps & { reveal?: RevealConfig }) {
+export function ImageCard({ src, alt, media, sizes = "(min-width: 1024px) 50vw, 100vw", overlay, className, children, imgClassName, interactive = true, hoverable = interactive, parallax = interactive, compositeOverlay = false, fadeImage = false, loading = "lazy", reveal = true, style, ...props }: ImageCardProps & { reveal?: RevealConfig }) {
   const imageRef = useRef<HTMLDivElement>(null);
   const imageY = useImageParallax(imageRef, parallax ? 11 : 0);
   // `.parallax-layer` is 136% tall and starts at -18%. Moving the overlay's
@@ -110,11 +113,12 @@ export function ImageCard({ src, alt, media, sizes = "(min-width: 1024px) 50vw, 
     data-gsap-reveal-boundary="true"
     data-image-card="true"
     data-composite-overlay={compositeOverlay ? "true" : undefined}
-    initial={interactive ? "rest" : undefined}
-    whileHover={interactive ? "hover" : undefined}
-    variants={interactive ? cardVariants : undefined}
-    transition={interactive ? springSoft : undefined}
-    className={cn("group/card group se-3 relative isolate flex flex-col overflow-hidden text-white", interactive && "card-spring cursor-pointer", className)}
+    initial={hoverable ? "rest" : undefined}
+    whileHover={hoverable ? "hover" : undefined}
+    variants={hoverable ? cardVariants : undefined}
+    transition={hoverable ? springSoft : undefined}
+    data-card-hoverable={hoverable ? "true" : undefined}
+    className={cn("group/card group se-3 relative isolate flex flex-col overflow-hidden text-white", hoverable && "card-spring", interactive && "cursor-pointer", className)}
   >
     <div ref={imageRef} data-parallax-viewport className="parallax-viewport absolute inset-0 z-0">
       <motion.div
@@ -127,7 +131,7 @@ export function ImageCard({ src, alt, media, sizes = "(min-width: 1024px) 50vw, 
         data-image-composite-layer={compositeOverlay ? "true" : undefined}
         className="parallax-layer overflow-hidden"
       >
-        <ProgressiveImage skeleton={!fadeImage} media={media} sizes={sizes} src={src} alt={alt} loading={loading} className={cn("h-full w-full object-cover", imgClassName)} variants={interactive ? imageVariants : undefined} transition={springSoft} />
+        <ProgressiveImage skeleton={!fadeImage} media={media} sizes={sizes} src={src} alt={alt} loading={loading} className={cn("h-full w-full object-cover", imgClassName)} variants={hoverable ? imageVariants : undefined} transition={springSoft} />
         {compositeOverlay && <motion.div data-image-overlay={overlay} style={{ top: compositeOverlayTop }} className="image-card-composite-overlay pointer-events-none absolute inset-x-0 z-[1]" aria-hidden="true" />}
       </motion.div>
     </div>
