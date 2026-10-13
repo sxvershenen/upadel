@@ -222,7 +222,7 @@ export const SiteSettings: GlobalConfig = {
               label: 'Метрики клуба',
               maxRows: 4,
               defaultValue: [
-                { value: '2023', label: 'Год открытия' },
+                { value: '2026', label: 'Год открытия' },
                 { value: '3', label: 'Панорамных корта' },
                 { value: '9', label: 'Тренеров в штате' },
                 { value: '2 100+', label: 'Игроков в клубе' },
@@ -232,7 +232,7 @@ export const SiteSettings: GlobalConfig = {
                 { name: 'label', type: 'text', label: 'Подпись', required: true },
               ],
             },
-            { name: 'legalEntity', type: 'textarea', label: 'Реквизиты', defaultValue: 'ООО «Анлим Спорт» · ИНН 5024178932 · ОГРН 1235000078451' },
+            { name: 'legalEntity', type: 'textarea', label: 'Реквизиты', defaultValue: 'ИП Баранова Татьяна Геннадьевна · ИНН 772803390700 · ОГРНИП 322774600668879 · E-mail: t.baranova@mail.ru' },
             {
               name: 'footerNavigation',
               type: 'array',

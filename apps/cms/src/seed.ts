@@ -61,7 +61,6 @@ const images = {
     px(31519042, 900, 900),
   ],
   blog: [px(4920425, 1000, 750), px(3926934, 1000, 750), px(5310723, 1000, 750)],
-  footerClub: px(33095509, 1200, 1400),
   reviewAvatars: [
     px(34079544, 200, 200),
     px(34079995, 200, 200),
@@ -610,7 +609,6 @@ async function seed() {
       [images.trainingGroup, 'Групповая тренировка по паделу'],
       [images.trainingKids, 'Детская тренировка по паделу'],
       [images.tournamentParty, 'Клубный турнир Americano'],
-      [images.footerClub, 'Клуб Unlim Riga Padel'],
       ...images.coaches.map((source, index) => [source, `Тренер Unlim Riga Padel ${index + 1}`] as const),
       ...images.gallery.map((source, index) => [source, `Жизнь клуба Unlim Riga Padel ${index + 1}`] as const),
       ...images.blog.map((source, index) => [source, `Статья блога Unlim Riga Padel ${index + 1}`] as const),
@@ -618,7 +616,7 @@ async function seed() {
       [padelCourtZakazSeed.heroImage.source, padelCourtZakazSeed.heroImage.alt],
       [padelCourtZakazSeed.technology.background.source, padelCourtZakazSeed.technology.background.alt],
       ...padelCourtZakazSeed.gallery.items.map(({ source, alt }) => [source, alt] as const),
-      ...padelCourtZakazSeed.models.items.map(({ image }) => [image.source, image.alt] as const),
+      ...padelCourtZakazSeed.models.items.filter(({ image }) => image.source.startsWith('https://')).map(({ image }) => [image.source, image.alt] as const),
     ])
 
     const remoteMedia = new Map<string, { id: number | string }>()
@@ -683,7 +681,8 @@ async function seed() {
       heroImage: mediaID(padelCourtZakazSeed.heroImage.source),
       technologyBackground: mediaID(padelCourtZakazSeed.technology.background.source),
       gallery: padelCourtZakazSeed.gallery.items.map(({ source }) => mediaID(source)),
-      models: padelCourtZakazSeed.models.items.map(({ image }) => mediaID(image.source)),
+      models: await Promise.all(padelCourtZakazSeed.models.items.map(({ image }) => ensureLocalMedia(payload, image.source, image.alt))),
+      footerImage: await ensureLocalMedia(payload, 'images/footer/super-panoramic-player.webp', 'Игрок с ракеткой на корте JUBO Super Panoramic; фотография создана с помощью ИИ'),
       turnkey: await Promise.all(padelCourtZakazSeed.turnkey.steps.map(({ image, title }) => ensureLocalMedia(payload, image, title))),
     }
 
@@ -1582,7 +1581,7 @@ async function seed() {
         slug: 'about-page' as const, data: {
           eyebrow: 'О клубе', title: 'Пространство для игры и сообщества', intro: 'Мы объединили профессиональные корты, сильную тренерскую команду и атмосферу современного спортивного клуба.',
           story: richText('UNLIM RIGA PADEL создан для игроков разного уровня — от первой тренировки до клубных лиг. Пространство спроектировано вокруг качества игры, восстановления и общения.'),
-          stats: [{ value: '2023', label: 'год открытия' }, { value: '3', label: 'панорамных корта' }, { value: '9', label: 'тренеров' }, { value: '2 100+', label: 'игроков клуба' }],
+          stats: [{ value: '2026', label: 'год открытия' }, { value: '3', label: 'панорамных корта' }, { value: '9', label: 'тренеров' }, { value: '2 100+', label: 'игроков клуба' }],
           seo: { title: 'О клубе — UNLIM RIGA PADEL', description: 'История, команда и инфраструктура клуба.', robots: 'index-follow' },
         },
       },
@@ -1721,7 +1720,7 @@ async function seed() {
         badge: padelCourtZakazSeed.models.badge,
         items: padelCourtZakazSeed.models.items.map((model, index) => ({
           ...model,
-          image: padelCourtZakazMedia.models[index],
+          image: padelCourtZakazMedia.models[index].id,
           highlights: model.highlights.map((text) => ({ text })),
         })),
       },
@@ -1964,13 +1963,13 @@ async function seed() {
           addressLabel: 'Адрес', transitLabel: 'Ближайшее метро', parkingLabel: 'Парковка', openingHoursLabel: 'Режим работы', phoneFieldLabel: 'Телефон', emailFieldLabel: 'Email',
           phoneDisplay: '+7 985 835-00-55', phoneValue: '+79858350055', email: 'hello@unlimriga.club', transit: 'Мякинино · 12 мин пешком',
           parking: '50 бесплатных мест у входа', openingHours: 'Ежедневно 07:00–23:00', map: { latitude: 55.8, longitude: 37.15, zoom: 14 },
-          footerImage: mediaID(images.footerClub),
+          footerImage: padelCourtZakazMedia.footerImage.id,
           footerAbout: 'Unlim Riga Padel — клуб для тех, кто хочет играть на кортах уровня мировых турниров рядом с домом. Мы строили пространство вокруг трёх вещей: качества покрытия, работы тренеров и атмосферы, в которую хочется возвращаться. Здесь одинаково комфортно и новичку на первой тренировке, и резиденту клуба перед финалом лиги.',
           footerStats: [
-            { value: '2023', label: 'Год открытия' }, { value: '3', label: 'Панорамных корта' },
+            { value: '2026', label: 'Год открытия' }, { value: '3', label: 'Панорамных корта' },
             { value: '9', label: 'Тренеров в штате' }, { value: '2 100+', label: 'Игроков в клубе' },
           ],
-          legalEntity: 'ООО «Анлим Спорт» · ИНН 5024178932 · ОГРН 1235000078451',
+          legalEntity: 'ИП Баранова Татьяна Геннадьевна · ИНН 772803390700 · ОГРНИП 322774600668879 · E-mail: t.baranova@mail.ru',
           footerNavigation: [...footerNavigation],
           socialLinks: [
             { provider: 'vk', label: 'VK', url: 'https://vk.ru/unlimpadel' },

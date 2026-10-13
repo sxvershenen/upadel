@@ -21,7 +21,8 @@
     "media:responsive": "cross-env NODE_OPTIONS=--no-deprecation payload run src/scripts/mediaResponsiveBackfill.ts",
     "test:analytics:batch:db": "cross-env NODE_OPTIONS=--no-deprecation payload run src/scripts/analyticsBatchIntegration.ts",
     "test:content:db": "cross-env NODE_OPTIONS=--no-deprecation payload run src/scripts/contentLifecycleIntegration.ts",
-    "content:opening": "cross-env NODE_OPTIONS=--no-deprecation payload run src/scripts/openingContent.ts"
+    "content:opening": "cross-env NODE_OPTIONS=--no-deprecation payload run src/scripts/openingContent.ts",
+    "content:padel-court-zakaz": "cross-env NODE_OPTIONS=--no-deprecation payload run src/scripts/refreshPadelCourtZakaz.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.90.2",
