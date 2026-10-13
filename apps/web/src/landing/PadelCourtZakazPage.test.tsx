@@ -30,6 +30,9 @@ test('court model tabs expose all 6 JUBO models, crisp photos, and standardized 
   assert.equal((html.match(/role="tabpanel"/g) ?? []).length, 6)
   assert.equal((html.match(/aria-selected="true"/g) ?? []).length, 1)
   assert.equal((html.match(/ hidden=""/g) ?? []).length, 5)
+  assert.equal((html.match(/loading="eager"/g) ?? []).length, 1)
+  assert.match(html, /<img[^>]+loading="eager"[^>]+fetchpriority="high"/i)
+  assert.equal((html.match(/loading="lazy"/g) ?? []).length, 5)
 
   for (const id of ['infinity', 'super-panoramic', 'panoramic', 'vision-pro', 'infinity-tournament', 'infinity-xtrem']) {
     assert.match(html, new RegExp(`role="tab"[^>]+aria-controls="court-model-panel-${id}"`))

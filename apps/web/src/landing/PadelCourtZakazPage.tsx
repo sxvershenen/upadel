@@ -80,7 +80,6 @@ type ModelId = PadelModel['id']
 export function CourtModelTabs({ badge, models, onSelectModel }: { badge: string; models: PadelModel[]; onSelectModel?: (modelId: ModelId) => void }) {
   const [activeModel, setActiveModel] = useState<ModelId>(models[0]?.id ?? 'consultation')
   const [showTabHint, setShowTabHint] = useState(false)
-  const panelRef = useRef<HTMLDivElement>(null)
   const tabsRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -91,14 +90,6 @@ export function CourtModelTabs({ badge, models, onSelectModel }: { badge: string
     window.addEventListener('resize', syncHint)
     return () => window.removeEventListener('resize', syncHint)
   }, [])
-
-  useEffect(() => {
-    if (!panelRef.current) return
-    const ctx = gsap.context(() => {
-      gsap.fromTo(panelRef.current, { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.48, ease: 'power3.out', clearProps: 'opacity,visibility,transform' })
-    }, panelRef)
-    return () => ctx.revert()
-  }, [activeModel])
 
   const handleTabChange = (val: string) => {
     const id = val as ModelId
@@ -127,7 +118,7 @@ export function CourtModelTabs({ badge, models, onSelectModel }: { badge: string
       </div>
 
       <SurfaceCard tone="white" interactive={false} className="mt-6 p-6 md:p-10">
-        <div ref={panelRef}>
+        <div>
           {models.map((model) => {
             const isSelected = activeModel === model.id
             return (
@@ -145,10 +136,15 @@ export function CourtModelTabs({ badge, models, onSelectModel }: { badge: string
               >
                 <div className="grid gap-8 lg:grid-cols-[1.15fr_.85fr] lg:gap-12 lg:items-start">
                   <div className="relative aspect-[16/9] w-full overflow-hidden bg-white flex items-center justify-center">
-                    <ProgressiveImage
-                      media={model.image}
+                    <img
+                      src={model.image.url}
+                      srcSet={model.image.srcSet}
                       sizes="(min-width: 1024px) 55vw, 100vw"
-                      loading="lazy"
+                      alt={model.image.alt}
+                      width={model.image.width ?? undefined}
+                      height={model.image.height ?? undefined}
+                      loading={isSelected ? 'eager' : 'lazy'}
+                      fetchPriority={isSelected ? 'high' : 'low'}
                       decoding="async"
                       className="h-full w-full object-contain"
                     />
@@ -582,7 +578,7 @@ export function PadelCourtZakazPage({ dto, publicOrigin: _publicOrigin }: { dto:
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,5,8,.52)_0%,rgba(3,5,8,.82)_65%,rgba(3,5,8,.98)_100%)]" />
 
-        <div className="container-page relative z-10 flex flex-col justify-between flex-1">
+        <div className="container-page relative z-10 flex flex-1 flex-col justify-end">
           <Reveal eager className="pt-2 sm:pt-4">
             <Badge tone="glass" className="mb-4">
               <span className="mr-1.5 h-2 w-2 rounded-full bg-lime animate-pulse" />

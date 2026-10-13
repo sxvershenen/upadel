@@ -682,7 +682,7 @@ async function seed() {
       technologyBackground: mediaID(padelCourtZakazSeed.technology.background.source),
       gallery: padelCourtZakazSeed.gallery.items.map(({ source }) => mediaID(source)),
       models: await Promise.all(padelCourtZakazSeed.models.items.map(({ image }) => ensureLocalMedia(payload, image.source, image.alt))),
-      footerImage: await ensureLocalMedia(payload, 'images/footer/super-panoramic-player.webp', 'Игрок с ракеткой на корте JUBO Super Panoramic; фотография создана с помощью ИИ'),
+      footerImage: await ensureLocalMedia(payload, 'images/footer/super-panoramic-player-v2.webp', 'Игрок с ракеткой на корте JUBO Super Panoramic; фотография создана с помощью ИИ'),
       turnkey: await Promise.all(padelCourtZakazSeed.turnkey.steps.map(({ image, title }) => ensureLocalMedia(payload, image, title))),
     }
 
@@ -1961,7 +1961,7 @@ async function seed() {
           mobileActions: { playLabel: 'Играть', menuLabel: 'Меню', menuTitle: 'Меню', quickActionsTitle: 'Быстрые действия', bookCourtLabel: 'Забронировать корт', callLabel: 'Позвонить в клуб', directionsLabel: 'Проложить маршрут' },
           address: 'Новорижское шоссе, 3к1', directionsURL: 'https://yandex.ru/maps/?text=Новорижское%20шоссе%203к1',
           addressLabel: 'Адрес', transitLabel: 'Ближайшее метро', parkingLabel: 'Парковка', openingHoursLabel: 'Режим работы', phoneFieldLabel: 'Телефон', emailFieldLabel: 'Email',
-          phoneDisplay: '+7 985 835-00-55', phoneValue: '+79858350055', email: 'hello@unlimriga.club', transit: 'Мякинино · 12 мин пешком',
+          phoneDisplay: '+7 985 835-00-55', phoneValue: '+79858350055', email: 't.baranova@mail.ru', transit: 'Мякинино · 12 мин пешком',
           parking: '50 бесплатных мест у входа', openingHours: 'Ежедневно 07:00–23:00', map: { latitude: 55.8, longitude: 37.15, zoom: 14 },
           footerImage: padelCourtZakazMedia.footerImage.id,
           footerAbout: 'Unlim Riga Padel — клуб для тех, кто хочет играть на кортах уровня мировых турниров рядом с домом. Мы строили пространство вокруг трёх вещей: качества покрытия, работы тренеров и атмосферы, в которую хочется возвращаться. Здесь одинаково комфортно и новичку на первой тренировке, и резиденту клуба перед финалом лиги.',

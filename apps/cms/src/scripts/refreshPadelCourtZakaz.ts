@@ -100,8 +100,8 @@ try {
   } as never)
 
   const footerImage = await media(
-    'court-content:footer-super-panoramic-player:v1',
-    'images/footer/super-panoramic-player.webp',
+    'court-content:footer-super-panoramic-player:v2',
+    'images/footer/super-panoramic-player-v2.webp',
     'Игрок с ракеткой на корте JUBO Super Panoramic',
     true,
   )
@@ -112,7 +112,7 @@ try {
     ...options,
     slug: 'site-settings',
     draft: false,
-    data: { footerImage, footerStats, legalEntity, _status: 'published' },
+    data: { footerImage, footerStats, legalEntity, email: 't.baranova@mail.ru', _status: 'published' },
   } as never)
 
   const aboutStats = (about.stats ?? []).map((item: Record<string, any>) =>

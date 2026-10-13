@@ -28,7 +28,7 @@ test('refinements update only requested content, preserve cancellation rules and
   assert.equal(globals.homepage.benefitsSection.cards[1].variant, 'community')
   assert.equal(globals.homepage.benefitsSection.cards[1].action.href, 'https://t.me/unlimpadel')
   assert.equal(globals.homepage.benefitsSection.cards[2].variant, 'kids-wide')
-  assert.equal(globals['site-settings'].email, 'info@unlimpadel.ru')
+  assert.equal(globals['site-settings'].email, 't.baranova@mail.ru')
   assert.equal(globals.homepage.methodistBanner.price, 3000)
   globals.homepage.methodistBanner.eyebrow = 'Редактор изменил'
   const before = writes
