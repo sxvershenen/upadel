@@ -18,6 +18,8 @@ const dto = {
 test('Prices removes the tab control when memberships are hidden and keeps terms/FAQ in two columns', () => {
   const html = renderToStaticMarkup(<Prices dto={dto} />)
   assert.doesNotMatch(html, /role="tablist"|role="tabpanel"|Разделы цен/)
+  assert.match(html, /lg:grid-cols-12 lg:grid-rows-/)
+  assert.match(html, /pricing-rent-swiper/)
   assert.match(html, /lg:grid-cols-2/)
   assert.match(html, /Условия и правила/)
   assert.match(html, /lucide-credit-card/)
@@ -49,7 +51,9 @@ test('Prices gets the membership offer and standards from homepage pricing conte
   assert.ok(html.indexOf('Прайм-тайм') < html.indexOf('Специальные абонементы'))
   assert.match(html, /Цена по запросу/)
   assert.match(html, /Стандарты Unlim Riga/)
-  assert.equal((html.match(/bg-white/g) ?? []).length, 4)
+  assert.match(html, /lg:col-span-8 lg:row-start-2/)
+  assert.match(html, /lg:col-start-9 lg:row-span-2 lg:row-start-1/)
+  assert.match(html, /pricing-rent-swiper/)
 })
 
 test('rental cards keep title and time at the top and description with the price at the bottom', () => {

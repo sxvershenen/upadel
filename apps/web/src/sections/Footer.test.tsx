@@ -28,13 +28,13 @@ const site = {
   contacts: {
     address: 'Москва',
     directionsURL: 'https://yandex.ru/maps/example',
-    transit: 'Транспорт',
+    transit: 'Строгино',
     parking: 'Парковка',
     openingHours: '07:00–23:00',
     phoneDisplay: '+7 999 000-00-00',
     phoneValue: '+79990000000',
     email: 'club@example.com',
-    labels: { address: 'Адрес', transit: 'Транспорт', parking: 'Парковка', openingHours: 'Часы работы', phone: 'Телефон', email: 'Email' },
+    labels: { address: 'Адрес', transit: 'Ближайшее метро', parking: 'Парковка', openingHours: 'Часы работы', phone: 'Телефон', email: 'Email' },
     map: { longitude: 37.3, latitude: 55.8, zoom: 15 },
   },
   booking: { mode: 'external-link', ready: true, buttonLabel: 'Забронировать корт', externalURL: 'https://booking.example' },
@@ -52,4 +52,5 @@ test('footer centers legal links and credits OCHK.OOO', () => {
   assert.match(legalRow, /href="https:\/\/ochk\.ooo"[^>]*>Разработано OCHK\.OOO<\/a>/)
   assert.match(legalRow, /sm:grid-cols-\[minmax\(0,1fr\)_auto_minmax\(0,1fr\)\]/)
   assert.match(legalRow, /justify-center/)
+  assert.match(html, /Ближайшее метро[\s\S]*Строгино/)
 })

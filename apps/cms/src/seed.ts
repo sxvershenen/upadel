@@ -1926,6 +1926,16 @@ async function seed() {
       if (currentSettings.phoneDisplay === '+7 999 000-00-00') contactUpdates.phoneDisplay = '+7 985 835-00-55'
       if (currentSettings.phoneValue === '+79990000000') contactUpdates.phoneValue = '+79858350055'
       if (currentSettings.openingHours === 'Ежедневно 07:00–00:00') contactUpdates.openingHours = 'Ежедневно 07:00–23:00'
+      if (currentSettings.transit === 'Мякинино · 12 мин пешком') contactUpdates.transit = 'Строгино'
+      const currentAnalytics = currentSettings.analytics ?? {}
+      const analyticsUpdate: Record<string, unknown> = {}
+      if (!currentAnalytics.yandexMetricaCounterID) {
+        analyticsUpdate.yandexMetricaEnabled = true
+        analyticsUpdate.yandexMetricaCounterID = '113700320'
+        analyticsUpdate.yandexMetricaWebvisor = true
+      }
+      if (!currentAnalytics.yandexWebmasterVerification) analyticsUpdate.yandexWebmasterVerification = 'fccfcc811cf8f0fc'
+      if (Object.keys(analyticsUpdate).length) contactUpdates.analytics = { ...currentAnalytics, ...analyticsUpdate }
       if (currentSettings.parking === '40 бесплатных мест у входа' || currentSettings.parking === '40 бесплатных мест у входа') contactUpdates.parking = '50 бесплатных мест у входа'
       if (Object.keys(contactUpdates).length > 0) {
         await payload.updateGlobal({ slug: 'site-settings', draft: false, overrideAccess: true, data: { ...contactUpdates, _status: 'published' } as never })
@@ -1961,7 +1971,7 @@ async function seed() {
           mobileActions: { playLabel: 'Играть', menuLabel: 'Меню', menuTitle: 'Меню', quickActionsTitle: 'Быстрые действия', bookCourtLabel: 'Забронировать корт', callLabel: 'Позвонить в клуб', directionsLabel: 'Проложить маршрут' },
           address: 'Новорижское шоссе, 3к1', directionsURL: 'https://yandex.ru/maps/?text=Новорижское%20шоссе%203к1',
           addressLabel: 'Адрес', transitLabel: 'Ближайшее метро', parkingLabel: 'Парковка', openingHoursLabel: 'Режим работы', phoneFieldLabel: 'Телефон', emailFieldLabel: 'Email',
-          phoneDisplay: '+7 985 835-00-55', phoneValue: '+79858350055', email: 't.baranova@mail.ru', transit: 'Мякинино · 12 мин пешком',
+          phoneDisplay: '+7 985 835-00-55', phoneValue: '+79858350055', email: 't.baranova@mail.ru', transit: 'Строгино',
           parking: '50 бесплатных мест у входа', openingHours: 'Ежедневно 07:00–23:00', map: { latitude: 55.8, longitude: 37.15, zoom: 14 },
           footerImage: padelCourtZakazMedia.footerImage.id,
           footerAbout: 'Unlim Riga Padel — клуб для тех, кто хочет играть на кортах уровня мировых турниров рядом с домом. Мы строили пространство вокруг трёх вещей: качества покрытия, работы тренеров и атмосферы, в которую хочется возвращаться. Здесь одинаково комфортно и новичку на первой тренировке, и резиденту клуба перед финалом лиги.',
@@ -1981,6 +1991,7 @@ async function seed() {
           contactConfirmation,
           booking: { mode: 'vivacrm-widget', widgetURL: 'https://supadb.vivacrm.ru/storage/v1/object/public/widgets/3ffc4681-890e-4d27-9676-1a5a7c246b17.js', buttonLabel: 'Забронировать' },
           account: { mode: 'vivacrm-widget', widgetURL: 'https://supadb.vivacrm.ru/storage/v1/object/public/widgets/8e5e55da-bb08-4d93-9572-047f3d99b3b8.js', buttonLabel: 'Личный кабинет', mobileLabel: 'Кабинет' },
+          analytics: { mode: 'consent-required', yandexMetricaEnabled: true, yandexMetricaCounterID: '113700320', yandexMetricaWebvisor: true, yandexWebmasterVerification: 'fccfcc811cf8f0fc' },
         } as never,
       })
       stats.globalsPublished += 1

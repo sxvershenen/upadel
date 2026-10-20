@@ -41,6 +41,8 @@ Accepted: four base tabs, optional extra tab only for a clearly separate questio
 
 Keep the pseudonymous browser identifier for 13 months and its first recognised advertising source for at most 60 days. Russian privacy/legal behavior must be reviewed before launch; do not reuse the discarded Latvian assumption.
 
+Yandex.Metrica uses the existing cookie-consent gate. Counter ID, Webvisor and Webmaster verification stay editable under `Настройки сайта → Интеграции`; replay masks all shared form inputs and textareas. This is an implementation default, not a legal conclusion.
+
 ## D8 — MVP boundary
 
 Recommendation for first release: all listed public routes, core CMS editing, media optimization, lead capture, SEO controls, booking adapter, article/entity management and a focused analytics overview. Defer visual page building, advanced attribution, media dependency graphs and automated booking-provider synchronization unless explicitly promoted into MVP.
@@ -58,7 +60,7 @@ Use one level of native collapsible navigation groups, ordered as `Обраще�
 
 ## D10 — Homepage editor tabs — accepted
 
-`Главная` groups its section fields and homepage-only collections in tabs, including rental standards and the membership offer. Rental-rate records contain actual rental tariffs; standards and the membership offer are homepage-owned, and `/prices` consumes the same offer. Catalog and thematic page editors additionally expose a `Шапка страницы` tab for hero media and grayscale. Reusable coaches, tournaments and articles remain collection-owned and are linked/resolved rather than copied.
+`Главная` groups its section fields and homepage-only collections in tabs, including rental standards and the membership offer. Rental-rate records contain actual rental tariffs; standards and the membership offer are homepage-owned, and `/prices` consumes the same data and card composition. The `/prices` route keeps its own terms, FAQ and membership tab while reusing the homepage desktop grid and mobile card carousels. Catalog and thematic page editors additionally expose a `Шапка страницы` tab for hero media and grayscale. Reusable coaches, tournaments and articles remain collection-owned and are linked/resolved rather than copied.
 
 Shared header, mobile navigation/menu, contacts and footer belong to `Настройки сайта`, because every public page consumes them. Desktop navigation items may contain typed submenu rows and both levels may reference optional SVG icons from the Media collection; public rendering uses safe image URLs rather than editor-provided inline markup.
 CMS users and SEO redirects are also managed from dedicated tabs inside `Настройки сайта`; their standalone navigation entries stay hidden.

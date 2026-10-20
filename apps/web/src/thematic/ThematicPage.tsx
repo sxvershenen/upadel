@@ -1,15 +1,19 @@
 import { TermsList } from '../components/TermsList'
 import type { PricesPageDTO, ThematicPageDTO } from '@unlim/content-contract'
 import { CalendarCheck, ClipboardCheck, CreditCard, PackageCheck, RefreshCw, ShowerHead, Car, Clock, Layers3, Lightbulb, MapPin, PanelTop, Thermometer, Train } from 'lucide-react'
-import { useState, type CSSProperties } from 'react'
+import { useRef, useState, type CSSProperties } from 'react'
 
 import { MembershipCard } from '../components/cards/MembershipCards'
 import { RentalRateCard } from '../components/cards/RentPricingCards'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import type { Swiper as SwiperType } from 'swiper'
 import { CourtCard } from '../components/cards/CourtCards'
 import { SiteFrame } from '../components/SiteFrame'
 import { Accordion } from '../components/ui/Accordion'
 import { Typography } from '../components/ui/Typography'
 import { Tabs } from '../components/ui/Tabs'
+import { horizontalSwiperProps } from '../lib/swiper'
+import { useMobileSwipeHint } from '../lib/useMobileSwipeHint'
 import { GalleryExperience } from './GalleryExperience'
 import { PageHeader } from './PageHeader'
 
@@ -18,11 +22,12 @@ export function Prices({ dto }: { dto: PricesPageDTO }) {
     { id: 'rent' as const, label: dto.tabs.rent, panelId: 'price-panel-rent' },
     ...(dto.memberships.length ? [{ id: 'memberships' as const, label: dto.tabs.memberships, panelId: 'price-panel-memberships' }] : []),
   ]
-  const standardRates = [
-    ...dto.rentalRates,
-    ...(dto.membershipOffer.enabled ? [{ id: 'membership-offer', title: dto.membershipOffer.title, eyebrow: dto.membershipOffer.eyebrow, description: dto.membershipOffer.description, priceLabel: dto.membershipOffer.priceLabel, price: null, priceSuffix: null, timeLabel: null, badge: null, badgeTone: null, meshTone: dto.membershipOffer.meshTone, includedItems: [], action: dto.membershipOffer.action, cardVariant: 'membership-offer' as const }] : []),
-    ...(dto.rentalStandards.enabled ? [{ id: 'rental-standards', title: dto.rentalStandards.title, eyebrow: dto.rentalStandards.eyebrow, description: dto.rentalStandards.description, priceLabel: null, price: null, priceSuffix: null, timeLabel: dto.rentalStandards.timeLabel, badge: null, badgeTone: null, meshTone: dto.rentalStandards.meshTone, includedItems: dto.rentalStandards.includedItems, action: { mode: 'none' as const }, cardVariant: 'standards' as const }] : []),
-  ]
+  const offers = dto.membershipOffer.enabled ? [{ id: 'membership-offer', title: dto.membershipOffer.title, eyebrow: dto.membershipOffer.eyebrow, description: dto.membershipOffer.description, priceLabel: dto.membershipOffer.priceLabel, price: null, priceSuffix: null, timeLabel: null, badge: null, badgeTone: null, meshTone: dto.membershipOffer.meshTone, includedItems: [], action: dto.membershipOffer.action, cardVariant: 'membership-offer' as const }] : []
+  const standards = dto.rentalStandards.enabled ? { id: 'rental-standards', title: dto.rentalStandards.title, eyebrow: dto.rentalStandards.eyebrow, description: dto.rentalStandards.description, priceLabel: null, price: null, priceSuffix: null, timeLabel: dto.rentalStandards.timeLabel, badge: null, badgeTone: null, meshTone: dto.rentalStandards.meshTone, includedItems: dto.rentalStandards.includedItems, action: { mode: 'none' as const }, cardVariant: 'standards' as const } : undefined
+  const rentSwiperRef = useRef<SwiperType | null>(null)
+  const membershipsSwiperRef = useRef<SwiperType | null>(null)
+  const rentSwipeHintRef = useMobileSwipeHint(rentSwiperRef, 'prices-rent')
+  const membershipsSwipeHintRef = useMobileSwipeHint(membershipsSwiperRef, 'prices-memberships')
   const [active, setActive] = useState<(typeof tabs)[number]['id']>('rent')
   const visibleActive = dto.memberships.length ? active : 'rent'
   return <>
@@ -31,8 +36,18 @@ export function Prices({ dto }: { dto: PricesPageDTO }) {
       <Tabs reveal={false} layoutId="prices-tabs" aria-label="Разделы цен" tabs={tabs} value={visibleActive} onChange={setActive} className="w-full [&>button]:flex-1 md:w-auto md:[&>button]:flex-none" />
     </div></>}
     <div className="container-page pt-8 pb-8 md:pb-12">
-      <section id="price-panel-rent" role={tabs.length > 1 ? 'tabpanel' : undefined} aria-label={dto.tabs.rent} hidden={visibleActive !== 'rent'}><div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">{standardRates.map((item) => <RentalRateCard key={item.id} rate={item} layout={item.cardVariant === 'membership-offer' ? 'strip' : undefined} />)}</div></section>
-      <section id="price-panel-memberships" role={tabs.length > 1 ? 'tabpanel' : undefined} aria-label={dto.tabs.memberships} hidden={visibleActive !== 'memberships'}><div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">{dto.memberships.map((item) => <MembershipCard key={item.id} membership={item} />)}</div></section>
+      <section id="price-panel-rent" role={tabs.length > 1 ? 'tabpanel' : undefined} aria-label={dto.tabs.rent} hidden={visibleActive !== 'rent'}>
+        <div className="grid gap-4 lg:grid-cols-12 lg:grid-rows-[minmax(320px,1fr)_auto]">
+          {dto.rentalRates.map((rate) => <div key={rate.id} className="hidden lg:col-span-4 lg:row-start-1 lg:block"><RentalRateCard rate={rate} sourcePage="/prices" /></div>)}
+          <div ref={rentSwipeHintRef} className="-mx-5 lg:hidden"><Swiper {...horizontalSwiperProps} onSwiper={(swiper) => { rentSwiperRef.current = swiper }} slidesPerView={1} spaceBetween={12} className="swiper-breathe pricing-rent-swiper !px-5">{dto.rentalRates.map((rate) => <SwiperSlide key={rate.id} className="!h-auto"><RentalRateCard rate={rate} sourcePage="/prices" layout="compact" /></SwiperSlide>)}</Swiper></div>
+          {offers.map((offer) => <div key={offer.id} className="lg:col-span-8 lg:row-start-2"><RentalRateCard rate={{ ...offer, action: dto.membershipOffer.action }} sourcePage="/prices" layout="strip" /></div>)}
+          {standards && <div className="lg:col-span-4 lg:col-start-9 lg:row-span-2 lg:row-start-1"><RentalRateCard rate={standards} sourcePage="/prices" /></div>}
+        </div>
+      </section>
+      <section id="price-panel-memberships" role={tabs.length > 1 ? 'tabpanel' : undefined} aria-label={dto.tabs.memberships} hidden={visibleActive !== 'memberships'}>
+        <div className="hidden gap-4 lg:grid lg:grid-cols-4">{dto.memberships.map((item) => <MembershipCard key={item.id} membership={item} />)}</div>
+        <div ref={membershipsSwipeHintRef} className="-mx-5 lg:hidden"><Swiper {...horizontalSwiperProps} onSwiper={(swiper) => { membershipsSwiperRef.current = swiper }} slidesPerView={1} spaceBetween={12} className="swiper-breathe pricing-memberships-swiper !px-5">{dto.memberships.map((item) => <SwiperSlide key={item.id} className="!h-auto"><MembershipCard membership={item} /></SwiperSlide>)}</Swiper></div>
+      </section>
       <section className="mt-16 grid gap-8 lg:grid-cols-2 lg:gap-0 lg:divide-x lg:divide-ink/10" aria-label={dto.termsTitle}>
         <div className="lg:pr-16">
           <Typography as="h2" role="section" className="font-semibold text-ink">{dto.termsTitle}</Typography>

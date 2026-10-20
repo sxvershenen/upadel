@@ -47,11 +47,25 @@ export function ExternalAnalytics({
           "unlim-yandex-metrica",
           "https://mc.yandex.ru/metrika/tag.js",
         );
+        window.dataLayer ??= [];
         window.ym(Number(metrica.counterId), "init", {
+          ssr: true,
           clickmap: true,
+          ecommerce: "dataLayer",
+          referrer: document.referrer,
+          url: location.href,
           trackLinks: true,
           accurateTrackBounce: true,
           webvisor: metrica.webvisor,
+        });
+        let previousUrl = location.href;
+        document.addEventListener("swup:page:view", () => {
+          const referer = previousUrl;
+          previousUrl = location.href;
+          window.ym?.(Number(metrica.counterId), "hit", location.href, {
+            title: document.title,
+            referer,
+          });
         });
       }
       const ga4 = vendors.ga4;
