@@ -9,9 +9,16 @@ import { CardAction } from './CardAction'
 
 export type RentalRate = RentalCardDTO
 
-export function RentalRateCard({ rate, sourcePage, layout = 'compact' }: { rate: RentalRate; sourceEntity?: string; sourcePage?: string; layout?: 'wide' | 'compact' | 'strip' }) {
+export function RentalRateCard({ rate, sourcePage, layout = 'compact' }: { rate: RentalRate; sourceEntity?: string; sourcePage?: string; layout?: 'wide' | 'compact' | 'strip' | 'membership' }) {
   let card
-  if (layout === 'strip' && rate.cardVariant === 'membership-offer') {
+  if (layout === 'membership' && rate.cardVariant === 'membership-offer') {
+    card = <WhiteCard interactive={false} reveal={false} className="flex h-full min-h-[460px] flex-col justify-center gap-4 p-7 md:p-8">
+      <div className="flex items-center justify-between gap-5">
+        <div className="min-w-0"><Typography as="h3" role="title-compact" reveal={false} className="font-semibold text-ink">{rate.title}</Typography>{rate.description && <Typography role="body-small" reveal={false} className="mt-1 text-ink-soft">{rate.description}</Typography>}</div>
+        <div className="flex shrink-0 items-center gap-4"><Typography role="body-small" reveal={false} className="font-semibold text-ink">{rate.priceLabel}</Typography><ArrowAction tone="light" size="sm" cardHover className="bg-surface-muted text-ink" /></div>
+      </div>
+    </WhiteCard>
+  } else if (layout === 'strip' && rate.cardVariant === 'membership-offer') {
     card = <WhiteCard interactive={false} reveal={false} className="flex h-full flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between md:px-7">
       <div className="min-w-0"><Typography as="h3" role="title-compact" reveal={false} className="font-semibold text-ink">{rate.title}</Typography>{rate.description && <Typography role="body-small" reveal={false} className="mt-1 text-ink-soft">{rate.description}</Typography>}</div>
       <div className="flex shrink-0 items-center justify-between gap-4 sm:justify-end"><Typography role="body-small" reveal={false} className="font-semibold text-ink">{rate.priceLabel}</Typography><ArrowAction tone="light" size="sm" cardHover className="bg-surface-muted text-ink" /></div>

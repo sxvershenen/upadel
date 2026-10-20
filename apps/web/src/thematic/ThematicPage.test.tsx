@@ -51,8 +51,8 @@ test('Prices gets the membership offer and standards from homepage pricing conte
   assert.ok(html.indexOf('Прайм-тайм') < html.indexOf('Специальные абонементы'))
   assert.match(html, /Цена по запросу/)
   assert.match(html, /Стандарты Unlim Riga/)
-  assert.match(html, /lg:col-span-8 lg:row-start-2/)
-  assert.match(html, /lg:col-start-9 lg:row-span-2 lg:row-start-1/)
+  assert.match(html, /min-h-\[460px\]/)
+  assert.match(html, /lg:col-span-4 lg:row-start-2/)
   assert.match(html, /pricing-rent-swiper/)
 })
 

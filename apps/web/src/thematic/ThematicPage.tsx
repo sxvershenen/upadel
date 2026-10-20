@@ -37,11 +37,11 @@ export function Prices({ dto }: { dto: PricesPageDTO }) {
     </div></>}
     <div className="container-page pt-8 pb-8 md:pb-12">
       <section id="price-panel-rent" role={tabs.length > 1 ? 'tabpanel' : undefined} aria-label={dto.tabs.rent} hidden={visibleActive !== 'rent'}>
-        <div className="grid gap-4 lg:grid-cols-12 lg:grid-rows-[minmax(320px,1fr)_auto]">
+        <div className="grid gap-4 lg:grid-cols-12 lg:grid-rows-[minmax(460px,1fr)_auto]">
           {dto.rentalRates.map((rate) => <div key={rate.id} className="hidden lg:col-span-4 lg:row-start-1 lg:block"><RentalRateCard rate={rate} sourcePage="/prices" /></div>)}
           <div ref={rentSwipeHintRef} className="-mx-5 lg:hidden"><Swiper {...horizontalSwiperProps} onSwiper={(swiper) => { rentSwiperRef.current = swiper }} slidesPerView={1} spaceBetween={12} className="swiper-breathe pricing-rent-swiper !px-5">{dto.rentalRates.map((rate) => <SwiperSlide key={rate.id} className="!h-auto"><RentalRateCard rate={rate} sourcePage="/prices" layout="compact" /></SwiperSlide>)}</Swiper></div>
-          {offers.map((offer) => <div key={offer.id} className="lg:col-span-8 lg:row-start-2"><RentalRateCard rate={{ ...offer, action: dto.membershipOffer.action }} sourcePage="/prices" layout="strip" /></div>)}
-          {standards && <div className="lg:col-span-4 lg:col-start-9 lg:row-span-2 lg:row-start-1"><RentalRateCard rate={standards} sourcePage="/prices" /></div>}
+          {offers.map((offer) => <div key={offer.id} className="lg:col-span-4 lg:row-start-1"><RentalRateCard rate={{ ...offer, action: dto.membershipOffer.action }} sourcePage="/prices" layout="membership" /></div>)}
+          {standards && <div className="lg:col-span-4 lg:row-start-2"><RentalRateCard rate={standards} sourcePage="/prices" /></div>}
         </div>
       </section>
       <section id="price-panel-memberships" role={tabs.length > 1 ? 'tabpanel' : undefined} aria-label={dto.tabs.memberships} hidden={visibleActive !== 'memberships'}>
