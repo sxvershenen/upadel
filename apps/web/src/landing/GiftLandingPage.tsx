@@ -290,6 +290,13 @@ export function GiftLandingPage({ dto, publicOrigin: _publicOrigin = 'https://un
     const phone = preferredChannel === 'phone' ? contactValue : ''
     const telegram = preferredChannel === 'telegram' ? contactValue : ''
     const vk = preferredChannel === 'vk' ? contactValue : ''
+    if (formData.get('consent') !== 'on') {
+      setErrorMessage('Для отправки необходимо согласие на обработку персональных данных.')
+      setFormState('idle')
+      trackAnalytics({ name: 'form_error', formType: 'gift', objectType: 'form', objectId: `gift:${selectedFormat}` })
+      return
+    }
+
     const formatLabel = selectedFormat === 'box' ? 'Подарочный бокс' : 'Электронный PDF'
     const sourceEntity = `Подарочный сертификат: ${formatLabel}`
     const fullComment = [`Формат: ${formatLabel}`, `Назначение: ${selectedPurpose}`, recipientName ? `Получатель: ${recipientName}` : '', comment ? `Пожелание: ${comment}` : ''].filter(Boolean).join('. ')
@@ -783,7 +790,6 @@ export function GiftLandingPage({ dto, publicOrigin: _publicOrigin = 'https://un
                       <CheckboxField
                         name="consent"
                         required
-                        defaultChecked
                         label={
                           <span>
                             <a

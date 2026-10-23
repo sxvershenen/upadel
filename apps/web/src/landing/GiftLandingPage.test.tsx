@@ -87,6 +87,10 @@ test('GiftLandingPage renders server HTML with SEO content and key sections', ()
   assert.match(html, /class="[^"]*sm:rounded-\[var\(--se-2\)\][^"]*sm:bg-surface-muted[^"]*"/)
   assert.match(html, /class="[^"]*border-b border-ink\/10[^"]*last:border-b-0[^"]*sm:border-b-0[^"]*"/)
 
+  const consent = html.match(/<input[^>]*name="consent"[^>]*>/)?.[0] ?? ''
+  assert.match(consent, /required/)
+  assert.doesNotMatch(consent, /checked/)
+
   // Form inputs have sr-only labels
   assert.match(html, /class="[^"]*sr-only[^"]*"[^>]*>Ваше имя<\/label>/)
   assert.match(html, /class="[^"]*sr-only[^"]*"[^>]*>Контакт для связи<\/label>/)
