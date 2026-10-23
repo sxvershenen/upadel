@@ -73,7 +73,7 @@ export function ExternalAnalytics({
           accurateTrackBounce: true,
           webvisor: metrica.webvisor,
         });
-        loadScript("unlim-yandex-metrica", "https://mc.yandex.ru/metrika/tag.js");
+        loadScript("unlim-yandex-metrica", "https://mc.yandex.ru/metrika/tag.js?consent=accepted");
         let previousUrl = location.href;
         document.addEventListener("swup:page:view", () => {
           const referer = previousUrl;
