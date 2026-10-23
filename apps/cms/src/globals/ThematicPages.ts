@@ -8,7 +8,7 @@ import { imageOnlyFilter } from '../fields/media'
 import { seoField } from '../fields/seo'
 import { requirePublishedGlobal } from '../hooks/requirePublishedGlobal'
 
-export type ThematicPageKind = 'prices' | 'training' | 'gift' | 'courts' | 'gallery' | 'about' | 'contacts' | 'policy' | 'oferta'
+export type ThematicPageKind = 'prices' | 'training' | 'gift' | 'courts' | 'gallery' | 'about' | 'contacts' | 'policy' | 'oferta' | 'rules'
 export type CodeDefinedPageKind = 'padel-court-zakaz'
 export type ThematicPageSlug = `${ThematicPageKind | CodeDefinedPageKind}-page`
 
@@ -314,3 +314,13 @@ function createLegalPage(kind: 'policy' | 'oferta', label: string): GlobalConfig
 
 export const PolicyPage = createLegalPage('policy', 'Политика конфиденциальности')
 export const OfertaPage = createLegalPage('oferta', 'Публичная оферта')
+
+export const RulesPage = createThematicPage({
+  slug: 'rules-page', label: 'Правила посещения клуба', kind: 'rules', fields: [
+    { name: 'sections', type: 'array', label: 'Разделы правил', minRows: 1, fields: [
+      { name: 'title', type: 'text', label: 'Заголовок', required: true },
+      { name: 'content', type: 'richText', label: 'Правила раздела', required: true },
+    ] },
+    { name: 'closingText', type: 'textarea', label: 'Заключение' },
+  ],
+})

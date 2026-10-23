@@ -35,7 +35,7 @@ import { BlogPage } from './globals/BlogPage'
 import { CoachesPage } from './globals/CoachesPage'
 import { TournamentsPage } from './globals/TournamentsPage'
 import { TournamentDefaults } from './globals/TournamentDefaults'
-import { AboutPage, ContactsPage, CourtsPage, GalleryPage, GiftPage, OfertaPage, PadelCourtZakazPage, PolicyPage, PricesPage, TrainingPage } from './globals/ThematicPages'
+import { AboutPage, ContactsPage, CourtsPage, GalleryPage, GiftPage, OfertaPage, PadelCourtZakazPage, PolicyPage, PricesPage, RulesPage, TrainingPage } from './globals/ThematicPages'
 import { migrations } from './migrations'
 import { installTransactionInvalidation, invalidateCollectionContent, invalidateGlobalContent } from './content/projectionCache'
 
@@ -122,7 +122,7 @@ export default buildConfig({
   globals: [
     { ...SiteSettings, admin: { ...SiteSettings.admin, group: 'Настройки' } },
     { ...TournamentDefaults, label: 'Общие условия турниров', admin: { ...TournamentDefaults.admin, group: 'Турниры' } },
-    ...[HomePage, PricesPage, TrainingPage, CoachesPage, TournamentsPage, GiftPage, BlogPage, GalleryPage, AboutPage, ContactsPage, CourtsPage, PadelCourtZakazPage, PolicyPage, OfertaPage]
+    ...[HomePage, PricesPage, TrainingPage, CoachesPage, TournamentsPage, GiftPage, BlogPage, GalleryPage, AboutPage, ContactsPage, CourtsPage, PadelCourtZakazPage, PolicyPage, OfertaPage, RulesPage]
       .map((global) => ({
         ...global,
         ...(global.slug === 'padel-court-zakaz-page' ? { label: 'Дистрибьюция кортов' } : {}),

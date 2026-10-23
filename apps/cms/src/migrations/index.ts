@@ -1,3 +1,4 @@
+import * as clubRulesWaitlist from './20261023_170000_club_rules_waitlist';
 import * as brandWordmark from './20261023_160000_brand_wordmark';
 import * as payloadAuthRequestedAt from './20261011_010000_payload_auth_requested_at'
 import * as homepageHeroSlots from './20261011_050000_homepage_hero_slots'
@@ -146,4 +147,5 @@ export const migrations = [
   { up: homepageHeroSlotVisibility.up, down: homepageHeroSlotVisibility.down, name: '20261011_080000_homepage_hero_slot_visibility' },
   { up: footerSponsorsConsent.up, down: footerSponsorsConsent.down, name: '20261023_140000_footer_sponsors_consent' },
   { up: brandWordmark.up, down: brandWordmark.down, name: '20261023_160000_brand_wordmark' },
+  { up: clubRulesWaitlist.up, down: clubRulesWaitlist.down, name: '20261023_170000_club_rules_waitlist' },
 ];

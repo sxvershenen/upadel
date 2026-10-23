@@ -126,6 +126,7 @@ export function AnalyticsTracker({ analytics }: { analytics: SiteDTO['analytics'
     }
     addEventListener('click', click, true); addEventListener('scroll', scroll, { passive: true }); addEventListener('pointerdown', activity, { passive: true }); addEventListener('keydown', activity)
     start()
+    window.dispatchEvent(new Event('unlim:analytics-ready'))
     return () => { void flush(true); stop(); if (window.unlimAnalytics === analyticsBridge) delete window.unlimAnalytics; removeEventListener('click', click, true); removeEventListener('scroll', scroll); removeEventListener('pointerdown', activity); removeEventListener('keydown', activity) }
   }, [analytics.endpoint, analytics.mode, analytics.schemaVersion])
   return null

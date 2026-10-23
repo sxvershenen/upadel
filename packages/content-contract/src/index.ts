@@ -1,7 +1,7 @@
 export * from './widgets'
 import type { CatalogPagination, CatalogQuery } from './catalog'
 export * from './catalog'
-export const homepageDTOversion = 24 as const
+export const homepageDTOversion = 25 as const
 
 export const publicRouteRegistry = [
   { path: '/', parent: null, template: 'homepage', globalSlug: 'homepage' },
@@ -13,6 +13,7 @@ export const publicRouteRegistry = [
   { path: '/gift', parent: '/', template: 'gift', globalSlug: 'gift-page' },
   { path: '/gallery', parent: '/', template: 'gallery', globalSlug: 'gallery-page' },
   { path: '/about', parent: '/', template: 'about', globalSlug: 'about-page' },
+  { path: '/rules', parent: '/', template: 'club-rules', globalSlug: 'rules-page' },
   { path: '/policy', parent: '/', template: 'legal-policy', globalSlug: 'policy-page' },
   { path: '/oferta', parent: '/', template: 'legal-oferta', globalSlug: 'oferta-page' },
 ] as const
@@ -168,6 +169,7 @@ export type HomepageDTO = {
     account?: BookingDTO & { mobileLabel?: string }
     booking: BookingDTO
 
+    waitlist?: { enabled: boolean; title: string; description: string; submitLabel: string; successTitle: string; successText: string; telegramTitle: string; telegramCopy: string; telegramURL: string }
     contactConfirmation: {
       avatar?: MediaDTO | null
       cancelLabel: string
@@ -440,7 +442,8 @@ export type GalleryPageDTO = ThematicPageBase & { kind: 'gallery'; gallery: Home
 export type AboutPageDTO = ThematicPageBase & { kind: 'about'; storyHTML: string; stats: Array<{ value: string; label: string }>; gallery: HomepageDTO['entities']['gallery'] }
 export type ContactsPageDTO = ThematicPageBase & { kind: 'contacts'; directionsTitle: string; directionsText: string; arrivalNotes: Array<{ title: string; text: string; icon: 'Car' | 'Train' | 'Clock' | 'MapPin' }> }
 export type LegalPageDTO = ThematicPageBase & { kind: 'policy' | 'oferta'; notice: string; contentHTML: string; approved: boolean }
-export type ThematicPageDTO = PricesPageDTO | TrainingPageDTO | GiftPageDTO | CourtsPageDTO | GalleryPageDTO | AboutPageDTO | ContactsPageDTO | LegalPageDTO
+export type ClubRulesPageDTO = ThematicPageBase & { kind: 'rules'; sections: Array<{ title: string; contentHTML: string }>; closingText: string }
+export type ThematicPageDTO = ClubRulesPageDTO | PricesPageDTO | TrainingPageDTO | GiftPageDTO | CourtsPageDTO | GalleryPageDTO | AboutPageDTO | ContactsPageDTO | LegalPageDTO
 
 const sectionKeys = new Set<HomeSectionKey>(['hero', 'benefits', 'offers', 'courts', 'pricing', 'coaches', 'methodist-banner', 'tournaments', 'gallery', 'blog', 'reviews-faq'])
 const overlays = new Set(['overlay-lime', 'overlay-blue', 'overlay-cyan', 'overlay-violet', 'overlay-sunset', 'overlay-emerald', 'overlay-dark'])
@@ -535,7 +538,7 @@ export function parseThematicPageDTO(value: unknown): ThematicPageDTO {
   if (!value || typeof value !== 'object') throw new Error('Page DTO must be an object.')
   const dto = value as Partial<ThematicPageDTO>
   if (dto.version !== homepageDTOversion || !dto.site || !dto.page) throw new Error('Page DTO is incomplete.')
-  if (!['prices', 'training', 'gift', 'courts', 'gallery', 'about', 'contacts', 'policy', 'oferta'].includes(String(dto.kind))) throw new Error('Page DTO kind is invalid.')
+  if (!['prices', 'training', 'gift', 'courts', 'gallery', 'about', 'contacts', 'policy', 'oferta', 'rules'].includes(String(dto.kind))) throw new Error('Page DTO kind is invalid.')
   assertDesktopNavigation(dto.site)
   return dto as ThematicPageDTO
 }

@@ -30,7 +30,7 @@
     "@payloadcms/next": "3.90.2",
     "@payloadcms/richtext-lexical": "3.90.2",
     "@payloadcms/ui": "3.90.2",
-    "@unlim/content-contract": "0.0.19",
+    "@unlim/content-contract": "0.0.20",
     "cross-env": "7.0.3",
     "graphql": "16.11.0",
     "lucide-react": "1.45.0",

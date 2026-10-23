@@ -6,7 +6,7 @@ import { richContentHTML } from './catalogProjection'
 import { actionDTO, mediaDTO, pageHeroDTO, requiredMedia, seoDTO, siteDTO } from './normalize'
 import type { ThematicPageKind, ThematicPageSlug } from '../globals/ThematicPages'
 
-const pageSlugs = Object.fromEntries(['prices', 'training', 'gift', 'courts', 'gallery', 'about', 'contacts', 'policy', 'oferta'].map((kind) => [kind, `${kind}-page`])) as Record<ThematicPageKind, ThematicPageSlug>
+const pageSlugs = Object.fromEntries(['prices', 'training', 'gift', 'courts', 'gallery', 'about', 'contacts', 'policy', 'oferta', 'rules'].map((kind) => [kind, `${kind}-page`])) as Record<ThematicPageKind, ThematicPageSlug>
 type Row = Record<string, any>
 
 const rentalRate = (item: Row): HomepageDTO['entities']['rentalRates'][number] => ({ id: String(item.id), title: String(item.title), eyebrow: item.eyebrow, timeLabel: item.timeLabel, description: String(item.description), price: item.price, priceLabel: item.priceLabel, priceSuffix: item.priceSuffix, badge: item.badge, badgeTone: item.badgeTone, cardVariant: item.cardVariant, meshTone: item.meshTone, includedItems: (item.includedItems ?? []).map(({ text }: Row) => String(text)), action: actionDTO(item.action) })
@@ -120,6 +120,7 @@ export async function createThematicPageProjection(payload: Payload, options: { 
     const gallery = await publishedCollection(payload, 'gallery-items', preview, { showOnAboutPage: { equals: true } }, ['aboutPageOrder', '-createdAt', 'id'])
     return parseThematicPageDTO({ ...base, kind, storyHTML: richContentHTML(page.story), stats: page.stats ?? [], gallery: gallery.docs.map((item) => galleryItem(item, origin)) })
   }
+  if (kind === 'rules') return parseThematicPageDTO({ ...base, kind, sections: (page.sections ?? []).map((section: Row) => ({ title: String(section.title), contentHTML: richContentHTML(section.content) })), closingText: page.closingText ?? '' })
   if (kind === 'contacts') return parseThematicPageDTO({ ...base, kind, directionsTitle: page.directionsTitle, directionsText: page.directionsText, arrivalNotes: page.arrivalNotes ?? [] })
   return parseThematicPageDTO({ ...base, kind, notice: page.notice, contentHTML: richContentHTML(page.content), approved: page.approved === true })
 }

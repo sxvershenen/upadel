@@ -48,6 +48,20 @@ export const SiteSettings: GlobalConfig = {
           ],
         },
         {
+          label: 'Лист ожидания',
+          fields: [{ name: 'waitlist', type: 'group', label: 'Попап при заходе на сайт', fields: [
+            { name: 'enabled', type: 'checkbox', label: 'Показывать при каждом заходе', defaultValue: false },
+            { name: 'title', type: 'text', label: 'Заголовок' },
+            { name: 'description', type: 'textarea', label: 'Описание' },
+            { name: 'submitLabel', type: 'text', label: 'Кнопка формы' },
+            { name: 'successTitle', type: 'text', label: 'Успешная отправка — заголовок' },
+            { name: 'successText', type: 'textarea', label: 'Успешная отправка — текст' },
+            { name: 'telegramTitle', type: 'text', label: 'Telegram — заголовок' },
+            { name: 'telegramCopy', type: 'text', label: 'Telegram — подпись' },
+            { name: 'telegramURL', type: 'text', label: 'Telegram — ссылка', validate: validateHTTPSURL },
+          ] }],
+        },
+        {
           label: 'Навигация',
           fields: [
             {
@@ -239,7 +253,7 @@ export const SiteSettings: GlobalConfig = {
               name: 'footerNavigation',
               type: 'array',
               label: 'Навигация футера',
-              maxRows: 8,
+              maxRows: 10,
               defaultValue: [
                 { label: 'Цены', href: '/prices', column: '1' },
                 { label: 'Тренировки', href: '/training', column: '1' },

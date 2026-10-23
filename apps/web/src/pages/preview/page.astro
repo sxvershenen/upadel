@@ -7,7 +7,7 @@ import SiteLayout from '../../layouts/SiteLayout.astro'
 export const prerender = false
 const type = Astro.url.searchParams.get('type')
 const secret = Astro.url.searchParams.get('secret')
-const kinds: ThematicPageKind[] = ['prices', 'training', 'gift', 'courts', 'gallery', 'about', 'contacts', 'policy', 'oferta']
+const kinds: ThematicPageKind[] = ['prices', 'training', 'gift', 'courts', 'gallery', 'about', 'contacts', 'policy', 'oferta', 'rules']
 const padelCourtZakaz = type === 'padel-court-zakaz'
 const allowed = padelCourtZakaz || kinds.includes(type as ThematicPageKind)
 let dto: ThematicPageDTO | null = null

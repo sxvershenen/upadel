@@ -10,7 +10,7 @@ import type { ThematicPageKind } from '@/globals/ThematicPages'
 import { publicContentOrigin } from '@/config/publicURLs'
 
 export const dynamic = 'force-dynamic'
-const kinds = new Set<ThematicPageKind>(['prices', 'training', 'gift', 'courts', 'gallery', 'about', 'contacts', 'policy', 'oferta'])
+const kinds = new Set<ThematicPageKind>(['prices', 'training', 'gift', 'courts', 'gallery', 'about', 'contacts', 'policy', 'oferta', 'rules'])
 const padelCourtZakazKind = 'padel-court-zakaz'
 
 function validSecret(value: string | null): boolean {

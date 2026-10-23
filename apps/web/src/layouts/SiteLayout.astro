@@ -2,6 +2,7 @@
 import '../index.css'
 import type { MediaDTO, SiteDTO } from '@unlim/content-contract'
 import { ANALYTICS_CONSENT_KEY } from '../analytics/identity'
+import WaitlistNotice from '../components/WaitlistNotice.astro'
 import CookieNotice from '../components/CookieNotice.astro'
 import { SiteChromeIsland } from '../components/navigation/SiteChromeIsland'
 import { GlobalPageTransition } from '../transition-demo/GlobalPageTransition'
@@ -184,6 +185,7 @@ const pageEntrance = Astro.url.pathname === '/gift'
   </head>
   <body>
     {site && <CookieNotice site={site} />}
+    {site && <WaitlistNotice site={site} />}
     {enableGlobalTransitions && <GlobalPageTransition client:load />}
     {site && <SiteChromeIsland client:load site={site} />}
     <div id="swup" data-swup-container data-page-entrance={pageEntrance}>

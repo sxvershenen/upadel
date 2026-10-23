@@ -144,6 +144,7 @@ export interface Config {
     'padel-court-zakaz-page': PadelCourtZakazPage;
     'policy-page': PolicyPage;
     'oferta-page': OfertaPage;
+    'rules-page': RulesPage;
   };
   globalsSelect: {
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
@@ -162,6 +163,7 @@ export interface Config {
     'padel-court-zakaz-page': PadelCourtZakazPageSelect<false> | PadelCourtZakazPageSelect<true>;
     'policy-page': PolicyPageSelect<false> | PolicyPageSelect<true>;
     'oferta-page': OfertaPageSelect<false> | OfertaPageSelect<true>;
+    'rules-page': RulesPageSelect<false> | RulesPageSelect<true>;
   };
   locale: null;
   widgets: {
@@ -2337,6 +2339,17 @@ export interface SiteSetting {
   brandLogo?: (number | null) | Media;
   brandLogoMode?: ('text' | 'prefix' | 'replace') | null;
   headerSubtitle?: string | null;
+  waitlist?: {
+    enabled?: boolean | null;
+    title?: string | null;
+    description?: string | null;
+    submitLabel?: string | null;
+    successTitle?: string | null;
+    successText?: string | null;
+    telegramTitle?: string | null;
+    telegramCopy?: string | null;
+    telegramURL?: string | null;
+  };
   desktopNavigation?:
     | {
         label: string;
@@ -4038,6 +4051,63 @@ export interface OfertaPage {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "rules-page".
+ */
+export interface RulesPage {
+  id: number;
+  seedVersion?: string | null;
+  eyebrow: string;
+  title: string;
+  intro: string;
+  sections?:
+    | {
+        title: string;
+        content: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  closingText?: string | null;
+  /**
+   * Если поле пустое, используется подготовленный фон страницы.
+   */
+  heroImage?: (number | null) | Media;
+  /**
+   * Картинка страницы получает спокойный grayscale-режим.
+   */
+  heroGrayscale?: boolean | null;
+  seo: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Оставьте пустым, чтобы использовать основной публичный URL записи.
+     */
+    canonical?: string | null;
+    robots: 'index-follow' | 'noindex-follow' | 'noindex-nofollow';
+    /**
+     * Не заменяет фотографию карточки или preview image самой сущности.
+     */
+    socialImage?: (number | null) | Media;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "site-settings_select".
  */
 export interface SiteSettingsSelect<T extends boolean = true> {
@@ -4048,6 +4118,19 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   brandLogo?: T;
   brandLogoMode?: T;
   headerSubtitle?: T;
+  waitlist?:
+    | T
+    | {
+        enabled?: T;
+        title?: T;
+        description?: T;
+        submitLabel?: T;
+        successTitle?: T;
+        successText?: T;
+        telegramTitle?: T;
+        telegramCopy?: T;
+        telegramURL?: T;
+      };
   desktopNavigation?:
     | T
     | {
@@ -5358,6 +5441,39 @@ export interface OfertaPageSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "rules-page_select".
+ */
+export interface RulesPageSelect<T extends boolean = true> {
+  seedVersion?: T;
+  eyebrow?: T;
+  title?: T;
+  intro?: T;
+  sections?:
+    | T
+    | {
+        title?: T;
+        content?: T;
+        id?: T;
+      };
+  closingText?: T;
+  heroImage?: T;
+  heroGrayscale?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        canonical?: T;
+        robots?: T;
+        socialImage?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "collections_widget".
  */
 export interface CollectionsWidget {
@@ -5445,6 +5561,7 @@ export interface TaskSchedulePublish {
           | 'padel-court-zakaz-page'
           | 'policy-page'
           | 'oferta-page'
+          | 'rules-page'
         )
       | null;
     user?: {

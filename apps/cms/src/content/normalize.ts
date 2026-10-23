@@ -51,7 +51,7 @@ export function requiredMedia(value: unknown, origin: string, variant: MediaVari
 export function pageHeroDTO(value: unknown, kind: string, origin: string): PageHeroDTO {
   const page = value && typeof value === 'object' ? value as { heroImage?: unknown; heroGrayscale?: boolean } : {}
   const uploaded = mediaDTO(page.heroImage, origin, 'hero')
-  const assetKind = kind === 'policy' || kind === 'oferta' || kind === 'gift' || kind === 'padel-court-zakaz' ? 'about' : kind
+  const assetKind = kind === 'rules' || kind === 'policy' || kind === 'oferta' || kind === 'gift' || kind === 'padel-court-zakaz' ? 'about' : kind
   const media = uploaded ?? { alt: `Фон страницы ${kind}`, height: 745, mimeType: 'image/webp', url: new URL(`/page-heroes/${assetKind}.webp`, process.env.PUBLIC_WEB_URL ?? origin).toString(), width: 2110 }
   return { media, grayscale: page.heroGrayscale !== false }
 }
@@ -122,6 +122,11 @@ export function siteDTO(site: SiteSetting, origin: string, partners: Array<Recor
       ready: booking.ready, status: booking.status,
     },
     account: { mode: site.account?.mode ?? 'disabled', widgetURL: widgetURL(site.account?.widgetURL, 'vivacrm-script'), externalURL: site.account?.externalURL, buttonLabel: site.account?.buttonLabel ?? 'Личный кабинет', mobileLabel: site.account?.mobileLabel ?? 'Кабинет', ...bookingReadiness(site.account ?? {}) },
+    waitlist: site.waitlist ? {
+      enabled: site.waitlist.enabled === true, title: site.waitlist.title ?? '', description: site.waitlist.description ?? '',
+      submitLabel: site.waitlist.submitLabel ?? '', successTitle: site.waitlist.successTitle ?? '', successText: site.waitlist.successText ?? '',
+      telegramTitle: site.waitlist.telegramTitle ?? '', telegramCopy: site.waitlist.telegramCopy ?? '', telegramURL: isPublicSocialURL(site.waitlist.telegramURL ?? '') ? site.waitlist.telegramURL ?? '' : '',
+    } : undefined,
     contactConfirmation: {
       avatar: mediaDTO(confirmation?.avatar, origin, 'thumbnail'), dialogTitle: confirmation?.dialogTitle ?? 'Связаться с клубом', cancelLabel: confirmation?.cancelLabel ?? 'Отмена', continueLabel: confirmation?.continueLabel ?? 'Продолжить',
       formTitle: confirmation?.formTitle ?? 'Оставить заявку', submitLabel: confirmation?.submitLabel ?? 'Отправить', successTitle: confirmation?.successTitle ?? 'Заявка отправлена', successText: confirmation?.successText ?? '', consentLabel: confirmation?.consentLabel ?? '', leadEndpoint: new URL('/api/public/leads', origin).toString(), policyHref: confirmation?.policyHref ?? '/policy',

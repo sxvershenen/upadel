@@ -1,0 +1,69 @@
+---
+import { createElement } from 'react'
+import type { SiteDTO } from '@unlim/content-contract'
+import { Field } from './ui/Field'
+import { CheckboxField } from './ui/CheckboxField'
+import { Button } from './ui/Button'
+import { TelegramIcon } from './ui/ContactIcons'
+import { ArrowUpRight, X } from 'lucide-react'
+const { site } = Astro.props as { site: SiteDTO }
+const content = site.waitlist
+---
+{content?.enabled && <>
+  <dialog id="waitlist-dialog" class="waitlist-dialog border-0 bg-white p-0 text-ink" aria-labelledby="waitlist-title" aria-describedby="waitlist-description" data-endpoint={site.contactConfirmation.leadEndpoint} data-success-title={content.successTitle} data-success-text={content.successText}>
+    <div class="p-6 pb-[max(24px,env(safe-area-inset-bottom))] md:p-8">
+      <div class="mb-4 flex items-start justify-between gap-4">
+        <h2 id="waitlist-title" class="type-title-card min-w-0 font-semibold">{content.title}</h2>
+        <form method="dialog" data-waitlist-close-form class="shrink-0"><button type="submit" data-waitlist-close data-cool-mode="off" aria-label="Закрыть лист ожидания" class="se-2 flex h-9 w-9 items-center justify-center bg-control text-ink-soft transition-colors hover:bg-control-hover focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2"><X size={17} /></button></form>
+      </div>
+      <p id="waitlist-description" class="type-body-sm mb-6 whitespace-pre-line text-ink-soft">{content.description}</p>
+      <form data-waitlist-form class="grid gap-3" novalidate>
+        <Field id="waitlist-name" label="Имя" labelVisibility="sr-only" reveal={false} name="name" autoComplete="name" placeholder="Имя" minLength={2} maxLength={120} required />
+        <Field id="waitlist-phone" label="Телефон" labelVisibility="sr-only" reveal={false} name="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="Телефон" maxLength={40} required />
+        <label class="absolute -left-[10000px]" aria-hidden="true">Сайт<input name="website" tabindex="-1" autocomplete="off" /></label>
+        <CheckboxField name="consent" required reveal={false} labelSize="caption" label={createElement('a', { href: '/policy', target: '_blank', rel: 'noreferrer', className: 'underline decoration-ink/25 underline-offset-2 hover:text-ink' }, 'Согласие на обработку персональных данных')} />
+        <p data-waitlist-error hidden role="alert" class="type-body-sm text-danger"></p>
+        <Button type="submit" fullWidth reveal={false} className="mt-2">{content.submitLabel}</Button>
+      </form>
+      <p data-waitlist-success hidden role="status" class="type-body-sm text-ink-soft"></p>
+      {content.telegramURL && <a data-contact-confirmed data-analytics-action="telegram" href={content.telegramURL} target="_blank" rel="noopener noreferrer" class="mt-6 flex items-center gap-3 border-t border-ink/10 pt-5 transition-colors hover:text-lime-deep focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-4">
+        <span class="se-2 flex h-11 w-11 shrink-0 items-center justify-center bg-control"><TelegramIcon size={23} /></span>
+        <span class="min-w-0 flex-1"><span class="type-ui block font-medium">{content.telegramTitle}</span><span class="type-caption mt-1 block text-ink-soft">{content.telegramCopy}</span></span>
+        <ArrowUpRight size={20} className="shrink-0" />
+      </a>}
+    </div>
+  </dialog>
+  <script is:inline>
+    (() => {
+      if (window.__unlimWaitlistShown) return
+      const dialog = document.getElementById('waitlist-dialog')
+      if (!(dialog instanceof HTMLDialogElement)) return
+      window.__unlimWaitlistShown = true
+      dialog.showModal()
+      document.documentElement.setAttribute('data-waitlist-open', '')
+    })()
+  </script>
+</>}
+<script>
+  import { initializeWaitlist } from '../actions/waitlist'
+  initializeWaitlist(document.getElementById('waitlist-dialog'))
+</script>
+<style is:global>
+  html[data-waitlist-open] { overflow: hidden; }
+  .waitlist-dialog { position: fixed; inset: auto 0 0; margin: 0; width: 100%; max-width: 100%; max-height: 92dvh; overflow-y: auto; overscroll-behavior: contain; border-radius: var(--se-5) var(--se-5) 0 0; box-shadow: 0 24px 90px #0003; }
+  .waitlist-dialog::backdrop { background: rgb(3 5 8 / 42%); }
+  .waitlist-dialog[open] { animation: waitlist-up .34s cubic-bezier(.22,1,.36,1) both; }
+  .waitlist-dialog[data-closing] { animation: waitlist-up .22s ease-in reverse both; }
+  @keyframes waitlist-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  @keyframes waitlist-side { from { transform: translateX(calc(100% + 42px)); } to { transform: translateX(0); } }
+  @media (min-width: 768px) {
+    .waitlist-dialog { inset: 50% 42px auto auto; margin: 0; width: 440px; max-width: calc(100vw - 84px); max-height: calc(100dvh - 84px); translate: 0 -50%; border-radius: var(--se-4); }
+    .waitlist-dialog[open] { animation-name: waitlist-side; }
+    .waitlist-dialog[data-closing] { animation-name: waitlist-side; }
+  }
+  @supports (corner-shape: squircle) {
+    .waitlist-dialog { border-radius: calc(var(--se-5) * 2) calc(var(--se-5) * 2) 0 0; corner-shape: squircle; }
+    @media (min-width: 768px) { .waitlist-dialog { border-radius: calc(var(--se-4) * 2); } }
+  }
+  @media (prefers-reduced-motion: reduce) { .waitlist-dialog[open], .waitlist-dialog[data-closing] { animation-duration: .001s; } }
+</style>

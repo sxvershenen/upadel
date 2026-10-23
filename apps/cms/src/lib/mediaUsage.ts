@@ -282,7 +282,7 @@ async function scanMediaUsage(payload: Payload, mediaIDs: Array<number | string>
   for (const [slug, label] of [
     ['blog-page', 'Блог'], ['coaches-page', 'Страница тренеров'], ['tournaments-page', 'Страница турниров'],
     ['prices-page', 'Цены'], ['training-page', 'Тренировки'], ['gift-page', 'Подарочный сертификат'], ['courts-page', 'Корты'], ['gallery-page', 'Галерея'],
-    ['about-page', 'О клубе'], ['contacts-page', 'Контакты'], ['policy-page', 'Политика конфиденциальности'], ['oferta-page', 'Публичная оферта'],
+    ['about-page', 'О клубе'], ['contacts-page', 'Контакты'], ['policy-page', 'Политика конфиденциальности'], ['oferta-page', 'Публичная оферта'], ['rules-page', 'Правила клуба'],
   ] as const) {
     const [published, draft] = req
       ? [await payload.findGlobal({ slug, depth: 0, draft: false, overrideAccess: true, req }), await payload.findGlobal({ slug, depth: 0, draft: true, overrideAccess: true, req })]
