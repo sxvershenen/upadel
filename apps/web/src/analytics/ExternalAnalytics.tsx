@@ -62,7 +62,6 @@ export function ExternalAnalytics({
           queue.a.push(args);
         };
         (window.ym as unknown as { l?: number }).l ??= Date.now();
-        loadScript("unlim-yandex-metrica", "https://mc.yandex.ru/metrika/tag.js");
         window.dataLayer ??= [];
         window.ym?.(Number(metrica.counterId), "init", {
           ssr: true,
@@ -74,6 +73,7 @@ export function ExternalAnalytics({
           accurateTrackBounce: true,
           webvisor: metrica.webvisor,
         });
+        loadScript("unlim-yandex-metrica", "https://mc.yandex.ru/metrika/tag.js");
         let previousUrl = location.href;
         document.addEventListener("swup:page:view", () => {
           const referer = previousUrl;
