@@ -266,7 +266,7 @@ export const SiteSettings: GlobalConfig = {
               fields: [
                 { name: 'label', type: 'text', label: 'Название', required: true },
                 { name: 'href', type: 'text', label: 'Ссылка', required: true, validate: validateInternalLink },
-                { name: 'column', type: 'select', label: 'Колонка', defaultValue: '1', options: ['1', '2'], required: true },
+                { name: 'column', type: 'select', label: 'Группа порядка', admin: { description: 'Сначала ссылки группы 1, затем 2. Сайт равномерно распределяет их по трём колонкам.' }, defaultValue: '1', options: ['1', '2'], required: true },
               ],
             },
             {

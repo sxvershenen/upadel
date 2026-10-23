@@ -35,6 +35,35 @@ test('duplicate orchestration never invokes delivery', async () => {
   assert.equal(calls, 1)
 })
 
+test('every form type delivers to both configured channels', async () => {
+  for (const type of ['membership', 'gift', 'trial', 'consultation', 'other'] as const) {
+    const destinations: string[] = []
+    const result = await deliverLeadNotifications(payload(settings, []), { ...lead, type }, async (url) => {
+      destinations.push(new URL(String(url)).hostname)
+      return new Response('{}', { status: 200 })
+    })
+    assert.equal(result.notificationStatus, 'sent', type)
+    assert.deepEqual(destinations.sort(), ['api.telegram.org', 'api.vk.com'])
+  }
+})
+
+test('an enabled channel without credentials is a visible failure, not a successful delivery', async () => {
+  const result = await deliverLeadNotifications(payload({ ...settings, telegramBotToken: '' }, []), lead, async () => new Response('{}', { status: 200 }))
+  assert.equal(result.notificationStatus, 'partial')
+  assert.match(result.notificationResult, /Telegram: не настроены/)
+  assert.match(result.notificationResult, /VK: отправлено/)
+})
+
+test('provider errors retain safe numeric codes without persisting tokens or response descriptions', async () => {
+  const result = await deliverLeadNotifications(payload(settings, []), lead, async (url) => String(url).includes('telegram')
+    ? new Response('{}', { status: 401 })
+    : Response.json({ error: { error_code: 901, error_msg: 'unsafe secret' } }))
+  assert.equal(result.notificationStatus, 'failed')
+  assert.match(result.notificationResult, /Telegram: HTTP 401/)
+  assert.match(result.notificationResult, /VK: API 901/)
+  assert.doesNotMatch(result.notificationResult, /secret|unsafe|https/)
+})
+
 test('notification message preserves lead type, page and useful source entity', async () => {
   const tournamentLead = { ...lead, type: 'consultation', sourcePage: '/tournaments/summer-open', sourceEntity: 'Summer Open — регистрация', comment: 'Нужна суббота' } as Lead
   assert.match(formatLeadNotificationMessage(tournamentLead), /Новое обращение: Консультация/)

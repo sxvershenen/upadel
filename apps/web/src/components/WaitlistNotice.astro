@@ -25,7 +25,7 @@ const content = site.waitlist
         <p data-waitlist-error hidden role="alert" class="type-body-sm text-danger"></p>
         <Button type="submit" fullWidth reveal={false} className="mt-2">{content.submitLabel}</Button>
       </form>
-      <p data-waitlist-success hidden role="status" class="type-body-sm text-ink-soft"></p>
+      <p data-waitlist-success hidden role="status" class="type-body-sm whitespace-pre-line text-ink-soft"></p>
       {content.telegramURL && <a data-contact-confirmed data-analytics-action="telegram" href={content.telegramURL} target="_blank" rel="noopener noreferrer" class="mt-6 flex items-center gap-3 border-t border-ink/10 pt-5 transition-colors hover:text-lime-deep focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-4">
         <span class="se-2 flex h-11 w-11 shrink-0 items-center justify-center bg-control"><TelegramIcon size={23} /></span>
         <span class="min-w-0 flex-1"><span class="type-ui block font-medium">{content.telegramTitle}</span><span class="type-caption mt-1 block text-ink-soft">{content.telegramCopy}</span></span>

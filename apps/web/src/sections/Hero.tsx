@@ -65,9 +65,9 @@ function SocialProof({ className }: { className?: string }) {
       <div className="flex min-w-0 flex-col gap-0 md:gap-0.5">
         <div className="flex items-center gap-1 text-[14px] leading-tight font-semibold text-white md:text-[12px]">
           <Star size={12} className="fill-[#c2f542] text-[#c2f542]" />
-          {home.hero.socialProof.ratingLabel}
+          <span className="md:hidden">{home.hero.socialProof.ratingLabel.split('·')[0].trim()}</span><span className="hidden md:inline">{home.hero.socialProof.ratingLabel}</span>
         </div>
-        <div className="type-micro truncate text-white/60">{home.hero.socialProof.caption}</div>
+        <div className="type-micro truncate text-white/60"><span className="md:hidden">{home.hero.socialProof.caption.replace(/^Рейтинг на\s*/i, '')}</span><span className="hidden md:inline">{home.hero.socialProof.caption}</span></div>
       </div>
     </div>
   );
@@ -111,7 +111,7 @@ export function Hero() {
         <a href="#top" className="flex min-w-0 items-center gap-2.5 leading-none text-white">
           {site.brandLogo && site.brandLogoMode !== "text" && !brandLogoFailed ? <img src={site.brandLogo.url} alt={site.brandName} onError={() => setBrandLogoFailed(true)} className={replaceBrand ? "h-12 max-w-[150px] object-contain" : "h-12 w-12 shrink-0 object-contain"} /> : <span className="h-2.5 w-2.5 shrink-0 rounded-[3px] bg-lime" />}
           {(!replaceBrand || !site.brandLogo || brandLogoFailed) && <span className="flex min-w-0 flex-col gap-1">
-            <BrandWordmark media={site.brandWordmark} name={site.brandName} className="w-[184px] max-w-full" />
+            <BrandWordmark media={site.brandWordmark} name={site.brandName} className="w-[126px] max-w-[126px]" />
             <span className="type-micro text-white/55">{site.headerSubtitle}</span>
           </span>}
         </a>

@@ -7,6 +7,7 @@ type Delivery = {
   notifiedAt: string | null;
   notificationResult: string;
 };
+class DeliveryError extends Error {}
 export async function deliverOnlyForNewLead<T>(duplicate: boolean, deliver: () => Promise<T>): Promise<T | null> {
   return duplicate ? null : deliver();
 }
@@ -53,9 +54,12 @@ const timeoutFetch = async (
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
     const response = await fetcher(url, { ...init, signal: controller.signal });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const payload = await response.clone().json().catch(() => null) as { ok?: boolean; error?: unknown } | null;
-    if (payload?.ok === false || payload?.error) throw new Error("API error");
+    if (!response.ok) throw new DeliveryError(`HTTP ${response.status}`);
+    const payload = await response.clone().json().catch(() => null) as { ok?: boolean; error?: { error_code?: number }; error_code?: number } | null;
+    if (payload?.ok === false || payload?.error) {
+      const code = payload.error_code ?? payload.error?.error_code;
+      throw new DeliveryError(typeof code === 'number' ? `API ${code}` : 'ошибка API');
+    }
   } finally {
     clearTimeout(timer);
   }
@@ -75,18 +79,19 @@ export async function deliverLeadNotifications(
     showHiddenFields: true,
   })) as SiteSetting;
   const cfg = site.leadNotifications;
-  const telegramToken = process.env.TELEGRAM_BOT_TOKEN || cfg?.telegramBotToken;
-  const telegramChat = process.env.TELEGRAM_CHAT_ID || cfg?.telegramChatID;
+  const telegramToken = (process.env.TELEGRAM_BOT_TOKEN || cfg?.telegramBotToken || '').trim();
+  const telegramChat = (process.env.TELEGRAM_CHAT_ID || cfg?.telegramChatID || '').trim();
   const vkToken = (process.env.VK_ACCESS_TOKEN || cfg?.vkAccessToken || '').replace(/^api\s+/i, '').trim();
   const vkPeer = (process.env.VK_PEER_ID || cfg?.vkPeerID || '').trim();
   const tasks: Array<{ name: string; run: () => Promise<void> }> = [];
   const message = formatLeadNotificationMessage(lead);
   // Telegram requires the token in its Bot API path. The path is never logged, returned, or persisted.
-  if (cfg?.telegramEnabled && telegramToken && telegramChat)
+  if (cfg?.telegramEnabled)
     tasks.push({
       name: "Telegram",
-      run: () =>
-        timeoutFetch(
+      run: () => {
+        if (!telegramToken || !telegramChat) return Promise.reject(new DeliveryError('не настроены токен или чат'));
+        return timeoutFetch(
           `https://api.telegram.org/bot${encodeURIComponent(telegramToken)}/sendMessage`,
           {
             method: "POST",
@@ -95,13 +100,15 @@ export async function deliverLeadNotifications(
           },
           fetcher,
           timeoutMs,
-        ),
+        );
+      },
     });
-  if (cfg?.vkEnabled && vkToken && vkPeer)
+  if (cfg?.vkEnabled)
     tasks.push({
       name: "VK",
-      run: () =>
-        timeoutFetch(
+      run: () => {
+        if (!vkToken || !vkPeer) return Promise.reject(new DeliveryError('не настроены токен или получатель'));
+        return timeoutFetch(
           "https://api.vk.com/method/messages.send",
           {
             method: "POST",
@@ -116,7 +123,8 @@ export async function deliverLeadNotifications(
           },
           fetcher,
           timeoutMs,
-        ),
+        );
+      },
     });
   if (!tasks.length)
     return {
@@ -130,7 +138,7 @@ export async function deliverLeadNotifications(
         await run();
         return `${name}: отправлено`;
       } catch (error) {
-        return `${name}: ${error instanceof DOMException && error.name === "AbortError" ? "таймаут" : "ошибка доставки"}`;
+        return `${name}: ${error instanceof DOMException && error.name === "AbortError" ? "таймаут" : error instanceof DeliveryError ? error.message : "ошибка доставки"}`;
       }
     }),
   );

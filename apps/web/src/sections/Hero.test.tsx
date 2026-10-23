@@ -23,7 +23,7 @@ const content = {
       { type: 'button', enabled: true, icon: 'CalendarCheck', action: { mode: 'booking', label: 'Забронировать' } },
       { type: 'info', enabled: true, icon: 'CalendarDays', title: 'Открытие в ноябре', caption: 'Акция с 01.11 до 15.11' },
     ],
-    socialProof: { coachPhotos: [], ratingLabel: '4.9', caption: 'Рейтинг на Яндекс' }, stats: [],
+    socialProof: { coachPhotos: [], ratingLabel: '4.9 · 500+ игроков', caption: 'Рейтинг на Яндекс' }, stats: [],
   } },
 } as any
 
@@ -142,4 +142,13 @@ test('mobile opening notice reads its configured slot and receives the glass ent
   assert.match(html, /bg-white/)
   assert.match(html, /leading-tight/)
   assert.match(html, /data-hero-accent="" class="inline-block text-\[#c2f542\]">одного/)
+})
+
+
+test('social proof keeps full desktop copy alongside compact mobile text', () => {
+  const html = renderToStaticMarkup(<ContentProvider content={content}><Hero /></ContentProvider>)
+  assert.match(html, /class="md:hidden">4.9<\/span>/)
+  assert.match(html, /class="hidden md:inline">4.9 · 500\+ игроков<\/span>/)
+  assert.match(html, /class="md:hidden">Яндекс<\/span>/)
+  assert.match(html, /class="hidden md:inline">Рейтинг на Яндекс<\/span>/)
 })

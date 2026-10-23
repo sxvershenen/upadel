@@ -83,7 +83,7 @@ curl -fsS https://example.com/ >/dev/null
 curl -fsS https://example.com/robots.txt
 ```
 
-Verify `/urp-panel`, preview, media upload, one test lead, Telegram/VK delivery, sitemap, backup creation and restore procedure before announcing launch.
+Verify `/urp-panel`, preview, media upload, one test lead, Telegram/VK delivery, sitemap, backup creation and restore procedure before announcing launch. On the current VPS, `/etc/hosts` routes `api.telegram.org` to the reachable official endpoint `149.154.167.220`; HTTPS hostname verification stays enabled. If Telegram alone fails, recheck this route, DNS and bot/chat access before rotating credentials. The original hosts file is preserved in `/srv/unlim/shared/hosts.before-telegram-20261023`.
 
 The health-check timer probes the local web server, Payload homepage API, and the public Nginx HTTPS virtual host every minute. After two consecutive failed checks it restarts only the affected systemd service and records the action in the journal. This recovers crashed or hung application and proxy processes; it cannot repair provider, ISP, DNS, or upstream network outages.
 

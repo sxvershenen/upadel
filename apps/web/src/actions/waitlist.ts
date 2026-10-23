@@ -50,6 +50,7 @@ export function initializeWaitlist(element: HTMLElement | null) {
       const result = await response.json().catch(() => ({})) as { ok?: boolean; error?: string }
       if (!response.ok || !result.ok) { fail(result.error ?? 'Не удалось отправить заявку. Попробуйте ещё раз.'); return }
       form.hidden = true; description.hidden = true; title.textContent = dialog.dataset.successTitle ?? ''; success.textContent = dialog.dataset.successText ?? ''; success.hidden = false
+      window.setTimeout(close, 7_000)
     } catch { fail('Связь прервалась. Попробуйте ещё раз — повтор не создаст дубль.') }
     finally { clearTimeout(timeout); sending = false; submit.disabled = false; submit.removeAttribute('aria-busy'); submit.textContent = submitLabel }
   })
