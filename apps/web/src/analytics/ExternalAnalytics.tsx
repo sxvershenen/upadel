@@ -25,6 +25,15 @@ function loadScript(id: string, src: string) {
   node.src = src;
   document.head.appendChild(node);
 }
+function preloadScript(id: string, src: string) {
+  if (document.getElementById(id)) return;
+  const node = document.createElement("link");
+  node.id = id;
+  node.rel = "preload";
+  node.as = "script";
+  node.href = src;
+  document.head.appendChild(node);
+}
 
 export function ExternalAnalytics({
   vendors,
@@ -37,12 +46,7 @@ export function ExternalAnalytics({
     const metrica = vendors.yandexMetrica;
     if (!analyticsEnabled) return;
     if (shouldLoadMetricaScript(analyticsEnabled, metrica.enabled, metrica.counterId)) {
-      window.ym ??= (...args: unknown[]) => {
-        const queue = window.ym as unknown as { a?: unknown[] };
-        queue.a ??= [];
-        queue.a.push(args);
-      };
-      loadScript("unlim-yandex-metrica", "https://mc.yandex.ru/metrika/tag.js");
+      preloadScript("unlim-yandex-metrica-preload", "https://mc.yandex.ru/metrika/tag.js");
     }
 
     const load = () => {
@@ -52,6 +56,13 @@ export function ExternalAnalytics({
         shouldInitializeVendor(initialized, `ym:${metrica.counterId}`)
       ) {
         initialized.add(`ym:${metrica.counterId}`);
+        window.ym ??= (...args: unknown[]) => {
+          const queue = window.ym as unknown as { a?: unknown[] };
+          queue.a ??= [];
+          queue.a.push(args);
+        };
+        (window.ym as unknown as { l?: number }).l ??= Date.now();
+        loadScript("unlim-yandex-metrica", "https://mc.yandex.ru/metrika/tag.js");
         window.dataLayer ??= [];
         window.ym?.(Number(metrica.counterId), "init", {
           ssr: true,
