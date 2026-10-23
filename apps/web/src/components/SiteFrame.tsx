@@ -22,5 +22,5 @@ export function SiteFrame({ site, children }: { site: SiteDTO; children: ReactNo
     mobileMenuNavigation: site.mobileMenuNavigation.map((item) => ({ ...item, href: rootHref(item.href) })),
     footer: { ...site.footer, navigation: site.footer.navigation.map((item) => ({ ...item, href: rootHref(item.href) })) },
   }
-  return <SiteProvider site={innerSite} homeHref="/#top"><MotionConfig reducedMotion="user"><AnalyticsTracker analytics={innerSite.analytics} /><ExternalAnalytics vendors={innerSite.analytics.vendors} /><CoolModeEffects /><div className="min-h-screen bg-page text-ink"><main>{children}<MainContentReady /></main><Footer /></div></MotionConfig></SiteProvider>
+  return <SiteProvider site={innerSite} homeHref="/#top"><MotionConfig reducedMotion="user"><AnalyticsTracker analytics={innerSite.analytics} /><ExternalAnalytics analyticsEnabled={innerSite.analytics.mode !== 'disabled'} vendors={innerSite.analytics.vendors} /><CoolModeEffects /><div className="min-h-screen bg-page text-ink"><main>{children}<MainContentReady /></main><Footer /></div></MotionConfig></SiteProvider>
 }
