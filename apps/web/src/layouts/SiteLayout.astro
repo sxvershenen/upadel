@@ -73,6 +73,9 @@ const siteSchema = site ? {
 const schemaGraph = [...(siteSchema?.['@graph'] ?? []), ...structuredData]
 const siteSchemaJSON = schemaGraph.length > 0 ? serializeStructuredData({ '@context': 'https://schema.org', '@graph': schemaGraph }) : null
 const enableGlobalTransitions = !Astro.url.pathname.startsWith('/transitions/') && !Astro.url.pathname.startsWith('/preview/')
+const alwaysOnMetrica = site?.analytics.mode === 'first-party' && site.analytics.vendors.yandexMetrica.enabled && site.analytics.vendors.yandexMetrica.counterId
+  ? { counterId: Number(site.analytics.vendors.yandexMetrica.counterId), webvisor: site.analytics.vendors.yandexMetrica.webvisor }
+  : null
 const pageEntrance = Astro.url.pathname === '/gift'
   ? 'gift'
   : /^\/blog\/[^/]+\/?$/.test(Astro.url.pathname)
@@ -87,6 +90,37 @@ const pageEntrance = Astro.url.pathname === '/gift'
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    {alwaysOnMetrica && <>
+      <link rel="preconnect" href="https://mc.yandex.ru" crossorigin />
+      <link rel="preload" href="https://mc.yandex.ru/metrika/tag.js" as="script" />
+      <script is:inline define:vars={{ counterId: alwaysOnMetrica.counterId, webvisor: alwaysOnMetrica.webvisor }}>
+        (() => {
+          const initialized = window.__unlimYandexMetricaInitialized === String(counterId)
+          if (initialized) return
+          window.ym = window.ym || function (...args) {
+            const queue = window.ym
+            queue.a = queue.a || []
+            queue.a.push(args)
+          }
+          window.ym.l = window.ym.l || Date.now()
+          window.ym(counterId, 'init', {
+            clickmap: true,
+            ecommerce: 'dataLayer',
+            referrer: document.referrer,
+            url: location.href,
+            trackLinks: true,
+            accurateTrackBounce: true,
+            webvisor,
+          })
+          window.__unlimYandexMetricaInitialized = String(counterId)
+          const script = document.createElement('script')
+          script.id = 'unlim-yandex-metrica'
+          script.async = true
+          script.src = 'https://mc.yandex.ru/metrika/tag.js'
+          document.head.appendChild(script)
+        })()
+      </script>
+    </>}
     <script is:inline define:vars={{ consentKey: ANALYTICS_CONSENT_KEY }}>
       (() => {
         const root = document.documentElement

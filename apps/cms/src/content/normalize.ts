@@ -78,7 +78,8 @@ export function siteDTO(site: SiteSetting, origin: string, partners: Array<Recor
   const telegram = social.find(({ provider }) => provider === 'telegram')
   const vk = social.find(({ provider }) => provider === 'vk')
   const confirmation = site.contactConfirmation
-  const externalAnalyticsAllowed = site.analytics?.mode === 'consent-required'
+  const metricaAllowed = site.analytics?.mode === 'consent-required' || site.analytics?.mode === 'first-party'
+  const ga4Allowed = site.analytics?.mode === 'consent-required'
   const booking = bookingReadiness(site.booking ?? {})
   return {
     brandName: site.brandName,
@@ -108,8 +109,8 @@ export function siteDTO(site: SiteSetting, origin: string, partners: Array<Recor
     analytics: {
       mode: site.analytics?.mode ?? 'consent-required', endpoint: new URL('/api/public/analytics', origin).toString(), schemaVersion: 1,
       vendors: {
-        yandexMetrica: { enabled: externalAnalyticsAllowed && site.analytics?.yandexMetricaEnabled === true && Boolean(site.analytics?.yandexMetricaCounterID), counterId: site.analytics?.yandexMetricaCounterID, webvisor: site.analytics?.yandexMetricaWebvisor === true },
-        ga4: { enabled: externalAnalyticsAllowed && site.analytics?.ga4Enabled === true && Boolean(site.analytics?.ga4MeasurementID), measurementId: site.analytics?.ga4MeasurementID },
+        yandexMetrica: { enabled: metricaAllowed && site.analytics?.yandexMetricaEnabled === true && Boolean(site.analytics?.yandexMetricaCounterID), counterId: site.analytics?.yandexMetricaCounterID, webvisor: site.analytics?.yandexMetricaWebvisor === true },
+        ga4: { enabled: ga4Allowed && site.analytics?.ga4Enabled === true && Boolean(site.analytics?.ga4MeasurementID), measurementId: site.analytics?.ga4MeasurementID },
         webmasterVerification: site.analytics?.yandexWebmasterVerification,
       },
     },

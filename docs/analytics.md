@@ -50,9 +50,9 @@ Do not store form values, full referrer query strings or raw IP. Geo may be deri
 
 ## Privacy boundary
 
-The audience and brand are Russian; Latvian/EU assumptions do not apply by default. Treat browser identifiers, event history and submitted lead data as potentially regulated data. Keep purpose, legal basis, Russian data localisation, notices/consents, access and deletion configurable and review them before launch. Form consent and analytics behavior are separate concerns.
+The audience and brand are Russian; Latvian/EU assumptions do not apply by default. Treat browser identifiers, event history and submitted lead data as potentially regulated data. Purpose is site usage measurement and improvement; keep Russian data localisation, notices, access and deletion in scope. Form consent and analytics behavior are separate concerns. Owner selected the no-banner production mode; legal sufficiency of implied consent and the privacy-policy wording have not been independently reviewed.
 
-The Yandex Metrica library is preloaded on page load. Its code runs and the counter starts collecting only after continued use is recorded by a click outside the notice, a page scroll, or the notice’s “ОК” button. Preloading makes a request to Yandex before that action; GA4 remains consent-gated.
+In `first-party` mode, the Yandex Metrica tag is emitted in the document head and begins collecting on page load; the cookie notice is hidden. React only adds SPA route hits, so tag startup does not depend on hydration. In `consent-required` mode, the library is preloaded and collection starts after the visitor accepts or continues using the site. GA4 remains gated by explicit accepted state.
 
 ## Accepted retention
 

@@ -7,13 +7,14 @@ declare global {
     dataLayer?: unknown[];
     gtag?: (...args: unknown[]) => void;
     ym?: (...args: unknown[]) => void;
+    __unlimYandexMetricaInitialized?: string;
   }
 }
 const loaded = new Set<string>();
 const initialized = new Set<string>();
 export const shouldLoadExternalVendor = (consent: string | null, enabled: boolean, id?: string | null) => consent === "accepted" && enabled && Boolean(id);
 export const shouldLoadMetricaScript = (analyticsEnabled: boolean, enabled: boolean, id?: string | null) => analyticsEnabled && enabled && Boolean(id);
-export const shouldInitializeMetrica = (consent: string | null, analyticsEnabled: boolean, enabled: boolean, id?: string | null) => consent === "accepted" && shouldLoadMetricaScript(analyticsEnabled, enabled, id);
+export const shouldInitializeMetrica = (mode: SiteDTO["analytics"]["mode"], consent: string | null, analyticsEnabled: boolean, enabled: boolean, id?: string | null) => (mode === "first-party" || consent === "accepted") && shouldLoadMetricaScript(analyticsEnabled, enabled, id);
 export const shouldReloadForVendorRevoke = (wasAccepted: boolean, vendorLoaded: boolean) => wasAccepted && vendorLoaded;
 export const shouldInitializeVendor = (initializedKeys: ReadonlySet<string>, key: string) => !initializedKeys.has(key)
 function loadScript(id: string, src: string) {
@@ -38,42 +39,46 @@ function preloadScript(id: string, src: string) {
 export function ExternalAnalytics({
   vendors,
   analyticsEnabled,
+  analyticsMode,
 }: {
   vendors: SiteDTO["analytics"]["vendors"];
   analyticsEnabled: boolean;
+  analyticsMode: SiteDTO["analytics"]["mode"];
 }) {
   useEffect(() => {
     const metrica = vendors.yandexMetrica;
     if (!analyticsEnabled) return;
-    if (shouldLoadMetricaScript(analyticsEnabled, metrica.enabled, metrica.counterId)) {
+    if (analyticsMode !== "first-party" && shouldLoadMetricaScript(analyticsEnabled, metrica.enabled, metrica.counterId)) {
       preloadScript("unlim-yandex-metrica-preload", "https://mc.yandex.ru/metrika/tag.js");
     }
 
     const load = () => {
       const consent = localStorage.getItem(ANALYTICS_CONSENT_KEY);
       if (
-        shouldInitializeMetrica(consent, analyticsEnabled, metrica.enabled, metrica.counterId) &&
+        shouldInitializeMetrica(analyticsMode, consent, analyticsEnabled, metrica.enabled, metrica.counterId) &&
         shouldInitializeVendor(initialized, `ym:${metrica.counterId}`)
       ) {
         initialized.add(`ym:${metrica.counterId}`);
-        window.ym ??= (...args: unknown[]) => {
-          const queue = window.ym as unknown as { a?: unknown[] };
-          queue.a ??= [];
-          queue.a.push(args);
-        };
-        (window.ym as unknown as { l?: number }).l ??= Date.now();
-        window.dataLayer ??= [];
-        window.ym?.(Number(metrica.counterId), "init", {
-          ssr: true,
-          clickmap: true,
-          ecommerce: "dataLayer",
-          referrer: document.referrer,
-          url: location.href,
-          trackLinks: true,
-          accurateTrackBounce: true,
-          webvisor: metrica.webvisor,
-        });
-        loadScript("unlim-yandex-metrica", "https://mc.yandex.ru/metrika/tag.js?consent=accepted");
+        if (window.__unlimYandexMetricaInitialized !== metrica.counterId) {
+          window.ym ??= (...args: unknown[]) => {
+            const queue = window.ym as unknown as { a?: unknown[] };
+            queue.a ??= [];
+            queue.a.push(args);
+          };
+          (window.ym as unknown as { l?: number }).l ??= Date.now();
+          window.dataLayer ??= [];
+          window.ym?.(Number(metrica.counterId), "init", {
+            clickmap: true,
+            ecommerce: "dataLayer",
+            referrer: document.referrer,
+            url: location.href,
+            trackLinks: true,
+            accurateTrackBounce: true,
+            webvisor: metrica.webvisor,
+          });
+          window.__unlimYandexMetricaInitialized = String(metrica.counterId);
+          loadScript("unlim-yandex-metrica", "https://mc.yandex.ru/metrika/tag.js");
+        }
         let previousUrl = location.href;
         document.addEventListener("swup:page:view", () => {
           const referer = previousUrl;
@@ -107,6 +112,6 @@ export function ExternalAnalytics({
     };
     addEventListener("unlim:analytics-consent", consent);
     return () => removeEventListener("unlim:analytics-consent", consent);
-  }, [analyticsEnabled, vendors]);
+  }, [analyticsEnabled, analyticsMode, vendors]);
   return null;
 }

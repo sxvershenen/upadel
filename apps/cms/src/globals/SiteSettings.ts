@@ -312,14 +312,14 @@ export const SiteSettings: GlobalConfig = {
           fields: [
             {
               name: 'analytics', type: 'group', label: 'Сбор собственной аналитики',
-              admin: { description: 'Юридическая модель для России ещё не согласована. Безопасное значение по умолчанию требует отдельного согласия посетителя.' },
+              admin: { description: 'Режим задаёт включение first-party аналитики и внешний сбор (Метрика, GA4). Описание цели и правил обработки должно быть отражено в опубликованной политике конфиденциальности.' },
               fields: [
                 {
                   name: 'mode', type: 'select', label: 'Режим сбора', required: true, defaultValue: 'consent-required',
                   options: [
                     { label: 'Отключено', value: 'disabled' },
                     { label: 'Только после согласия', value: 'consent-required' },
-                    { label: 'Первая сторона без баннера (после юридического согласования)', value: 'first-party' },
+                    { label: 'Постоянный сбор без баннера', value: 'first-party' },
                   ],
                 },
                 { name: 'yandexMetricaEnabled', type: 'checkbox', label: 'Яндекс.Метрика включена', defaultValue: true },

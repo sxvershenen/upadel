@@ -67,7 +67,7 @@ export default function App({ content, view = "home" }: AppProps) {
     <ContentProvider content={content}>
     <MotionConfig reducedMotion="user">
     <AnalyticsTracker analytics={content.site.analytics} />
-    <ExternalAnalytics analyticsEnabled={content.site.analytics.mode !== 'disabled'} vendors={content.site.analytics.vendors} />
+    <ExternalAnalytics analyticsEnabled={content.site.analytics.mode !== 'disabled'} analyticsMode={content.site.analytics.mode} vendors={content.site.analytics.vendors} />
     <CoolModeEffects />
     <div className="min-h-screen bg-page text-ink" onClickCapture={handleAppClick}>
       <main>
