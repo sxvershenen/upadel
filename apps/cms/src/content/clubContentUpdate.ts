@@ -5,6 +5,7 @@ import { createLocalReq, type Payload } from 'payload'
 import { clubCoachRoster } from './clubUpdateData'
 
 const revision = 'club-roster-documents-20261023-v3'
+export const currentAnalyticsMode = (mode: unknown): 'disabled' | 'consent-required' => mode === 'disabled' ? 'disabled' : 'consent-required'
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../seed-media/club-update-20261023')
 export function documentRichText(lines: string[]) {
   return { root: { type: 'root', version: 1, direction: 'ltr' as const, format: '' as const, indent: 0, children: lines.map((text) => ({
@@ -72,10 +73,10 @@ export async function applyClubContentUpdate(payload: Payload): Promise<boolean>
       const { id, createdAt, updatedAt, ...draft } = draftGift
       await payload.updateGlobal({ ...opts, slug: 'gift-page', draft: true, data: { ...draft, form: { ...draft.form, consentLabel }, _status: 'draft' } })
     }
-    await payload.updateGlobal({ ...opts, slug: 'site-settings', draft: false, data: { brandWordmark: wordmark, clubUpdateVersion: revision, _status: 'published' } })
+    await payload.updateGlobal({ ...opts, slug: 'site-settings', draft: false, data: { brandWordmark: wordmark, clubUpdateVersion: revision, analytics: { ...site.analytics, mode: currentAnalyticsMode(site.analytics?.mode) }, _status: 'published' } })
     if (draftSite._status === 'draft') {
       const { id, createdAt, updatedAt, ...draft } = draftSite
-      await payload.updateGlobal({ ...opts, slug: 'site-settings', draft: true, data: { ...draft, brandWordmark: wordmark, clubUpdateVersion: revision, _status: 'draft' } })
+      await payload.updateGlobal({ ...opts, slug: 'site-settings', draft: true, data: { ...draft, brandWordmark: wordmark, clubUpdateVersion: revision, analytics: { ...draft.analytics, mode: currentAnalyticsMode(draft.analytics?.mode) }, _status: 'draft' } })
     }
     await payload.db.commitTransaction(transactionID)
     return true
