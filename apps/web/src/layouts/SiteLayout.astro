@@ -94,19 +94,26 @@ const pageEntrance = Astro.url.pathname === '/gift'
           if (localStorage.getItem(consentKey) === 'accepted') root.setAttribute('data-analytics-consent', 'accepted')
         } catch {}
 
-        document.addEventListener('click', (event) => {
-          const button = event.target instanceof Element ? event.target.closest('[data-cookie-consent]') : null
-          if (!button) return
-          const banner = button.closest('.cookie-notice')
-          if (!banner) return
-          banner.classList.add('cookie-notice--closing')
+        const accept = () => {
+          if (root.getAttribute('data-analytics-consent') === 'accepted') return
           root.setAttribute('data-analytics-consent', 'accepted')
           try { localStorage.setItem(consentKey, 'accepted') } catch {}
           window.dispatchEvent(new CustomEvent('unlim:analytics-consent', { detail: 'accepted' }))
+          document.querySelectorAll('.cookie-notice').forEach((notice) => notice.classList.add('cookie-notice--closing'))
           window.setTimeout(() => {
             document.querySelectorAll('.cookie-notice').forEach((notice) => { notice.hidden = true })
           }, 180)
+        }
+
+        document.addEventListener('click', (event) => {
+          if (!(event.target instanceof Element)) return
+          if (event.target.closest('[data-cookie-consent]')) {
+            accept()
+            return
+          }
+          if (!event.target.closest('.cookie-notice')) accept()
         }, { capture: true })
+        document.addEventListener('scroll', accept, { capture: true, passive: true, once: true })
       })()
     </script>
     <link rel="icon" type="image/svg+xml" href={site?.brandLogo?.url ?? '/favicon.svg'} />

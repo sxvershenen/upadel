@@ -52,7 +52,7 @@ Do not store form values, full referrer query strings or raw IP. Geo may be deri
 
 The audience and brand are Russian; Latvian/EU assumptions do not apply by default. Treat browser identifiers, event history and submitted lead data as potentially regulated data. Keep purpose, legal basis, Russian data localisation, notices/consents, access and deletion configurable and review them before launch. Form consent and analytics behavior are separate concerns.
 
-The Yandex Metrica library is preloaded on page load, but its code runs and the counter starts collecting visit data only after explicit analytics consent. Preloading still makes a request to Yandex before consent; GA4 remains fully consent-gated.
+The Yandex Metrica library is preloaded on page load. Its code runs and the counter starts collecting only after continued use is recorded by a click outside the notice, a page scroll, or the notice’s “ОК” button. Preloading makes a request to Yandex before that action; GA4 remains consent-gated.
 
 ## Accepted retention
 
