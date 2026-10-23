@@ -273,7 +273,7 @@ function HeaderBrand({ compact, filterId, homeHref, logo, logoMode, wordmark, na
         <span data-header-brand-icon className="col-start-1 row-start-1 inline-flex items-center justify-center" style={{ opacity: compact ? 1 : 0 }} aria-hidden={!compact}><Home aria-hidden="true" size={17} strokeWidth={1.9} /></span>
         <span data-header-brand-label className="col-start-1 row-start-1 flex items-center gap-2.5" style={{ opacity: compact ? 0 : 1 }} aria-hidden={compact}>
           {showLogo ? <img src={logo?.url} alt="" aria-hidden="true" className={replaceBrand ? 'h-9 max-w-[150px] object-contain' : 'h-7 w-7 object-contain'} /> : <span className="h-2.5 w-2.5 shrink-0 rounded-[3px] bg-lime" />}
-          {!replaceBrand && <span className="flex flex-col"><BrandWordmark media={wordmark} name={name} className="h-[13px] w-auto max-w-[195px]" /><span className="desktop-header-subtitle type-micro text-white/50">{subtitle}</span></span>}
+          {!replaceBrand && <span className="flex flex-col"><BrandWordmark media={wordmark} name={name} className="h-auto w-[126px] max-w-[126px]" /><span className="desktop-header-subtitle type-micro text-white/50">{subtitle}</span></span>}
         </span>
       </span>
     </motion.a>
