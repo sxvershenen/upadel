@@ -84,6 +84,7 @@ export function siteDTO(site: SiteSetting, origin: string, partners: Array<Recor
   const booking = bookingReadiness(site.booking ?? {})
   return {
     brandName: site.brandName,
+    brandWordmark: mediaDTO(site.brandWordmark, origin, 'original'),
     brandLogo: mediaDTO(site.brandLogo, origin, 'original'),
     brandLogoMode: (site.brandLogoMode ?? 'prefix') as BrandLogoMode,
     headerSubtitle: site.headerSubtitle ?? '',

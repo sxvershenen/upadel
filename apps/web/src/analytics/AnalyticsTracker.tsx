@@ -2,7 +2,6 @@ import type { SiteDTO } from '@unlim/content-contract'
 import { useEffect } from 'react'
 
 import { ANALYTICS_QUEUE_KEY, browserIdentity, firstSource, sessionIdentity, sourceFromLocation, type Source } from './identity'
-import { hasAnalyticsPreference, readAnalyticsPreferences } from './consent'
 import { createAnalyticsDeliveryQueue, type AnalyticsDeliveryQueue } from './deliveryQueue'
 import { createDeferredVitalDelivery, ensureDocumentVitals, type VitalEvent } from './documentVitals'
 
@@ -34,7 +33,6 @@ function configureDocumentVitals(analytics: SiteDTO['analytics']) {
     documentVitalDelivery = createDeferredVitalDelivery(initialDocumentContext, (context, events) => {
       const policy = liveAnalyticsPolicy
       if (!policy || policy.mode === 'disabled') return true
-      if (!hasAnalyticsPreference(readAnalyticsPreferences(localStorage), 'siteAnalytics')) return false
       const now = Date.now()
       const browser = browserIdentity(localStorage, now)
       const session = sessionIdentity(localStorage, now)
@@ -44,7 +42,7 @@ function configureDocumentVitals(analytics: SiteDTO['analytics']) {
       for (const event of events) queue.enqueue({
         eventId: pageViewId(), schemaVersion: policy.schemaVersion, occurredAt: new Date(now).toISOString(), anonymousId: browser.id, sessionId: session.id,
         pageViewId: context.pageViewId, path: context.path, title: context.title, language: context.language,
-        consentState: policy.mode === 'first-party' ? 'not-required' : 'accepted', currentSource: context.currentSource, firstSource: initialSource, ...event,
+        consentState: 'not-required', currentSource: context.currentSource, firstSource: initialSource, ...event,
       })
       void queue.flush({ endpoint: policy.endpoint, unloading: document.visibilityState === 'hidden', fetcher: fetch, sendBeacon: navigator.sendBeacon?.bind(navigator) })
       return true
@@ -71,7 +69,6 @@ export function AnalyticsTracker({ analytics }: { analytics: SiteDTO['analytics'
   useEffect(() => {
     const ownsInitialDocumentContext = configureDocumentVitals(analytics)
     if (analytics.mode === 'disabled') return
-    let enabled = hasAnalyticsPreference(readAnalyticsPreferences(localStorage), 'siteAnalytics')
     const queue = deliveryQueue()
     let current = sourceFromLocation(new URL(location.href), document.referrer)
     let first: Source | null = null
@@ -81,26 +78,22 @@ export function AnalyticsTracker({ analytics }: { analytics: SiteDTO['analytics'
     let lastActive = Date.now()
     const readMarks = new Set<number>()
     const track = (data: CustomEventData, eventContext?: { pageViewId: string; path: string; title: string; currentSource: Source; firstSource: Source | null }) => {
-      if (!enabled) return
       const now = Date.now(); const browser = browserIdentity(localStorage, now); const session = sessionIdentity(localStorage, now)
       first ??= firstSource(localStorage, current, now)
-      queue.enqueue({ eventId: pageViewId(), schemaVersion: analytics.schemaVersion, occurredAt: new Date(now).toISOString(), anonymousId: browser.id, sessionId: session.id, pageViewId: eventContext?.pageViewId ?? currentPageView, path: eventContext?.path ?? location.pathname, title: eventContext?.title ?? document.title.slice(0, 180), language: document.documentElement.lang || 'ru', consentState: analytics.mode === 'first-party' ? 'not-required' : 'accepted', currentSource: eventContext?.currentSource ?? current, firstSource: eventContext?.firstSource ?? first, ...data })
+      queue.enqueue({ eventId: pageViewId(), schemaVersion: analytics.schemaVersion, occurredAt: new Date(now).toISOString(), anonymousId: browser.id, sessionId: session.id, pageViewId: eventContext?.pageViewId ?? currentPageView, path: eventContext?.path ?? location.pathname, title: eventContext?.title ?? document.title.slice(0, 180), language: document.documentElement.lang || 'ru', consentState: 'not-required', currentSource: eventContext?.currentSource ?? current, firstSource: eventContext?.firstSource ?? first, ...data })
       if (queue.size() >= 10) void flush(false)
     }
     const flush = async (unloading: boolean) => {
-      if (!enabled) return
       await queue.flush({ endpoint: analytics.endpoint, unloading, fetcher: fetch, sendBeacon: navigator.sendBeacon?.bind(navigator) })
     }
     const serverContext = () => {
-      if (!enabled) return null
       const now = Date.now(); const browser = browserIdentity(localStorage, now); const session = sessionIdentity(localStorage, now)
       first ??= firstSource(localStorage, current, now)
-      return { eventId: pageViewId(), schemaVersion: analytics.schemaVersion, occurredAt: new Date(now).toISOString(), anonymousId: browser.id, sessionId: session.id, pageViewId: currentPageView, path: location.pathname, title: document.title.slice(0, 180), language: document.documentElement.lang || 'ru', consentState: analytics.mode === 'first-party' ? 'not-required' : 'accepted', currentSource: current, firstSource: first }
+      return { eventId: pageViewId(), schemaVersion: analytics.schemaVersion, occurredAt: new Date(now).toISOString(), anonymousId: browser.id, sessionId: session.id, pageViewId: currentPageView, path: location.pathname, title: document.title.slice(0, 180), language: document.documentElement.lang || 'ru', consentState: 'not-required', currentSource: current, firstSource: first }
     }
     const analyticsBridge = { track, serverContext }
     window.unlimAnalytics = analyticsBridge
     const start = () => {
-      if (!enabled) return
       currentPageView = pageViewId(); current = sourceFromLocation(new URL(location.href), document.referrer); first = null
       if (ownsInitialDocumentContext && initialDocumentContext) initialDocumentContext.pageViewId = currentPageView
       const context = objectContext()
@@ -112,13 +105,6 @@ export function AnalyticsTracker({ analytics }: { analytics: SiteDTO['analytics'
       }, 15_000)
     }
     const stop = () => { window.clearInterval(flushTimer); window.clearInterval(activeTimer); flushTimer = 0; activeTimer = 0 }
-    const consent = (event: Event) => {
-      const preferences = (event as CustomEvent).detail
-      const wasEnabled = enabled; enabled = hasAnalyticsPreference(preferences, 'siteAnalytics')
-      if (!wasEnabled && enabled) start()
-      if (!wasEnabled && enabled) documentVitalDelivery?.policyChanged()
-      if (!enabled) { stop(); queue.clear() }
-    }
     const activity = () => { lastActive = Date.now() }
     const click = (event: MouseEvent) => {
       if (!(event.target instanceof Element)) return
@@ -138,9 +124,9 @@ export function AnalyticsTracker({ analytics }: { analytics: SiteDTO['analytics'
       const percent = Math.round((scrollY / available) * 100)
       for (const mark of [25, 50, 90]) if (percent >= mark && !readMarks.has(mark)) { readMarks.add(mark); track({ name: 'article_read', value: mark, ...objectContext() }) }
     }
-    addEventListener('unlim:analytics-consent', consent); addEventListener('click', click, true); addEventListener('scroll', scroll, { passive: true }); addEventListener('pointerdown', activity, { passive: true }); addEventListener('keydown', activity)
-    if (enabled) start()
-    return () => { void flush(true); stop(); if (window.unlimAnalytics === analyticsBridge) delete window.unlimAnalytics; removeEventListener('unlim:analytics-consent', consent); removeEventListener('click', click, true); removeEventListener('scroll', scroll); removeEventListener('pointerdown', activity); removeEventListener('keydown', activity) }
+    addEventListener('click', click, true); addEventListener('scroll', scroll, { passive: true }); addEventListener('pointerdown', activity, { passive: true }); addEventListener('keydown', activity)
+    start()
+    return () => { void flush(true); stop(); if (window.unlimAnalytics === analyticsBridge) delete window.unlimAnalytics; removeEventListener('click', click, true); removeEventListener('scroll', scroll); removeEventListener('pointerdown', activity); removeEventListener('keydown', activity) }
   }, [analytics.endpoint, analytics.mode, analytics.schemaVersion])
   return null
 }

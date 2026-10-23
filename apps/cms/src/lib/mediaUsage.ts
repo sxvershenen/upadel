@@ -141,6 +141,7 @@ function scanHomepage(target: Map<string, MediaUsage>, doc: Record<string, unkno
 function scanSiteSettings(target: Map<string, MediaUsage>, doc: Record<string, unknown>, state: MediaUsage['state']) {
   for (const [path, location] of [
     ['brandLogo', 'Настройки сайта → Бренд → логотип'],
+    ['brandWordmark', 'Настройки сайта → Бренд → надпись логотипа'],
     ['footerImage', 'Настройки сайта → Футер → фотография клуба'],
     ['contactConfirmation.avatar', 'Настройки сайта → Подтверждения и формы → аватар клуба'],
   ] as const) {

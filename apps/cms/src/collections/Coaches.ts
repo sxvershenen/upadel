@@ -82,15 +82,15 @@ export const Coaches: CollectionConfig = {
               },
             },
             {
-              name: 'levels', type: 'select', hasMany: true, label: 'Уровни — фильтр', required: true,
+              name: 'levels', type: 'select', hasMany: true, label: 'Уровни — фильтр',
               options: [...coachLevelOptions],
             },
             {
-              name: 'focusAreas', type: 'select', hasMany: true, label: 'Направления — фильтр', required: true,
+              name: 'focusAreas', type: 'select', hasMany: true, label: 'Направления — фильтр',
               options: [...coachFocusOptions],
             },
             {
-              name: 'languageCodes', type: 'select', hasMany: true, label: 'Языки — фильтр', required: true,
+              name: 'languageCodes', type: 'select', hasMany: true, label: 'Языки — фильтр',
               options: ['RU', 'EN', 'LV', 'DE'],
             },
             {

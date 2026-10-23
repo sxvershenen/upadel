@@ -1,5 +1,6 @@
 import React, { useState, type CSSProperties } from "react";
 import { ArrowUpRight, CalendarCheck, CalendarDays, Info, MapPin, Sparkles, Star, UserRound, type LucideIcon } from "lucide-react";
+import { BrandWordmark } from "../components/BrandWordmark";
 import { ContentAction } from "../components/ContentAction";
 import { useContent } from "../content/ContentContext";
 import { SplitTextReveal } from "../components/ui/SplitTextReveal";
@@ -61,8 +62,8 @@ function SocialProof({ className }: { className?: string }) {
           <ProgressiveImage key={media.url} src={media.url} alt="" className="h-8 w-8 rounded-full object-cover" />
         ))}
       </div>
-      <div className="flex min-w-0 flex-col gap-0.5">
-        <div className="type-caption flex items-center gap-1 font-semibold text-white">
+      <div className="flex min-w-0 flex-col gap-0 md:gap-0.5">
+        <div className="flex items-center gap-1 text-[14px] leading-tight font-semibold text-white md:text-[12px]">
           <Star size={12} className="fill-[#c2f542] text-[#c2f542]" />
           {home.hero.socialProof.ratingLabel}
         </div>
@@ -108,9 +109,9 @@ export function Hero() {
 
       <div className="container-page absolute inset-x-0 top-8 z-10 flex items-center justify-between gap-2 md:hidden">
         <a href="#top" className="flex min-w-0 items-center gap-2.5 leading-none text-white">
-          {site.brandLogo && site.brandLogoMode !== "text" && !brandLogoFailed ? <img src={site.brandLogo.url} alt={site.brandName} onError={() => setBrandLogoFailed(true)} className={replaceBrand ? "h-9 max-w-[150px] object-contain" : "h-7 w-7 object-contain"} /> : <span className="h-2.5 w-2.5 shrink-0 rounded-[3px] bg-lime" />}
-          {(!replaceBrand || !site.brandLogo || brandLogoFailed) && <span className="flex flex-col">
-            <span className="text-[14px] font-semibold tracking-[0] text-white">{site.brandName}</span>
+          {site.brandLogo && site.brandLogoMode !== "text" && !brandLogoFailed ? <img src={site.brandLogo.url} alt={site.brandName} onError={() => setBrandLogoFailed(true)} className={replaceBrand ? "h-12 max-w-[150px] object-contain" : "h-12 w-12 shrink-0 object-contain"} /> : <span className="h-2.5 w-2.5 shrink-0 rounded-[3px] bg-lime" />}
+          {(!replaceBrand || !site.brandLogo || brandLogoFailed) && <span className="flex min-w-0 flex-col gap-1">
+            <BrandWordmark media={site.brandWordmark} name={site.brandName} className="w-[184px] max-w-full" />
             <span className="type-micro text-white/55">{site.headerSubtitle}</span>
           </span>}
         </a>

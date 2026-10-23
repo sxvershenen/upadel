@@ -424,11 +424,11 @@ export interface Coach {
    * Краткая подпись для профиля, например: RU · EN.
    */
   languages: string;
-  levels: ('beginner' | 'intermediate' | 'medium' | 'tournament' | 'kids' | 'all')[];
-  focusAreas: (
-    'technique' | 'pair-tactics' | 'tournament-prep' | 'kids' | 'fitness' | 'beginner-start' | 'groups' | 'women'
-  )[];
-  languageCodes: ('RU' | 'EN' | 'LV' | 'DE')[];
+  levels?: ('beginner' | 'intermediate' | 'medium' | 'tournament' | 'kids' | 'all')[] | null;
+  focusAreas?:
+    | ('technique' | 'pair-tactics' | 'tournament-prep' | 'kids' | 'fitness' | 'beginner-start' | 'groups' | 'women')[]
+    | null;
+  languageCodes?: ('RU' | 'EN' | 'LV' | 'DE')[] | null;
   certificates?:
     | {
         title: string;
@@ -2330,8 +2330,10 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  */
 export interface SiteSetting {
   id: number;
+  clubUpdateVersion?: string | null;
   seedVersion?: string | null;
   brandName: string;
+  brandWordmark?: (number | null) | Media;
   brandLogo?: (number | null) | Media;
   brandLogoMode?: ('text' | 'prefix' | 'replace') | null;
   headerSubtitle?: string | null;
@@ -2460,7 +2462,7 @@ export interface SiteSetting {
     manageLabel?: string | null;
   };
   /**
-   * Режим задаёт включение first-party аналитики и внешний сбор (Метрика, GA4). Описание цели и правил обработки должно быть отражено в опубликованной политике конфиденциальности.
+   * Внутренняя статистика работает без переключателя cookies. Внешние счётчики (Метрика, GA4) запускаются после согласия. Описание цели и правил обработки должно быть отражено в опубликованной политике конфиденциальности.
    */
   analytics: {
     mode: 'disabled' | 'consent-required';
@@ -4039,8 +4041,10 @@ export interface OfertaPage {
  * via the `definition` "site-settings_select".
  */
 export interface SiteSettingsSelect<T extends boolean = true> {
+  clubUpdateVersion?: T;
   seedVersion?: T;
   brandName?: T;
+  brandWordmark?: T;
   brandLogo?: T;
   brandLogoMode?: T;
   headerSubtitle?: T;

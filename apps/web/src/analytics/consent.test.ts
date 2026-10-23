@@ -16,7 +16,7 @@ test('analytics preferences are absent until a complete explicit choice is saved
   assert.equal(readAnalyticsPreferences(storage), null)
 })
 
-test('analytics preferences independently control first-party, Metrica and GA4', () => {
+test('legacy internal preference remains readable while external vendor choices stay independent', () => {
   const storage = new MemoryStorage() as unknown as Storage
   const preferences = { siteAnalytics: false, yandexMetrica: true, ga4: false }
   assert.equal(saveAnalyticsPreferences(storage, preferences), true)

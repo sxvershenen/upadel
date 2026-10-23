@@ -17,6 +17,7 @@ export const SiteSettings: GlobalConfig = {
   },
   admin: { group: 'Настройки' },
   fields: [
+    { name: 'clubUpdateVersion', type: 'text', admin: { hidden: true }, access: { read: () => false } },
     {
       name: 'seedVersion',
       type: 'text',
@@ -30,6 +31,7 @@ export const SiteSettings: GlobalConfig = {
           label: 'Бренд',
           fields: [
             { name: 'brandName', type: 'text', label: 'Название', defaultValue: 'UNLIM RIGA PADEL', required: true },
+            { name: 'brandWordmark', type: 'upload', relationTo: 'media', filterOptions: imageOnlyFilter, label: 'Надпись логотипа' },
             { name: 'brandLogo', type: 'upload', relationTo: 'media', filterOptions: imageOnlyFilter, label: 'Логотип' },
             {
               name: 'brandLogoMode',
@@ -313,13 +315,13 @@ export const SiteSettings: GlobalConfig = {
           fields: [
             {
               name: 'analytics', type: 'group', label: 'Сбор собственной аналитики',
-              admin: { description: 'Режим задаёт включение first-party аналитики и внешний сбор (Метрика, GA4). Описание цели и правил обработки должно быть отражено в опубликованной политике конфиденциальности.' },
+              admin: { description: 'Внутренняя статистика работает без переключателя cookies. Внешние счётчики (Метрика, GA4) запускаются после согласия. Описание цели и правил обработки должно быть отражено в опубликованной политике конфиденциальности.' },
               fields: [
                 {
                   name: 'mode', type: 'select', label: 'Режим сбора', required: true, defaultValue: 'consent-required',
                   options: [
                     { label: 'Отключено', value: 'disabled' },
-                    { label: 'Только после согласия', value: 'consent-required' },
+                    { label: 'Внутренняя статистика + внешние счётчики после согласия', value: 'consent-required' },
                   ],
                 },
                 { name: 'yandexMetricaEnabled', type: 'checkbox', label: 'Яндекс.Метрика включена', defaultValue: true },

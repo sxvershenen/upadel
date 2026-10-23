@@ -786,14 +786,13 @@ export function GiftLandingPage({ dto, publicOrigin: _publicOrigin = 'https://un
                         defaultChecked
                         label={
                           <span>
-                            {pageForm.consentLabel} ·{' '}
                             <a
                               href="/policy"
                               target="_blank"
                               rel="noreferrer"
                               className="text-ink underline hover:text-lime-deep"
                             >
-                              {pageForm.policyLabel}
+                              {pageForm.consentLabel}
                             </a>
                           </span>
                         }

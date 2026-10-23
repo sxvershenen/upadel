@@ -307,7 +307,7 @@ function createLegalPage(kind: 'policy' | 'oferta', label: string): GlobalConfig
     slug: `${kind}-page`, label, kind, fields: [
       { name: 'notice', type: 'textarea', label: 'Предупреждение', required: true, admin: { description: 'Показывается над документом, пока текст не согласован.' } },
       { name: 'content', type: 'richText', label: 'Текст документа', required: true },
-      { name: 'approved', type: 'checkbox', label: 'Текст согласован юристом', defaultValue: false, admin: { position: 'sidebar' } },
+      { name: 'approved', type: 'checkbox', label: 'Опубликовать предоставленный документ', defaultValue: false, admin: { position: 'sidebar' } },
     ],
   })
 }

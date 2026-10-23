@@ -1,7 +1,7 @@
 export * from './widgets'
 import type { CatalogPagination, CatalogQuery } from './catalog'
 export * from './catalog'
-export const homepageDTOversion = 23 as const
+export const homepageDTOversion = 24 as const
 
 export const publicRouteRegistry = [
   { path: '/', parent: null, template: 'homepage', globalSlug: 'homepage' },
@@ -153,6 +153,7 @@ export type HomepageDTO = {
   seo: { title?: string | null; description?: string | null; canonical?: string | null; robots: string; socialImage?: MediaDTO | null }
   site: {
     brandName: string
+    brandWordmark?: MediaDTO | null
     brandLogo?: MediaDTO | null
     brandLogoMode: BrandLogoMode
     headerSubtitle: string

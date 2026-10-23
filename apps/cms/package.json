@@ -22,14 +22,15 @@
     "test:analytics:batch:db": "cross-env NODE_OPTIONS=--no-deprecation payload run src/scripts/analyticsBatchIntegration.ts",
     "test:content:db": "cross-env NODE_OPTIONS=--no-deprecation payload run src/scripts/contentLifecycleIntegration.ts",
     "content:opening": "cross-env NODE_OPTIONS=--no-deprecation payload run src/scripts/openingContent.ts",
-    "content:padel-court-zakaz": "cross-env NODE_OPTIONS=--no-deprecation payload run src/scripts/refreshPadelCourtZakaz.ts"
+    "content:padel-court-zakaz": "cross-env NODE_OPTIONS=--no-deprecation payload run src/scripts/refreshPadelCourtZakaz.ts",
+    "content:club": "cross-env NODE_OPTIONS=--no-deprecation payload run src/scripts/clubContentUpdate.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.90.2",
     "@payloadcms/next": "3.90.2",
     "@payloadcms/richtext-lexical": "3.90.2",
     "@payloadcms/ui": "3.90.2",
-    "@unlim/content-contract": "0.0.18",
+    "@unlim/content-contract": "0.0.19",
     "cross-env": "7.0.3",
     "graphql": "16.11.0",
     "lucide-react": "1.45.0",

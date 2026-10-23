@@ -1,3 +1,4 @@
+import { BrandWordmark } from "../BrandWordmark";
 import { PersonIcon } from '../ui/ContactIcons'
 import type { DesktopNavigationChild, DesktopNavigationItem } from '@unlim/content-contract'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
@@ -263,7 +264,7 @@ function DesktopNavigationLink({ compact, filterId, item, wide }: { compact: boo
   </div>
 }
 
-function HeaderBrand({ compact, filterId, homeHref, logo, logoMode, name, reduceMotion, subtitle }: { compact: boolean; filterId: string; homeHref: string; logo?: { url: string } | null; logoMode: 'text' | 'prefix' | 'replace'; name: string; reduceMotion: boolean; subtitle: string }) {
+function HeaderBrand({ compact, filterId, homeHref, logo, logoMode, wordmark, name, reduceMotion, subtitle }: { compact: boolean; filterId: string; homeHref: string; logo?: { url: string } | null; logoMode: 'text' | 'prefix' | 'replace'; wordmark?: { url: string } | null; name: string; reduceMotion: boolean; subtitle: string }) {
   const showLogo = Boolean(logo) && logoMode !== 'text'
   const replaceBrand = showLogo && logoMode === 'replace'
   return <div className="desktop-header-brand desktop-header-compact-control relative shrink-0">
@@ -272,7 +273,7 @@ function HeaderBrand({ compact, filterId, homeHref, logo, logoMode, name, reduce
         <span data-header-brand-icon className="col-start-1 row-start-1 inline-flex items-center justify-center" style={{ opacity: compact ? 1 : 0 }} aria-hidden={!compact}><Home aria-hidden="true" size={17} strokeWidth={1.9} /></span>
         <span data-header-brand-label className="col-start-1 row-start-1 flex items-center gap-2.5" style={{ opacity: compact ? 0 : 1 }} aria-hidden={compact}>
           {showLogo ? <img src={logo?.url} alt="" aria-hidden="true" className={replaceBrand ? 'h-9 max-w-[150px] object-contain' : 'h-7 w-7 object-contain'} /> : <span className="h-2.5 w-2.5 shrink-0 rounded-[3px] bg-lime" />}
-          {!replaceBrand && <span className="flex flex-col"><span className="text-[14px] font-semibold tracking-[0] text-white">{name}</span><span className="desktop-header-subtitle type-micro text-white/50">{subtitle}</span></span>}
+          {!replaceBrand && <span className="flex flex-col"><BrandWordmark media={wordmark} name={name} className="h-[13px] w-auto max-w-[195px]" /><span className="desktop-header-subtitle type-micro text-white/50">{subtitle}</span></span>}
         </span>
       </span>
     </motion.a>
@@ -373,7 +374,7 @@ export function DesktopHeader() {
   return <motion.header ref={headerRef} initial={false} animate={{ '--header-progress': compact ? 1 : 0 }} transition={reduceMotion ? { duration: 0 } : headerMorphTransition} data-header-compact={compact ? 'true' : 'false'} data-header-direction={scrollState.direction ?? 'none'} data-header-scroll="true" data-header-tooltips={tooltipSuppressed ? 'suppressed' : 'ready'} onClickCapture={() => setTooltipSuppressed(true)} onFocusCapture={() => setTooltipSuppressed(false)} onPointerLeave={() => setTooltipSuppressed(false)} onPointerMove={() => setTooltipSuppressed(false)} className="desktop-header fixed inset-x-0 top-0 z-50 hidden justify-center md:flex">
     <GooFilter id={tooltipFilterId} strength={5} />
       <div className={`desktop-header-island se-top-2 mx-4 flex h-[60px] items-center whitespace-nowrap bg-black text-white ${compact ? 'gap-0 py-1.5 pl-3 pr-2' : 'justify-between gap-4 py-2.5 pl-7 pr-3'}`}>
-      <HeaderBrand compact={compact} filterId={tooltipFilterId} homeHref={homeHref} logo={site.brandLogo} logoMode={site.brandLogoMode} name={site.brandName} reduceMotion={reduceMotion} subtitle={site.headerSubtitle} />
+      <HeaderBrand compact={compact} filterId={tooltipFilterId} homeHref={homeHref} logo={site.brandLogo} logoMode={site.brandLogoMode} wordmark={site.brandWordmark} name={site.brandName} reduceMotion={reduceMotion} subtitle={site.headerSubtitle} />
       <nav className={`desktop-header-nav flex min-w-0 items-center ${compact ? 'gap-0' : 'gap-0.5'}`} aria-label="Основная навигация">
         {site.desktopNavigation.map((item) => <DesktopNavigationLink key={`${item.href}-${item.label}`} compact={compact} filterId={tooltipFilterId} item={item} wide={wide} />)}
       </nav>

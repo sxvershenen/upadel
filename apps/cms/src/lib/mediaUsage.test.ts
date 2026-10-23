@@ -121,3 +121,17 @@ test('later article/version pages retain deletion references and scan failures r
   payload.findVersions = async () => { throw new Error('scan failed') }
   await assert.rejects(getMediaUsage(payload as never, [55], {} as never), /scan failed/)
 })
+
+test('brand wordmark is protected while used by live or draft site settings', async () => {
+  const payload = {
+    find: async () => ({ docs: [] }),
+    findVersions: async () => ({ docs: [] }),
+    findGlobal: async ({ slug, draft }: { slug: string; draft: boolean }) => slug === 'site-settings'
+      ? { _status: draft ? 'draft' : 'published', brandWordmark: 91 }
+      : { _status: 'draft' },
+  }
+  const usage = await getMediaUsage(payload as never, [91])
+  assert.equal(usage[0]?.mediaID, '91')
+  assert.equal(usage[0]?.state, 'live')
+  assert.match(usage[0]?.location ?? '', /надпись логотипа/)
+})

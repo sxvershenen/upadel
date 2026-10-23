@@ -41,16 +41,12 @@ const privacyHref = site.footer.legalLinks.find(({ label, href }) => /полит
     </div>
   </div>
 
-  <dialog id="cookie-preferences" class="cookie-preferences m-auto w-[calc(100%-32px)] max-w-[520px] border-0 bg-ink p-0 text-white backdrop:bg-black/65" aria-labelledby="cookie-preferences-title">
+  <dialog id="cookie-preferences" class="cookie-preferences se-4 m-auto w-[calc(100%-32px)] max-w-[520px] border-0 bg-ink p-0 text-white backdrop:bg-black/65" aria-labelledby="cookie-preferences-title">
     <div class="p-6 sm:p-8">
       <h2 id="cookie-preferences-title" class="type-title-card font-semibold">Настройки аналитики</h2>
-      <p class="mt-2 type-body-sm text-white/65">Выберите инструменты, которым разрешено собирать статистику. Сохранить решение можно здесь или изменить его позже внизу сайта.</p>
+      <p class="mt-2 type-body-sm text-white/65">Выберите внешние инструменты, которым разрешено собирать статистику. Сохранить решение можно здесь или изменить его позже внизу сайта.</p>
       <fieldset class="mt-6 flex flex-col gap-4">
         <legend class="sr-only">Разрешённые инструменты аналитики</legend>
-        <label class="flex items-start gap-3 type-ui text-white/85">
-          <input type="checkbox" data-analytics-toggle="siteAnalytics" checked class="mt-0.5 accent-lime" />
-          <span><strong class="font-medium">Внутренняя аналитика UNLIM</strong><span class="mt-0.5 block type-caption text-white/55">Обезличенная статистика посещений и действий на сайте.</span></span>
-        </label>
         {site.analytics.vendors.yandexMetrica.enabled && <label class="flex items-start gap-3 type-ui text-white/85">
           <input type="checkbox" data-analytics-toggle="yandexMetrica" checked class="mt-0.5 accent-lime" />
           <span><strong class="font-medium">Яндекс.Метрика</strong><span class="mt-0.5 block type-caption text-white/55">Статистика посещений и, если включён, Вебвизор.</span></span>

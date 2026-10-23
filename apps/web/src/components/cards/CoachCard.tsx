@@ -1,11 +1,6 @@
 import React, { useCallback, useRef, useState } from "react";
-import { motion } from "framer-motion";
-import { BadgeCheck, Star } from "lucide-react";
 import type { HomepageDTO } from "@unlim/content-contract";
-import { springSoft } from "../../lib/motion";
-import { useImageParallax } from "../../lib/useImageParallax";
 import { ArrowAction } from "../ui/ArrowAction";
-import { Badge } from "../ui/Badge";
 import { ButtonLink } from "../ui/Button";
 import { ContentAction } from "../ContentAction";
 import { WhiteCard } from "../ui/Card";
@@ -22,8 +17,6 @@ export function CoachCard({ coach, loading = "lazy", reveal = true }: { coach: C
   const [modalPhotoSrc, setModalPhotoSrc] = useState(coach.photo.url);
   const closeDialog = useCallback(() => setOpen(false), []);
   const photoImageRef = useRef<HTMLImageElement>(null);
-  const photoViewportRef = useRef<HTMLDivElement>(null);
-  const photoY = useImageParallax(photoViewportRef, 11);
   const openDialog = useCallback(() => {
     const image = photoImageRef.current;
     setModalPhotoSrc(image?.currentSrc || image?.src || coach.photo.url);
@@ -33,17 +26,13 @@ export function CoachCard({ coach, loading = "lazy", reveal = true }: { coach: C
   return <>
     <button data-coach-card="true" type="button" aria-haspopup="dialog" aria-label={`Открыть профиль тренера ${coach.name}`} onClick={openDialog} className="block h-full w-full text-left focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-4">
       <WhiteCard data-coach-surface="true" reveal={reveal} className="flex h-full flex-col overflow-hidden p-4">
-        <div ref={photoViewportRef} data-parallax-viewport className="parallax-viewport relative aspect-[4/5] w-full rounded-[var(--se-2)]">
-          <motion.div data-parallax-layer style={{ y: photoY }} className="parallax-layer overflow-hidden">
-            <ProgressiveImage skeleton={false} ref={photoImageRef} media={coach.photo} sizes="(min-width: 1024px) 20vw, (min-width: 640px) 50vw, 100vw" alt={coach.photo.alt} loading={loading} className="h-full w-full object-cover" variants={{ rest: { scale: 1.04 }, hover: { scale: 1.095 } }} transition={springSoft} />
-          </motion.div>
-          <div className="absolute left-3 top-3"><Badge reveal={false} tone="glass" className="image-glass px-2.5"><Star size={12} className="fill-lime text-lime" /> {coach.rating} · {coach.reviewsCount}</Badge></div>
-          <div className="absolute right-3 top-3 flex flex-col items-end gap-1.5">{coach.certificates.slice(0, 2).map((certificate) => <span key={certificate} className="se-1 type-micro image-glass flex items-center gap-1 px-2 py-1 text-white"><BadgeCheck size={11} /> {certificate}</span>)}</div>
+        <div className="relative aspect-[2/3] w-full overflow-hidden rounded-[var(--se-2)] bg-ink">
+          <ProgressiveImage skeleton={false} ref={photoImageRef} media={coach.photo} sizes="(min-width: 1024px) 20vw, (min-width: 640px) 50vw, 100vw" alt={coach.photo.alt} loading={loading} className="h-full w-full object-contain" />
         </div>
         <div className="flex flex-1 flex-col px-2 pb-2 pt-4">
           <h3 className="type-title-compact text-ink">{coach.name}</h3>
-          <p className="type-body-sm mt-2 text-ink-soft/90">{coach.bio}</p>
-          <div className="mt-4 flex items-end justify-between border-t border-ink/10 pt-4"><Price label="час от" value={coach.priceFrom} /><ArrowAction tone="light" size="sm" cardHover className="bg-surface-muted text-ink" /></div>
+          <p className="type-body-sm mt-2 line-clamp-4 text-ink-soft/90">{coach.bio}</p>
+          <div className="mt-4 flex items-end justify-between border-t border-ink/10 pt-4"><Price label="тренировка от" value={coach.priceFrom} /><ArrowAction tone="light" size="sm" cardHover className="bg-surface-muted text-ink" /></div>
         </div>
       </WhiteCard>
     </button>
@@ -58,7 +47,7 @@ export function CoachCard({ coach, loading = "lazy", reveal = true }: { coach: C
           loading="eager"
           decoding="sync"
           draggable={false}
-          className="se-3 h-[175px] w-[140px] object-cover md:h-auto md:max-h-[360px] md:w-full"
+          className="se-3 h-auto w-[140px] self-start object-contain md:max-h-[420px] md:w-full"
         />
         <div className="flex flex-col">
           <Typography role="body" tone="muted">{coach.bio}</Typography>

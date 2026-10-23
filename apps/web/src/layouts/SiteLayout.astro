@@ -122,7 +122,7 @@ const pageEntrance = Astro.url.pathname === '/gift'
         }
         const save = () => {
           const dialog = getDialog()
-          const next = { siteAnalytics: false, yandexMetrica: false, ga4: false }
+          const next = { siteAnalytics: true, yandexMetrica: false, ga4: false }
           dialog?.querySelectorAll('[data-analytics-toggle]').forEach((input) => {
             if (!(input instanceof HTMLInputElement)) return
             const key = input.getAttribute('data-analytics-toggle')
