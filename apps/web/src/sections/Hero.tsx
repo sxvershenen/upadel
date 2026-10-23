@@ -111,11 +111,11 @@ export function Hero() {
         <a href="#top" className="flex min-w-0 items-center gap-2.5 leading-none text-white">
           {site.brandLogo && site.brandLogoMode !== "text" && !brandLogoFailed ? <img src={site.brandLogo.url} alt={site.brandName} onError={() => setBrandLogoFailed(true)} className={replaceBrand ? "h-12 max-w-[150px] object-contain" : "h-12 w-12 shrink-0 object-contain"} /> : <span className="h-2.5 w-2.5 shrink-0 rounded-[3px] bg-lime" />}
           {(!replaceBrand || !site.brandLogo || brandLogoFailed) && <span className="flex min-w-0 flex-col gap-1">
-            <BrandWordmark media={site.brandWordmark} name={site.brandName} className="w-[126px] max-w-[126px]" />
+            <BrandWordmark media={site.brandWordmark} name={site.brandName} className="w-[160px] max-w-full" />
             <span className="type-micro text-white/55">{site.headerSubtitle}</span>
           </span>}
         </a>
-        <SocialProof className="w-fit max-w-[55%]" />
+        <SocialProof className="w-fit max-w-[55%] shrink-0" />
       </div>
       {replaceBrand && <HeroAddress className="absolute right-4 top-20 z-10 md:bottom-8 md:right-8 md:top-auto" />}
 
