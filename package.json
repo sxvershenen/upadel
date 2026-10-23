@@ -7,9 +7,13 @@
     "packages/*"
   ],
   "overrides": {
-    "dompurify": "3.4.16",
+    "dompurify": "3.4.17",
     "sass": "1.105.1",
-    "undici": "7.29.1"
+    "undici": "7.29.1",
+    "esbuild": "^0.28.2",
+    "monaco-editor": {
+      "dompurify": "3.4.17"
+    }
   },
   "scripts": {
     "dev:web": "npm run dev --workspace @unlim/web",

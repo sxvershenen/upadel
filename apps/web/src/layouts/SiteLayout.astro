@@ -73,9 +73,6 @@ const siteSchema = site ? {
 const schemaGraph = [...(siteSchema?.['@graph'] ?? []), ...structuredData]
 const siteSchemaJSON = schemaGraph.length > 0 ? serializeStructuredData({ '@context': 'https://schema.org', '@graph': schemaGraph }) : null
 const enableGlobalTransitions = !Astro.url.pathname.startsWith('/transitions/') && !Astro.url.pathname.startsWith('/preview/')
-const alwaysOnMetrica = site?.analytics.mode === 'first-party' && site.analytics.vendors.yandexMetrica.enabled && site.analytics.vendors.yandexMetrica.counterId
-  ? { counterId: Number(site.analytics.vendors.yandexMetrica.counterId), webvisor: site.analytics.vendors.yandexMetrica.webvisor }
-  : null
 const pageEntrance = Astro.url.pathname === '/gift'
   ? 'gift'
   : /^\/blog\/[^/]+\/?$/.test(Astro.url.pathname)
@@ -90,64 +87,60 @@ const pageEntrance = Astro.url.pathname === '/gift'
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    {alwaysOnMetrica && <>
-      <link rel="preconnect" href="https://mc.yandex.ru" crossorigin />
-      <link rel="preload" href="https://mc.yandex.ru/metrika/tag.js" as="script" />
-      <script is:inline define:vars={{ counterId: alwaysOnMetrica.counterId, webvisor: alwaysOnMetrica.webvisor }}>
-        (() => {
-          const initialized = window.__unlimYandexMetricaInitialized === String(counterId)
-          if (initialized) return
-          window.ym = window.ym || function (...args) {
-            const queue = window.ym
-            queue.a = queue.a || []
-            queue.a.push(args)
-          }
-          window.ym.l = window.ym.l || Date.now()
-          window.ym(counterId, 'init', {
-            clickmap: true,
-            ecommerce: 'dataLayer',
-            referrer: document.referrer,
-            url: location.href,
-            trackLinks: true,
-            accurateTrackBounce: true,
-            webvisor,
-          })
-          window.__unlimYandexMetricaInitialized = String(counterId)
-          const script = document.createElement('script')
-          script.id = 'unlim-yandex-metrica'
-          script.async = true
-          script.src = 'https://mc.yandex.ru/metrika/tag.js'
-          document.head.appendChild(script)
-        })()
-      </script>
-    </>}
     <script is:inline define:vars={{ consentKey: ANALYTICS_CONSENT_KEY }}>
       (() => {
         const root = document.documentElement
-        try {
-          if (localStorage.getItem(consentKey) === 'accepted') root.setAttribute('data-analytics-consent', 'accepted')
-        } catch {}
+        const keys = ['siteAnalytics', 'yandexMetrica', 'ga4']
+        const read = () => {
+          try {
+            const value = JSON.parse(localStorage.getItem(consentKey) || 'null')
+            return value && keys.every((key) => typeof value[key] === 'boolean') ? value : null
+          } catch { return null }
+        }
+        if (read()) root.setAttribute('data-analytics-consent', 'saved')
 
-        const accept = () => {
-          if (root.getAttribute('data-analytics-consent') === 'accepted') return
-          root.setAttribute('data-analytics-consent', 'accepted')
-          try { localStorage.setItem(consentKey, 'accepted') } catch {}
-          window.dispatchEvent(new CustomEvent('unlim:analytics-consent', { detail: 'accepted' }))
+        const hideNotice = () => {
           document.querySelectorAll('.cookie-notice').forEach((notice) => notice.classList.add('cookie-notice--closing'))
           window.setTimeout(() => {
             document.querySelectorAll('.cookie-notice').forEach((notice) => { notice.hidden = true })
           }, 180)
         }
+        const dialog = document.getElementById('cookie-preferences')
+        const openPreferences = () => {
+          if (!(dialog instanceof HTMLDialogElement)) return
+          const current = read()
+          dialog.querySelectorAll('[data-analytics-toggle]').forEach((input) => {
+            if (!(input instanceof HTMLInputElement)) return
+            const key = input.getAttribute('data-analytics-toggle')
+            input.checked = current ? current[key] === true : input.defaultChecked
+          })
+          if (!dialog.open) dialog.showModal()
+        }
+        const save = () => {
+          const next = { siteAnalytics: false, yandexMetrica: false, ga4: false }
+          dialog?.querySelectorAll('[data-analytics-toggle]').forEach((input) => {
+            if (!(input instanceof HTMLInputElement)) return
+            const key = input.getAttribute('data-analytics-toggle')
+            if (key in next) next[key] = input.checked
+          })
+          const previous = read()
+          try { localStorage.setItem(consentKey, JSON.stringify({ version: 2, ...next })) } catch { return }
+          root.setAttribute('data-analytics-consent', 'saved')
+          window.dispatchEvent(new CustomEvent('unlim:analytics-consent', { detail: next }))
+          hideNotice()
+          if (dialog instanceof HTMLDialogElement) dialog.close()
+          if (previous && keys.some((key) => previous[key] && !next[key])) location.reload()
+        }
 
         document.addEventListener('click', (event) => {
           if (!(event.target instanceof Element)) return
-          if (event.target.closest('[data-cookie-consent]')) {
-            accept()
-            return
-          }
-          if (!event.target.closest('.cookie-notice')) accept()
+          if (event.target.closest('[data-cookie-ok]')) save()
+          else if (event.target.closest('[data-cookie-open], [data-cookie-settings]')) openPreferences()
+          else if (event.target.closest('[data-cookie-save]')) save()
+          else if (event.target.closest('[data-cookie-close]') && dialog instanceof HTMLDialogElement) dialog.close()
         }, { capture: true })
-        document.addEventListener('scroll', accept, { capture: true, passive: true, once: true })
+        dialog?.addEventListener('click', (event) => { if (event.target === dialog && dialog instanceof HTMLDialogElement) dialog.close() })
+        window.addEventListener('unlim:open-analytics-settings', openPreferences)
       })()
     </script>
     <link rel="icon" type="image/svg+xml" href={site?.brandLogo?.url ?? '/favicon.svg'} />

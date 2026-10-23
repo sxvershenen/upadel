@@ -1,4 +1,4 @@
-export const ANALYTICS_CONSENT_KEY = 'unlim-analytics-consent-v1'
+export const ANALYTICS_CONSENT_KEY = 'unlim-analytics-consent-v2'
 export const ANALYTICS_BROWSER_KEY = 'unlim-analytics-browser-v1'
 export const ANALYTICS_SESSION_KEY = 'unlim-analytics-session-v1'
 export const ANALYTICS_FIRST_SOURCE_KEY = 'unlim-analytics-first-source-v1'

@@ -41,7 +41,7 @@ Accepted: four base tabs, optional extra tab only for a clearly separate questio
 
 Keep the pseudonymous browser identifier for 13 months and its first recognised advertising source for at most 60 days. Russian privacy/legal behavior must be reviewed before launch; do not reuse the discarded Latvian assumption.
 
-Yandex.Metrica uses the existing cookie-consent gate. Counter ID, Webvisor and Webmaster verification stay editable under `Настройки сайта → Интеграции`; replay masks all shared form inputs and textareas. This is an implementation default, not a legal conclusion.
+Analytics does not load before a saved choice. The banner has one `ОК` action (all configured analytics on) and a settings icon for separate first-party, Metrika and configured GA4 choices. Visitors can reopen settings from the footer. Counter ID, Webvisor and Webmaster verification stay editable under `Настройки сайта → Интеграции`; replay masks all shared form inputs and textareas. This is an implementation default, not a legal conclusion.
 
 ## D8 — MVP boundary
 

@@ -3,6 +3,7 @@ import * as homepageHeroSlots from './20261011_050000_homepage_hero_slots'
 import * as homepageDesktopThirdHeroSlot from './20261011_060000_homepage_desktop_third_hero_slot'
 import * as heroOpeningPromoLabel from './20261011_070000_hero_opening_promo_label'
 import * as homepageHeroSlotVisibility from './20261011_080000_homepage_hero_slot_visibility'
+import * as footerSponsorsConsent from './20261023_140000_footer_sponsors_consent'
 import * as offerVisibility from './20261010_200000_offer_visibility'
 import * as homepageRentalPricing from './20261011_000000_homepage_rental_pricing'
 import * as openingRefinements from './20261010_190000_opening_refinements'
@@ -142,4 +143,5 @@ export const migrations = [
   { up: homepageDesktopThirdHeroSlot.up, down: homepageDesktopThirdHeroSlot.down, name: '20261011_060000_homepage_desktop_third_hero_slot' },
   { up: heroOpeningPromoLabel.up, down: heroOpeningPromoLabel.down, name: '20261011_070000_hero_opening_promo_label' },
   { up: homepageHeroSlotVisibility.up, down: homepageHeroSlotVisibility.down, name: '20261011_080000_homepage_hero_slot_visibility' },
+  { up: footerSponsorsConsent.up, down: footerSponsorsConsent.down, name: '20261023_140000_footer_sponsors_consent' },
 ];

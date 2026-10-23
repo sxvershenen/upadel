@@ -50,9 +50,9 @@ Do not store form values, full referrer query strings or raw IP. Geo may be deri
 
 ## Privacy boundary
 
-The audience and brand are Russian; Latvian/EU assumptions do not apply by default. Treat browser identifiers, event history and submitted lead data as potentially regulated data. Purpose is site usage measurement and improvement; keep Russian data localisation, notices, access and deletion in scope. Form consent and analytics behavior are separate concerns. Owner selected the no-banner production mode; legal sufficiency of implied consent and the privacy-policy wording have not been independently reviewed.
+The audience and brand are Russian; Latvian/EU assumptions do not apply by default. Treat browser identifiers, event history and submitted lead data as potentially regulated data. Purpose is site usage measurement and improvement; keep Russian data localisation, notices, access and deletion in scope. Form consent and analytics behavior are separate concerns. Analytics uses an explicit saved choice; legal sufficiency and privacy-policy wording have not been independently reviewed.
 
-In `first-party` mode, the Yandex Metrica tag is emitted in the document head and begins collecting on page load; the cookie notice is hidden. React only adds SPA route hits, so tag startup does not depend on hydration. In `consent-required` mode, the library is preloaded and collection starts after the visitor accepts or continues using the site. GA4 remains gated by explicit accepted state.
+The consent banner shows one `ОК` button and a settings icon. `ОК` opts into all configured analytics; settings can independently enable first-party analytics, Yandex Metrica and configured GA4. The preference is saved in local storage and can be reopened from the footer. No analytics library is preloaded or initialized before the relevant choice; accepting a vendor loads it and dispatches the current page hit. Revoking an active choice reloads the page so the external tag stops collecting. Legacy `first-party` settings normalize to consent-required behavior.
 
 ## Accepted retention
 

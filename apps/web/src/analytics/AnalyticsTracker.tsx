@@ -1,7 +1,8 @@
 import type { SiteDTO } from '@unlim/content-contract'
 import { useEffect } from 'react'
 
-import { ANALYTICS_CONSENT_KEY, ANALYTICS_QUEUE_KEY, browserIdentity, firstSource, sessionIdentity, sourceFromLocation, type Source } from './identity'
+import { ANALYTICS_QUEUE_KEY, browserIdentity, firstSource, sessionIdentity, sourceFromLocation, type Source } from './identity'
+import { hasAnalyticsPreference, readAnalyticsPreferences } from './consent'
 import { createAnalyticsDeliveryQueue, type AnalyticsDeliveryQueue } from './deliveryQueue'
 import { createDeferredVitalDelivery, ensureDocumentVitals, type VitalEvent } from './documentVitals'
 
@@ -33,7 +34,7 @@ function configureDocumentVitals(analytics: SiteDTO['analytics']) {
     documentVitalDelivery = createDeferredVitalDelivery(initialDocumentContext, (context, events) => {
       const policy = liveAnalyticsPolicy
       if (!policy || policy.mode === 'disabled') return true
-      if (policy.mode !== 'first-party' && localStorage.getItem(ANALYTICS_CONSENT_KEY) !== 'accepted') return false
+      if (!hasAnalyticsPreference(readAnalyticsPreferences(localStorage), 'siteAnalytics')) return false
       const now = Date.now()
       const browser = browserIdentity(localStorage, now)
       const session = sessionIdentity(localStorage, now)
@@ -70,7 +71,7 @@ export function AnalyticsTracker({ analytics }: { analytics: SiteDTO['analytics'
   useEffect(() => {
     const ownsInitialDocumentContext = configureDocumentVitals(analytics)
     if (analytics.mode === 'disabled') return
-    let enabled = analytics.mode === 'first-party' || localStorage.getItem(ANALYTICS_CONSENT_KEY) === 'accepted'
+    let enabled = hasAnalyticsPreference(readAnalyticsPreferences(localStorage), 'siteAnalytics')
     const queue = deliveryQueue()
     let current = sourceFromLocation(new URL(location.href), document.referrer)
     let first: Source | null = null
@@ -112,8 +113,8 @@ export function AnalyticsTracker({ analytics }: { analytics: SiteDTO['analytics'
     }
     const stop = () => { window.clearInterval(flushTimer); window.clearInterval(activeTimer); flushTimer = 0; activeTimer = 0 }
     const consent = (event: Event) => {
-      const choice = (event as CustomEvent<'accepted' | 'rejected'>).detail
-      const wasEnabled = enabled; enabled = analytics.mode === 'first-party' || choice === 'accepted'
+      const preferences = (event as CustomEvent).detail
+      const wasEnabled = enabled; enabled = hasAnalyticsPreference(preferences, 'siteAnalytics')
       if (!wasEnabled && enabled) start()
       if (!wasEnabled && enabled) documentVitalDelivery?.policyChanged()
       if (!enabled) { stop(); queue.clear() }

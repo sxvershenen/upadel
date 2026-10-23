@@ -10,6 +10,7 @@ const site = {
   brandName: 'UNLIM RIGA PADEL',
   partners: [],
   footer: {
+    showPartners: false,
     about: 'Падел-клуб',
     stats: [],
     legalEntity: 'ООО «Анлим Спорт» · ИНН 5024178932 · ОГРН 1235000078451',
@@ -53,4 +54,14 @@ test('footer centers legal links and credits OCHK.OOO', () => {
   assert.match(legalRow, /sm:grid-cols-\[minmax\(0,1fr\)_auto_minmax\(0,1fr\)\]/)
   assert.match(legalRow, /justify-center/)
   assert.match(html, /Ближайшее метро[\s\S]*Строгино/)
+})
+
+test('partner strip follows the CMS footer toggle', () => {
+  const hidden = renderToStaticMarkup(<SiteProvider site={site} captureContacts={false}><Footer /></SiteProvider>)
+  assert.doesNotMatch(hidden, /partners-marquee/)
+
+  const visibleSite = { ...site, footer: { ...site.footer, showPartners: true }, partners: [{ id: 'p1', name: 'Partner One' }] }
+  const visible = renderToStaticMarkup(<SiteProvider site={visibleSite} captureContacts={false}><Footer /></SiteProvider>)
+  assert.match(visible, /partners-marquee/)
+  assert.match(visible, /Partner One/)
 })

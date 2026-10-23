@@ -78,8 +78,9 @@ export function siteDTO(site: SiteSetting, origin: string, partners: Array<Recor
   const telegram = social.find(({ provider }) => provider === 'telegram')
   const vk = social.find(({ provider }) => provider === 'vk')
   const confirmation = site.contactConfirmation
-  const metricaAllowed = site.analytics?.mode === 'consent-required' || site.analytics?.mode === 'first-party'
-  const ga4Allowed = site.analytics?.mode === 'consent-required'
+  const analyticsMode = site.analytics?.mode === 'disabled' ? 'disabled' : 'consent-required'
+  const metricaAllowed = analyticsMode === 'consent-required'
+  const ga4Allowed = analyticsMode === 'consent-required'
   const booking = bookingReadiness(site.booking ?? {})
   return {
     brandName: site.brandName,
@@ -104,10 +105,10 @@ export function siteDTO(site: SiteSetting, origin: string, partners: Array<Recor
     },
     footer: {
       image: mediaDTO(site.footerImage, origin), about: site.footerAbout ?? '', stats: (site.footerStats ?? []).map(({ value, label }) => ({ value, label })), legalEntity: site.legalEntity ?? '',
-      navigation: (site.footerNavigation ?? []).map(({ label, href, column }) => ({ label, href, column })), socialLinks: social.map(({ provider, label, url }) => ({ provider, label, url })), legalLinks: (site.legalLinks ?? []).map(({ label, href }) => ({ label, href })), copyright: site.copyright ?? '', cookieNotice: { text: site.cookieNotice?.text ?? 'Продолжая использовать наш сайт, вы даёте *согласие на использование собираемых данных (cookie)*. Если вы не хотите, чтобы ваши данные обрабатывались, измените настройки браузера.', acceptLabel: site.cookieNotice?.acceptLabel ?? 'ОК', rejectLabel: site.cookieNotice?.rejectLabel ?? 'Настройки', manageLabel: site.cookieNotice?.manageLabel ?? 'Настроить cookies' },
+      navigation: (site.footerNavigation ?? []).map(({ label, href, column }) => ({ label, href, column })), socialLinks: social.map(({ provider, label, url }) => ({ provider, label, url })), legalLinks: (site.legalLinks ?? []).map(({ label, href }) => ({ label, href })), copyright: site.copyright ?? '', showPartners: site.showPartners === true, cookieNotice: { text: site.cookieNotice?.text ?? 'Собираем статистику посещений, чтобы улучшать сайт. Нажмите ОК, чтобы включить аналитику, или откройте настройки и выберите, какие инструменты разрешить. Подробнее — *политика конфиденциальности*.', acceptLabel: site.cookieNotice?.acceptLabel ?? 'ОК', rejectLabel: site.cookieNotice?.rejectLabel ?? 'Настройки', manageLabel: site.cookieNotice?.manageLabel ?? 'Настройки cookies' },
     },
     analytics: {
-      mode: site.analytics?.mode ?? 'consent-required', endpoint: new URL('/api/public/analytics', origin).toString(), schemaVersion: 1,
+      mode: analyticsMode, endpoint: new URL('/api/public/analytics', origin).toString(), schemaVersion: 1,
       vendors: {
         yandexMetrica: { enabled: metricaAllowed && site.analytics?.yandexMetricaEnabled === true && Boolean(site.analytics?.yandexMetricaCounterID), counterId: site.analytics?.yandexMetricaCounterID, webvisor: site.analytics?.yandexMetricaWebvisor === true },
         ga4: { enabled: ga4Allowed && site.analytics?.ga4Enabled === true && Boolean(site.analytics?.ga4MeasurementID), measurementId: site.analytics?.ga4MeasurementID },

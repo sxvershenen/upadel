@@ -2446,6 +2446,10 @@ export interface SiteSetting {
       }[]
     | null;
   copyright?: string | null;
+  /**
+   * Можно включить обратно без публикации нового релиза.
+   */
+  showPartners?: boolean | null;
   cookieNotice?: {
     /**
      * Одинаковый текст на телефоне и компьютере. Заключите фразу для ссылки на политику между звёздочками: *текст ссылки*.
@@ -2456,10 +2460,10 @@ export interface SiteSetting {
     manageLabel?: string | null;
   };
   /**
-   * Юридическая модель для России ещё не согласована. Безопасное значение по умолчанию требует отдельного согласия посетителя.
+   * Режим задаёт включение first-party аналитики и внешний сбор (Метрика, GA4). Описание цели и правил обработки должно быть отражено в опубликованной политике конфиденциальности.
    */
   analytics: {
-    mode: 'disabled' | 'consent-required' | 'first-party';
+    mode: 'disabled' | 'consent-required';
     yandexMetricaEnabled?: boolean | null;
     yandexMetricaCounterID?: string | null;
     yandexMetricaWebvisor?: boolean | null;
@@ -4137,6 +4141,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         id?: T;
       };
   copyright?: T;
+  showPartners?: T;
   cookieNotice?:
     | T
     | {

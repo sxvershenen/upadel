@@ -8,7 +8,7 @@ const privacyHref = site.footer.legalLinks.find(({ label, href }) => /полит
 ---
 
 {site.analytics.mode === 'consent-required' && <>
-  <div class="cookie-notice fixed inset-x-4 bottom-[calc(84px+env(safe-area-inset-bottom))] z-40 mx-auto hidden max-w-[680px] sm:block md:bottom-6" style="font-family: 'Inter Tight Fallback', Arial, sans-serif">
+  <div class="cookie-notice fixed inset-x-4 bottom-[calc(84px+env(safe-area-inset-bottom))] z-40 mx-auto hidden max-w-[680px] sm:block md:bottom-6" style="font-family: 'Inter Tight Fallback', Arial, sans-serif" role="dialog" aria-label="Согласие на сбор статистики">
     <div class="se-3 flex flex-col items-start gap-4 bg-ink px-5 py-4 text-white sm:flex-row sm:items-center">
       <span class="se-1 flex h-9 w-9 shrink-0 items-center justify-center bg-white/10" aria-hidden="true">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10c0-.6-.05-1.19-.16-1.77A3.5 3.5 0 0 1 17.5 6.5 3.5 3.5 0 0 1 12 2Z"/><path d="M8 14v.01M8 10v.01M12 16v.01M16 12v.01M13 8v.01"/></svg>
@@ -16,23 +16,54 @@ const privacyHref = site.footer.legalLinks.find(({ label, href }) => /полит
       <div class="min-w-0 flex-1">
         <p class="whitespace-pre-line text-[12px] leading-[1.45] text-white/80">{before}{linked && <a href={privacyHref} class="font-medium text-lime underline decoration-lime/40 underline-offset-2 transition-colors hover:text-lime-hover hover:decoration-lime focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2">{linked}</a>}{after}</p>
       </div>
-      <div class="flex shrink-0">
-        <button type="button" data-cookie-consent class="se-2 relative inline-flex h-[var(--control-sm)] select-none items-center justify-center gap-1.5 bg-lime px-4 type-ui font-medium text-lime-ink transition-colors duration-150 hover:bg-lime-hover focus-visible:outline-2 focus-visible:outline-[var(--color-focus)] focus-visible:outline-offset-2">
+      <div class="flex shrink-0 gap-2">
+        <button type="button" data-cookie-open aria-label="Настроить сбор аналитики" title="Настроить сбор аналитики" class="se-2 inline-flex h-[var(--control-sm)] w-[var(--control-sm)] items-center justify-center border border-white/25 text-white/80 transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2">
+          <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-7m0-4V3m8 18v-9m0-4V3m8 18v-5m0-4V3"/><path d="M2 14h4m4-6h4m4 8h4"/></svg>
+        </button>
+        <button type="button" data-cookie-ok class="se-2 relative inline-flex h-[var(--control-sm)] select-none items-center justify-center gap-1.5 bg-lime px-4 type-ui font-medium text-lime-ink transition-colors duration-150 hover:bg-lime-hover focus-visible:outline-2 focus-visible:outline-[var(--color-focus)] focus-visible:outline-offset-2">
           <span>{site.footer.cookieNotice.acceptLabel}</span>
         </button>
       </div>
     </div>
   </div>
 
-  <div class="cookie-notice fixed inset-x-0 top-[calc(var(--page-gutter)+env(safe-area-inset-top))] z-50 mx-auto w-full max-w-[var(--container-page)] px-[var(--page-gutter)] sm:hidden" style="font-family: 'Inter Tight Fallback', Arial, sans-serif">
+  <div class="cookie-notice fixed inset-x-0 top-[calc(var(--page-gutter)+env(safe-area-inset-top))] z-50 mx-auto w-full max-w-[var(--container-page)] px-[var(--page-gutter)] sm:hidden" style="font-family: 'Inter Tight Fallback', Arial, sans-serif" role="dialog" aria-label="Согласие на сбор статистики">
     <div class="se-3 bg-ink px-5 py-4 text-white shadow-xl">
       <p class="whitespace-pre-line text-[12px] leading-[1.45] text-white/80">{before}{linked && <a href={privacyHref} class="font-medium text-lime underline decoration-lime/40 underline-offset-2 transition-colors hover:text-lime-hover hover:decoration-lime focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2">{linked}</a>}{after}</p>
     </div>
     <div class="mt-2 flex justify-end gap-2">
-      <button type="button" data-cookie-consent class="se-2 relative inline-flex h-[var(--control-sm)] select-none items-center justify-center gap-1.5 bg-lime px-4 type-ui font-medium text-lime-ink transition-colors duration-150 hover:bg-lime-hover focus-visible:outline-2 focus-visible:outline-[var(--color-focus)] focus-visible:outline-offset-2">
+      <button type="button" data-cookie-open aria-label="Настроить сбор аналитики" title="Настроить сбор аналитики" class="se-2 inline-flex h-[var(--control-sm)] w-[var(--control-sm)] items-center justify-center border border-ink/25 bg-ink text-white transition-colors hover:bg-ink/90 focus-visible:outline-2 focus-visible:outline-lime focus-visible:outline-offset-2">
+        <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-7m0-4V3m8 18v-9m0-4V3m8 18v-5m0-4V3"/><path d="M2 14h4m4-6h4m4 8h4"/></svg>
+      </button>
+      <button type="button" data-cookie-ok class="se-2 relative inline-flex h-[var(--control-sm)] select-none items-center justify-center gap-1.5 bg-lime px-4 type-ui font-medium text-lime-ink transition-colors duration-150 hover:bg-lime-hover focus-visible:outline-2 focus-visible:outline-[var(--color-focus)] focus-visible:outline-offset-2">
         <span>{site.footer.cookieNotice.acceptLabel}</span>
       </button>
     </div>
   </div>
 
+  <dialog id="cookie-preferences" class="cookie-preferences m-auto w-[calc(100%-32px)] max-w-[520px] border-0 bg-ink p-0 text-white backdrop:bg-black/65" aria-labelledby="cookie-preferences-title">
+    <div class="p-6 sm:p-8">
+      <h2 id="cookie-preferences-title" class="type-title-card font-semibold">Настройки аналитики</h2>
+      <p class="mt-2 type-body-sm text-white/65">Выберите инструменты, которым разрешено собирать статистику. Сохранить решение можно здесь или изменить его позже внизу сайта.</p>
+      <fieldset class="mt-6 flex flex-col gap-4">
+        <legend class="sr-only">Разрешённые инструменты аналитики</legend>
+        <label class="flex items-start gap-3 type-ui text-white/85">
+          <input type="checkbox" data-analytics-toggle="siteAnalytics" checked class="mt-0.5 accent-lime" />
+          <span><strong class="font-medium">Внутренняя аналитика UNLIM</strong><span class="mt-0.5 block type-caption text-white/55">Обезличенная статистика посещений и действий на сайте.</span></span>
+        </label>
+        {site.analytics.vendors.yandexMetrica.enabled && <label class="flex items-start gap-3 type-ui text-white/85">
+          <input type="checkbox" data-analytics-toggle="yandexMetrica" checked class="mt-0.5 accent-lime" />
+          <span><strong class="font-medium">Яндекс.Метрика</strong><span class="mt-0.5 block type-caption text-white/55">Статистика посещений и, если включён, Вебвизор.</span></span>
+        </label>}
+        {site.analytics.vendors.ga4.enabled && <label class="flex items-start gap-3 type-ui text-white/85">
+          <input type="checkbox" data-analytics-toggle="ga4" checked class="mt-0.5 accent-lime" />
+          <span><strong class="font-medium">Google Analytics</strong><span class="mt-0.5 block type-caption text-white/55">Статистика посещений.</span></span>
+        </label>}
+      </fieldset>
+      <div class="mt-8 flex justify-end gap-2">
+        <button type="button" data-cookie-close class="se-2 inline-flex h-[var(--control-sm)] items-center justify-center border border-white/25 px-4 type-ui text-white/80 hover:bg-white/10">Назад</button>
+        <button type="button" data-cookie-save class="se-2 inline-flex h-[var(--control-sm)] items-center justify-center bg-lime px-4 type-ui font-medium text-lime-ink hover:bg-lime-hover">Сохранить выбор</button>
+      </div>
+    </div>
+  </dialog>
 </>}

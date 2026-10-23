@@ -29,7 +29,10 @@ button:not(:disabled), a[href], [role="button"] { cursor: pointer; }
 .cookie-notice { transition: opacity 180ms ease, transform 180ms ease; }
 .cookie-notice--closing { opacity: 0; transform: translateY(8px); pointer-events: none; }
 html .cookie-notice[hidden] { display: none !important; }
-html[data-analytics-consent="accepted"] .cookie-notice:not(.cookie-notice--closing) { display: none; }
+html[data-analytics-consent="saved"] .cookie-notice:not(.cookie-notice--closing) { display: none; }
+.cookie-preferences[open] { animation: cookie-preferences-enter 150ms ease-out; }
+.cookie-preferences::backdrop { background: rgb(0 0 0 / 65%); }
+@keyframes cookie-preferences-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) { .cookie-notice { transition: none; } .cookie-notice--closing { transform: none; } }
 
 @keyframes route-progress-loading {

@@ -1,6 +1,6 @@
 import type { SiteDTO } from "@unlim/content-contract";
 import { useEffect } from "react";
-import { ANALYTICS_CONSENT_KEY } from "./identity";
+import { hasAnalyticsPreference, readAnalyticsPreferences, type AnalyticsPreferences } from "./consent";
 
 declare global {
   interface Window {
@@ -12,9 +12,9 @@ declare global {
 }
 const loaded = new Set<string>();
 const initialized = new Set<string>();
-export const shouldLoadExternalVendor = (consent: string | null, enabled: boolean, id?: string | null) => consent === "accepted" && enabled && Boolean(id);
+export const shouldLoadExternalVendor = (consent: boolean, enabled: boolean, id?: string | null) => consent && enabled && Boolean(id);
 export const shouldLoadMetricaScript = (analyticsEnabled: boolean, enabled: boolean, id?: string | null) => analyticsEnabled && enabled && Boolean(id);
-export const shouldInitializeMetrica = (mode: SiteDTO["analytics"]["mode"], consent: string | null, analyticsEnabled: boolean, enabled: boolean, id?: string | null) => (mode === "first-party" || consent === "accepted") && shouldLoadMetricaScript(analyticsEnabled, enabled, id);
+export const shouldInitializeMetrica = (_mode: SiteDTO["analytics"]["mode"], consent: AnalyticsPreferences | null, analyticsEnabled: boolean, enabled: boolean, id?: string | null) => hasAnalyticsPreference(consent, "yandexMetrica") && shouldLoadMetricaScript(analyticsEnabled, enabled, id);
 export const shouldReloadForVendorRevoke = (wasAccepted: boolean, vendorLoaded: boolean) => wasAccepted && vendorLoaded;
 export const shouldInitializeVendor = (initializedKeys: ReadonlySet<string>, key: string) => !initializedKeys.has(key)
 function loadScript(id: string, src: string) {
@@ -26,16 +26,6 @@ function loadScript(id: string, src: string) {
   node.src = src;
   document.head.appendChild(node);
 }
-function preloadScript(id: string, src: string) {
-  if (document.getElementById(id)) return;
-  const node = document.createElement("link");
-  node.id = id;
-  node.rel = "preload";
-  node.as = "script";
-  node.href = src;
-  document.head.appendChild(node);
-}
-
 export function ExternalAnalytics({
   vendors,
   analyticsEnabled,
@@ -48,12 +38,8 @@ export function ExternalAnalytics({
   useEffect(() => {
     const metrica = vendors.yandexMetrica;
     if (!analyticsEnabled) return;
-    if (analyticsMode !== "first-party" && shouldLoadMetricaScript(analyticsEnabled, metrica.enabled, metrica.counterId)) {
-      preloadScript("unlim-yandex-metrica-preload", "https://mc.yandex.ru/metrika/tag.js");
-    }
-
     const load = () => {
-      const consent = localStorage.getItem(ANALYTICS_CONSENT_KEY);
+      const consent = readAnalyticsPreferences(localStorage);
       if (
         shouldInitializeMetrica(analyticsMode, consent, analyticsEnabled, metrica.enabled, metrica.counterId) &&
         shouldInitializeVendor(initialized, `ym:${metrica.counterId}`)
@@ -91,7 +77,7 @@ export function ExternalAnalytics({
       }
       const ga4 = vendors.ga4;
       if (
-        shouldLoadExternalVendor(consent, ga4.enabled, ga4.measurementId) &&
+        shouldLoadExternalVendor(hasAnalyticsPreference(consent, "ga4"), ga4.enabled, ga4.measurementId) &&
         ga4.measurementId &&
         shouldInitializeVendor(initialized, `ga4:${ga4.measurementId}`)
       ) {
