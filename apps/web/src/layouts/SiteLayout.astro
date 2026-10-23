@@ -105,9 +105,13 @@ const pageEntrance = Astro.url.pathname === '/gift'
             document.querySelectorAll('.cookie-notice').forEach((notice) => { notice.hidden = true })
           }, 180)
         }
-        const dialog = document.getElementById('cookie-preferences')
+        const getDialog = () => {
+          const dialog = document.getElementById('cookie-preferences')
+          return dialog instanceof HTMLDialogElement ? dialog : null
+        }
         const openPreferences = () => {
-          if (!(dialog instanceof HTMLDialogElement)) return
+          const dialog = getDialog()
+          if (!dialog) return
           const current = read()
           dialog.querySelectorAll('[data-analytics-toggle]').forEach((input) => {
             if (!(input instanceof HTMLInputElement)) return
@@ -117,6 +121,7 @@ const pageEntrance = Astro.url.pathname === '/gift'
           if (!dialog.open) dialog.showModal()
         }
         const save = () => {
+          const dialog = getDialog()
           const next = { siteAnalytics: false, yandexMetrica: false, ga4: false }
           dialog?.querySelectorAll('[data-analytics-toggle]').forEach((input) => {
             if (!(input instanceof HTMLInputElement)) return
@@ -137,9 +142,9 @@ const pageEntrance = Astro.url.pathname === '/gift'
           if (event.target.closest('[data-cookie-ok]')) save()
           else if (event.target.closest('[data-cookie-open], [data-cookie-settings]')) openPreferences()
           else if (event.target.closest('[data-cookie-save]')) save()
-          else if (event.target.closest('[data-cookie-close]') && dialog instanceof HTMLDialogElement) dialog.close()
+          else if (event.target.closest('[data-cookie-close]')) getDialog()?.close()
         }, { capture: true })
-        dialog?.addEventListener('click', (event) => { if (event.target === dialog && dialog instanceof HTMLDialogElement) dialog.close() })
+        document.addEventListener('click', (event) => { if (event.target === getDialog()) getDialog()?.close() })
         window.addEventListener('unlim:open-analytics-settings', openPreferences)
       })()
     </script>
