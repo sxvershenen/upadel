@@ -1829,7 +1829,7 @@ async function seed() {
             description: 'с испанскими панорамными кортами Jubo Super Panoramic, профессиональным покрытием PRO TURF 240 и клубным лаунжем.',
             desktopMedia: mediaID(images.hero),
             tint: defaultHeroTint,
-            titleFontSize: { mobile: 32, desktop: 88 },
+            titleFontSize: { mobile: 24, desktop: 88 },
             buttonsAndElements: {
               desktop: { slot1: { enabled: true, type: 'button', icon: 'CalendarCheck', action: { label: 'Забронировать', mode: 'booking' } }, slot2: { enabled: true, type: 'button', icon: 'UserRound', action: { label: 'Личный кабинет', mode: 'account' } }, slot3: { enabled: true, type: 'info', icon: 'CalendarDays', title: '2 недели с открытия', caption: 'Аренда со скидкой 50%' } },
               mobile: { slot1: { enabled: true, type: 'button', icon: 'CalendarCheck', action: { label: 'Забронировать', mode: 'booking' } }, slot2: { enabled: true, type: 'info', icon: 'CalendarDays', title: '2 недели с открытия', caption: 'Аренда со скидкой 50%' } },

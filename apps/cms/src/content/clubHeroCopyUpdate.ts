@@ -1,11 +1,11 @@
 import { createLocalReq, type Payload } from 'payload'
 
-export const clubHeroCopyRevision = 'club-hero-copy-20261024-v2'
+export const clubHeroCopyRevision = 'club-hero-copy-20261024-v3'
 export const clubHeroCopy = {
   titleLine: '2 недели с открытия',
   titleConnector: 'Аренда со скидкой',
   titleAccent: '50%',
-  titleFontSize: { mobile: 32, desktop: 88 },
+  titleFontSize: { mobile: 24, desktop: 88 },
 }
 
 /** Apply the approved opening offer to the large hero heading and keep drafts in sync. */
@@ -20,7 +20,7 @@ export async function applyClubHeroCopyUpdate(payload: Payload): Promise<boolean
       await payload.db.rollbackTransaction(transactionID)
       return false
     }
-    if (site.clubUpdateVersion !== 'club-offer-20261024-v1') throw new Error('Apply the club offer update before the hero copy update.')
+    if (site.clubUpdateVersion !== 'club-hero-copy-20261024-v2') throw new Error('Apply the previous hero copy update before the revised hero size.')
 
     const live = await payload.findGlobal({ ...opts, slug: 'homepage', draft: false })
     const pending = await payload.findGlobal({ ...opts, slug: 'homepage', draft: true })

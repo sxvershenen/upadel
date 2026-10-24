@@ -7,6 +7,6 @@ test('hero campaign copy has two explicit lines and a mobile-safe size', () => {
     titleLine: '2 недели с открытия',
     titleConnector: 'Аренда со скидкой',
     titleAccent: '50%',
-    titleFontSize: { mobile: 32, desktop: 88 },
+    titleFontSize: { mobile: 24, desktop: 88 },
   })
 })
