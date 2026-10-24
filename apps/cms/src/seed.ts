@@ -1824,12 +1824,12 @@ async function seed() {
             { section: 'blog', visible: true }, { section: 'reviews-faq', visible: true },
           ],
           hero: {
-            titleLine: 'Первая тренировка', titleConnector: 'за', titleAccent: '1 990 ₽',
+            titleLine: '2 недели с открытия', titleConnector: 'Аренда со скидкой', titleAccent: '50%',
             seoHeading: 'Премиальный крытый падел-клуб',
             description: 'с испанскими панорамными кортами Jubo Super Panoramic, профессиональным покрытием PRO TURF 240 и клубным лаунжем.',
             desktopMedia: mediaID(images.hero),
             tint: defaultHeroTint,
-            titleFontSize: defaultHeroTitleFontSize,
+            titleFontSize: { mobile: 32, desktop: 88 },
             buttonsAndElements: {
               desktop: { slot1: { enabled: true, type: 'button', icon: 'CalendarCheck', action: { label: 'Забронировать', mode: 'booking' } }, slot2: { enabled: true, type: 'button', icon: 'UserRound', action: { label: 'Личный кабинет', mode: 'account' } }, slot3: { enabled: true, type: 'info', icon: 'CalendarDays', title: '2 недели с открытия', caption: 'Аренда со скидкой 50%' } },
               mobile: { slot1: { enabled: true, type: 'button', icon: 'CalendarCheck', action: { label: 'Забронировать', mode: 'booking' } }, slot2: { enabled: true, type: 'info', icon: 'CalendarDays', title: '2 недели с открытия', caption: 'Аренда со скидкой 50%' } },

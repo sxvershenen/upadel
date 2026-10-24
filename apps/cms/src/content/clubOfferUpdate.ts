@@ -24,7 +24,7 @@ export async function applyClubOfferUpdate(payload: Payload): Promise<boolean> {
     const req = await createLocalReq({ req: { transactionID } }, payload)
     const opts = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
     const site = await payload.findGlobal({ ...opts, slug: 'site-settings', draft: false })
-    if (site.clubUpdateVersion === clubOfferRevision) {
+    if ([clubOfferRevision, 'club-hero-copy-20261024-v2'].includes(site.clubUpdateVersion ?? '')) {
       await payload.db.rollbackTransaction(transactionID)
       return false
     }

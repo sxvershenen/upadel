@@ -203,9 +203,23 @@ test('training swipers keep the mobile gutter and hint separate from Swiper stat
   assert.doesNotMatch(coachSource, /useImageParallax|data-parallax-layer/)
   assert.match(coachSource, /object-contain/)
   assert.doesNotMatch(coachSource, /coach\.rating|coach\.reviewsCount/)
-  assert.match(coachSource, /<CoachRentalNote \/>/)
+  assert.match(coachSource, /<CoachRentalNote className="type-caption mt-3 text-ink-soft" \/>/)
+  const coachPreview = coachSource.split('<Dialog')[0]
+  const coachDialog = coachSource.match(/<Dialog open=\{open\}[\s\S]*?<\/Dialog>/)?.[0] ?? ''
+  assert.doesNotMatch(coachPreview, /<CoachRentalNote/)
+  assert.ok(coachDialog.indexOf('<CoachRentalNote') < coachDialog.indexOf('<Price'))
   assert.match(coachSource, /<ProgressiveImage skeleton=\{false\} ref=\{photoImageRef\}/)
   assert.match(css, /\[data-coach-card="true"\] img \{[\s\S]*?transform: none !important/)
+})
+
+test('coach rental note sits with profile copy, before the price and action row', () => {
+  const detailSource = readFileSync(new URL('../catalog/DetailPage.tsx', import.meta.url), 'utf8')
+  const coachDetail = detailSource.slice(detailSource.indexOf("if (dto.kind === 'coaches')"))
+  const bioPosition = coachDetail.indexOf('dto.item.bio')
+  const notePosition = coachDetail.indexOf('<CoachRentalNote')
+  const pricePosition = coachDetail.indexOf('<Price')
+
+  assert.ok(bioPosition >= 0 && bioPosition < notePosition && notePosition < pricePosition)
 })
 
 test('coach dialog reuses the loaded photo without a second progressive reveal and fits the dynamic viewport', () => {
