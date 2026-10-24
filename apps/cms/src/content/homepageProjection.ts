@@ -82,11 +82,11 @@ function projectHeroSlots(hero: Record<string, any>) {
     desktop: [
       projectHeroSlot(config.desktop?.slot1, { type: 'button', enabled: true, icon: 'CalendarCheck', action: actionDTO(hero.primaryAction ?? { mode: 'booking', label: 'Забронировать' }) }),
       projectHeroSlot(config.desktop?.slot2, { type: 'button', enabled: true, icon: 'UserRound', action: actionDTO(hero.secondaryAction ?? { mode: 'account', label: 'Личный кабинет' }) }),
-      projectHeroSlot(config.desktop?.slot3, { type: 'info', enabled: true, icon: 'CalendarDays', title: String(notice.title ?? 'Открытие в ноябре'), caption: String(notice.caption ?? 'Акция с 01.11 до 15.11') }),
+      projectHeroSlot(config.desktop?.slot3, { type: 'info', enabled: true, icon: 'CalendarDays', title: String(notice.title ?? '2 недели с открытия'), caption: String(notice.caption ?? 'Аренда со скидкой 50%') }),
     ] as [HeroSlotDTO, HeroSlotDTO, HeroSlotDTO],
     mobile: [
       projectHeroSlot(config.mobile?.slot1, { type: 'button', enabled: true, icon: 'CalendarCheck', action: actionDTO(hero.primaryAction ?? { mode: 'booking', label: 'Забронировать' }) }),
-      projectHeroSlot(config.mobile?.slot2, { type: 'info', enabled: true, icon: 'CalendarDays', title: String(notice.title ?? 'Открытие в ноябре'), caption: String(notice.caption ?? 'Акция с 01.11 до 15.11') }),
+      projectHeroSlot(config.mobile?.slot2, { type: 'info', enabled: true, icon: 'CalendarDays', title: String(notice.title ?? '2 недели с открытия'), caption: String(notice.caption ?? 'Аренда со скидкой 50%') }),
     ] as [HeroSlotDTO, HeroSlotDTO],
   }
 }

@@ -82,8 +82,8 @@ function HeroSlot({ slot, index }: { slot: HeroSlotDTO; index: 0 | 1 | 2 }) {
     <ContentAction data-hero-cta={index === 0 ? "primary" : "secondary"} reveal={false} action={slot.action} variant={index === 0 ? "primary" : "glass"} size="lg" icon={<Icon size={17} />} className="w-fit min-w-0 whitespace-nowrap px-4 !leading-none !text-[14px] sm:w-auto sm:px-5 sm:!text-base" />
   </div>;
   return <div data-hero-opening-notice="" data-hero-slot={index + 1} data-hero-slot-type="info" className="glass-overlay se-3 inline-flex min-h-[52px] w-fit max-w-[calc(50vw-24px)] flex-none items-center gap-2 py-2 pl-4 pr-4 text-white sm:max-w-none sm:gap-3 sm:px-3.5">
-    <Icon size={18} className="shrink-0 text-white" />
-    <div className="flex min-w-0 flex-col gap-0"><span className="type-caption truncate font-semibold text-white">{slot.title}</span><span className="type-micro truncate leading-tight text-white/70">{slot.caption}</span></div>
+    <Icon size={18} className="hidden shrink-0 text-white sm:block" />
+    <div className="flex min-w-0 flex-col gap-0"><span className="type-caption truncate font-semibold text-white max-sm:!text-[10px]">{slot.title}</span><span className="type-micro truncate leading-tight text-white/70 max-sm:!text-[9px]">{slot.caption}</span></div>
   </div>;
 }
 

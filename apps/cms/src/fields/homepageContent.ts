@@ -155,11 +155,11 @@ const heroSlotsField: Field = {
     fields: [
       {
         name: 'desktop', type: 'group', label: 'ПК',
-        fields: [{ type: 'row', fields: [heroSlotAccordion('slot1', 'Слот 1', 'desktop', 1, { type: 'button', icon: 'CalendarCheck', label: 'Забронировать', mode: 'booking' }), heroSlotAccordion('slot2', 'Слот 2', 'desktop', 2, { type: 'button', icon: 'UserRound', label: 'Личный кабинет', mode: 'account' }), heroSlotAccordion('slot3', 'Слот 3', 'desktop', 3, { type: 'info', icon: 'CalendarDays', title: 'Открытие в ноябре', caption: 'Акция с 01.11 до 15.11' })] }],
+        fields: [{ type: 'row', fields: [heroSlotAccordion('slot1', 'Слот 1', 'desktop', 1, { type: 'button', icon: 'CalendarCheck', label: 'Забронировать', mode: 'booking' }), heroSlotAccordion('slot2', 'Слот 2', 'desktop', 2, { type: 'button', icon: 'UserRound', label: 'Личный кабинет', mode: 'account' }), heroSlotAccordion('slot3', 'Слот 3', 'desktop', 3, { type: 'info', icon: 'CalendarDays', title: '2 недели с открытия', caption: 'Аренда со скидкой 50%' })] }],
       },
       {
         name: 'mobile', type: 'group', label: 'Мобильные',
-        fields: [{ type: 'row', fields: [heroSlotAccordion('slot1', 'Слот 1', 'mobile', 1, { type: 'button', icon: 'CalendarCheck', label: 'Забронировать', mode: 'booking' }), heroSlotAccordion('slot2', 'Слот 2', 'mobile', 2, { type: 'info', icon: 'CalendarDays', title: 'Открытие в ноябре', caption: 'Акция с 01.11 до 15.11' })] }],
+        fields: [{ type: 'row', fields: [heroSlotAccordion('slot1', 'Слот 1', 'mobile', 1, { type: 'button', icon: 'CalendarCheck', label: 'Забронировать', mode: 'booking' }), heroSlotAccordion('slot2', 'Слот 2', 'mobile', 2, { type: 'info', icon: 'CalendarDays', title: '2 недели с открытия', caption: 'Аренда со скидкой 50%' })] }],
       },
     ],
   }],
@@ -204,7 +204,7 @@ const heroStatsField: Field = {
       maxRows: 4,
       defaultValue: [
         { value: '3 корта', label: 'Jubo Super Panoramic' },
-        { value: '11.5 м', label: 'Высота до балок' },
+        { value: '13 м', label: 'Высота до балок' },
         { value: '+21°C', label: 'Климат-контроль круглый год' },
         { value: '30 сек', label: 'Мгновенное бронирование' },
       ],
@@ -270,8 +270,8 @@ export const heroFields: Field[] = [
       { name: 'primaryAction', type: 'group', admin: { hidden: true }, fields: createActionField('legacyPrimary', 'Основная кнопка').fields },
       { name: 'secondaryAction', type: 'group', admin: { hidden: true }, fields: createActionField('legacySecondary', 'Вторая кнопка').fields },
       { name: 'openingNotice', type: 'group', admin: { hidden: true }, fields: [
-        { name: 'title', type: 'text', label: 'Первая строка', defaultValue: 'Открытие в ноябре' },
-        { name: 'caption', type: 'text', label: 'Вторая строка', defaultValue: 'Акция с 01.11 до 15.11' },
+        { name: 'title', type: 'text', label: 'Первая строка', defaultValue: '2 недели с открытия' },
+        { name: 'caption', type: 'text', label: 'Вторая строка', defaultValue: 'Аренда со скидкой 50%' },
       ] },
       heroStatsField,
     ],

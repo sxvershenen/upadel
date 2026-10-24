@@ -9,6 +9,7 @@ import { Price } from "../ui/Price";
 import { Typography } from "../ui/Typography";
 import { ProgressiveImage } from "../ui/ProgressiveImage";
 import type { RevealConfig } from "../ui/revealAttributes";
+import { CoachRentalNote } from "./CoachRentalNote";
 
 export type Coach = HomepageDTO["entities"]["coaches"][number];
 
@@ -32,7 +33,7 @@ export function CoachCard({ coach, loading = "lazy", reveal = true }: { coach: C
         <div className="flex flex-1 flex-col px-2 pb-2 pt-4">
           <h3 className="type-title-compact text-ink">{coach.name}</h3>
           <p className="type-body-sm mt-2 line-clamp-4 text-ink-soft/90">{coach.bio}</p>
-          <div className="mt-4 flex items-end justify-between border-t border-ink/10 pt-4"><Price label="тренировка от" value={coach.priceFrom} /><ArrowAction tone="light" size="sm" cardHover className="bg-surface-muted text-ink" /></div>
+          <div className="mt-4 border-t border-ink/10 pt-4"><div className="flex items-end justify-between"><Price label="тренировка от" value={coach.priceFrom} /><ArrowAction tone="light" size="sm" cardHover className="bg-surface-muted text-ink" /></div><CoachRentalNote /></div>
         </div>
       </WhiteCard>
     </button>
@@ -58,7 +59,7 @@ export function CoachCard({ coach, loading = "lazy", reveal = true }: { coach: C
           <div className="flex justify-between gap-4"><dt className="text-ink-soft">Опыт</dt><dd className="text-right text-ink">{coach.experience}</dd></div>
           <div className="flex justify-between gap-4"><dt className="text-ink-soft">Языки</dt><dd className="text-right text-ink">{coach.languages}</dd></div>
         </dl>
-        <div className="col-span-2 flex items-end gap-3"><Price label="тренировка от" value={coach.priceFrom} size="compact" className="shrink-0" /><div className="ml-auto flex shrink-0 gap-2"><ButtonLink href={`/coaches/${coach.slug}`} variant="neutral" onClick={closeDialog}>Подробнее</ButtonLink><ContentAction action={coach.action} sourcePage="/coaches" sourceEntity={coach.name} onAction={closeDialog} modalDelayMs={300}>Выбрать</ContentAction></div></div>
+        <div className="col-span-2"><div className="flex items-end gap-3"><Price label="тренировка от" value={coach.priceFrom} size="compact" className="shrink-0" /><div className="ml-auto flex shrink-0 gap-2"><ButtonLink href={`/coaches/${coach.slug}`} variant="neutral" onClick={closeDialog}>Подробнее</ButtonLink><ContentAction action={coach.action} sourcePage="/coaches" sourceEntity={coach.name} onAction={closeDialog} modalDelayMs={300}>Выбрать</ContentAction></div></div><CoachRentalNote /></div>
       </div>
     </Dialog>
   </>;

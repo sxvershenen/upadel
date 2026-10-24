@@ -36,7 +36,6 @@ const images = {
   offerTournament: px(38028147, 1600, 900),
   offerEvent: px(34079544, 1600, 900),
   courtsBg: px(35248404, 2200, 1400),
-  trainingIndividual: px(38347564, 1200, 1500),
   trainingGroup: px(35248404, 1200, 1500),
   trainingKids: px(8224496, 1200, 1500),
   coaches: [
@@ -605,7 +604,6 @@ async function seed() {
       [images.offerTournament, 'Падел-турнир в клубе'],
       [images.offerEvent, 'Клубное мероприятие'],
       [images.courtsBg, 'Панорамные корты Unlim Riga Padel'],
-      [images.trainingIndividual, 'Индивидуальная тренировка по паделу'],
       [images.trainingGroup, 'Групповая тренировка по паделу'],
       [images.trainingKids, 'Детская тренировка по паделу'],
       [images.tournamentParty, 'Клубный турнир Americano'],
@@ -622,6 +620,15 @@ async function seed() {
     const remoteMedia = new Map<string, { id: number | string }>()
     for (const [source, alt] of remoteEntries) {
       remoteMedia.set(source, await ensureRemoteMedia(payload, source, alt))
+    }
+    const trainingPhotoSeedKey = 'club-offer-20261024:training-individual'
+    let trainingIndividualMedia = await findBySeedKey(payload, 'media', trainingPhotoSeedKey)
+    if (!trainingIndividualMedia || !await storedMediaFilesExist(trainingIndividualMedia)) {
+      const filePath = path.resolve(dirname, '../seed-media/club-update-20261024/training-individual.webp')
+      const data = { seedKey: trainingPhotoSeedKey, alt: 'Мячи и ракетка на крытом падел-корте', credit: 'AI-generated for UNLIM PADEL', sourceURL: 'apps/cms/seed-media/club-update-20261024/training-individual.webp' }
+      trainingIndividualMedia = trainingIndividualMedia
+        ? await payload.update({ collection: 'media', id: trainingIndividualMedia.id, data, filePath, depth: 0, overrideAccess: true } as never) as unknown as SeededRecord
+        : await payload.create({ collection: 'media', data, filePath, depth: 0, overrideAccess: true } as never) as unknown as SeededRecord
     }
 
     const decorativeMedia = {
@@ -1207,7 +1214,7 @@ async function seed() {
       {
         slug: 'metrics', title: 'Характеристики кортов', cardVariant: 'metrics',
         metrics: [
-          { value: '11.5 м', label: 'Высота потолка', icon: 'PanelTop' },
+          { value: '13 м', label: 'Высота потолка', icon: 'PanelTop' },
           { value: '+21°C', label: 'Температура в зале', icon: 'Lightbulb' },
           { value: '350 Lux', label: 'Flicker-free свет', icon: 'Activity' },
           { value: '3', label: 'Панорамных корта', icon: 'Layers3' },
@@ -1288,7 +1295,7 @@ async function seed() {
 
     const trainingPrograms = [
       {
-        slug: 'individual', title: 'Индивидуальная', badge: '1 на 1', image: mediaID(images.trainingIndividual), overlay: 'overlay-blue', icon: 'User', priceFrom: 4900,
+        slug: 'individual', title: 'Индивидуальная', badge: '1 на 1', image: trainingIndividualMedia.id, overlay: 'overlay-blue', icon: 'User', priceFrom: 4900,
         description: 'Персональная программа под ваш уровень: техника, тактика и разбор ошибок один на один с тренером.',
       },
       {
@@ -1571,7 +1578,7 @@ async function seed() {
           eyebrow: 'Инфраструктура', title: 'Панорамные корты', intro: 'Турнирная геометрия, профессиональное покрытие и контролируемый климат для стабильной игры круглый год.',
           infographicTitle: 'Корт в цифрах', infographicCopy: 'Параметры площадки и зала, которые напрямую влияют на качество игры.',
           metrics: [
-            { value: '3', label: 'панорамных корта', icon: 'Layers3' }, { value: '11.5 м', label: 'высота потолка', icon: 'PanelTop' },
+            { value: '3', label: 'панорамных корта', icon: 'Layers3' }, { value: '13 м', label: 'высота потолка', icon: 'PanelTop' },
             { value: '350 Lux', label: 'flicker-free свет', icon: 'Lightbulb' }, { value: '+21°C', label: 'климат круглый год', icon: 'Thermometer' },
           ], seo: { title: 'Корты — UNLIM RIGA PADEL', description: 'Три панорамных корта Jubo и профессиональное покрытие PRO TURF 240.', robots: 'index-follow' },
         },
@@ -1781,7 +1788,7 @@ async function seed() {
       if (!migratedHero.tint) migratedHero.tint = defaultHeroTint
       if (!migratedHero.titleFontSize) migratedHero.titleFontSize = defaultHeroTitleFontSize
       if (!migratedHero.buttonsAndElements) {
-        const notice = migratedHero.openingNotice ?? { title: 'Открытие в ноябре', caption: 'Акция с 01.11 до 15.11' }
+        const notice = migratedHero.openingNotice ?? { title: '2 недели с открытия', caption: 'Аренда со скидкой 50%' }
         const book = migratedHero.primaryAction ?? { label: 'Забронировать', mode: 'booking' }
         migratedHero.buttonsAndElements = {
           desktop: { slot1: { enabled: true, type: 'button', icon: 'CalendarCheck', action: book }, slot2: { enabled: true, type: 'button', icon: 'UserRound', action: migratedHero.secondaryAction ?? { label: 'Личный кабинет', mode: 'account' } }, slot3: { enabled: true, type: 'info', icon: 'CalendarDays', title: notice.title, caption: notice.caption } },
@@ -1824,14 +1831,14 @@ async function seed() {
             tint: defaultHeroTint,
             titleFontSize: defaultHeroTitleFontSize,
             buttonsAndElements: {
-              desktop: { slot1: { enabled: true, type: 'button', icon: 'CalendarCheck', action: { label: 'Забронировать', mode: 'booking' } }, slot2: { enabled: true, type: 'button', icon: 'UserRound', action: { label: 'Личный кабинет', mode: 'account' } }, slot3: { enabled: true, type: 'info', icon: 'CalendarDays', title: 'Открытие в ноябре', caption: 'Акция с 01.11 до 15.11' } },
-              mobile: { slot1: { enabled: true, type: 'button', icon: 'CalendarCheck', action: { label: 'Забронировать', mode: 'booking' } }, slot2: { enabled: true, type: 'info', icon: 'CalendarDays', title: 'Открытие в ноябре', caption: 'Акция с 01.11 до 15.11' } },
+              desktop: { slot1: { enabled: true, type: 'button', icon: 'CalendarCheck', action: { label: 'Забронировать', mode: 'booking' } }, slot2: { enabled: true, type: 'button', icon: 'UserRound', action: { label: 'Личный кабинет', mode: 'account' } }, slot3: { enabled: true, type: 'info', icon: 'CalendarDays', title: '2 недели с открытия', caption: 'Аренда со скидкой 50%' } },
+              mobile: { slot1: { enabled: true, type: 'button', icon: 'CalendarCheck', action: { label: 'Забронировать', mode: 'booking' } }, slot2: { enabled: true, type: 'info', icon: 'CalendarDays', title: '2 недели с открытия', caption: 'Аренда со скидкой 50%' } },
             },
             primaryAction: { label: 'Забронировать', mode: 'booking' },
             secondaryAction: { label: 'Личный кабинет', mode: 'account' },
             socialProof: { ratingLabel: '4.9 · 500+ игроков', caption: 'Рейтинг на Яндекс', coaches: coaches.slice(0, 3).map(({ id }) => id) },
             stats: [
-              { value: '3 корта', label: 'Jubo Super Panoramic' }, { value: '11.5 м', label: 'Высота до балок' },
+              { value: '3 корта', label: 'Jubo Super Panoramic' }, { value: '13 м', label: 'Высота до балок' },
               { value: '+21°C', label: 'Климат-контроль круглый год' }, { value: '30 сек', label: 'Мгновенное бронирование' },
             ],
           },

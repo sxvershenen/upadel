@@ -17,11 +17,11 @@ const content = {
     desktopSlots: [
       { type: 'button', enabled: true, icon: 'CalendarCheck', action: { mode: 'booking', label: 'Забронировать' } },
       { type: 'button', enabled: true, icon: 'UserRound', action: { mode: 'account', label: 'Личный кабинет' } },
-      { type: 'info', enabled: true, icon: 'CalendarDays', title: 'Открытие в ноябре', caption: 'Акция с 01.11 до 15.11' },
+      { type: 'info', enabled: true, icon: 'CalendarDays', title: '2 недели с открытия', caption: 'Аренда со скидкой 50%' },
     ],
     mobileSlots: [
       { type: 'button', enabled: true, icon: 'CalendarCheck', action: { mode: 'booking', label: 'Забронировать' } },
-      { type: 'info', enabled: true, icon: 'CalendarDays', title: 'Открытие в ноябре', caption: 'Акция с 01.11 до 15.11' },
+      { type: 'info', enabled: true, icon: 'CalendarDays', title: '2 недели с открытия', caption: 'Аренда со скидкой 50%' },
     ],
     socialProof: { coachPhotos: [], ratingLabel: '4.9 · 500+ игроков', caption: 'Рейтинг на Яндекс' }, stats: [],
   } },
@@ -46,7 +46,7 @@ test('disabled hero slots are omitted from server-rendered markup', () => {
   const html = renderToStaticMarkup(<ContentProvider content={disabled}><Hero /></ContentProvider>)
   assert.equal([...html.matchAll(/data-hero-slot="1" data-hero-slot-type="button"/g)].length, 1)
   assert.equal([...html.matchAll(/data-hero-cta="primary"/g)].length, 1)
-  assert.match(html, /Открытие в ноябре/)
+  assert.match(html, /2 недели с открытия/)
 })
 
 test('glass hero CTA animates its own backdrop-filter layer', () => {
@@ -134,11 +134,11 @@ test('hero renders separate desktop and mobile three-point black tints and keeps
 
 test('mobile opening notice reads its configured slot and receives the glass entrance animation', () => {
   const updated = structuredClone(content)
-  updated.home.hero = { ...updated.home.hero, titleLine: '2 часа', titleConnector: 'по цене', titleAccent: 'одного', mobileSlots: [updated.home.hero.mobileSlots[0], { type: 'info', enabled: true, icon: 'CalendarDays', title: 'Открытие в ноябре', caption: 'Акция с 01.11 до 15.11' }] }
+  updated.home.hero = { ...updated.home.hero, titleLine: '2 часа', titleConnector: 'по цене', titleAccent: 'одного', mobileSlots: [updated.home.hero.mobileSlots[0], { type: 'info', enabled: true, icon: 'CalendarDays', title: '2 недели с открытия', caption: 'Аренда со скидкой 50%' }] }
   const html = renderToStaticMarkup(<ContentProvider content={updated}><Hero /></ContentProvider>)
   assert.match(html, /data-hero-opening-notice="" data-hero-slot="2" data-hero-slot-type="info"/)
-  assert.match(html, /Открытие в ноябре/)
-  assert.match(html, /Акция с 01.11 до 15.11/)
+  assert.match(html, /2 недели с открытия/)
+  assert.match(html, /Аренда со скидкой 50%/)
   assert.match(html, /bg-white/)
   assert.match(html, /leading-tight/)
   assert.match(html, /data-hero-accent="" class="inline-block text-\[#c2f542\]">одного/)

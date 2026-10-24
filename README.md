@@ -34,7 +34,7 @@ Run analytics aggregation every 15 minutes with `npm run analytics:maintain`; `n
 
 Production templates target `unlimpadel.ru` with `cms.unlimpadel.ru`; local Mac development keeps its own localhost/LAN settings.
 
-Production admin uses `PAYLOAD_ADMIN_ROUTE` and `ADMIN_USERNAME` from the server-only environment. Schema changes ship as Payload migrations. `npm run content:opening --workspace @unlim/cms` applies the November opening content once in a transaction; seed and release run it automatically, and subsequent runs preserve editor changes. `npm run content:club --workspace @unlim/cms` transactionally imports the supplied October coach roster, wordmark, legal documents, club rules and launch waitlist once; repeat runs preserve CMS edits. Never run `migrate:fresh` or commit production secrets.
+Production admin uses `PAYLOAD_ADMIN_ROUTE` and `ADMIN_USERNAME` from the server-only environment. Schema changes ship as Payload migrations. `npm run content:opening --workspace @unlim/cms` applies the November opening content once in a transaction; seed and release run it automatically, and subsequent runs preserve editor changes. `npm run content:club --workspace @unlim/cms` transactionally applies the October roster, launch setup and later owner content updates once; repeat runs preserve CMS edits. Never run `migrate:fresh` or commit production secrets.
 
 Production backups use [`deploy/backup.sh`](deploy/backup.sh): daily and weekly timers each replace their own archive, retaining at most two archives. Releases write their pre-migration snapshot to the daily slot. Each archive contains PostgreSQL, Payload media, production environment and release metadata; source/build dependencies remain reproducible from GitHub.
 

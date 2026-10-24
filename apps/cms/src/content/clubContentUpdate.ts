@@ -24,7 +24,7 @@ export async function applyClubContentUpdate(payload: Payload): Promise<boolean>
     const req = await createLocalReq({ req: { transactionID } }, payload)
     const opts = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
     const site = await payload.findGlobal({ ...opts, slug: 'site-settings', draft: false })
-    if ([revision, 'club-launch-20261023-v1', 'club-launch-20261023-v2'].includes(site.clubUpdateVersion ?? '')) { await payload.db.rollbackTransaction(transactionID); return false }
+    if ([revision, 'club-launch-20261023-v1', 'club-launch-20261023-v2', 'club-offer-20261024-v1'].includes(site.clubUpdateVersion ?? '')) { await payload.db.rollbackTransaction(transactionID); return false }
     const draftSite = await payload.findGlobal({ ...opts, slug: 'site-settings', draft: true })
     const upload = async (name: string, alt: string) => {
       const seedKey = `club-update-20261023:${name}`

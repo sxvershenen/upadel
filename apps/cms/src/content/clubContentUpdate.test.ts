@@ -13,7 +13,7 @@ test('document import preserves every paragraph and marks section headings witho
 test('new roster contains only five supplied identities and requested prices', () => {
   assert.equal(clubCoachRoster.length, 5)
   assert.equal(new Set(clubCoachRoster.map(({ slug }) => slug)).size, 5)
-  assert.deepEqual(clubCoachRoster.map(({ priceFrom }) => priceFrom), [7000, 5500, 7000, 5500, 7000])
+  assert.deepEqual(clubCoachRoster.map(({ priceFrom }) => priceFrom), [7500, 5500, 7500, 5500, 7500])
   assert.ok(clubCoachRoster.every(({ name, bio, experience }) => name && bio && experience))
 })
 

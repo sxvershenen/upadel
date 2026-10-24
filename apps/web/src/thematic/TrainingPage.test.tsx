@@ -203,6 +203,7 @@ test('training swipers keep the mobile gutter and hint separate from Swiper stat
   assert.doesNotMatch(coachSource, /useImageParallax|data-parallax-layer/)
   assert.match(coachSource, /object-contain/)
   assert.doesNotMatch(coachSource, /coach\.rating|coach\.reviewsCount/)
+  assert.match(coachSource, /<CoachRentalNote \/>/)
   assert.match(coachSource, /<ProgressiveImage skeleton=\{false\} ref=\{photoImageRef\}/)
   assert.match(css, /\[data-coach-card="true"\] img \{[\s\S]*?transform: none !important/)
 })

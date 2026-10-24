@@ -17,7 +17,7 @@ export async function applyClubRefinements(payload: Payload): Promise<boolean> {
     const req = await createLocalReq({ req: { transactionID } }, payload)
     const opts = { depth: 0, overrideAccess: true, showHiddenFields: true, req }
     const site = await payload.findGlobal({ ...opts, slug: 'site-settings', draft: false })
-    if (site.clubUpdateVersion === clubRefinementRevision) { await payload.db.rollbackTransaction(transactionID); return false }
+    if ([clubRefinementRevision, 'club-offer-20261024-v1'].includes(site.clubUpdateVersion ?? '')) { await payload.db.rollbackTransaction(transactionID); return false }
     if (site.clubUpdateVersion !== 'club-launch-20261023-v1') throw new Error('Apply the club launch update first.')
     const patchGlobal = async (slug: GlobalSlug, patch: (doc: any) => Record<string, unknown>) => {
       const live = await payload.findGlobal({ ...opts, slug, draft: false })
