@@ -622,6 +622,9 @@ html[data-reveal-ready] [data-reveal-visible="true"] [data-reveal-word] { --reve
 .article-prose h3 { margin-block: 2.25rem .75rem; }
 .article-prose h4 { margin-block: 1.75rem .625rem; }
 .article-prose h2, .article-prose h3, .article-prose h4 { color: var(--color-ink); }
+.article-content--legal:not(.article-prose) p, .article-content--legal:not(.article-prose) ul, .article-content--legal:not(.article-prose) ol { margin-block: .75rem; }
+.article-content--legal:not(.article-prose) h2 { margin-block: 2rem .75rem; font-size: clamp(1.5rem, 2.5vw, 2rem); line-height: 1.2; }
+.article-content--legal:not(.article-prose) h3 { margin-block: 1.5rem .5rem; font-size: 1.25rem; line-height: 1.3; }
 .article-prose ul, .article-prose ol { padding-left: 1.5rem; }
 .article-prose ul { list-style: disc; }
 .article-prose ol { list-style: decimal; }
