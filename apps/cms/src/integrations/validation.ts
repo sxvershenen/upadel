@@ -16,6 +16,7 @@ export type BookingConfig = {
   externalURL?: unknown
   widgetURL?: unknown
   mode?: unknown
+  lundaClubID?: unknown
   providerAccountID?: unknown
   providerAdapter?: unknown
 }
@@ -26,18 +27,22 @@ export function bookingReadiness(config: BookingConfig, env: Record<string, stri
     ? { ready: true, status: 'ready-external' as const }
     : { ready: false, status: 'missing-config' as const }
   if (config.mode === 'vivacrm-widget') return widgetURL(config.widgetURL, 'vivacrm-script') ? { ready: true, status: 'ready-widget' as const } : { ready: false, status: 'missing-config' as const }
+  if (config.mode === 'provider-adapter' && config.providerAdapter === 'lunda') return isLundaClubID(config.lundaClubID) ? { ready: true, status: 'ready-widget' as const } : { ready: false, status: 'missing-config' as const }
   const envName = typeof config.credentialEnvironmentVariable === 'string' ? config.credentialEnvironmentVariable : ''
   if (!config.providerAdapter || !config.providerAccountID || !envName || !env[envName]) return { ready: false, status: 'missing-config' as const }
   return { ready: false, status: 'integration-not-implemented' as const }
 }
 
 export const validateBookingAdapter = (value: unknown, siblingData: BookingConfig): true | string =>
-  siblingData.mode !== 'provider-adapter' || value && siblingData.providerAccountID
+  siblingData.mode !== 'provider-adapter' || value === 'lunda' || value && siblingData.providerAccountID
     ? true : 'Выберите адаптер и укажите ID аккаунта/клуба.'
 
 export const validateBookingCredentialEnv = (value: unknown, siblingData: BookingConfig, env: Record<string, string | undefined> = process.env): true | string => {
+  if (siblingData.providerAdapter === 'lunda') return true
   if (siblingData.mode === 'provider-adapter' && !value) return 'Для provider adapter укажите environment variable с секретом.'
   if (value && (typeof value !== 'string' || !/^[A-Z][A-Z0-9_]*$/.test(value))) return 'Используйте имя environment variable в формате BOOKING_API_TOKEN.'
   if (siblingData.mode === 'provider-adapter' && typeof value === 'string' && !env[value]) return 'Указанная environment variable не найдена в текущем окружении.'
   return true
 }
+
+export const isLundaClubID = (value: unknown): value is string => typeof value === 'string' && /^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(value)

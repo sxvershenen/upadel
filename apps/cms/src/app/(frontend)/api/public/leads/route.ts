@@ -36,12 +36,12 @@ export async function POST(request: Request): Promise<Response> {
     if (isLeadHoneypotTriggered(input)) return Response.json({ ok: true, accepted: false }, { status: 200, headers })
     const submission = parseLeadSubmission(input)
     if (!submission) return Response.json({ ok: false, error: 'Проверьте заполненные поля и согласие.' }, { status: 400, headers })
-    const { name, phone, email, telegram, vk, comment, type, sourcePage, sourceEntity, idempotencyKey } = submission
+    const { name, phone, email, telegram, vk, comment, type, sourcePage, sourceEntity, idempotencyKey, yandexClientID } = submission
     const payload = await getPayload({ config })
     const analyticsInput = input.analytics && typeof input.analytics === 'object' ? input.analytics as Record<string, unknown> : null
     const analyticsEvent = analyticsInput ? sanitizeAnalyticsEvent({ ...analyticsInput, name: 'form_submit_success', path: sourcePage, objectType: 'form', objectId: sourceEntity || type, formType: type, actionKind: 'lead', value: null, metricName: '' }) : null
     const client = detectClient(request.headers.get('user-agent') ?? '')
-    const { lead, duplicate } = await persistLead(payload, { type, status: 'new', name, phone: phone || null, email: email || null, telegram: telegram || null, vk: vk || null, comment: comment || null, sourcePage, sourceEntity: sourceEntity || null, idempotencyKey, analyticsAnonymousId: analyticsEvent?.anonymousId || null, analyticsSessionId: analyticsEvent?.sessionId || null, analyticsChannel: analyticsEvent?.currentSource.channel || null, analyticsDevice: analyticsEvent ? client.device : null, analyticsLanguage: analyticsEvent?.language || null })
+    const { lead, duplicate } = await persistLead(payload, { type, status: 'new', name, phone: phone || null, email: email || null, telegram: telegram || null, vk: vk || null, comment: comment || null, sourcePage, sourceEntity: sourceEntity || null, idempotencyKey, yandexClientID: yandexClientID || null, analyticsAnonymousId: analyticsEvent?.anonymousId || null, analyticsSessionId: analyticsEvent?.sessionId || null, analyticsChannel: analyticsEvent?.currentSource.channel || null, analyticsDevice: analyticsEvent ? client.device : null, analyticsLanguage: analyticsEvent?.language || null })
     if (analyticsEvent) await persistAnalyticsEvent(payload, analyticsEvent, request.headers.get('user-agent') ?? 'Other', lead.id).catch(() => undefined)
     await deliverOnlyForNewLead(duplicate, async () => notifyAndRecord(payload, lead)).catch(() => undefined)
     return Response.json({ ok: true, duplicate }, { status: duplicate ? 200 : 201, headers })

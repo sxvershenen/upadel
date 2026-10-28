@@ -37,6 +37,7 @@ export function formatLeadNotificationMessage(lead: Lead): string {
     lead.email && `Email: ${clean(lead.email)}`,
     lead.telegram && `Telegram: ${clean(lead.telegram)}`,
     lead.vk && `VK: ${clean(lead.vk)}`,
+    lead.yandexClientID && `ClientID Яндекс Метрики: ${clean(lead.yandexClientID)}`,
     lead.comment && `Комментарий: ${clean(lead.comment)}`,
     `Страница: ${clean(lead.sourcePage)}`,
     lead.sourceEntity && `Форма: ${clean(lead.sourceEntity)}`,

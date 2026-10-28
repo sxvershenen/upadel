@@ -1788,7 +1788,7 @@ async function seed() {
       if (!migratedHero.tint) migratedHero.tint = defaultHeroTint
       if (!migratedHero.titleFontSize) migratedHero.titleFontSize = defaultHeroTitleFontSize
       if (!migratedHero.buttonsAndElements) {
-        const notice = migratedHero.openingNotice ?? { title: '2 недели с открытия', caption: 'Аренда со скидкой 50%' }
+        const notice = migratedHero.openingNotice ?? { title: 'Планируемая дата', caption: 'открытия 8.11' }
         const book = migratedHero.primaryAction ?? { label: 'Забронировать', mode: 'booking' }
         migratedHero.buttonsAndElements = {
           desktop: { slot1: { enabled: true, type: 'button', icon: 'CalendarCheck', action: book }, slot2: { enabled: true, type: 'button', icon: 'UserRound', action: migratedHero.secondaryAction ?? { label: 'Личный кабинет', mode: 'account' } }, slot3: { enabled: true, type: 'info', icon: 'CalendarDays', title: notice.title, caption: notice.caption } },
@@ -1831,8 +1831,8 @@ async function seed() {
             tint: defaultHeroTint,
             titleFontSize: { mobile: 24, desktop: 88 },
             buttonsAndElements: {
-              desktop: { slot1: { enabled: true, type: 'button', icon: 'CalendarCheck', action: { label: 'Забронировать', mode: 'booking' } }, slot2: { enabled: true, type: 'button', icon: 'UserRound', action: { label: 'Личный кабинет', mode: 'account' } }, slot3: { enabled: true, type: 'info', icon: 'CalendarDays', title: '2 недели с открытия', caption: 'Аренда со скидкой 50%' } },
-              mobile: { slot1: { enabled: true, type: 'button', icon: 'CalendarCheck', action: { label: 'Забронировать', mode: 'booking' } }, slot2: { enabled: true, type: 'info', icon: 'CalendarDays', title: '2 недели с открытия', caption: 'Аренда со скидкой 50%' } },
+              desktop: { slot1: { enabled: true, type: 'button', icon: 'CalendarCheck', action: { label: 'Забронировать', mode: 'booking' } }, slot2: { enabled: true, type: 'button', icon: 'UserRound', action: { label: 'Личный кабинет', mode: 'account' } }, slot3: { enabled: true, type: 'info', icon: 'CalendarDays', title: 'Планируемая дата', caption: 'открытия 8.11' } },
+              mobile: { slot1: { enabled: true, type: 'button', icon: 'CalendarCheck', action: { label: 'Забронировать', mode: 'booking' } }, slot2: { enabled: true, type: 'info', icon: 'CalendarDays', title: 'Планируемая дата', caption: 'открытия 8.11' } },
             },
             primaryAction: { label: 'Забронировать', mode: 'booking' },
             secondaryAction: { label: 'Личный кабинет', mode: 'account' },
@@ -1969,14 +1969,14 @@ async function seed() {
         data: {
           seedVersion,
           _status: 'published',
-          brandName: 'UNLIM RIGA PADEL', brandLogoMode: 'prefix', headerSubtitle: 'Новорижское шоссе 3к1',
+          brandName: 'UNLIM RIGA PADEL', brandLogoMode: 'prefix', headerSubtitle: 'Новорижское шоссе 32км 3с2',
           desktopNavigation: requiredPageLinks.filter(({ href }) => href !== '/training' && href !== '/coaches').map((item) => item.href === '/prices' ? { ...item, children: priceNavigationChildren.map((child) => ({ ...child })) } : item),
           mobileNavigation: [
             { label: 'Главная', href: '/', icon: 'Home' }, { label: 'Цены', href: '/prices', icon: 'Tag' },
           ],
           mobileMenuNavigation: [...requiredPageLinks],
           mobileActions: { playLabel: 'Играть', menuLabel: 'Меню', menuTitle: 'Меню', quickActionsTitle: 'Быстрые действия', bookCourtLabel: 'Забронировать корт', callLabel: 'Позвонить в клуб', directionsLabel: 'Проложить маршрут' },
-          address: 'Новорижское шоссе, 3к1', directionsURL: 'https://yandex.ru/maps/?text=Новорижское%20шоссе%203к1',
+          address: 'Новорижское шоссе 32км 3с2', directionsURL: 'https://yandex.ru/maps/?text=Новорижское%20шоссе%2032км%203с2',
           addressLabel: 'Адрес', transitLabel: 'Ближайшее метро', parkingLabel: 'Парковка', openingHoursLabel: 'Режим работы', phoneFieldLabel: 'Телефон', emailFieldLabel: 'Email',
           phoneDisplay: '+7 985 835-00-55', phoneValue: '+79858350055', email: 't.baranova@mail.ru', transit: 'Строгино',
           parking: '50 бесплатных мест у входа', openingHours: 'Ежедневно 07:00–23:00', map: { latitude: 55.8, longitude: 37.15, zoom: 14 },
@@ -1996,8 +1996,8 @@ async function seed() {
           copyright: '© 2026 Unlim Riga Padel. Все права защищены.',
           cookieNotice: { text: 'Продолжая использовать наш сайт, вы даёте *согласие на использование собираемых данных (cookie)*. Если вы не хотите, чтобы ваши данные обрабатывались, измените настройки браузера.', acceptLabel: 'ОК', rejectLabel: 'Настройки' },
           contactConfirmation,
-          booking: { mode: 'vivacrm-widget', widgetURL: 'https://supadb.vivacrm.ru/storage/v1/object/public/widgets/3ffc4681-890e-4d27-9676-1a5a7c246b17.js', buttonLabel: 'Забронировать' },
-          account: { mode: 'vivacrm-widget', widgetURL: 'https://supadb.vivacrm.ru/storage/v1/object/public/widgets/8e5e55da-bb08-4d93-9572-047f3d99b3b8.js', buttonLabel: 'Личный кабинет', mobileLabel: 'Кабинет' },
+          booking: { mode: 'provider-adapter', providerAdapter: 'lunda', lundaClubID: '25591c97-c7c7-48ef-9244-20d82dcca967', widgetURL: 'https://supadb.vivacrm.ru/storage/v1/object/public/widgets/3ffc4681-890e-4d27-9676-1a5a7c246b17.js', buttonLabel: 'Забронировать' },
+          account: { mode: 'disabled', widgetURL: 'https://supadb.vivacrm.ru/storage/v1/object/public/widgets/8e5e55da-bb08-4d93-9572-047f3d99b3b8.js', buttonLabel: 'Личный кабинет', mobileLabel: 'Кабинет' },
           analytics: { mode: 'consent-required', yandexMetricaEnabled: true, yandexMetricaCounterID: '113700320', yandexMetricaWebvisor: true, yandexWebmasterVerification: 'fccfcc811cf8f0fc' },
         } as never,
       })

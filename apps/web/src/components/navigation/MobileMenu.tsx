@@ -19,6 +19,6 @@ export function MobileMenu({ open, onClose }: { open: boolean; onClose: () => vo
       {telegram && <a href={telegram.url} data-contact-confirmed data-analytics-action="telegram" onClick={(event) => { event.preventDefault(); onClose(); window.setTimeout(() => requestContact('telegram'), 300) }} target="_blank" rel="noreferrer" className="flex items-center gap-2.5"><TelegramIcon size={16} className="shrink-0" /> {telegram.label}</a>}
     </div>
     <div className="mt-4"><ContentAction action={{ mode: 'booking', label: site.mobileActions.bookCourtLabel }} onAction={onClose} modalDelayMs={300} variant="primary" size="lg" fullWidth /></div>
-    <div className="mt-2"><ContentAction action={{ mode: 'account', label: site.account?.buttonLabel ?? 'Личный кабинет' }} onAction={onClose} modalDelayMs={300} variant="neutral" size="lg" fullWidth className="bg-surface-subtle text-ink" /></div>
+    {site.account && site.account.mode !== 'disabled' && <div className="mt-2"><ContentAction action={{ mode: 'account', label: site.account?.buttonLabel ?? 'Личный кабинет' }} onAction={onClose} modalDelayMs={300} variant="neutral" size="lg" fullWidth className="bg-surface-subtle text-ink" /></div>}
   </BottomSheet>
 }

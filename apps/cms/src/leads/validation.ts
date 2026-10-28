@@ -17,6 +17,7 @@ export type ValidLeadSubmission = {
   sourcePage: string
   sourceEntity: string
   idempotencyKey: string
+  yandexClientID?: string
 }
 
 export function normalizeLeadSourcePage(value: unknown): string {
@@ -55,5 +56,6 @@ export function parseLeadSubmission(input: Record<string, unknown>): ValidLeadSu
   const valid = name.length >= 2 && leadTypes.has(type) && isAllowedLeadSourcePage(sourcePage) && /^[a-zA-Z0-9:_-]{8,100}$/.test(idempotencyKey) && input.consent === true && !isLeadHoneypotTriggered(input) &&
     Boolean(phone || email || telegram || vk) && (!email || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) && (!phone || /^[+\d\s()-]{6,40}$/.test(phone)) && (!telegram || /^@?[\p{L}\p{N}_.-]{3,80}$/u.test(telegram)) && (!vk || /^@?[\p{L}\p{N}_.-]{3,80}$/u.test(vk)) &&
     (!sourceEntity || /^[\p{L}\p{N}\s._:/+()№#&'’«»–—₽-]{1,160}$/u.test(sourceEntity))
-  return valid ? { name, phone, email, telegram, vk, comment, type, sourcePage, sourceEntity, idempotencyKey } : null
+  const attribution = input.yandexMetricaConsent === true && typeof input.yandexClientID === 'string' && /^\d{1,32}$/.test(input.yandexClientID) ? { yandexClientID: input.yandexClientID } : {}
+  return valid ? { ...attribution, name, phone, email, telegram, vk, comment, type, sourcePage, sourceEntity, idempotencyKey } : null
 }

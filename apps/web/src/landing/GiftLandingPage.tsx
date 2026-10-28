@@ -19,6 +19,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import type { Swiper as SwiperType } from 'swiper'
 
 import { useActionLayer } from '../actions/ActionLayer'
+import { metricaLeadContext } from '../analytics/metrica'
 import { analyticsServerContext, trackAnalytics } from '../analytics/AnalyticsTracker'
 import { Badge } from '../components/ui/Badge'
 import { Button, ButtonLink } from '../components/ui/Button'
@@ -319,6 +320,7 @@ export function GiftLandingPage({ dto, publicOrigin: _publicOrigin = 'https://un
           sourcePage: '/gift',
           sourceEntity,
           idempotencyKey,
+          ...await metricaLeadContext(),
           analytics: analyticsServerContext(),
         }),
       })

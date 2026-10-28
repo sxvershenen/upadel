@@ -218,6 +218,10 @@ export interface Lead {
   notificationStatus?: ('not-configured' | 'sent' | 'partial' | 'failed') | null;
   notifiedAt?: string | null;
   notificationResult?: string | null;
+  /**
+   * Привязка заявки к визиту, бронированию и оплате. Только при согласии на Метрику; удаляется вместе с обращением.
+   */
+  yandexClientID?: string | null;
   analyticsAnonymousId?: string | null;
   analyticsSessionId?: string | null;
   analyticsChannel?: string | null;
@@ -1513,6 +1517,7 @@ export interface LeadsSelect<T extends boolean = true> {
   notificationStatus?: T;
   notifiedAt?: T;
   notificationResult?: T;
+  yandexClientID?: T;
   analyticsAnonymousId?: T;
   analyticsSessionId?: T;
   analyticsChannel?: T;
@@ -2344,6 +2349,10 @@ export interface SiteSetting {
     title?: string | null;
     description?: string | null;
     submitLabel?: string | null;
+    analyticsNotice?: string | null;
+    analyticsPolicyPrefix?: string | null;
+    analyticsContinueLabel?: string | null;
+    analyticsDeclineLabel?: string | null;
     successTitle?: string | null;
     successText?: string | null;
     telegramTitle?: string | null;
@@ -2438,6 +2447,9 @@ export interface SiteSetting {
     | {
         label: string;
         href: string;
+        /**
+         * Сначала ссылки группы 1, затем 2. Сайт равномерно распределяет их по трём колонкам.
+         */
         column: '1' | '2';
         id?: string | null;
       }[]
@@ -2530,7 +2542,7 @@ export interface SiteSetting {
     vkEnabled?: boolean | null;
   };
   /**
-   * Для VivaCRM вставьте URL или тег script установки. Сохраняется только проверенный URL; произвольный JavaScript не исполняется.
+   * Lunda: режим «Адаптер», адаптер Lunda и публичный UUID клуба. VivaCRM: URL или тег script установки. Произвольный JavaScript не исполняется.
    */
   booking: {
     /**
@@ -2540,6 +2552,10 @@ export interface SiteSetting {
     mode: 'disabled' | 'external-link' | 'vivacrm-widget' | 'provider-adapter';
     externalURL?: string | null;
     providerAdapter?: ('vivacrm' | 'lunda' | 'padel-app') | null;
+    /**
+     * UUID клуба из preferredClubs. Публичная настройка, API-секрет не требуется.
+     */
+    lundaClubID?: string | null;
     providerAccountID?: string | null;
     /**
      * Хранится только имя переменной, например BOOKING_API_TOKEN. Сам токен в CMS не вводится.
@@ -4125,6 +4141,10 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         title?: T;
         description?: T;
         submitLabel?: T;
+        analyticsNotice?: T;
+        analyticsPolicyPrefix?: T;
+        analyticsContinueLabel?: T;
+        analyticsDeclineLabel?: T;
         successTitle?: T;
         successText?: T;
         telegramTitle?: T;
@@ -4284,6 +4304,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         mode?: T;
         externalURL?: T;
         providerAdapter?: T;
+        lundaClubID?: T;
         providerAccountID?: T;
         credentialEnvironmentVariable?: T;
         buttonLabel?: T;

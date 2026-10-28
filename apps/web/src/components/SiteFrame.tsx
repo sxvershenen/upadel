@@ -6,7 +6,6 @@ import { SiteProvider } from '../content/ContentContext'
 import { CoolModeEffects } from './ui/CoolModeButton'
 import { Footer } from '../sections/Footer'
 import { AnalyticsTracker } from '../analytics/AnalyticsTracker'
-import { ExternalAnalytics } from '../analytics/ExternalAnalytics'
 import { MainContentReady } from './MainContentReady'
 
 export function SiteFrame({ site, children }: { site: SiteDTO; children: ReactNode; backLink?: { href: string; label?: string } }) {
@@ -22,5 +21,5 @@ export function SiteFrame({ site, children }: { site: SiteDTO; children: ReactNo
     mobileMenuNavigation: site.mobileMenuNavigation.map((item) => ({ ...item, href: rootHref(item.href) })),
     footer: { ...site.footer, navigation: site.footer.navigation.map((item) => ({ ...item, href: rootHref(item.href) })) },
   }
-  return <SiteProvider site={innerSite} homeHref="/#top"><MotionConfig reducedMotion="user"><AnalyticsTracker analytics={innerSite.analytics} /><ExternalAnalytics analyticsEnabled={innerSite.analytics.mode !== 'disabled'} analyticsMode={innerSite.analytics.mode} vendors={innerSite.analytics.vendors} /><CoolModeEffects /><div className="min-h-screen bg-page text-ink"><main>{children}<MainContentReady /></main><Footer /></div></MotionConfig></SiteProvider>
+  return <SiteProvider site={innerSite} homeHref="/#top"><MotionConfig reducedMotion="user"><AnalyticsTracker analytics={innerSite.analytics} /><CoolModeEffects /><div className="min-h-screen bg-page text-ink"><main>{children}<MainContentReady /></main><Footer /></div></MotionConfig></SiteProvider>
 }

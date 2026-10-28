@@ -63,7 +63,7 @@ export async function applyOpeningRefinements(payload: Payload, req?: PayloadReq
   const cards = (home.benefitsSection?.cards ?? []).filter((card) => card.variant !== 'community').map((card) => ({ ...card, description: descriptions[card.variant] ?? card.description }))
   const kidsIndex = cards.findIndex((card) => card.variant === 'kids-wide')
   cards.splice(kidsIndex < 0 ? cards.length : kidsIndex, 0, { variant: 'community', eyebrow: 'Играйте вместе', title: 'Комьюнити клуба', description: 'Находите партнёров и следите за жизнью клуба', meshTone: 'deep-blue', action: { mode: 'external-link', href: telegram, label: 'Вступить в Telegram' } } as never)
-  await payload.updateGlobal({ ...options, slug: 'site-settings', data: { email: 't.baranova@mail.ru', address: 'Новорижское шоссе, 3к1', directionsURL: 'https://yandex.ru/maps/?pt=37.158614,55.783974&z=17', map: { latitude: 55.783974, longitude: 37.158614, zoom: 16 } } })
+  await payload.updateGlobal({ ...options, slug: 'site-settings', data: { email: 't.baranova@mail.ru', address: 'Новорижское шоссе 32км 3с2', directionsURL: 'https://yandex.ru/maps/?pt=37.158614,55.783974&z=17', map: { latitude: 55.783974, longitude: 37.158614, zoom: 16 } } })
   await payload.updateGlobal({ ...options, slug: 'homepage', draft: false, data: {
     benefitsSection: { ...home.benefitsSection, cards },
     methodistBanner: { ...home.methodistBanner, eyebrow: 'Самостоятельная практика', icon: 'Target', decorativeMedia: robot.id },

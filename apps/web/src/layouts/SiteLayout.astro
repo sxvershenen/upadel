@@ -121,26 +121,29 @@ const pageEntrance = Astro.url.pathname === '/gift'
           })
           if (!dialog.open) dialog.showModal()
         }
-        const save = () => {
-          const dialog = getDialog()
-          const next = { siteAnalytics: true, yandexMetrica: false, ga4: false }
-          dialog?.querySelectorAll('[data-analytics-toggle]').forEach((input) => {
-            if (!(input instanceof HTMLInputElement)) return
-            const key = input.getAttribute('data-analytics-toggle')
-            if (key in next) next[key] = input.checked
-          })
+        const persist = (next) => {
           const previous = read()
           try { localStorage.setItem(consentKey, JSON.stringify({ version: 2, ...next })) } catch { return }
           root.setAttribute('data-analytics-consent', 'saved')
           window.dispatchEvent(new CustomEvent('unlim:analytics-consent', { detail: next }))
           hideNotice()
-          if (dialog instanceof HTMLDialogElement) dialog.close()
+          getDialog()?.close()
           if (previous && keys.some((key) => previous[key] && !next[key])) location.reload()
+        }
+        const save = () => {
+          const next = { siteAnalytics: true, yandexMetrica: false, ga4: false }
+          getDialog()?.querySelectorAll('[data-analytics-toggle]').forEach((input) => {
+            if (!(input instanceof HTMLInputElement)) return
+            const key = input.getAttribute('data-analytics-toggle')
+            if (key in next) next[key] = input.checked
+          })
+          persist(next)
         }
 
         document.addEventListener('click', (event) => {
           if (!(event.target instanceof Element)) return
-          if (event.target.closest('[data-cookie-ok]')) save()
+          if (event.target.closest('[data-cookie-metrica-accept]')) persist({ siteAnalytics: true, yandexMetrica: true, ga4: read()?.ga4 ?? false })
+          else if (event.target.closest('[data-cookie-ok]')) save()
           else if (event.target.closest('[data-cookie-open], [data-cookie-settings]')) openPreferences()
           else if (event.target.closest('[data-cookie-save]')) save()
           else if (event.target.closest('[data-cookie-close]')) getDialog()?.close()
@@ -188,6 +191,16 @@ const pageEntrance = Astro.url.pathname === '/gift'
   </head>
   <body>
     {site && <CookieNotice site={site} />}
+    {site && <script id="external-analytics-settings" type="application/json" set:html={JSON.stringify(site.analytics).replaceAll('<', '\\u003c')} />}
+    <script>
+      import { initializeExternalAnalytics } from '../analytics/externalVendors'
+      import type { SiteDTO } from '@unlim/content-contract'
+      const config = document.getElementById('external-analytics-settings')
+      if (config?.textContent) {
+        const analytics = JSON.parse(config.textContent) as SiteDTO['analytics']
+        initializeExternalAnalytics({ vendors: analytics.vendors, analyticsEnabled: analytics.mode !== 'disabled', analyticsMode: analytics.mode })
+      }
+    </script>
     {site && <WaitlistNotice site={site} />}
     {enableGlobalTransitions && <GlobalPageTransition client:load />}
     {site && <SiteChromeIsland client:load site={site} />}

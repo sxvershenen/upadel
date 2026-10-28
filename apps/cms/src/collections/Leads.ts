@@ -36,6 +36,7 @@ export const Leads: CollectionConfig = {
     { name: 'notifiedAt', type: 'date', label: 'Последняя попытка уведомления', admin: { position: 'sidebar', readOnly: true } },
     { name: 'notificationResult', type: 'textarea', label: 'Результат уведомления', maxLength: 500, admin: { position: 'sidebar', readOnly: true } },
     { name: 'notificationRetry', type: 'ui', admin: { position: 'sidebar', components: { Field: '/components/admin/LeadNotificationRetry#LeadNotificationRetry' } } },
+    { name: 'yandexClientID', type: 'text', label: 'ClientID Яндекс Метрики', index: true, maxLength: 32, admin: { readOnly: true, description: 'Привязка заявки к визиту, бронированию и оплате. Только при согласии на Метрику; удаляется вместе с обращением.' } },
     { name: 'analyticsAnonymousId', type: 'text', index: true, maxLength: 80, admin: { hidden: true, readOnly: true } },
     { name: 'analyticsSessionId', type: 'text', index: true, maxLength: 80, admin: { hidden: true, readOnly: true } },
     { name: 'analyticsChannel', type: 'text', maxLength: 40, admin: { hidden: true, readOnly: true } },

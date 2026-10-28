@@ -1,3 +1,6 @@
+import * as plannedOpening from './20261028_120000_planned_opening'
+import * as waitlistAnalyticsGate from './20261028_110000_waitlist_analytics_gate'
+import * as lundaAttribution from './20261028_100000_lunda_attribution'
 import * as clubRulesWaitlist from './20261023_170000_club_rules_waitlist';
 import * as brandWordmark from './20261023_160000_brand_wordmark';
 import * as payloadAuthRequestedAt from './20261011_010000_payload_auth_requested_at'
@@ -40,6 +43,7 @@ import * as migration_20260921_011600_gift_page_fields from './20260921_011600_g
 import * as migration_20260921_134500_training_page_content from './20260921_134500_training_page_content';
 
 export const migrations = [
+
   {
     up: migration_20260914_230951_analytics_mvp.up,
     down: migration_20260914_230951_analytics_mvp.down,
@@ -148,4 +152,7 @@ export const migrations = [
   { up: footerSponsorsConsent.up, down: footerSponsorsConsent.down, name: '20261023_140000_footer_sponsors_consent' },
   { up: brandWordmark.up, down: brandWordmark.down, name: '20261023_160000_brand_wordmark' },
   { up: clubRulesWaitlist.up, down: clubRulesWaitlist.down, name: '20261023_170000_club_rules_waitlist' },
+  { up: lundaAttribution.up, down: lundaAttribution.down, name: '20261028_100000_lunda_attribution' },
+  { up: waitlistAnalyticsGate.up, down: waitlistAnalyticsGate.down, name: '20261028_110000_waitlist_analytics_gate' },
+  { up: plannedOpening.up, down: plannedOpening.down, name: '20261028_120000_planned_opening' },
 ];

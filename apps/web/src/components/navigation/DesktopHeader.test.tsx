@@ -9,6 +9,7 @@ import { DesktopHeader } from './DesktopHeader'
 
 const site = {
   brandName: 'UNLIM',
+  account: { mode: 'vivacrm-widget', buttonLabel: 'Личный кабинет', ready: true },
   brandLogo: null,
   brandLogoMode: 'text',
   headerSubtitle: 'RIGA PADEL',
@@ -75,4 +76,9 @@ test('tournament and gift icons use the same centered wrapper as every navigatio
   })
   assert.match(html, /data-navigation-glyph="tournaments"/)
   assert.match(html, /data-navigation-glyph="gift"/)
+})
+
+test('disabled account removes the complete utility control', () => {
+  const html = renderToStaticMarkup(<SiteProvider site={{ ...site, account: { mode: 'disabled' } }} captureContacts={false}><DesktopHeader /></SiteProvider>)
+  assert.doesNotMatch(html, /desktop-header-account-control|aria-label="Личный кабинет"/)
 })

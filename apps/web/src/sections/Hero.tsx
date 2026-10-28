@@ -2,7 +2,7 @@ import React, { useState, type CSSProperties } from "react";
 import { ArrowUpRight, CalendarCheck, CalendarDays, Info, MapPin, Sparkles, Star, UserRound, type LucideIcon } from "lucide-react";
 import { BrandWordmark } from "../components/BrandWordmark";
 import { ContentAction } from "../components/ContentAction";
-import { useContent } from "../content/ContentContext";
+import { useContent, useSite } from "../content/ContentContext";
 import { SplitTextReveal } from "../components/ui/SplitTextReveal";
 import { cn } from "../utils/cn";
 import { defaultHeroTint, defaultHeroTitleFontSize, type HeroSlotDTO, type HeroTintDeviceDTO, type MediaDTO } from "@unlim/content-contract";
@@ -76,7 +76,8 @@ function SocialProof({ className }: { className?: string }) {
 const heroSlotIconMap: Record<HeroSlotDTO['icon'], LucideIcon> = { CalendarCheck, CalendarDays, UserRound, ArrowUpRight, Info, Sparkles };
 
 function HeroSlot({ slot, index }: { slot: HeroSlotDTO; index: 0 | 1 | 2 }) {
-  if (!slot.enabled) return null;
+  const site = useSite();
+  if (!slot.enabled || slot.type === 'button' && slot.action.mode === 'account' && (!site.account || site.account.mode === 'disabled')) return null;
   const Icon = heroSlotIconMap[slot.icon];
   if (slot.type === 'button') return <div data-hero-slot={index + 1} data-hero-slot-type="button" className="min-w-0 flex-1 sm:flex-none">
     <ContentAction data-hero-cta={index === 0 ? "primary" : "secondary"} reveal={false} action={slot.action} variant={index === 0 ? "primary" : "glass"} size="lg" icon={<Icon size={17} />} className="w-fit min-w-0 whitespace-nowrap px-4 !leading-none !text-[14px] sm:w-auto sm:px-5 sm:!text-base" />

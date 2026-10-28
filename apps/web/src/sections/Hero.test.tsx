@@ -11,6 +11,7 @@ const content = {
     brandLogoMode: 'text', brandName: 'UNLIM', headerSubtitle: 'RIGA',
     contacts: {}, booking: { ready: false, buttonLabel: 'Забронировать' },
     contactConfirmation: { channels: [] },
+    account: { mode: 'vivacrm-widget', ready: true, buttonLabel: 'Личный кабинет' },
   },
   home: { hero: {
     seoHeading: 'Премиальный крытый падел-клуб в Москве', titleLine: 'Первая тренировка', titleConnector: 'за', titleAccent: '1 990 ₽', description: 'с испанскими панорамными кортами',
@@ -151,4 +152,11 @@ test('social proof keeps full desktop copy alongside compact mobile text', () =>
   assert.match(html, /class="hidden md:inline">4.9 · 500\+ игроков<\/span>/)
   assert.match(html, /class="md:hidden">Яндекс<\/span>/)
   assert.match(html, /class="hidden md:inline">Рейтинг на Яндекс<\/span>/)
+})
+
+test('disabled CMS account suppresses the hero account slot completely', () => {
+  const updated = structuredClone(content)
+  updated.site.account.mode = 'disabled'
+  const html = renderToStaticMarkup(<ContentProvider content={updated}><Hero /></ContentProvider>)
+  assert.doesNotMatch(html, /data-hero-slot="2" data-hero-slot-type="button"|Личный кабинет/)
 })

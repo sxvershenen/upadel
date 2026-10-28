@@ -1,7 +1,7 @@
 export * from './widgets'
 import type { CatalogPagination, CatalogQuery } from './catalog'
 export * from './catalog'
-export const homepageDTOversion = 25 as const
+export const homepageDTOversion = 26 as const
 
 export const publicRouteRegistry = [
   { path: '/', parent: null, template: 'homepage', globalSlug: 'homepage' },
@@ -88,7 +88,7 @@ export const defaultHeroTint: HeroTintDTO = {
 
 export const defaultHeroTitleFontSize: HeroTitleFontSizeDTO = { mobile: 48, desktop: 102 }
 
-export type BookingDTO = { mode: 'disabled' | 'external-link' | 'provider-adapter' | 'vivacrm-widget'; externalURL?: string | null; widgetURL?: string | null; buttonLabel: string; ready: boolean; status: 'disabled' | 'ready-external' | 'ready-widget' | 'missing-config' | 'integration-not-implemented' }
+export type BookingDTO = { lunda?: { clubId: string }; mode: 'disabled' | 'external-link' | 'provider-adapter' | 'vivacrm-widget'; externalURL?: string | null; widgetURL?: string | null; buttonLabel: string; ready: boolean; status: 'disabled' | 'ready-external' | 'ready-widget' | 'missing-config' | 'integration-not-implemented' }
 
 export type ActionDTO = {
   href?: string | null
@@ -169,7 +169,7 @@ export type HomepageDTO = {
     account?: BookingDTO & { mobileLabel?: string }
     booking: BookingDTO
 
-    waitlist?: { enabled: boolean; title: string; description: string; submitLabel: string; successTitle: string; successText: string; telegramTitle: string; telegramCopy: string; telegramURL: string }
+    waitlist?: { analyticsNotice: string; analyticsPolicyPrefix: string; analyticsContinueLabel: string; analyticsDeclineLabel: string; enabled: boolean; title: string; description: string; submitLabel: string; successTitle: string; successText: string; telegramTitle: string; telegramCopy: string; telegramURL: string }
     contactConfirmation: {
       avatar?: MediaDTO | null
       cancelLabel: string

@@ -2,8 +2,8 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { clubOfferPriceUpdates, clubOpeningPromo, updateCeilingStats } from './clubOfferUpdate'
 
-test('opening offer uses the requested two-line copy', () => {
-  assert.deepEqual(clubOpeningPromo, { title: '2 недели с открытия', caption: 'Аренда со скидкой 50%' })
+test('hero info uses the approved planned opening date', () => {
+  assert.deepEqual(clubOpeningPromo, { title: 'Планируемая дата', caption: 'открытия 8.11' })
 })
 
 test('only the three requested coaches receive the new price', () => {

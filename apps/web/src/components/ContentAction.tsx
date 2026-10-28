@@ -36,6 +36,7 @@ type Props = {
 export function ContentAction({ action, children, sourceEntity, sourcePage, onAction, mobileQuickActions = false, modalDelayMs = 0, ...buttonProps }: Props) {
   const site = useSite()
   const { requestContact, requestExternal, requestLead, requestWidget } = useActionLayer()
+  if (action.mode === 'account' && (!site.account || site.account.mode === 'disabled')) return null
   const label = children ?? action.label ?? site.booking.buttonLabel
   let href = action.href ?? undefined
 
@@ -57,7 +58,8 @@ export function ContentAction({ action, children, sourceEntity, sourcePage, onAc
   const bookingConfig = action.mode === 'account' ? site.account : site.booking
   if (action.mode === 'account' || action.mode === 'booking' || action.mode === 'trial-booking' || action.mode === 'embed-widget') {
     const individual = action.mode === 'embed-widget'
-    if (individual || bookingConfig?.mode === 'vivacrm-widget') return <Button {...buttonProps} {...analyticsProps} onClick={() => openAfterCurrentSurfaceCloses(() => requestWidget({ kind: individual ? action.widgetKind ?? 'iframe' : 'vivacrm-script', url: (individual ? action.widgetURL : bookingConfig?.widgetURL) ?? '', label: action.label ?? bookingConfig?.buttonLabel ?? 'Запись' }))}>{label}</Button>
+    if (!individual && bookingConfig?.lunda) return <Button {...buttonProps} {...analyticsProps} onClick={() => openAfterCurrentSurfaceCloses(() => requestWidget({ kind: 'lunda', url: bookingConfig.lunda!.clubId, label: action.label ?? bookingConfig.buttonLabel }))}>{label}</Button>
+    if (individual || bookingConfig?.mode === 'vivacrm-widget') return <Button {...buttonProps} {...analyticsProps} onClick={() => openAfterCurrentSurfaceCloses(() => requestWidget({ kind: individual ? action.widgetKind ?? 'iframe' : 'vivacrm-script', url: (individual ? action.widgetURL : bookingConfig?.widgetURL) ?? '', label: action.label ?? bookingConfig?.buttonLabel ?? 'Запись', booking: action.mode !== 'account' }))}>{label}</Button>
     if (action.mode === 'account') {
       const url = bookingConfig?.externalURL
       return <Button {...buttonProps} onClick={() => openAfterCurrentSurfaceCloses(() => url && bookingConfig?.mode === 'external-link' ? requestExternal({ href: url, label: action.label }) : requestWidget({ kind: 'vivacrm-script', url: '', label: 'Личный кабинет' }))}>{label}</Button>

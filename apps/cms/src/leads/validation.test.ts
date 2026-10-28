@@ -78,3 +78,11 @@ test('honeypot rejects bot-filled fields without treating them as a valid lead',
   assert.equal(isLeadHoneypotTriggered(input), true)
   assert.equal(parseLeadSubmission(input), null)
 })
+
+test('ClientID is optional and kept only as a numeric string with an explicit analytics choice', () => {
+  const input = { name: 'Анна', phone: '+7 999 000-00-00', type: 'consultation', sourcePage: '/', idempotencyKey: 'attribution-test', consent: true, yandexClientID: '1761630000123456789', yandexMetricaConsent: true }
+  assert.equal(parseLeadSubmission(input)?.yandexClientID, input.yandexClientID)
+  for (const value of ['<script>', '1'.repeat(33), 123]) assert.equal(parseLeadSubmission({ ...input, yandexClientID: value })?.yandexClientID, undefined)
+  assert.equal(parseLeadSubmission({ ...input, yandexMetricaConsent: false })?.yandexClientID, undefined)
+  assert.equal(parseLeadSubmission({ ...input, yandexClientID: undefined })?.name, 'Анна')
+})

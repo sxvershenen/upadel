@@ -1,23 +1,31 @@
 ---
 import { createElement } from 'react'
 import type { SiteDTO } from '@unlim/content-contract'
+import { ANALYTICS_CONSENT_KEY } from '../analytics/identity'
 import { Field } from './ui/Field'
 import { CheckboxField } from './ui/CheckboxField'
 import { Button } from './ui/Button'
 import { TelegramIcon } from './ui/ContactIcons'
-import { ArrowUpRight, X } from 'lucide-react'
+import { ArrowUpRight, Cookie, X } from 'lucide-react'
 const { site } = Astro.props as { site: SiteDTO }
 const content = site.waitlist
+const requiresMetrica = site.analytics.mode !== 'disabled' && site.analytics.vendors.yandexMetrica.enabled
 ---
 {content?.enabled && <>
-  <dialog id="waitlist-dialog" class="waitlist-dialog border-0 bg-white p-0 text-ink" aria-labelledby="waitlist-title" aria-describedby="waitlist-description" data-endpoint={site.contactConfirmation.leadEndpoint} data-success-title={content.successTitle} data-success-text={content.successText}>
+  <button type="button" class="waitlist-reopen" data-waitlist-reopen aria-haspopup="dialog" aria-controls="waitlist-dialog"><span>{content.submitLabel}</span></button>
+  <dialog id="waitlist-dialog" class="waitlist-dialog border-0 bg-white p-0 text-ink" aria-labelledby="waitlist-title" aria-describedby="waitlist-description" data-requires-metrica={requiresMetrica ? 'true' : undefined} data-endpoint={site.contactConfirmation.leadEndpoint} data-success-title={content.successTitle} data-success-text={content.successText}>
     <div class="p-6 pb-[max(24px,env(safe-area-inset-bottom))] md:p-8">
       <div class="mb-4 flex items-start justify-between gap-4">
         <h2 id="waitlist-title" class="type-title-card min-w-0 font-semibold">{content.title}</h2>
         <form method="dialog" data-waitlist-close-form class="shrink-0"><button type="submit" data-waitlist-close data-cool-mode="off" aria-label="Закрыть лист ожидания" class="se-2 flex h-9 w-9 items-center justify-center bg-control text-ink-soft transition-colors hover:bg-control-hover focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2"><X size={17} /></button></form>
       </div>
       <p id="waitlist-description" class="type-body-sm mb-6 whitespace-pre-line text-ink-soft">{content.description}</p>
-      <form data-waitlist-form class="grid gap-3" novalidate>
+      {requiresMetrica && <div data-waitlist-analytics-gate>
+        <p class="flex items-center gap-2 text-[13px] font-medium leading-snug"><Cookie size={16} aria-hidden="true" className="shrink-0 text-ink-muted" />{content.analyticsNotice}</p>
+        <p class="mt-2 text-[11px] leading-snug text-ink-muted">{content.analyticsPolicyPrefix}{' '}<a href="/policy" target="_blank" rel="noreferrer" class="underline underline-offset-2">политикой конфиденциальности</a>.</p>
+        <div class="mt-5 grid gap-2"><Button type="button" data-cookie-metrica-accept fullWidth reveal={false}>{content.analyticsContinueLabel}</Button><Button type="button" data-waitlist-decline variant="neutral" fullWidth reveal={false}>{content.analyticsDeclineLabel}</Button></div>
+      </div>}
+      <form data-waitlist-form hidden={requiresMetrica} class="grid gap-3" novalidate>
         <Field id="waitlist-name" label="Имя" labelVisibility="sr-only" reveal={false} name="name" autoComplete="name" placeholder="Имя" minLength={2} maxLength={120} required />
         <Field id="waitlist-phone" label="Телефон" labelVisibility="sr-only" reveal={false} name="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="Телефон" maxLength={40} required />
         <label class="absolute -left-[10000px]" aria-hidden="true">Сайт<input name="website" tabindex="-1" autocomplete="off" /></label>
@@ -33,11 +41,19 @@ const content = site.waitlist
       </a>}
     </div>
   </dialog>
-  <script is:inline>
+  <script is:inline define:vars={{ consentKey: ANALYTICS_CONSENT_KEY }}>
     (() => {
       if (window.__unlimWaitlistShown) return
       const dialog = document.getElementById('waitlist-dialog')
       if (!(dialog instanceof HTMLDialogElement)) return
+      try {
+        if (JSON.parse(localStorage.getItem(consentKey) || 'null')?.yandexMetrica === true) {
+          const gate = dialog.querySelector('[data-waitlist-analytics-gate]')
+          if (gate) gate.hidden = true
+          const form = dialog.querySelector('[data-waitlist-form]')
+          if (form) form.hidden = false
+        }
+      } catch {}
       window.__unlimWaitlistShown = true
       dialog.showModal()
       document.documentElement.setAttribute('data-waitlist-open', '')
@@ -50,6 +66,10 @@ const content = site.waitlist
 </script>
 <style is:global>
   html[data-waitlist-open] { overflow: hidden; }
+  .waitlist-reopen { position: fixed; z-index: 39; right: 0; top: calc(112px + env(safe-area-inset-top)); bottom: auto; display: flex; align-items: center; gap: 10px; min-width: 44px; padding: 17px 12px; writing-mode: vertical-rl; border-radius: var(--se-2) 0 0 var(--se-2); background: var(--color-lime); color: var(--color-lime-ink); font-size: 12px; font-weight: 600; box-shadow: 0 6px 24px #0002; cursor: pointer; transition: padding .18s ease; }
+  .waitlist-reopen:hover { padding-right: 22px; }
+  .waitlist-reopen:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3px; }
+  html[data-waitlist-open] .waitlist-reopen { visibility: hidden; pointer-events: none; }
   .waitlist-dialog { position: fixed; inset: auto 0 0; margin: 0; width: 100%; max-width: 100%; max-height: 92dvh; overflow-y: auto; overscroll-behavior: contain; border-radius: var(--se-5) var(--se-5) 0 0; box-shadow: 0 24px 90px #0003; }
   .waitlist-dialog::backdrop { background: rgb(3 5 8 / 42%); }
   .waitlist-dialog[open] { animation: waitlist-up .34s cubic-bezier(.22,1,.36,1) both; }
@@ -57,6 +77,7 @@ const content = site.waitlist
   @keyframes waitlist-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
   @keyframes waitlist-side { from { transform: translateX(calc(100% + 42px)); } to { transform: translateX(0); } }
   @media (min-width: 768px) {
+    .waitlist-reopen { top: auto; bottom: 80px; }
     .waitlist-dialog { inset: 50% 42px auto auto; margin: 0; width: 440px; max-width: calc(100vw - 84px); max-height: calc(100dvh - 84px); translate: 0 -50%; border-radius: var(--se-4); }
     .waitlist-dialog[open] { animation-name: waitlist-side; }
     .waitlist-dialog[data-closing] { animation-name: waitlist-side; }

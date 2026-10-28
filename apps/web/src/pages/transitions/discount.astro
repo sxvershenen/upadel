@@ -1,0 +1,8 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro'
+import { DiscountPlayground } from '../../playground/DiscountPlayground'
+if (!import.meta.env.DEV) return new Response(null, { status: 404 })
+---
+<SiteLayout title="Скидка и аналитика — UNLIM playground" robots="noindex-nofollow">
+  <DiscountPlayground client:load />
+</SiteLayout>

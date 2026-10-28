@@ -118,11 +118,13 @@ export function siteDTO(site: SiteSetting, origin: string, partners: Array<Recor
     },
     partners: partners.map((item) => ({ id: String(item.id), name: String(item.name), logo: mediaDTO(item.logo, origin), websiteURL: item.websiteURL as string | null })),
     booking: {
+      ...(site.booking?.mode === 'provider-adapter' && site.booking.providerAdapter === 'lunda' && booking.ready ? { lunda: { clubId: site.booking.lundaClubID! } } : {}),
       widgetURL: widgetURL(site.booking?.widgetURL, 'vivacrm-script'), mode: site.booking?.mode ?? 'disabled', externalURL: site.booking?.externalURL, buttonLabel: site.booking?.buttonLabel ?? '',
       ready: booking.ready, status: booking.status,
     },
     account: { mode: site.account?.mode ?? 'disabled', widgetURL: widgetURL(site.account?.widgetURL, 'vivacrm-script'), externalURL: site.account?.externalURL, buttonLabel: site.account?.buttonLabel ?? 'Личный кабинет', mobileLabel: site.account?.mobileLabel ?? 'Кабинет', ...bookingReadiness(site.account ?? {}) },
     waitlist: site.waitlist ? {
+      analyticsNotice: site.waitlist.analyticsNotice ?? '', analyticsPolicyPrefix: site.waitlist.analyticsPolicyPrefix ?? '', analyticsContinueLabel: site.waitlist.analyticsContinueLabel ?? '', analyticsDeclineLabel: site.waitlist.analyticsDeclineLabel ?? '',
       enabled: site.waitlist.enabled === true, title: site.waitlist.title ?? '', description: site.waitlist.description ?? '',
       submitLabel: site.waitlist.submitLabel ?? '', successTitle: site.waitlist.successTitle ?? '', successText: site.waitlist.successText ?? '',
       telegramTitle: site.waitlist.telegramTitle ?? '', telegramCopy: site.waitlist.telegramCopy ?? '', telegramURL: isPublicSocialURL(site.waitlist.telegramURL ?? '') ? site.waitlist.telegramURL ?? '' : '',

@@ -10,7 +10,7 @@ export const clubOfferPriceUpdates = {
 } as const
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../seed-media/club-update-20261024')
-export const clubOpeningPromo = { title: '2 недели с открытия', caption: 'Аренда со скидкой 50%' }
+export const clubOpeningPromo = { title: 'Планируемая дата', caption: 'открытия 8.11' }
 
 export function updateCeilingStats(items: Array<Record<string, unknown>> = []) {
   return items.map((item) => item.value === '11.5 м' ? { ...item, value: '13 м' } : item)

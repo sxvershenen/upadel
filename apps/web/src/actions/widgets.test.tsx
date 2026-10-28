@@ -36,3 +36,18 @@ test('mobile navigation has five slots, prices second and account fourth, includ
   assert.doesNotMatch(html, /href="\/training"/)
   assert.match(html, /aria-label="Личный кабинет"/)
 })
+
+test('disabled account is absent from all ContentAction and mobile navigation surfaces', () => {
+  const settings = { ...site, account: { mode: 'disabled' } }
+  assert.equal(render(<ContentAction action={{ mode: 'account' }} />, settings), '')
+  const nav = render(<MobileBottomNav />, settings)
+  assert.doesNotMatch(nav, /Кабинет|Личный кабинет/)
+  assert.match(nav, /Главная[\s\S]*Цены[\s\S]*aria-label="Играть"[\s\S]*href="\/coaches"[\s\S]*Тренеры[\s\S]*Меню/)
+})
+
+test('Lunda central actions remain buttons and do not emit duplicate provider triggers', () => {
+  const settings = { ...site, booking: { mode: 'provider-adapter', lunda: { clubId: '25591c97-c7c7-48ef-9244-20d82dcca967' }, ready: true } }
+  const html = render(<ContentAction action={{ mode: 'booking', label: 'Бронь Lunda' }} />, settings)
+  assert.match(html, /<button/)
+  assert.doesNotMatch(html, /<script|<iframe|booking-button-PADEL/)
+})

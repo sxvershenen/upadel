@@ -44,7 +44,7 @@ export const SiteSettings: GlobalConfig = {
                 { label: 'Полностью заменить текст', value: 'replace' },
               ],
             },
-            { name: 'headerSubtitle', type: 'text', label: 'Подпись в шапке', defaultValue: 'Новорижское шоссе 3к1' },
+            { name: 'headerSubtitle', type: 'text', label: 'Подпись в шапке', defaultValue: 'Новорижское шоссе 32км 3с2' },
           ],
         },
         {
@@ -54,6 +54,10 @@ export const SiteSettings: GlobalConfig = {
             { name: 'title', type: 'text', label: 'Заголовок' },
             { name: 'description', type: 'textarea', label: 'Описание' },
             { name: 'submitLabel', type: 'text', label: 'Кнопка формы' },
+            { name: 'analyticsNotice', type: 'text', label: 'Первый шаг — уведомление', defaultValue: 'Используем cookie и Яндекс Метрику' },
+            { name: 'analyticsPolicyPrefix', type: 'text', label: 'Первый шаг — перед ссылкой на политику', defaultValue: 'Продолжая, вы соглашаетесь с' },
+            { name: 'analyticsContinueLabel', type: 'text', label: 'Первый шаг — согласие', defaultValue: 'Продолжить' },
+            { name: 'analyticsDeclineLabel', type: 'text', label: 'Первый шаг — закрыть', defaultValue: 'Я передумал' },
             { name: 'successTitle', type: 'text', label: 'Успешная отправка — заголовок' },
             { name: 'successText', type: 'textarea', label: 'Успешная отправка — текст' },
             { name: 'telegramTitle', type: 'text', label: 'Telegram — заголовок' },
@@ -194,7 +198,7 @@ export const SiteSettings: GlobalConfig = {
         {
           label: 'Контакты',
           fields: [
-            { name: 'address', type: 'text', label: 'Адрес', defaultValue: 'Новорижское шоссе, 3к1' },
+            { name: 'address', type: 'text', label: 'Адрес', defaultValue: 'Новорижское шоссе 32км 3с2' },
             { name: 'directionsURL', type: 'text', label: 'Ссылка «Проложить маршрут»', validate: validateHTTPSURL },
             { name: 'addressLabel', type: 'text', label: 'Подпись адреса', defaultValue: 'Адрес' },
             { name: 'transitLabel', type: 'text', label: 'Подпись маршрута', defaultValue: 'Ближайшее метро' },
@@ -393,7 +397,7 @@ export const SiteSettings: GlobalConfig = {
               name: 'booking',
               type: 'group',
               label: 'Центральный адаптер бронирования',
-              admin: { description: 'Для VivaCRM вставьте URL или тег script установки. Сохраняется только проверенный URL; произвольный JavaScript не исполняется.' },
+              admin: { description: 'Lunda: режим «Адаптер», адаптер Lunda и публичный UUID клуба. VivaCRM: URL или тег script установки. Произвольный JavaScript не исполняется.' },
               fields: [
                 createWidgetURLField('Виджет VivaCRM: URL или script', 'vivacrm-widget', 'vivacrm-script'),
                 {
@@ -433,12 +437,13 @@ export const SiteSettings: GlobalConfig = {
                   admin: { condition: (_, siblingData) => siblingData.mode === 'provider-adapter' },
                   validate: (value: unknown, options: unknown) => validateBookingAdapter(value, (options as { siblingData?: Record<string, unknown> }).siblingData ?? {}),
                 },
+                { name: 'lundaClubID', type: 'text', label: 'Lunda: публичный ID клуба', admin: { condition: (_, data) => data.mode === 'provider-adapter' && data.providerAdapter === 'lunda', description: 'UUID клуба из preferredClubs. Публичная настройка, API-секрет не требуется.' }, validate: (value: unknown, options: any) => options.siblingData?.mode !== 'provider-adapter' || options.siblingData?.providerAdapter !== 'lunda' || typeof value === 'string' && /^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(value) || 'Укажите UUID клуба Lunda.' },
                 {
                   name: 'providerAccountID',
                   type: 'text',
                   label: 'ID аккаунта/клуба',
                   access: { read: ({ req }) => Boolean(req.user) },
-                  admin: { condition: (_, siblingData) => siblingData.mode === 'provider-adapter' },
+                  admin: { condition: (_, siblingData) => siblingData.mode === 'provider-adapter' && siblingData.providerAdapter !== 'lunda' },
                 },
                 {
                   name: 'credentialEnvironmentVariable',
@@ -446,7 +451,7 @@ export const SiteSettings: GlobalConfig = {
                   label: 'Имя environment variable с секретом',
                   access: { read: ({ req }) => Boolean(req.user) },
                   admin: {
-                    condition: (_, siblingData) => siblingData.mode === 'provider-adapter',
+                    condition: (_, siblingData) => siblingData.mode === 'provider-adapter' && siblingData.providerAdapter !== 'lunda',
                     description: 'Хранится только имя переменной, например BOOKING_API_TOKEN. Сам токен в CMS не вводится.',
                   },
                   validate: (value: unknown, options: unknown) => validateBookingCredentialEnv(value, (options as { siblingData?: Record<string, unknown> }).siblingData ?? {}),

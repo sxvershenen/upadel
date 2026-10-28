@@ -83,3 +83,8 @@ test('notification message preserves lead type, page and useful source entity', 
   const membershipLead = { ...lead, type: 'gift', sourceEntity: 'Подарочный сертификат — сумма 12 500 ₽' } as Lead
   assert.match(formatLeadNotificationMessage(membershipLead), /Форма: Подарочный сертификат — сумма 12 500 ₽/)
 })
+
+test('one shared notification text carries ClientID to both Telegram and VK', () => {
+  assert.match(formatLeadNotificationMessage({ ...lead, yandexClientID: '1761630000123456789' }), /ClientID Яндекс Метрики: 1761630000123456789/)
+  assert.doesNotMatch(formatLeadNotificationMessage(lead), /ClientID/)
+})

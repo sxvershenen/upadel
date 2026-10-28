@@ -1,7 +1,7 @@
 import { useActionLayer } from '../../actions/ActionLayer'
 import { quickActionsEvent } from '../../actions/quickActions'
 import { useEffect, useState } from "react";
-import { Home, Dumbbell, Tag, User, Menu as MenuIcon } from "lucide-react";
+import { Home, Dumbbell, Tag, User, UsersRound, Menu as MenuIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import { PlayBottomSheet } from "./PlayBottomSheet";
 import { MobileMenu } from "./MobileMenu";
@@ -12,8 +12,9 @@ const icons = { Home, Dumbbell, Tag };
 export function MobileBottomNav() {
   const site = useSite();
   const { requestWidget, requestExternal } = useActionLayer();
+  const coachesLabel = site.mobileMenuNavigation.find(item => item.href === '/coaches')?.label ?? 'Тренеры';
   const items = site.mobileNavigation.filter(item => item.href !== '/training').slice(0, 2);
-  const openAccount = () => { if (site.account?.mode === 'external-link' && site.account.externalURL) requestExternal({ href: site.account.externalURL, label: site.account.buttonLabel }); else requestWidget({ kind: 'vivacrm-script', url: site.account?.mode === 'vivacrm-widget' ? site.account.widgetURL ?? '' : '', label: site.account?.buttonLabel ?? 'Личный кабинет' }); };
+  const openAccount = () => { if (site.account?.mode === 'external-link' && site.account.externalURL) requestExternal({ href: site.account.externalURL, label: site.account.buttonLabel }); else requestWidget({ kind: 'vivacrm-script', url: site.account?.mode === 'vivacrm-widget' ? site.account.widgetURL ?? '' : '', label: site.account?.buttonLabel ?? 'Личный кабинет', booking: false }); };
 
   const [playOpen, setPlayOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -55,7 +56,7 @@ export function MobileBottomNav() {
             </motion.button>
           </div>
 
-          <button type="button" onClick={openAccount} aria-label={site.account?.buttonLabel ?? 'Личный кабинет'} className="flex flex-1 flex-col items-center gap-1 py-1 text-white/60 transition-colors active:text-white"><User size={19} strokeWidth={1.8} /><span className="type-micro font-medium text-current">{site.account?.mobileLabel ?? 'Кабинет'}</span></button>
+          {site.account && site.account.mode !== 'disabled' ? <button type="button" onClick={openAccount} aria-label={site.account?.buttonLabel ?? 'Личный кабинет'} className="flex flex-1 flex-col items-center gap-1 py-1 text-white/60 transition-colors active:text-white"><User size={19} strokeWidth={1.8} /><span className="type-micro font-medium text-current">{site.account?.mobileLabel ?? 'Кабинет'}</span></button> : <a href="/coaches" className="flex flex-1 flex-col items-center gap-1 py-1 text-white/60 transition-colors active:text-white"><UsersRound size={19} strokeWidth={1.8} /><span className="type-micro font-medium text-current">{coachesLabel}</span></a>}
           <button type="button" onClick={() => setMenuOpen(true)} className="flex flex-1 flex-col items-center gap-1 py-1 text-white/60 transition-colors active:text-white"><MenuIcon size={19} strokeWidth={1.8} /><span className="type-micro font-medium text-current">{site.mobileActions.menuLabel}</span></button>
         </div>
       </motion.nav>

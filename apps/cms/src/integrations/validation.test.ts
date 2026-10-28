@@ -27,3 +27,10 @@ test('VivaCRM widgets require a trusted installation URL without API secrets', (
   assert.deepEqual(bookingReadiness({ mode: 'vivacrm-widget', widgetURL: 'https://evil.example/code.js' }, {}), { ready: false, status: 'missing-config' })
   assert.equal(bookingReadiness({ mode: 'vivacrm-widget' }, {}).ready, false)
 })
+
+test('Lunda needs a public UUID and no API credential', () => {
+  const config = { mode: 'provider-adapter', providerAdapter: 'lunda', lundaClubID: '25591c97-c7c7-48ef-9244-20d82dcca967' }
+  assert.deepEqual(bookingReadiness(config, {}), { ready: true, status: 'ready-widget' })
+  assert.equal(bookingReadiness({ ...config, lundaClubID: 'invalid' }, {}).ready, false)
+  assert.equal(validateBookingCredentialEnv('', config, {}), true)
+})
