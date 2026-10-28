@@ -5,6 +5,21 @@ let installedClub = ''
 let opening: Promise<void> | null = null
 const frame = () => document.querySelector<HTMLIFrameElement>('iframe[src^="https://app.lundapadel.ru/create-booking-web"]')
 
+/** The provider pushes browser history; let an in-flight page visit finish first. */
+function waitForSiteNavigation(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const observer = new window.MutationObserver(() => {
+      if (document.documentElement.dataset.routeTransition === 'loading') return
+      observer.disconnect(); window.clearTimeout(timer); resolve()
+    })
+    const timer = window.setTimeout(() => {
+      observer.disconnect()
+      reject(new Error('Страница ещё загружается. Повторите бронирование через несколько секунд.'))
+    }, 8_000)
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-route-transition'] })
+  })
+}
+
 function install(clubId: string): Promise<void> {
   if (installed && installedClub !== clubId) return Promise.reject(new Error('Настройки бронирования обновились. Обновите страницу.'))
   if (installed) return installed
@@ -28,6 +43,7 @@ export function openLundaWidget(clubId: string): Promise<void> {
   if (opening) return opening
   opening = (async () => {
     if (frame()) return
+    if (document.documentElement.dataset.routeTransition === 'loading') await waitForSiteNavigation()
     await install(clubId)
     const trigger = document.createElement('button')
     trigger.type = 'button'; trigger.className = 'booking-button-PADEL'; trigger.hidden = true

@@ -36,6 +36,14 @@ test('Lunda validates configuration, retries failed loads and shares one provide
     browser.document.querySelector('iframe')!.remove()
     await openLundaWidget(clubId); assert.equal(clicks, 2)
     assert.equal(browser.document.querySelectorAll('script').length, 1)
+    browser.document.querySelector('iframe')!.remove()
+    browser.document.documentElement.dataset.routeTransition = 'loading'
+    const duringNavigation = openLundaWidget(clubId)
+    await new Promise(resolve => setTimeout(resolve, 0))
+    assert.equal(clicks, 2, 'provider must not push history during an unfinished page visit')
+    browser.document.documentElement.dataset.routeTransition = 'done'
+    await duringNavigation
+    assert.equal(clicks, 3)
   } finally {
     browser.close()
     for (const key of keys) { const value = old.get(key); if (value) Object.defineProperty(globalThis, key, value); else Reflect.deleteProperty(globalThis, key) }
