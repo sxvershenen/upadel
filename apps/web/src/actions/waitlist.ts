@@ -35,9 +35,16 @@ export function initializeWaitlist(element: HTMLElement | null) {
     if (dialog.hasAttribute('data-closing') || !dialog.open) return
     window.clearTimeout(successTimer)
     dialog.setAttribute('data-closing', '')
-    const finish = () => { dialog.close(); dialog.removeAttribute('data-closing'); document.documentElement.removeAttribute('data-waitlist-open') }
-    dialog.addEventListener('animationend', finish, { once: true })
-    window.setTimeout(() => { if (dialog.open && dialog.hasAttribute('data-closing')) finish() }, 260)
+    let closingTimer = 0
+    const finish = (event?: Event) => {
+      if (event && event.target !== dialog) return
+      window.clearTimeout(closingTimer)
+      dialog.removeEventListener('animationend', finish)
+      if (!dialog.hasAttribute('data-closing')) return
+      dialog.close(); dialog.removeAttribute('data-closing'); document.documentElement.removeAttribute('data-waitlist-open')
+    }
+    dialog.addEventListener('animationend', finish)
+    closingTimer = window.setTimeout(() => finish(), 260)
   }
   dialog.querySelector('[data-waitlist-decline]')?.addEventListener('click', close)
   dialog.addEventListener('cancel', (event) => event.preventDefault())

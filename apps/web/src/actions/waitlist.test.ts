@@ -55,6 +55,13 @@ test('waitlist validates consent, retries with the same key, and dismisses outsi
     mobile = true; dialog.dispatchEvent(new browser.MouseEvent('click', { clientX: 10, clientY: 10 }))
     assert.equal(dialog.hasAttribute('data-closing'), true)
     dialog.dispatchEvent(new browser.Event('animationend')); assert.equal(dialog.open, false)
+    ;(browser.document.querySelector('[data-waitlist-reopen]') as any).click()
+    dialog.querySelector('[data-waitlist-close-form]')!.dispatchEvent(new browser.Event('submit', { bubbles: true, cancelable: true }))
+    await new Promise(resolve => setTimeout(resolve, 300))
+    assert.equal(dialog.open, false)
+    ;(browser.document.querySelector('[data-waitlist-reopen]') as any).click()
+    dialog.dispatchEvent(new browser.Event('animationend'))
+    assert.equal(dialog.open, true, 'opening animation must not run an old fallback close handler')
   } finally {
     browser.close()
     for (const key of keys) { const descriptor = previous.get(key); if (descriptor) Object.defineProperty(globalThis, key, descriptor); else Reflect.deleteProperty(globalThis, key) }
