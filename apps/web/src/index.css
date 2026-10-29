@@ -3,6 +3,7 @@
 @import "./styles/tokens.css";
 @import "./styles/typography.css";
 @import "./styles/surfaces.css";
+@import "./styles/pixelPhoneNumber.css";
 
 html { scroll-behavior: smooth; scrollbar-gutter: stable; }
 html { scrollbar-width: thin; scrollbar-color: #4a4a50 #000; }

@@ -42,6 +42,9 @@ function engagement(kind: 'prices' | 'booking' | 'scroll') {
   if (state.prices && state.booking) reachMetricaGoal('two_interactions', true)
   if (state.prices && state.booking && state.scroll) reachMetricaGoal('engaged_visitor', true)
 }
+export function trackDesktopPhoneClick() {
+  if (!window.matchMedia('(max-width: 767px)').matches) reachMetricaGoal('call_button_click')
+}
 export function trackBookingOpen() {
   reachMetricaGoal('booking_open')
   engagement('booking')
@@ -53,7 +56,7 @@ export function initializeMetricaGoals(analytics: SiteDTO['analytics']): () => v
     const target = event.target.closest<HTMLElement>('a[href], [data-analytics-action]')
     if (!target) return
     const href = target.getAttribute('href') ?? ''
-    if (href.startsWith('tel:') || target.dataset.analyticsAction === 'phone') reachMetricaGoal('call_button_click')
+    if (window.matchMedia('(max-width: 767px)').matches && event.target.closest('[data-metrica-call-confirm]')) reachMetricaGoal('call_button_click')
     if (href) {
       try {
         const url = new URL(href, location.href)

@@ -1,0 +1,7 @@
+.pixel-phone-number { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pixel-phone-number__suffix { position: relative; display: inline-block; width: 2.55em; height: 1.05em; vertical-align: -.13em; letter-spacing: 0; line-height: 1; }
+.pixel-phone-number__digits, .pixel-phone-number__art { position: absolute; inset: 0; }
+.pixel-phone-number__digits { display: flex; align-items: center; justify-content: center; letter-spacing: -.025em; }
+.pixel-phone-number__digits[hidden], .pixel-phone-number__art[hidden] { display: none; }
+.pixel-phone-number__art i { position: absolute; left: var(--x); top: var(--y); width: .18em; height: .18em; border-radius: 1px; background: #d3d6de; opacity: var(--alpha); transform: translate(-50%, -50%); }
+.pixel-phone-number__art i:nth-child(9n) { background: var(--color-lime); opacity: .7; }

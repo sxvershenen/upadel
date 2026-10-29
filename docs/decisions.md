@@ -29,7 +29,7 @@ The primary goal is a confirmed booking when the booking provider can report it.
 - successfully saved membership lead;
 - successfully saved gift-certificate lead.
 
-Never label a click as a confirmed booking or call.
+Never label a click as a confirmed booking or call. `call_button_click` measures desktop phone-popup opening (header and page CTAs, including JUBO/gift) or footer-number disclosure; mobile counts only the final popup call button. Footer desktop uses the approved pixel-fragment mask plus eye; the whole card toggles the last four digits, and hiding them does not emit a goal.
 
 ## D6 — Booking integration — accepted
 
