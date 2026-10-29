@@ -1,0 +1,25 @@
+---
+interface Props { kind: 'symbols' | 'balls' | 'particles' | 'pixels'; suffix: string }
+const { kind, suffix } = Astro.props
+const pieces = Array.from({ length: kind === 'particles' ? 40 : 30 }, (_, i) => {
+  const cluster = Math.floor(i / 10)
+  const x = kind === 'particles' ? 12 + cluster * 25 + ((i * 17) % 19 - 9) : 4 + (i % 8) * 12 + ((i * 7) % 4)
+  const y = kind === 'particles' ? 10 + (i * 23) % 80 : 7 + Math.floor(i / 8) * 23
+  return { x, y, size: .055 + ((i * 7) % 5) * .016, alpha: .22 + ((i * 11) % 7) * .1, dx: ((i * 29) % 25) - 12, dy: ((i * 13) % 21) - 10 }
+})
+---
+<span class={`mask-tail mask-${kind}`} aria-hidden="true">
+  <span class="mask-original">{suffix}</span>
+  <span class="mask-art">
+    {kind === 'symbols' && <span class="symbol-mask">••<span class="mask-dash">–</span>••</span>}
+    {kind === 'balls' && <span class="ball-mask">{Array.from({ length: 4 }, (_, i) => <>{i === 2 && <span class="mask-dash">–</span>}<svg class="tennis-ball" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10.5" fill="currentColor" /><path d="M3.3 5.5C11 8 11 16 3.3 18.5M20.7 5.5C13 8 13 16 20.7 18.5" stroke="white" stroke-opacity=".9" stroke-width="1.7" stroke-linecap="round" /></svg></>)}</span>}
+    {(kind === 'particles' || kind === 'pixels') && pieces.map((piece, index) => <i class="mask-piece" style={`--x:${piece.x}%;--y:${piece.y}%;--size:${piece.size}em;--alpha:${piece.alpha};--dx:${piece.dx}px;--dy:${piece.dy}px;--delay:${(index % 5) * .026}s`}></i>)}
+  </span>
+</span>
+<style>
+  .mask-tail{position:relative;display:inline-block;width:2.55em;height:1.05em;vertical-align:-.13em;letter-spacing:0;white-space:nowrap;line-height:1}.mask-original,.mask-art{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}.mask-original{opacity:0;font-variant-numeric:tabular-nums;letter-spacing:-.025em;transition:opacity .15s}.mask-art{transition:opacity .15s}.symbol-mask{font-size:.88em;font-weight:600;letter-spacing:.035em;color:#e1e1e7}.mask-dash{font-size:.5em;margin:0 .18em;color:#ffffff65;vertical-align:middle}.mask-balls{width:3.35em}.ball-mask{display:flex;align-items:center;justify-content:center;gap:.05em}.tennis-ball{width:.72em;height:.72em;flex-shrink:0;color:#c2f542;filter:drop-shadow(0 1px 2px #0004)}.mask-piece{position:absolute;left:var(--x);top:var(--y);width:var(--size);height:var(--size);opacity:var(--alpha);background:#e2e4ea;border-radius:50%;transform:translate(-50%,-50%)}.mask-pixels .mask-piece{width:.18em;height:.18em;border-radius:1px;background:#d3d6de}.mask-pixels .mask-piece:nth-child(9n){background:#c2f542;opacity:.7}.mask-particles .mask-piece:nth-child(11n){background:#c2f542}
+  :global([data-revealed=true]) .mask-original{opacity:1}:global([data-revealed=true]) .mask-art{opacity:0}
+  :global(.demo-replay:not([data-revealed=true])) .mask-original{animation:digit-dissolve 1s ease both}:global(.demo-replay:not([data-revealed=true])) .mask-art{animation:art-appear 1s ease both}:global(.demo-replay:not([data-revealed=true])) .mask-piece{animation:piece-burst 1s cubic-bezier(.2,.7,.2,1) var(--delay) both}
+  @keyframes digit-dissolve{0%,12%{opacity:1;filter:none;transform:translateY(0)}45%{opacity:0;filter:blur(1px);transform:translateY(-.035em)}100%{opacity:0;filter:none;transform:none}}@keyframes art-appear{0%,12%{opacity:0}40%,100%{opacity:1}}@keyframes piece-burst{0%,12%{opacity:0;transform:translate(calc(-50% - var(--dx)),calc(-50% - var(--dy))) scale(.2)}42%{opacity:var(--alpha)}100%{opacity:var(--alpha);transform:translate(-50%,-50%) scale(1)}}
+  @media(prefers-reduced-motion:reduce){.mask-original,.mask-art{transition:none}:global(.demo-replay:not([data-revealed=true])) .mask-original{animation:none;opacity:0}:global(.demo-replay:not([data-revealed=true])) .mask-art,:global(.demo-replay:not([data-revealed=true])) .mask-piece{animation:none}}
+</style>
